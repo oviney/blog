@@ -1,6 +1,3 @@
-# viney.github.io
-*A blog for Software Engineering, Home Automation and Personal Improvement.
-
 Hey there! You have reached my blog. Take a look below for key sections.
 
 ## Purpose
