@@ -1,3 +1,4 @@
+# Home Page
 Hey there! You have reached my blog. Take a look below for key sections.
 
 ## Purpose
