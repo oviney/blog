@@ -9,8 +9,8 @@ Hey there! You have reached my blog. Take a look below for key sections.
 
 ## Navigation Index
 * [About](./ABOUT.md)
-* Software Engineering
-* Test Engineering
-* Speaking
-* Home Automation
-* Personal Improvement
+* [Software Engineering](./SOFTWARE-ENGINEERING.md)
+* [Test Engineering](./TEST-ENGINEERING.md)
+* [Speaking](./SPEAKING.md)
+* [Home Automation](./HOME-AUTOMATION.md)
+* [Personal Improvement](./PERSONAL-IMPROVEMENT.md)
