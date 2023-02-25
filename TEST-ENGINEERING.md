@@ -6,7 +6,7 @@
 3. [What are the Principles of Test Engineering?](#principles-of-test-engineering)
 4. [What are the Principles of Quality Engineering?](#principles-of-quality-engineering)
 5. [What is the difference between Test Engineering and Quality Engineering?](#difference-between-test-engineering-and-quality-engineering)
-6. [Quality Engineering Strategy](#Quality Engineering Strategy)
+6. [Quality Engineering Strategy](#quality-engineering-strategy)
 
 ## Test Engineering?
 Test engineering is designing, implementing, and maintaining testing methodologies, frameworks, and tools to ensure the quality of software products. It involves creating test plans, test cases, and test suites to verify software applications' functionality, performance, and reliability.
