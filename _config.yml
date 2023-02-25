@@ -10,15 +10,3 @@ plugins:
 title: Ouray Viney's blog
 description: A blog for Software Engineering, Quality Engineering, Test Automation, Performance Engineering and more.
 show_downloads: false
-
-@import "{{ site.theme }}";
-.markdown-body {
-  # -webkit-font-smoothing: antialiased;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif, Arial;
-  # font-feature-settings: "ss01","cv05","cv07","cv08";
-  color: rgb(14, 16, 26);
-  font-size: calc(1.0625px * var(--rem));
-  font-weight: 400;
-  # letter-spacing: calc(0px * var(--rem));
-  # line-height: calc(2px * var(--rem));
-}
