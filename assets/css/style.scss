@@ -1,3 +1,8 @@
+---
+---
+
+@import "{{ site.theme }}";
+/*Custom CSS rules*?
 body {
   -webkit-font-smoothing: antialiased;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif, Arial;
@@ -8,7 +13,3 @@ body {
   letter-spacing: calc(0px * var(--rem));
   line-height: calc(2px * var(--rem));
 }
----
----
-
-@import "{{ site.theme }}";
