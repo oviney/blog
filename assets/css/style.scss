@@ -1,7 +1,5 @@
 ---
 ---
-
-@import "{{ site.theme }}";
 /*Custom CSS rules*?
 * {
   -webkit-font-smoothing: antialiased;
@@ -13,3 +11,5 @@
   letter-spacing: calc(0px * var(--rem));
   line-height: calc(2px * var(--rem));
 }
+
+@import "{{ site.theme }}";
