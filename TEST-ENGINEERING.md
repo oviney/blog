@@ -1,11 +1,10 @@
 # Test Engineering
 
 Table of Contents
-1. [What is Test Engineering?](#What-is-Test-Engineering?)
+1. [What is Test Engineering?](#what-is-test-engineering)
 2. [What is Quality Engineering?](#What-is-Quality-Engineering?)
 3. [What are the Principles of Test Engineering?](#What-are-the-Principles-of-Test-Engineering?)
 4. [What is the difference between Test Engineering and Quality Engineering?](#What-is-the-difference-between-Test-Engineering-and-Quality-Engineering?)
-5. []()
 
 ## What is Test Engineering?
 Test engineering is designing, implementing, and maintaining testing methodologies, frameworks, and tools to ensure the quality of software products. It involves creating test plans, test cases, and test suites to verify software applications' functionality, performance, and reliability.
