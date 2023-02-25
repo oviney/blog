@@ -1,4 +1,4 @@
-# Testing and Automation
+# Testing Automation
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -30,13 +30,20 @@ Effective automation testing practices should consider the following factors:
 
 ## Principles of Test Automation
 The principles of test automation are as follows:
-Early Automation: Test automation should be introduced as early as possible in the software development lifecycle to catch defects early in the process and prevent them from propagating into later stages. Automation applied early helps reduce the overall cost of defects and increases the efficiency of the testing process.
-Reusability: Test automation design should consider reusability, i.e., modular and able to be applied or re-used across different testing scenarios. Reusable scripts reduce the effort required to create new tests and make maintenance easier.
-Maintainability: Test automation scripts should be easy to maintain, i.e., they should be updated and modified as needed to keep pace with changes in the software under test. Test automation frameworks design should facilitate easy maintenance with clear documentation, standardized coding practices, and version control.
-Scalability: Test automation design should scalable, i.e., able to handle many test cases across multiple platforms and configurations. Test automation design requires careful planning and a well-designed test automation framework.
-Robustness: Test automation should be robust, i.e., able to handle unexpected events and errors without breaking. Test automation script design should handle error conditions and provide meaningful feedback when errors occur.
-Reliability: Test automation should be reliable, i.e., able to produce consistent results across multiple runs. Reliable test automation requires carefully selecting tools and platforms and rigorous testing of the automation scripts.
-Traceability: Test automation should provide traceability, i.e., clear documentation and reporting of test results and coverage. Test Automation traceability helps stakeholders to understand the progress of testing and to identify areas for improvement.
+
+1. Early Automation: Test automation should be introduced as early as possible in the software development lifecycle to catch defects early in the process and prevent them from propagating into later stages. Automation applied early helps reduce the overall cost of defects and increases the efficiency of the testing process.
+
+2. Reusability: Test automation design should consider reusability, i.e., modular and able to be applied or re-used across different testing scenarios. Reusable scripts reduce the effort required to create new tests and make maintenance easier.
+
+3. Maintainability: Test automation scripts should be easy to maintain, i.e., they should be updated and modified as needed to keep pace with changes in the software under test. Test automation frameworks design should facilitate easy maintenance with clear documentation, standardized coding practices, and version control.
+
+4. Scalability: Test automation design should scalable, i.e., able to handle many test cases across multiple platforms and configurations. Test automation design requires careful planning and a well-designed test automation framework.
+
+5. Robustness: Test automation should be robust, i.e., able to handle unexpected events and errors without breaking. Test automation script design should handle error conditions and provide meaningful feedback when errors occur.
+
+6. Reliability: Test automation should be reliable, i.e., able to produce consistent results across multiple runs. Reliable test automation requires carefully selecting tools and platforms and rigorous testing of the automation scripts.
+
+7. Traceability: Test automation should provide traceability, i.e., clear documentation and reporting of test results and coverage. Test Automation traceability helps stakeholders to understand the progress of testing and to identify areas for improvement.
 
 Overall, the principles of test automation focus on creating efficient, effective, and scalable automation frameworks that can handle the complexities of modern software development. They emphasize the importance of early automation, reusability, maintainability, scalability, robustness, reliability, and traceability to ensure that the testing process is rigorous and practical.
 
