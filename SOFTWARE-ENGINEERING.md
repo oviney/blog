@@ -50,13 +50,13 @@ Take "Best Practices" means things that have been observed to work. Software eng
 
 2. Design and architecture: The next step is to design and architect the system once the requirements have been gathered and analyzed. This involves breaking the system into smaller components, defining the interfaces and dependencies between components, and ensuring the design is modular, scalable, and maintainable. Green software engineering can be applied here, helping develop systems to minimize their environmental impact. Software Engineers can apply Green software engineering to the software engineering process in the following ways:
 
-- Energy-efficient design: During the design phase of the software engineering process, engineers can consider energy efficiency as a design constraint. They can design software systems optimized to consume less energy and resources, for example, by reducing the amount of data transferred over networks, minimizing disk I/O operations, and reducing the computational complexity of algorithms.
+ - Energy-efficient design: During the design phase of the software engineering process, engineers can consider energy efficiency as a design constraint. They can design software systems optimized to consume less energy and resources, for example, by reducing the amount of data transferred over networks, minimizing disk I/O operations, and reducing the computational complexity of algorithms.
 
-- Energy-efficient coding: In the coding phase, engineers can use energy-efficient coding practices, such as minimizing loops, reducing branching statements, and optimizing code for memory usage. They can also use code profiling tools to identify and optimize energy-intensive sections of the code.
+ - Energy-efficient coding: In the coding phase, engineers can use energy-efficient coding practices, such as minimizing loops, reducing branching statements, and optimizing code for memory usage. They can also use code profiling tools to identify and optimize energy-intensive sections of the code.
 
-- Energy-efficient testing: During testing, engineers can use energy-efficient testing practices, such as virtualization, to reduce the number of physical machines required for testing and optimize testing tools and frameworks to reduce their energy consumption.
+ - Energy-efficient testing: During testing, engineers can use energy-efficient testing practices, such as virtualization, to reduce the number of physical machines required for testing and optimize testing tools and frameworks to reduce their energy consumption.
 
-Sustainable development practices: Besides energy efficiency, green software engineering can include sustainable development practices, such as using recycled or renewable materials in hardware procurement, reducing waste in the software development process, and using collaboration tools to reduce travel.
+ - Sustainable development practices: Besides energy efficiency, green software engineering can include sustainable development practices, such as using recycled or renewable materials in hardware procurement, reducing waste in the software development process, and using collaboration tools to reduce travel.
 
 3. Code quality and best practices: Writing high-quality code is essential to the success of any software project. This involves following coding standards and best practices, such as using meaningful variable names, writing comments and documentation, and using version control systems to track changes.
 
