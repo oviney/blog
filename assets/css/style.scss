@@ -2,15 +2,19 @@
 ---
 /*Custom CSS rules*/
 body {
-  -webkit-font-smoothing: antialiased;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif, Arial;
-  font-feature-settings: "ss01","cv05","cv07","cv08";
-  color: rgb(14, 16, 26);
-  //font-size: calc(1.0625px * var(--rem));
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: calc(0px * var(--rem));
-  line-height: calc(2px * var(--rem));
+      -webkit-font-smoothing: antialiased;
+      font-family:  //
+      font-family: Helvetica;
+}
+
+html {
+      font-family: Helvetica;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+}
+
+body {
+     font-size: 18px;
 }
 
 @import "{{ site.theme }}";
