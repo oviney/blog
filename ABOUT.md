@@ -5,8 +5,6 @@ My name is Ouray Viney, and I have been working in the software engineering indu
 
 This blog is a platform for me to share my knowledge and insights on various topics related to software engineering, including software design, architecture, testing, deployment, and maintenance. I will also cover the latest trends in software development, such as machine learning (ML), artificial intelligence (AI) and green software engineering.
 
-In addition to providing valuable information and insights, I also want to create a community where fellow software engineers can connect, share their experiences, and collaborate on exciting projects. I encourage readers to leave comments and engage in discussions, as this will help to create a dynamic and interactive platform for all.
-
 Whether you are a seasoned software engineer or just starting your journey in the field, this blog has something for you. I hope you find the content informative, engaging, and valuable for your personal and professional growth.
 
 Thank you for visiting my blog, and I look forward to sharing my knowledge and insights with you.
