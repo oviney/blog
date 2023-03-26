@@ -1,6 +1,9 @@
-# Testing Automation
+---
+layout: page
+title: Test Automation
+permalink: /Test-Automation/
+---
 
-## Table of Contents
 1. [Introduction](#introduction)
 2. [Continuous Integration and Continuous Delivery](#CI/CD)
 3. [Test Automation Practices](#test-automation_practices)

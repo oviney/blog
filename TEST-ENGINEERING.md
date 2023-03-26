@@ -1,6 +1,9 @@
-# Test Engineering
+---
+layout: page
+title: Test Engineering
+permalink: /Test-Engineering/
+---
 
-## Table of Contents
 1. [What is Test Engineering?](#test-engineering)
 2. [What is Quality Engineering?](#quality-engineering)
 3. [What are the Principles of Test Engineering?](#principles-of-test-engineering)
@@ -45,18 +48,25 @@ The principles of test engineering are a set of fundamental concepts and guideli
 
 By following these principles, test engineers can design and execute practical tests that ensure the quality of software products.
 
-## Principles of Quality Engineering 
+## Principles of Quality Engineering
 Several principles of quality engineering guide the development and implementation of quality management systems and processes. Here are some of the fundamental principles:
 
 1. Customer-focused approach: Quality engineering should focus on meeting the customer's needs and expectations.
 Continuous improvement: Quality engineering involves continuously improving processes and systems to ensure optimal performance and quality.
+
 2. Process standardization: Quality engineering should involve standardizing processes and systems to ensure consistency and reliability.
+
 3. Risk management: Quality engineering should include risk management practices to identify and mitigate potential risks.
+
 4. Data-driven decision-making: Quality engineering should be based on data analysis and metrics to measure the effectiveness of the quality management systems and processes.
+
 5. Test automation: Test automation can help increase testing efficiency and accuracy.
 Compliance with industry standards: Quality engineering should ensure compliance with relevant industry standards and regulations.
+
 6. Continuous monitoring: Quality engineering involves constant monitoring throughout the software development life cycle.
+
 7. Collaboration: Quality engineering involves close collaboration with stakeholders, including developers, testers, project managers, and business users.
+
 8. Training and development: Quality engineering should include training and development programs to ensure that all stakeholders have the necessary skills and knowledge to effectively implement quality management systems and processes.
 
 By following these principles, quality engineering can help to ensure that software products meet the required quality standards, customer expectations, and business objectives.
