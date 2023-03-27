@@ -29,7 +29,7 @@ plugins:
   - jekyll-feed
 
 # Google Analytics
-google_analytics: G-STBYK3PVW1
+google_analytics: UA-22227712-1 #G-STBYK3PVW1
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
