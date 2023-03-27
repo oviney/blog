@@ -24,9 +24,11 @@ github_username:  oviney
 
 # Build settings
 markdown: kramdown
-theme: minima
+# theme: minima
+remote_theme: jekyll/minima
 plugins:
   - jekyll-feed
+  - jekyll-remote-theme
 
 # Google Analytics
 google_analytics: G-GTFG819MNS #UA-22227712-1 #G-STBYK3PVW1
