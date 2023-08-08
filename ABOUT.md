@@ -4,7 +4,7 @@ title: About
 permalink: /about/
 ---
 
-# About the Blog
+## About the Blog
 I created this blog to share my passion for software engineering with like-minded individuals interested in developing their skills, staying up-to-date with industry trends, and exploring new technologies.
 
 My name is Ouray Viney, and I have been working in the software engineering industry for 20+ years. During this time, I have gained a wealth of experience in developing & testing software applications, managing development teams, and implementing best practices to ensure high-quality software products.
@@ -15,7 +15,7 @@ Whether you are a seasoned software engineer or just starting your journey in th
 
 Thank you for visiting my blog, and I look forward to sharing my knowledge and insights with you.
 
-# About Me
+## About Me
 As a consultant passionate about innovation and problem-solving, I aim to create software solutions that can make a difference in people’s lives. My vision is to build software that is not only functional but also user-friendly, scalable, and secure. Software engineering is a collaborative effort, and I’m committed to working with others to develop software products that meet the needs of users and clients. My ultimate goal is to be a part of the tech industry’s transformation towards a more sustainable, equitable, and ethical future where technology serves humanity and not the other way around. I strive to achieve this by staying up-to-date with the latest technologies, fostering a culture of diversity and inclusion, and continuously improving my skills and knowledge as a software engineer.
 
 I believe in continuous learning and improvement and always look for new challenges and opportunities to grow as a software engineer. I think that software engineering is not just a job but a way of life, and I’m committed to helping others achieve their goals and become better engineers.
