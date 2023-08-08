@@ -4,7 +4,7 @@ title: Software Engineering
 permalink: /Software-Engineering/
 ---
 1. [What is Software Engineering?](#what-is-software-engineering)
-2. [Important of Software Engineering](#importance-of-software-engineering)
+2. [Importannce of Software Engineering](#importance-of-software-engineering)
 3. [Key principles of Software Engineering](#key-principles-of-software-engineering)
 4. [Best Practices for Software Engineering](#best-practices-for-software-engineering)
 5. [Challenges in Software Engineering](#challenges-in-software-engineering)
