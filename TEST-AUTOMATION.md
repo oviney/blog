@@ -10,7 +10,7 @@ permalink: /Test-Automation/
 <!-- 4. [Continuous Integration and Continuous Delivery](#continous-integration-and-continuous-delivery) -->
 4. [Test Automation Practices](#test-automation-practices)
 5. [Principles of Test Automation](#principles-of-test-automation)
-6. [Advantages of Automation Testing](#Advantages-of-Automation-Testing)
+6. [Advantages of Automation Testing](#advantages-of-automation-testing)
 7. [Choosing Between Manual and Automated Testing](#Choosing-Between-Manual-and-Automated-Testing)
 
 ## Introduction
