@@ -25,11 +25,14 @@ github_username:  oviney
 # Build settings
 markdown: kramdown
 # theme: minima
-# remote_theme: jekyll/minima
-remote_theme: aterenin/minima-reboot
+remote_theme: jekyll/minima
+# remote_theme: aterenin/minima-reboot
+# remote_theme: minimal-mistakes-jekyll
+# remote_theme: "mmistakes/minimal-mistakes@4.24.0"
 plugins:
   - jekyll-feed
   - jekyll-remote-theme
+  # - jekyll-include-cache
 
 # Google Analytics
 google_analytics: G-GTFG819MNS #UA-22227712-1 #G-STBYK3PVW1
@@ -45,3 +48,7 @@ google_analytics: G-GTFG819MNS #UA-22227712-1 #G-STBYK3PVW1
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+collections:
+    authors:
+        output: true

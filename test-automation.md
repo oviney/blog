@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Test Automation
-permalink: /Test-Automation/
+permalink: /test-automation/
 ---
 
 1. [Introduction](#introduction)

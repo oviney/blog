@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Test Engineering
-permalink: /Test-Engineering/
+permalink: /test-engineering/
 ---
 
 1. [What is Test Engineering?](#test-engineering)

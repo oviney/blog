@@ -1,0 +1,12 @@
+- name: Home
+  link: /
+- name: About
+  link: /about/
+- name: Blog
+  link: /blog.html
+- name: Software Engineer
+  link: /software-engineering/
+- name: Test Automation
+  link: /test-automation/
+- name: Authors
+  link: /staff.html

@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Software Engineering
-permalink: /Software-Engineering/
+permalink: /software-engineering/
 ---
 1. [What is Software Engineering?](#what-is-software-engineering)
 2. [Importance of Software Engineering](#importance-of-software-engineering)
