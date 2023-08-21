@@ -25,7 +25,8 @@ github_username:  oviney
 # Build settings
 markdown: kramdown
 # theme: minima
-remote_theme: jekyll/minima
+# remote_theme: jekyll/minima
+remote_theme: aterenin/minima-reboot
 plugins:
   - jekyll-feed
   - jekyll-remote-theme
