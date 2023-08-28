@@ -1,9 +1,8 @@
 ---
-layout: page
-title: Test Automation
+layout: default
 permalink: /test-automation/
 ---
-
+# Test Automation
 1. [Introduction](#introduction)
 2. [Manual Testing](#manual-testing)
 3. [Automated Testing](#automated-testing)

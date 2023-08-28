@@ -24,15 +24,12 @@ github_username:  oviney
 
 # Build settings
 markdown: kramdown
-# theme: minima
-remote_theme: jekyll/minima
-# remote_theme: aterenin/minima-reboot
-# remote_theme: minimal-mistakes-jekyll
-# remote_theme: "mmistakes/minimal-mistakes@4.24.0"
+
+remote_theme: pages-themes/cayman@v0.2.0
+
 plugins:
   - jekyll-feed
-  - jekyll-remote-theme
-  # - jekyll-include-cache
+  - jekyll-remote-theme # add this line to the plugins list if you already have one
 
 # Google Analytics
 google_analytics: G-GTFG819MNS #UA-22227712-1 #G-STBYK3PVW1

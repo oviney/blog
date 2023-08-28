@@ -1,8 +1,8 @@
 ---
-layout: page
-title: Software Engineering
+layout: default
 permalink: /software-engineering/
 ---
+# Software Engineering
 1. [What is Software Engineering?](#what-is-software-engineering)
 2. [Importance of Software Engineering](#importance-of-software-engineering)
 3. [Key principles of Software Engineering](#key-principles-of-software-engineering)
