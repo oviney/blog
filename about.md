@@ -2,6 +2,7 @@
 layout: default
 permalink: /about/
 ---
+# About
 ## About the Blog
 I created this blog to share my passion for software engineering with like-minded individuals interested in developing their skills, staying up-to-date with industry trends, and exploring new technologies.
 
