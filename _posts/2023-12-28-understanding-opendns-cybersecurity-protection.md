@@ -1,6 +1,7 @@
 ---
 layout: post
 categories: OpenDNS, Home Security, Network Security, Security, Cyber, Cyber Security
+author: ouray
 ---
 
 # How OpenDNS Stops Major Security Issues
