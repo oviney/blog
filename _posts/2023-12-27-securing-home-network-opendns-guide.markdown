@@ -1,3 +1,8 @@
+---
+layout: default
+categories: blog posts
+---
+
 # Fortifying Your Digital Fortress: A Beginner's Guide to OpenDNS Home Network Security
 
 In the digital age, securing your home network is as crucial as locking your front door. With cyber threats lurking in the shadows of our connected lives, it’s imperative to take proactive steps to safeguard our digital sanctuaries. OpenDNS emerges as a stalwart ally in this quest, offering robust solutions for keeping your data safe. In this comprehensive guide, we'll navigate the waters of home network security with OpenDNS as our compass.
