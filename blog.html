@@ -9,7 +9,7 @@ layout: default
 {% endfor %}
 
 {% for category in site.categories %}
-   {{ category | first | strip_html }}
+   <h3>{{ category | first | strip_html }}</h3>
 {% endfor %}
 
 
