@@ -2,7 +2,7 @@
 layout: default
 ---
 <h1>Latest Blog Posts</h1>
-{% for tag in site.tags %}
+<!--{% for tag in site.tags %}
   <h3>{{ tag[0] }}</h3>
   <ul>
     {% for post in tag[1] %}
@@ -10,6 +10,7 @@ layout: default
     {% endfor %}
   </ul>
 {% endfor %}
+-->
 
 {% for post in site.posts %}
     <p>{{ post.date | date_to_string }}</p>
