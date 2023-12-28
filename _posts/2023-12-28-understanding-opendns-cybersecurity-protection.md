@@ -1,6 +1,6 @@
 ---
-layout: post
-title: "Why you need to be using OpenDNS to secure your home network."
+layout: default
+categories: OpenDNS, Home Security, Network Security, Security, Cyber, Cyber Security
 ---
 
 # How OpenDNS Stops Major Security Issues
