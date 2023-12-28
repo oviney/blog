@@ -1,7 +1,7 @@
 ---
 layout: post
 categories: OpenDNS Home Security Network Security Cyber
-tags: OpenDNS, Home Security, Network Security, Cyber Security
+tags: OpenDNS Home Security Network Security Cyber Security
 author: ouray
 ---
 
