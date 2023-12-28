@@ -1,6 +1,7 @@
 ---
-layout: default
+layout: blog
 categories: blog posts
+author: ouray
 ---
 # Your New Sidekick for Supercharged Software Testing!
 Hey there, fellow tech enthusiast! Have you ever considered what goes on behind the scenes when using your favourite app? We're talking about the intricate web of code, the building blocks that create those *seamless experiences* we've come to expect. But what if we told you there's a new hero in town, ready to *team up* with you for some seriously *next-level* software testing? Enter [**Generative AI**](https://en.wikipedia.org/wiki/Generative_adversarial_network) and [**Large Language Models (LLMs)**](https://en.wikipedia.org/wiki/Large_language_model), the dynamic duo that's changing the game!
