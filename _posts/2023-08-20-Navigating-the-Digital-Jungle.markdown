@@ -1,6 +1,7 @@
 ---
 layout: default
 categories: blog posts
+author: ouray
 ---
 # Your Everyday Guide to Cybersecurity
 Hey there, fellow digital explorer! Have you ever stopped to think about the incredible journey we embark on every time we dive into the online world? From social media updates to online shopping sprees, our lives are intricately woven with the threads of technology. But just like any journey, there are twists and turns; in this case, they come as **[cyber threats](https://en.wikipedia.org/wiki/Cyber_threat)**. Fear not, though, because we've got your back with super practical tips to keep you safe and sound in this digital jungle. Let's dive in!
