@@ -3,7 +3,7 @@ layout: default
 categories: blog posts
 ---
 # Level Up Your Software's Cybersecurity Game: Tips and Tales for Tech Wizards
-Hey there, tech wizards! 👋 In our digital wonderland, where software reigns supreme, the battle against cyber baddies is real. As the magic makers behind the scenes, you software engineering champs are vital in warding off those pesky cyber threats. So, grab your virtual shields because, in this blog post, we're diving into some fantastic tips, backed by authentic stories, to armour up your software against the forces of darkness!
+Hey there, tech wizards! In our digital wonderland, where software reigns supreme, the battle against cyber baddies is real. As the magic makers behind the scenes, you software engineering champs are vital in warding off those pesky cyber threats. So, grab your virtual shields because, in this blog post, we're diving into some fantastic tips, backed by authentic stories, to armour up your software against the forces of darkness!
 
 ### Be the Guardian of Secure Coding
 Imagine this – you're building a digital fortress, but if your code has holes, it's like leaving the drawbridge down for the trolls! Start strong by weaving security into your code from the get-go. 
