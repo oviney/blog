@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: post
 categories: OpenDNS, Home Security, Network Security, Security, Cyber, Cyber Security
 ---
 
