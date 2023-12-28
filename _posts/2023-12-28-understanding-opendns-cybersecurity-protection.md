@@ -1,3 +1,8 @@
+---
+layout: post
+title: "Why you need to be using OpenDNS to secure your home network."
+---
+
 # How OpenDNS Stops Major Security Issues
 
 OpenDNS, now part of Cisco Umbrella, is known for effectively addressing several major security issues. It primarily functions as a cloud-delivered network security service that intercepts and analyzes internet requests to prevent cyber threats. Below is a summary of how OpenDNS tackles major security issues:
