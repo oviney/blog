@@ -3,7 +3,7 @@ layout: post
 categories: blog posts
 ---
 
-If you are a techie and want to get to the details, [please see]({% post_url 2023-12-28-understanding-opendns-cybersecurity-protection %}).
+**Note:** If you are a techie and want to get to the OpenDNS details, please see my post [A Beginner's Guide to OpenDNS Home Network Security]({% post_url 2023-12-28-understanding-opendns-cybersecurity-protection %}).
 
 # A Beginner's Guide to OpenDNS Home Network Security
 
