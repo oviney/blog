@@ -3,7 +3,7 @@ layout: post
 categories: blog posts
 author: ouray
 ---
-# Supercharge Your Software Skills with GenAI: Let's Dive In!
+## Supercharge Your Software Skills with GenAI: Let's Dive In!
 Hey there, software superheroes! 🚀 Are you ready to take your coding game to the next level? Say hello to Generative Artificial Intelligence (GenAI), the futuristic sidekick you didn't know you needed. In this blog post, we're strapping on our AI boots and diving into some seriously excellent tips and tricks for all your software whizzes. And guess what? We've got real-life stories to back up our claims! Let's rock and roll!
 
 1.**Speed Up Code Creation: GenAI's Turbo Boost for Developers**
