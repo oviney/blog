@@ -10,6 +10,7 @@ author: ouray
 ## A Beginner's Guide to OpenDNS Home Network Security
 
 Securing your home network is as crucial as locking your front door in the digital age. With cyber threats lurking in the shadows of our connected lives, we must take proactive steps to safeguard our digital sanctuaries. OpenDNS emerges as a stalwart ally in this quest, offering robust solutions for keeping your data safe. In this comprehensive guide, we'll navigate the waters of home network security with OpenDNS as our compass.
+<!--more-->
 
 ### Understanding the Need for Security
 
