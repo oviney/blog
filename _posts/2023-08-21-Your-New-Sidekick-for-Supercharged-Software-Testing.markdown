@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: post
 categories: blog posts
 author: ouray
 ---
