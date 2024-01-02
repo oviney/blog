@@ -8,7 +8,7 @@ author: ouray
 ## How OpenDNS Stops Major Security Issues
 
 OpenDNS, now part of Cisco Umbrella, is known for effectively addressing several major security issues. It primarily functions as a cloud-delivered network security service that intercepts and analyzes internet requests to prevent cyber threats. Below is a summary of how OpenDNS tackles major security issues:
-
+<!--more-->
 ### Malware Protection
 - **Mechanism:** OpenDNS maintains a constantly updated database of malicious internet destinations. When a user attempts to access a website, OpenDNS checks if the site is known for hosting malware.
 - **Effectiveness:** By preventing connections to malicious sites, it stops malware from being downloaded and can even disrupt communication between an infected device and its command-and-control center.
