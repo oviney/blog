@@ -3,7 +3,7 @@ layout: post
 categories: blog posts
 author: ouray
 ---
-## Welcome to my blog
+## {{ page.title }}
 Hey there! You have reached my blog. Take a look below for key sections. Yes, this is a low-tech blog :).
 
 #### Purpose
