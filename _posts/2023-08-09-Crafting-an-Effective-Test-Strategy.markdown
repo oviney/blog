@@ -3,7 +3,7 @@ layout: post
 categories: blog posts
 author: ouray
 ---
-## Crafting an Effective Test Strategy: Actionable Tips and Real-Life Insights
+## {{ page.title }}
 Hey there, awesome software champs! 🚀 Ready to dive into the exciting world of test strategies? Buckle up because we're about to embark on a journey full of actionable tips and real-life tales that'll turbocharge your testing game!
 
 1. [The Story](#level-set)
