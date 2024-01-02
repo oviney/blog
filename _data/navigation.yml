@@ -1,5 +1,7 @@
 - name: Home
   link: /
+- name: Blog
+  link: /blog/
 - name: Software Engineering
   link: /software-engineering/
 - name: Test Automation
