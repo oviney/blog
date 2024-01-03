@@ -5,7 +5,7 @@ categories: quality-management
 description: "Explore the distinct yet interconnected roles of Quality Assurance, Quality Control, and Quality Engineering in our comprehensive guide. Understand their importance in maintaining high standards in products and services across various industries."
 ---
 
-## Introduction
+## {{ page.title }}
 Quality is paramount in any industry, and three key roles ensure it: Quality Assurance (QA), Quality Control (QC), and Quality Engineering (QE). Often confused, these roles are distinct yet interconnected, vital in delivering superior products and services. This post demystifies these concepts, making them accessible to everyone.
 
 ## The Essence of Quality Assurance
