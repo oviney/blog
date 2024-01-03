@@ -32,7 +32,7 @@ In a world where automation, AI, and machine learning are reshaping roles, quali
 ### Quality: A Culture, Not Just a Department
 Quality transcends departmental boundaries; it's a culture that should permeate every aspect of an organization. A deep understanding and effective implementation of QA, QC, and QE are vital for any entity striving for excellence.
 
-## Further Learning: ASQ Resources on QA, QC, and QE
+### Further Learning: ASQ Resources on QA, QC, and QE
 To deepen your understanding of Quality Assurance, Quality Control, and Quality Engineering, the American Society for Quality (ASQ) offers a wealth of resources. These links are particularly relevant to the topics covered in this post:
 
 - **ASQ Quality Assurance Resources**: [Quality Assurance Guidelines](https://asq.org/quality-resources/quality-assurance) - Discover a range of resources, articles, and tools specifically focused on Quality Assurance practices and principles.
