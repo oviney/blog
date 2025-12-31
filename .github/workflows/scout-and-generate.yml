@@ -1,0 +1,126 @@
+name: Scout Topics & Generate Article
+
+on:
+  workflow_dispatch:
+    inputs:
+      focus_area:
+        description: 'Focus area (optional: "AI", "automation", "performance")'
+        required: false
+        type: string
+      auto_generate:
+        description: 'Automatically generate article from top topic?'
+        required: true
+        type: boolean
+        default: true
+  
+  schedule:
+    # Every Monday at 8am UTC (scout), article generates at 9am
+    - cron: '0 8 * * 1'
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    outputs:
+      top_topic: ${{ steps.scout.outputs.top_topic }}
+      topics: ${{ steps.scout.outputs.topics }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: pip install anthropic
+      
+      - name: Run Topic Scout
+        id: scout
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FOCUS_AREA: ${{ github.event.inputs.focus_area || '' }}
+        run: python scripts/topic_scout.py
+      
+      - name: Upload content queue
+        uses: actions/upload-artifact@v4
+        with:
+          name: content-queue
+          path: content_queue.json
+
+  generate:
+    needs: scout
+    if: ${{ github.event.inputs.auto_generate == 'true' || github.event_name == 'schedule' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install anthropic python-slugify matplotlib numpy
+          sudo apt-get update && sudo apt-get install -y fonts-dejavu-core
+      
+      - name: Download content queue
+        uses: actions/download-artifact@v4
+        with:
+          name: content-queue
+      
+      - name: Extract top topic
+        id: extract
+        run: |
+          TOP_TOPIC=$(python -c "import json; q=json.load(open('content_queue.json')); print(q['topics'][0]['topic'])")
+          TALKING_POINTS=$(python -c "import json; q=json.load(open('content_queue.json')); print(q['topics'][0].get('talking_points', ''))")
+          echo "topic=$TOP_TOPIC" >> $GITHUB_OUTPUT
+          echo "talking_points=$TALKING_POINTS" >> $GITHUB_OUTPUT
+          echo "🎯 Selected topic: $TOP_TOPIC"
+      
+      - name: Run Economist Agent Pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TOPIC: ${{ steps.extract.outputs.topic }}
+          TALKING_POINTS: ${{ steps.extract.outputs.talking_points }}
+          CATEGORY: quality-engineering
+        run: python scripts/economist_agent.py
+      
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "article: ${{ steps.extract.outputs.topic }}"
+          branch: draft/article-${{ github.run_number }}
+          title: "📰 ${{ steps.extract.outputs.topic }}"
+          body: |
+            ## Auto-Generated Article
+            
+            **Topic:** ${{ steps.extract.outputs.topic }}
+            
+            ### Agent Pipeline
+            - [x] **Topic Scout**: Identified trending topic
+            - [x] **Research Agent**: Data gathering
+            - [x] **Graphics Agent**: Chart generation
+            - [x] **Writer Agent**: Draft creation
+            - [x] **Editor Agent**: Polish & review
+            
+            ### Other Scouted Topics
+            See `content_queue.json` artifact for 4 more topic options.
+            
+            ### Review Checklist
+            - [ ] Topic is timely and relevant
+            - [ ] Data is accurate
+            - [ ] Chart renders correctly
+            - [ ] Voice matches Economist style
+            
+            ---
+            *Fully automated: Scout → Research → Write → Edit*
+          labels: economist-style, auto-scouted, needs-review
