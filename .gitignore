@@ -1,3 +1,4 @@
+# Jekyll
 _site
 .sass-cache
 .jekyll-metadata
@@ -5,4 +6,37 @@ _site
 .jekyll-cache
 Gemfile.lock
 .Gemfile
-.githubauth
+.githubauth%
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Agent outputs
+content_queue.json
+board_decision.json
+board_report.md
+test_outputs/
+model_comparison_results.json
+
+# Secrets
+.env
+*.key
+*_API_KEY*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
