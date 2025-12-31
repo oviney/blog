@@ -47,3 +47,11 @@ The system operates in a 3-stage pipeline:
 ## Common Patterns
 *   **Persona Definitions**: Agents are defined with specific personas and "What makes you click/scroll past" criteria (see `editorial_board.py`).
 *   **Verification Loop**: The research agent must flag unverified claims. The writer must not use unverified claims.
+
+## Governance & Human Oversight
+*   **4 Manual Checkpoints**: Topic review → Editorial decision → Article review → Publication approval
+*   **No Auto-Publishing**: Articles are saved as drafts, require explicit git push
+*   **Quality Gates**: Editor agent enforces Economist voice, British spelling, sourced data, no unverified claims
+*   **Transparency**: All agent reasoning is logged and auditable
+*   **Override Capability**: Humans can reject, edit, or force specific topics at any stage
+*   **Review Mode**: Run `python3 scripts/economist_agent.py` to see output without committing

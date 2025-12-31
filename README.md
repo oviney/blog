@@ -75,9 +75,70 @@ Six persona agents vote on every topic, each with different priorities:
 
 Each member scores topics 1-10 with rationale. Weighted votes determine the winner.
 
-## Fully Automated: Scout → Vote → Write → Publish
+## Responsible AI Governance: Human-in-the-Loop
 
-## Fully Automated: Scout → Vote → Write → Publish
+**This system generates content for your review, not instead of your review.** Think of AI agents as fast junior writers who need editorial supervision.
+
+### Four Governance Checkpoints
+
+#### **Checkpoint #1: Topic Review**
+```bash
+python3 scripts/topic_scout.py
+# → Review content_queue.json
+```
+- Reject off-brand or ethically problematic topics
+- Add context constraints
+- Manually edit queue before next stage
+
+#### **Checkpoint #2: Editorial Decision**
+```bash
+python3 scripts/editorial_board.py
+# → Read board_report.md
+```
+- Review all agent reasoning
+- Override consensus if flawed
+- Veto topics that shouldn't have passed
+- Force specific topics via environment variables
+
+#### **Checkpoint #3: Article Review**
+```bash
+python3 scripts/economist_agent.py
+# → Article saved to _posts/ (NOT auto-published)
+```
+**Human reviews before publication:**
+- Verify factual accuracy and data sources
+- Check for bias or misleading claims
+- Ensure appropriate tone
+- Edit markdown directly if needed
+- Re-run through editor if major changes required
+
+#### **Checkpoint #4: Publication Approval**
+```bash
+git add _posts/2025-01-01-new-article.md
+git commit -m "Publish: Article title"
+git push origin main
+```
+- Final approval via git commit
+- Can delay for legal/PR review
+- Can add disclaimers or editor's notes
+- Version control creates audit trail
+
+### Built-in Quality Controls
+
+**Transparency:**
+- Every agent documents reasoning
+- Research agent flags [UNVERIFIED] claims
+- Editor shows which quality gates passed/failed
+- All prompts are auditable code
+
+**Quality Gates (enforced by Editor Agent):**
+- ✅ Economist voice (no throat-clearing, confident tone)
+- ✅ British spelling (organisation, favour, etc.)
+- ✅ Data sourced (all stats have named sources)
+- ✅ No unverified claims (rejects [UNVERIFIED] content)
+- ✅ Readability (Hemingway score < 10)
+
+## End-to-End Workflow
 
 The **Scout → Vote → Generate** workflow runs every Monday:
 
