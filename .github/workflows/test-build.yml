@@ -1,0 +1,76 @@
+name: Test Jekyll Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+      
+      - name: Install dependencies
+        run: bundle install
+      
+      - name: Build Jekyll site
+        run: bundle exec jekyll build --verbose
+      
+      - name: Validate HTML
+        run: |
+          gem install html-proofer
+          htmlproofer ./_site \
+            --disable-external \
+            --allow-hash-href \
+            --ignore-urls "/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/" \
+            --ignore-status-codes "999"
+      
+      - name: Check for broken internal links
+        run: |
+          echo "Checking for broken internal links in markdown files..."
+          BROKEN=$(find _posts -name "*.md" -o -name "*.markdown" | xargs grep -n "](/" | grep -v "http" | grep -v "assets" | wc -l || echo "0")
+          if [ "$BROKEN" -gt 0 ]; then
+            echo "⚠️ Found $BROKEN potential broken internal links"
+            find _posts -name "*.md" -o -name "*.markdown" | xargs grep -n "](/" | grep -v "http" | grep -v "assets" || true
+          else
+            echo "✅ No broken internal links found"
+          fi
+      
+      - name: Validate YAML front matter
+        run: |
+          echo "Validating YAML front matter..."
+          for file in _posts/*.md _posts/*.markdown; do
+            if [ -f "$file" ]; then
+              if ! head -1 "$file" | grep -q "^---$"; then
+                echo "❌ Missing front matter in $file"
+                exit 1
+              fi
+              if ! grep -q "^title:" "$file"; then
+                echo "❌ Missing 'title' in $file"
+                exit 1
+              fi
+              if ! grep -q "^date:" "$file"; then
+                echo "❌ Missing 'date' in $file"
+                exit 1
+              fi
+            fi
+          done
+          echo "✅ All YAML front matter valid"
+      
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-build
+          path: _site/
+          retention-days: 7
