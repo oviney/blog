@@ -2,8 +2,11 @@
 title: "Testing times"
 subtitle: "Artificial intelligence has conquered software testing. The productivity gains remain elusive."
 date: 2024-12-31
+last_modified_at: 2024-12-31
 categories: [quality-engineering, ai]
 image: /assets/charts/testing-times-ai-gap.png
+ai_assisted: true
+author: ouray
 ---
 
 Four out of five software teams now use artificial intelligence in their testing workflows. Vendors promise self-healing scripts, autonomous test generation, and—inevitably—the obsolescence of manual testers. Yet by the measures that matter to engineering leaders, remarkably little has changed. Test maintenance still consumes a substantial share of automation budgets. Flaky tests still derail releases. The QA headcount that was supposed to shrink has, in many organisations, quietly grown.

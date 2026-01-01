@@ -1,6 +1,27 @@
 ---
 layout: default
 ---
-<p>{{ page.date | date_to_string }} - {{ page.author }}</p>
+<article>
+  <header>
+    <p class="post-meta">
+      Published: {{ page.date | date_to_string }}
+      {% if page.last_modified_at %}
+        | Updated: {{ page.last_modified_at | date_to_string }}
+      {% endif %}
+      {% if page.author %}
+        | {{ page.author }}
+      {% endif %}
+    </p>
+  </header>
 
-{{ content }}
+  {{ content }}
+
+  {% if page.ai_assisted %}
+  <footer class="post-footer">
+    <p class="ai-disclosure">
+      <em>This article was generated with AI assistance and reviewed by a human editor.
+      {{ site.ai_disclosure }}</em>
+    </p>
+  </footer>
+  {% endif %}
+</article>

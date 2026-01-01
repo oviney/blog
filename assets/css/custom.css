@@ -1,0 +1,28 @@
+/* Post metadata styling */
+.post-meta {
+  color: #666;
+  font-size: 0.9em;
+  margin-bottom: 1.5em;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid #eee;
+}
+
+/* AI disclosure footer */
+.post-footer {
+  margin-top: 3em;
+  padding-top: 1.5em;
+  border-top: 1px solid #eee;
+}
+
+.ai-disclosure {
+  font-size: 0.85em;
+  color: #666;
+  background-color: #f9f9f9;
+  padding: 1em;
+  border-left: 3px solid #0366d6;
+  margin: 1em 0;
+}
+
+.ai-disclosure em {
+  font-style: normal;
+}
