@@ -5,7 +5,6 @@ subtitle: "Artificial intelligence has conquered software testing. The productiv
 date: 2025-12-31
 last_modified_at: 2025-12-31
 categories: [quality-engineering, ai]
-image: /assets/charts/testing-times-ai-gap.png
 ai_assisted: true
 author: ouray
 ---
@@ -38,13 +37,13 @@ The third benefit is accessibility. Low-code and no-code testing platforms, now 
 
 The fundamental problem is architectural, not technological. AI tools optimise for the moment of test creation. The cost of testing, however, accumulates over time. A test that takes five minutes to generate with AI and runs successfully for three months still requires human judgment when it starts failing. Someone must determine whether the failure indicates a genuine bug, a flaky dependency, an environment issue, or a test that no longer reflects valid requirements.
 
-Self-healing capabilities address only the narrowest slice of this problem: locator changes in user interface tests. When a button's position shifts or a CSS class name changes, AI can often detect and fix the broken selector automatically. This is useful but marginal. It does nothing for the test that fails because an upstream API changed its contract, or because a race condition surfaces under load, or because the business logic it validates is no longer correct.
+"Self-healing capabilities address only the narrowest slice of this problem: locator changes in user interface tests. When a button's position shifts or a CSS class name changes, AI can often detect and fix the broken selector automatically. This is useful but marginal. It does nothing for the test that fails because an upstream API changed its contract, or because a race condition surfaces under load, or because the business logic it validates is no longer correct."
 
 The vendors know this. Their roadmaps increasingly emphasise "agentic AI"—autonomous systems that can not only fix tests but decide which tests to run, when to run them, and whether a failure matters. The vision is compelling. The gap between vision and production-ready capability remains measured in years, not months.
 
 ## The quiet revolution
 
-The most significant change may not be AI itself but the organisational shifts it has accelerated. The companies extracting real value from AI-assisted testing share a common pattern: they have dissolved the boundary between quality engineering and software development. QE specialists are embedded in platform teams rather than siloed in a separate department. Testing is a shared responsibility rather than a handoff.
+"The most significant change may not be AI itself but the organisational shifts it has accelerated. The companies extracting real value from AI-assisted testing share a common pattern: they have dissolved the boundary between quality engineering and software development. QE specialists are embedded in platform teams rather than siloed in a separate department. Testing is a shared responsibility rather than a handoff."
 
 In these organisations, AI tools amplify human judgment rather than replacing it. Engineers use AI to generate test scaffolding, then apply domain knowledge to refine assertions. They use AI-powered triage to focus attention, not to avoid thinking. The productivity gains are genuine but unglamorous—15% here, 20% there—compounding over time rather than arriving in a single dramatic leap.
 
