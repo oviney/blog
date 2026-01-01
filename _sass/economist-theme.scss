@@ -992,3 +992,189 @@ table {
   white-space: nowrap;
   border: 0;
 }
+
+// ============================================
+// TOPIC PAGE (BLOG INDEX)
+// ============================================
+
+.topic-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-xl $spacing-md;
+}
+
+.topic-header {
+  margin-bottom: $spacing-xl;
+  text-align: center;
+}
+
+.topic-title {
+  font-family: $font-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 $spacing-md 0;
+  line-height: $line-height-tight;
+}
+
+.topic-description {
+  font-family: $font-serif;
+  font-size: 1.25rem;
+  color: $text-secondary;
+  margin: 0;
+  line-height: $line-height-normal;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.topic-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-lg;
+  margin-top: $spacing-xl;
+}
+
+.topic-card {
+  display: flex;
+  flex-direction: column;
+  background: $background-white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.topic-card-image {
+  display: block;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: $background-light;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+.topic-card-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  
+  .placeholder-content {
+    color: #ccc;
+  }
+}
+
+.topic-card-content {
+  padding: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  flex: 1;
+}
+
+.topic-category {
+  font-family: $font-sans;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: $economist-red;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: $spacing-xs;
+}
+
+.topic-card-title {
+  margin: 0;
+  flex: 0 0 auto;
+  
+  a {
+    font-family: $font-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $text-primary;
+    text-decoration: none;
+    line-height: $line-height-tight;
+    transition: color 0.2s ease;
+    display: block;
+    
+    &:hover {
+      color: $economist-red;
+    }
+  }
+}
+
+.topic-card-excerpt {
+  font-family: $font-serif;
+  font-size: 0.938rem;
+  color: $text-secondary;
+  line-height: $line-height-normal;
+  margin: 0;
+  flex: 1 1 auto;
+}
+
+.topic-card-meta {
+  display: flex;
+  gap: $spacing-md;
+  font-family: $font-sans;
+  font-size: 0.813rem;
+  color: $text-tertiary;
+  margin-top: auto;
+  padding-top: $spacing-sm;
+}
+
+.topic-meta-item {
+  &:not(:last-child)::after {
+    content: '•';
+    margin-left: $spacing-md;
+  }
+}
+
+// Responsive behavior for topic page
+@media (max-width: 1024px) {
+  .topic-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .topic-page {
+    padding: $spacing-lg $spacing-md;
+  }
+  
+  .topic-title {
+    font-size: 2rem;
+  }
+  
+  .topic-description {
+    font-size: 1rem;
+  }
+  
+  .topic-grid {
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+  }
+  
+  .topic-card-image {
+    height: 180px;
+  }
+  
+  .topic-card-title a {
+    font-size: 1.125rem;
+  }
+  
+  .topic-card-excerpt {
+    font-size: 0.875rem;
+  }
+}
+
