@@ -3,6 +3,7 @@ layout: post
 title: "Practical Applications of AI in Software Development"
 date: 2023-08-08
 categories: [software-engineering, ai]
+ai_assisted: true
 ---
 
 Generative AI tools are changing how developers write code. This post examines where AI assistance adds genuine value and where it requires careful oversight.

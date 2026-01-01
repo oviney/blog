@@ -43,4 +43,4 @@ I believe quality engineering is a strategic function, not just a testing cost c
 
 ---
 
-**Connect:** [LinkedIn](https://linkedin.com/in/YOUR-PROFILE) | [GitHub](https://github.com/oviney)
+**Connect:** [LinkedIn](https://linkedin.com/in/ourayviney) | [GitHub](https://github.com/oviney)
