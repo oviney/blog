@@ -2,7 +2,8 @@
 
 Software engineering insights on quality, testing, and AI - written in The Economist's signature style.
 
-**Theme:** [Minimal Mistakes](https://mmistakes.github.io/minimal-mistakes/) v4.27.3  
+**Theme:** Custom Economist-inspired design system  
+**Typography:** Merriweather (serif) + Inter (sans-serif)  
 **Build:** Jekyll 4.3.2 via GitHub Actions  
 **Deployment:** GitHub Pages
 
@@ -42,12 +43,25 @@ GitHub Actions automatically builds and deploys changes to GitHub Pages.
 - Deployment time: 1-2 minutes
 - Monitor progress: https://github.com/oviney/blog/actions
 
+## Custom Theme
+
+The site features a bespoke design system inspired by The Economist:
+
+- **Typography**: Merriweather serif for body text, Inter for UI elements
+- **Colors**: The Economist red (#E3120B) for accents, clean blacks and grays
+- **Layout**: Red header banner, horizontal navigation, article cards, dark footer
+- **Components**: Category breadcrumbs, read time indicators, featured images, related posts
+- **Responsive**: Mobile-first design with breakpoints at 768px and 1024px
+
+Theme source: `_sass/economist-theme.scss` (600+ lines)
+
 ## Project Structure
 
 ```
 blog/
 ├── _posts/          # Blog articles (markdown)
-├── _layouts/        # Jekyll templates  
+├── _layouts/        # Custom theme layouts (default.html, post.html)
+├── _sass/           # Custom Economist theme SCSS  
 ├── _includes/       # Reusable components
 ├── assets/          # Images, CSS, charts
 ├── _config.yml      # Jekyll configuration
