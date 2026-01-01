@@ -1,9 +1,11 @@
 ---
-layout: post
+layout: single
 title: "Building a Test Strategy That Actually Works"
 date: 2023-08-09
 categories: [quality-engineering, test-strategy]
 ai_assisted: true
+author: Ouray Viney
+classes: wide
 ---
 
 A test strategy is not a document that sits in Confluence gathering dust. It's an operational blueprint that guides testing decisions across your delivery lifecycle. This post covers what separates effective test strategies from checkbox exercises.

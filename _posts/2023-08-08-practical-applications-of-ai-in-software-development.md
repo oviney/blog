@@ -1,9 +1,11 @@
 ---
-layout: post
+layout: single
 title: "Practical Applications of AI in Software Development"
 date: 2023-08-08
-categories: [software-engineering, ai]
+categories: ai software-engineering
 ai_assisted: true
+author: Ouray Viney
+classes: wide
 ---
 
 Generative AI tools are changing how developers write code. This post examines where AI assistance adds genuine value and where it requires careful oversight.

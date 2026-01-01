@@ -32,17 +32,54 @@ github_username:  oviney
 markdown: kramdown
 permalink: /:year/:month/:day/:title/
 
-remote_theme: pages-themes/cayman@v0.2.0
+remote_theme: "mmistakes/minimal-mistakes@4.27.3"
 
 plugins:
   - jekyll-feed
   - jekyll-remote-theme
   - jekyll-seo-tag
+  - jekyll-include-cache
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-gist
+  - jemoji
 
 excerpt_separator: <!--more-->
 
 # Google Analytics
 google_analytics: G-GTFG819MNS
+
+# Minimal Mistakes settings
+minimal_mistakes_skin: "default"
+
+# Site Author
+author:
+  name: "Ouray Viney"
+  bio: "Quality Engineering leader with 20+ years experience in software testing and automation"
+  location: "Canada"
+  email: "ouray@viney.ca"
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/oviney"
+    - label: "LinkedIn"
+      icon: "fab fa-fw fa-linkedin"
+      url: "https://linkedin.com/in/ourayviney"
+
+# Defaults for posts
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: single
+      author_profile: true
+      read_time: true
+      comments: false
+      share: true
+      related: true
+      toc: true
+      toc_sticky: true
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
