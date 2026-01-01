@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: default
 title: Test Automation
 permalink: /test-automation/
 ---
