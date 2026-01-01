@@ -1,6 +1,9 @@
 ---
-layout: default
+layout: splash
 title: Quality Engineering Insights
+header:
+  overlay_color: "#000"
+  overlay_filter: "0.5"
 ---
 
 # Quality Engineering Insights
