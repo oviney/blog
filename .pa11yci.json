@@ -4,7 +4,6 @@
     "timeout": 30000,
     "wait": 1000,
     "chromeLaunchConfig": {
-      "executablePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
       "args": ["--no-sandbox", "--disable-setuid-sandbox"]
     },
     "runners": [
