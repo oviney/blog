@@ -85,6 +85,32 @@ When adding new functionality:
 6. Test in multiple browsers
 7. Commit only after all checks pass
 
+## Required Tests for Each Change
+
+### For Layout/Design Changes
+1. **Visual Regression**: Take before/after screenshots
+2. **Responsive Testing**: Test at 320px, 768px, 1024px, 1920px
+3. **Browser Testing**: Chrome, Safari, Firefox
+4. **Print Styles**: Check print preview if applicable
+
+### For Content Changes
+1. **Build Verification**: Jekyll builds successfully
+2. **Link Validation**: All internal/external links work
+3. **Image Validation**: All images load and have alt text
+4. **Front Matter**: Required fields present and valid
+
+### For SCSS/CSS Changes
+1. **No Deprecation Warnings**: Build must be clean
+2. **File Size Check**: CSS under reasonable size (<300KB)
+3. **Selector Nesting**: Max 3 levels deep
+4. **Visual Verification**: Affected pages render correctly
+
+### For Template/Layout Changes
+1. **All Post Types**: Test with actual post content
+2. **Edge Cases**: Empty fields, long titles, no images
+3. **Accessibility**: Keyboard navigation, semantic HTML
+4. **Console Errors**: Browser console clean
+
 ## Manual Testing Checklist
 
 Before pushing changes:
@@ -95,17 +121,67 @@ Before pushing changes:
 - [ ] Open a blog post and verify layout
 - [ ] Test all navigation links
 - [ ] Verify footer links work
-- [ ] Check mobile responsive design
+- [ ] Test at mobile (375px), tablet (768px), desktop (1920px)
 - [ ] Verify images display correctly
-- [ ] Check browser console for errors
+- [ ] Check browser console for errors (0 errors required)
+- [ ] Take screenshots for documentation
 - [ ] Run pre-commit hook manually if needed
+- [ ] Verify in at least 2 browsers
 
 ## Automated Testing Tools
 
+### Currently Implemented
 - **Jekyll Build**: Built-in validation
-- **HTMLProofer**: Link checking (can be added)
-- **Pa11y**: Accessibility testing (can be added)
-- **Lighthouse CI**: Performance testing (can be added)
+- **Pre-commit Hook**: YAML, build, links, front matter
+- **GitHub Actions**: CI/CD deployment pipeline
+
+### Available for Enhancement
+- **HTMLProofer**: Comprehensive link checking
+- **Pa11y**: Accessibility testing (WCAG compliance)
+- **Lighthouse CI**: Performance metrics tracking
+- **Percy/Chromatic**: Visual regression testing
+- **axe-core**: Automated accessibility testing
+
+### Testing Priority
+
+## Testing Workflow Summary
+
+```
+Before Commit:
+├── Make changes
+├── Test locally (jekyll serve)
+├── Visual verification
+├── Responsive testing (mobile, tablet, desktop)
+├── Browser console check (0 errors)
+├── Stage changes (git add)
+└── Commit (pre-commit hook runs automatically)
+
+After Push:
+├── GitHub Actions runs
+├── Jekyll builds on CI
+├── Deploys to GitHub Pages
+└── Verify production site
+
+For Major Changes:
+├── Create branch
+├── Make changes + test
+├── Take screenshots
+├── Create PR
+├── Review + merge
+└── Verify production
+```
+
+## Documentation Requirements
+
+When publishing changes, document:
+- What was changed and why
+- Screenshots (before/after for visual changes)
+- Test results (which devices/browsers tested)
+- Any known issues or limitations
+- Link to GitHub issue/PR
+1. **Must Have** (Current): Build validation, link checking
+2. **Should Have** (Recommended): Visual regression, responsive testing
+3. **Nice to Have**: Performance monitoring, accessibility audits
 
 ## When Tests Fail
 
