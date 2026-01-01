@@ -747,11 +747,12 @@ blockquote {
 // ============================================
 
 .featured-post {
-  background: linear-gradient(135deg, $background-light 0%, $background-white 100%);
+  background: $background-white; // Solid white background for consistent contrast testing
   border-left: 4px solid $economist-red;
   padding: $spacing-xl;
   margin: $spacing-xl 0;
   border-radius: $radius-md;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   
   .featured-label {
     font-family: $font-sans;
