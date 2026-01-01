@@ -11,6 +11,10 @@ Self-healing tests promise to cut maintenance costs significantly, yet only a fr
 
 The allure of self-healing tests lies in their potential to significantly reduce the time spent on maintaining test scripts. According to a 2021 Gartner survey, 72% of enterprises report remarkable decreases in maintenance time because of these capabilities. This is supported by the rising adoption rate among Fortune 500 companies, which has surged by 40% over the past two years. Adoption has climbed from 30% in 2020 to 70% in 2023, underscoring a swift transition towards embracing this technology.
 
+As the chart shows, the gap between adoption and actual maintenance reduction reveals the disconnect between promise and reality. While adoption rates have soared, the realised benefits lag significantly behind vendor claims.
+
+![Self-Healing Tests: Adoption vs Maintenance Reduction](/assets/charts/self-healing-tests-myth-vs-reality.png)
+
 Self-healing test technology automatically adapts and modifies test scripts in response to changes in the software, freeing developers from the tedium of manual updates. In theory, this enhances agility in deployment cycles and reduces the bottleneck often encountered in testing phases. Yet, while large corporations appear on board, a significant faction of quality assurance professionals remains unconvinced.
 
 ## Persistent Skepticism in the Industry
