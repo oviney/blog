@@ -1,0 +1,105 @@
+---
+layout: default
+---
+
+<article>
+  <header class="article-header">
+    <div class="article-category">
+      {% if page.categories %}
+        <a href="{{ '/blog/' | relative_url }}">{{ page.categories | first }}</a>
+        <span class="separator">|</span>
+        <span>{{ page.title }}</span>
+      {% endif %}
+    </div>
+
+    <h1 class="article-title">{{ page.title }}</h1>
+
+    {% if page.subtitle %}
+    <h2 class="article-subtitle">{{ page.subtitle }}</h2>
+    {% endif %}
+
+    <div class="article-meta">
+      <div class="meta-item">
+        <time datetime="{{ page.date | date_to_xmlschema }}">
+          {{ page.date | date: "%B %d, %Y" }}
+        </time>
+      </div>
+      {% if page.author %}
+      <div class="meta-item">
+        {{ page.author }}
+      </div>
+      {% endif %}
+      {% if page.content %}
+      <div class="meta-item read-time">
+        {% assign words = page.content | number_of_words %}
+        {{ words | divided_by: 200 | plus: 1 }} min read
+      </div>
+      {% endif %}
+    </div>
+  </header>
+
+  {% if page.image %}
+  <figure class="article-image">
+    <img src="{{ page.image | relative_url }}" alt="{{ page.title }}">
+    {% if page.image_caption %}
+    <figcaption>{{ page.image_caption }}</figcaption>
+    {% endif %}
+  </figure>
+  {% endif %}
+
+  <div class="article-content">
+    {{ content }}
+  </div>
+
+  {% if page.tags %}
+  <div class="tag-list">
+    {% for tag in page.tags %}
+    <a href="{{ '/blog/' | relative_url }}#{{ tag | slugify }}" class="tag">{{ tag }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if page.ai_assisted %}
+  <aside class="ai-disclosure">
+    <p><strong>AI-Assisted Content:</strong> This article was generated using AI technology following The Economist's editorial standards, with human review and fact-checking.</p>
+  </aside>
+  {% endif %}
+
+  <footer class="article-footer">
+    <div class="article-actions">
+      <a href="{{ '/blog/' | relative_url }}">← Back to Blog</a>
+    </div>
+  </footer>
+</article>
+
+{% if site.posts.size > 1 %}
+<aside class="related-posts">
+  <h3>More from {{ page.categories | first | default: "the blog" }}</h3>
+  <div class="posts-grid">
+    {% assign related_posts = site.posts | where_exp: "post", "post.url != page.url" | limit: 3 %}
+    {% for post in related_posts %}
+    <article class="post-card">
+      {% if post.image %}
+      <img src="{{ post.image | relative_url }}" alt="{{ post.title }}" class="card-image">
+      {% endif %}
+      <div class="card-content">
+        {% if post.categories %}
+        <div class="card-category">{{ post.categories | first }}</div>
+        {% endif %}
+        <h4 class="card-title">
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+        </h4>
+        <p class="card-excerpt">{{ post.excerpt | strip_html | truncatewords: 25 }}</p>
+        <div class="card-meta">
+          <span class="meta-item">{{ post.date | date: "%b %d, %Y" }}</span>
+          <span class="meta-item">
+            {% assign words = post.content | number_of_words %}
+            {{ words | divided_by: 200 | plus: 1 }} min read
+          </span>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</aside>
+{% endif %}

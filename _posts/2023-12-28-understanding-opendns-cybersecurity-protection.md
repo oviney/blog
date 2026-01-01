@@ -1,5 +1,5 @@
 ---
-layout: single
+layout: post
 title: "Understanding OpenDNS: Cybersecurity Protection"
 date: 2023-12-28
 categories: Home Network Security

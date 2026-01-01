@@ -1,5 +1,5 @@
 ---
-layout: single
+layout: post
 title: "Building a Test Strategy That Actually Works"
 date: 2023-08-09
 categories: [quality-engineering, test-strategy]

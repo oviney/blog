@@ -1,0 +1,683 @@
+// The Economist Design System
+// Comprehensive theme matching The Economist's visual identity
+
+// ============================================
+// VARIABLES
+// ============================================
+
+// Colors
+$economist-red: #E3120B;
+$text-primary: #1a1a1a;
+$text-secondary: #666666;
+$text-tertiary: #999999;
+$border-color: #E1E4E8;
+$background-light: #F8F8F8;
+$background-white: #ffffff;
+
+// Typography
+$font-serif: 'Merriweather', 'Georgia', 'Times New Roman', serif;
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+// Spacing
+$content-max-width: 750px;
+$wide-max-width: 1200px;
+$spacing-xs: 0.5rem;
+$spacing-sm: 1rem;
+$spacing-md: 1.5rem;
+$spacing-lg: 2rem;
+$spacing-xl: 3rem;
+
+// Line heights
+$line-height-tight: 1.3;
+$line-height-normal: 1.6;
+$line-height-relaxed: 1.8;
+
+// Border radius
+$radius-sm: 4px;
+$radius-md: 6px;
+
+// ============================================
+// RESET & BASE STYLES
+// ============================================
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-serif;
+  font-size: 18px;
+  line-height: $line-height-relaxed;
+  color: $text-primary;
+  background-color: $background-white;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ============================================
+// LAYOUT
+// ============================================
+
+.page-header {
+  background-color: $economist-red;
+  color: white;
+  padding: $spacing-sm 0;
+  border-bottom: none;
+  
+  .site-title {
+    font-family: $font-sans;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    padding: 0 $spacing-md;
+    
+    a {
+      color: white;
+      text-decoration: none;
+    }
+  }
+}
+
+.site-nav {
+  background-color: $background-white;
+  border-bottom: 1px solid $border-color;
+  padding: 0;
+  font-family: $font-sans;
+  
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    max-width: $wide-max-width;
+    margin: 0 auto;
+    
+    li {
+      margin: 0;
+      
+      a {
+        display: block;
+        padding: $spacing-sm $spacing-md;
+        color: $text-primary;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border-bottom: 3px solid transparent;
+        transition: border-color 0.2s ease;
+        
+        &:hover {
+          border-bottom-color: $economist-red;
+        }
+      }
+    }
+  }
+}
+
+.main-content {
+  max-width: $content-max-width;
+  margin: 0 auto;
+  padding: $spacing-xl $spacing-md;
+}
+
+.page-wide {
+  max-width: $wide-max-width;
+}
+
+// ============================================
+// TYPOGRAPHY
+// ============================================
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-sans;
+  font-weight: 700;
+  line-height: $line-height-tight;
+  margin-top: $spacing-xl;
+  margin-bottom: $spacing-md;
+  color: $text-primary;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-top: $spacing-md;
+  
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+}
+
+h2 {
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: $text-secondary;
+  margin-top: $spacing-sm;
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+}
+
+h3 {
+  font-size: 1.4rem;
+  margin-top: $spacing-lg;
+}
+
+h4 {
+  font-size: 1.2rem;
+}
+
+p {
+  margin: 0 0 $spacing-md 0;
+  font-size: 1.1rem;
+  line-height: $line-height-relaxed;
+}
+
+// Drop cap for first paragraph
+article > p:first-of-type::first-letter {
+  font-size: 4rem;
+  font-weight: 700;
+  float: left;
+  line-height: 0.85;
+  margin: 0.1em 0.1em 0 0;
+  font-family: $font-sans;
+}
+
+a {
+  color: $economist-red;
+  text-decoration: none;
+  border-bottom: 1px solid $economist-red;
+  transition: opacity 0.2s ease;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+blockquote {
+  margin: $spacing-lg 0;
+  padding-left: $spacing-lg;
+  border-left: 4px solid $economist-red;
+  font-style: italic;
+  color: $text-secondary;
+  
+  p {
+    font-size: 1.2rem;
+  }
+}
+
+// ============================================
+// ARTICLE STRUCTURE
+// ============================================
+
+.article-header {
+  margin-bottom: $spacing-xl;
+  
+  .article-category {
+    font-family: $font-sans;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $economist-red;
+    margin-bottom: $spacing-sm;
+    
+    a {
+      color: $economist-red;
+      border: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    
+    .separator {
+      color: $text-tertiary;
+      margin: 0 $spacing-xs;
+    }
+  }
+  
+  .article-title {
+    margin-bottom: $spacing-sm;
+  }
+  
+  .article-subtitle {
+    font-family: $font-sans;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: $text-secondary;
+    line-height: $line-height-normal;
+    margin-bottom: $spacing-lg;
+  }
+  
+  .article-actions {
+    display: flex;
+    gap: $spacing-md;
+    margin-bottom: $spacing-lg;
+    font-family: $font-sans;
+    
+    button, a {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      padding: $spacing-xs $spacing-md;
+      background: $background-light;
+      border: 1px solid $border-color;
+      border-radius: $radius-sm;
+      font-size: 0.9rem;
+      color: $text-primary;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: darken($background-light, 5%);
+      }
+    }
+  }
+}
+
+.article-meta {
+  font-family: $font-sans;
+  font-size: 0.85rem;
+  color: $text-tertiary;
+  margin: $spacing-md 0;
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    
+    &:not(:last-child)::after {
+      content: "|";
+      margin-left: $spacing-sm;
+      color: $text-tertiary;
+    }
+  }
+  
+  time {
+    font-weight: 500;
+  }
+  
+  .read-time {
+    &::before {
+      content: "📖 ";
+    }
+  }
+}
+
+.article-image {
+  margin: $spacing-xl 0;
+  
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: $radius-sm;
+  }
+  
+  figcaption {
+    font-family: $font-sans;
+    font-size: 0.85rem;
+    color: $text-tertiary;
+    margin-top: $spacing-sm;
+    font-style: italic;
+  }
+}
+
+.article-content {
+  font-size: 1.1rem;
+  
+  img {
+    max-width: 100%;
+    height: auto;
+    margin: $spacing-lg 0;
+    border-radius: $radius-sm;
+  }
+  
+  figure {
+    margin: $spacing-xl 0;
+    
+    img {
+      margin: 0;
+    }
+  }
+}
+
+// ============================================
+// CARDS & LISTINGS
+// ============================================
+
+.post-card {
+  background-color: $background-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  margin-bottom: $spacing-lg;
+  
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+  
+  .card-image {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    display: block;
+  }
+  
+  .card-content {
+    padding: $spacing-lg;
+  }
+  
+  .card-category {
+    font-family: $font-sans;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $economist-red;
+    margin-bottom: $spacing-sm;
+  }
+  
+  .card-title {
+    font-family: $font-sans;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: $line-height-tight;
+    margin: 0 0 $spacing-sm 0;
+    
+    a {
+      color: $text-primary;
+      border: none;
+      
+      &:hover {
+        color: $economist-red;
+      }
+    }
+  }
+  
+  .card-excerpt {
+    font-family: $font-serif;
+    font-size: 1rem;
+    color: $text-secondary;
+    line-height: $line-height-normal;
+    margin-bottom: $spacing-md;
+  }
+  
+  .card-meta {
+    font-family: $font-sans;
+    font-size: 0.85rem;
+    color: $text-tertiary;
+    display: flex;
+    gap: $spacing-sm;
+    
+    .meta-item:not(:last-child)::after {
+      content: "|";
+      margin-left: $spacing-sm;
+    }
+  }
+}
+
+// Grid layout for cards
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: $spacing-lg;
+  margin: $spacing-xl 0;
+}
+
+// ============================================
+// FEATURED POST
+// ============================================
+
+.featured-post {
+  background: linear-gradient(135deg, $background-light 0%, $background-white 100%);
+  border-left: 4px solid $economist-red;
+  padding: $spacing-xl;
+  margin: $spacing-xl 0;
+  border-radius: $radius-md;
+  
+  .featured-label {
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: $economist-red;
+    margin-bottom: $spacing-sm;
+  }
+  
+  h3 {
+    font-size: 2rem;
+    margin: 0 0 $spacing-sm 0;
+    
+    a {
+      color: $text-primary;
+      border: none;
+      
+      &:hover {
+        color: $economist-red;
+      }
+    }
+  }
+  
+  .post-excerpt {
+    font-size: 1.1rem;
+    color: $text-secondary;
+    margin-bottom: $spacing-md;
+  }
+  
+  .read-more {
+    font-family: $font-sans;
+    font-weight: 600;
+    color: $economist-red;
+    border: none;
+    
+    &::after {
+      content: " →";
+    }
+  }
+}
+
+// ============================================
+// TAGS & CATEGORIES
+// ============================================
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin: $spacing-lg 0;
+  
+  .tag {
+    font-family: $font-sans;
+    font-size: 0.85rem;
+    padding: $spacing-xs $spacing-md;
+    background-color: $background-light;
+    color: $text-secondary;
+    border-radius: 20px;
+    text-decoration: none;
+    border: 1px solid $border-color;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: $economist-red;
+      color: white;
+      border-color: $economist-red;
+    }
+  }
+}
+
+// ============================================
+// FOOTER
+// ============================================
+
+.site-footer {
+  background-color: $text-primary;
+  color: white;
+  padding: $spacing-xl $spacing-md;
+  margin-top: $spacing-xl;
+  font-family: $font-sans;
+  
+  a {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+    
+    &:hover {
+      border-color: white;
+    }
+  }
+  
+  .footer-content {
+    max-width: $wide-max-width;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: $spacing-xl;
+  }
+  
+  h4 {
+    font-size: 1rem;
+    margin-bottom: $spacing-md;
+    color: white;
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    li {
+      margin-bottom: $spacing-sm;
+    }
+  }
+  
+  .copyright {
+    text-align: center;
+    margin-top: $spacing-xl;
+    padding-top: $spacing-lg;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
+    color: $text-tertiary;
+  }
+}
+
+// ============================================
+// CODE & PRE
+// ============================================
+
+code {
+  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+  font-size: 0.9em;
+  background-color: $background-light;
+  padding: 0.2em 0.4em;
+  border-radius: $radius-sm;
+  color: $text-primary;
+}
+
+pre {
+  background-color: $background-light;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  overflow-x: auto;
+  margin: $spacing-lg 0;
+  
+  code {
+    background: none;
+    padding: 0;
+  }
+}
+
+// ============================================
+// TABLES
+// ============================================
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: $spacing-lg 0;
+  font-family: $font-sans;
+  font-size: 0.95rem;
+  
+  th {
+    background-color: $background-light;
+    font-weight: 600;
+    text-align: left;
+    padding: $spacing-sm $spacing-md;
+    border-bottom: 2px solid $border-color;
+  }
+  
+  td {
+    padding: $spacing-sm $spacing-md;
+    border-bottom: 1px solid $border-color;
+  }
+  
+  tr:hover {
+    background-color: rgba($background-light, 0.5);
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+
+@media (max-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+  
+  .main-content {
+    padding: $spacing-md;
+  }
+  
+  .posts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .site-nav ul {
+    flex-direction: column;
+    
+    li a {
+      border-bottom: none;
+      border-left: 3px solid transparent;
+      
+      &:hover {
+        border-left-color: $economist-red;
+      }
+    }
+  }
+  
+  article > p:first-of-type::first-letter {
+    font-size: 3rem;
+  }
+}
+
+// ============================================
+// UTILITIES
+// ============================================
+
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: $text-secondary;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

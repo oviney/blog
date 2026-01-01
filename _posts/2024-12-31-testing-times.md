@@ -1,5 +1,5 @@
 ---
-layout: single
+layout: post
 title: "Testing times"
 subtitle: "Artificial intelligence has conquered software testing. The productivity gains remain elusive."
 date: 2024-12-31

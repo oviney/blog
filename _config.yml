@@ -32,7 +32,8 @@ github_username:  oviney
 markdown: kramdown
 permalink: /:year/:month/:day/:title/
 
-remote_theme: "mmistakes/minimal-mistakes@4.27.3"
+# Using custom Economist-inspired theme
+# remote_theme: "mmistakes/minimal-mistakes@4.27.3"
 
 plugins:
   - jekyll-feed
@@ -49,8 +50,8 @@ excerpt_separator: <!--more-->
 # Google Analytics
 google_analytics: G-GTFG819MNS
 
-# Minimal Mistakes settings
-minimal_mistakes_skin: "default"
+# Theme: Custom Economist-inspired design
+# Economist red: #E3120B, Serif typography, Clean layout
 
 # Site Author
 author:

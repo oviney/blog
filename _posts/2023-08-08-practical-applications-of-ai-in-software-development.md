@@ -1,5 +1,5 @@
 ---
-layout: single
+layout: post
 title: "Practical Applications of AI in Software Development"
 date: 2023-08-08
 categories: ai software-engineering
