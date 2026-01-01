@@ -26,3 +26,49 @@
 .ai-disclosure em {
   font-style: normal;
 }
+
+/* Featured post on homepage */
+.featured-post {
+  background-color: #f6f8fa;
+  padding: 1.5em;
+  border-radius: 6px;
+  border-left: 4px solid #159957;
+  margin: 1.5em 0;
+}
+
+.featured-post h3 {
+  margin-top: 0;
+  margin-bottom: 0.5em;
+}
+
+.featured-post h3 a {
+  color: #159957;
+  text-decoration: none;
+}
+
+.featured-post h3 a:hover {
+  text-decoration: underline;
+}
+
+.featured-post .post-meta {
+  font-size: 0.85em;
+  color: #666;
+  margin-bottom: 0.75em;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.featured-post p {
+  margin-bottom: 0.75em;
+  line-height: 1.6;
+}
+
+.read-more {
+  color: #159957;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.read-more:hover {
+  text-decoration: underline;
+}

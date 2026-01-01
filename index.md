@@ -23,4 +23,18 @@ I write about the intersection of quality engineering strategy and hands-on tech
 
 ---
 
+## Latest from the Blog
+
+{% assign latest_post = site.posts | first %}
+<div class="featured-post">
+  <h3><a href="{{ latest_post.url | relative_url }}">{{ latest_post.title }}</a></h3>
+  <p class="post-meta">Published {{ latest_post.date | date: "%B %d, %Y" }}</p>
+  <p>{{ latest_post.excerpt | strip_html | truncatewords: 50 }}</p>
+  <p><a href="{{ latest_post.url | relative_url }}" class="read-more">Read more →</a></p>
+</div>
+
+<p><a href="{{ '/blog/' | relative_url }}">View all posts →</a></p>
+
+---
+
 © 2025 Ouray Viney. All rights reserved.
