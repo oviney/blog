@@ -1,8 +1,8 @@
 ---
 title: "Testing times"
 subtitle: "Artificial intelligence has conquered software testing. The productivity gains remain elusive."
-date: 2024-12-31
-last_modified_at: 2024-12-31
+date: 2025-12-31
+last_modified_at: 2025-12-31
 categories: [quality-engineering, ai]
 image: /assets/charts/testing-times-ai-gap.png
 ai_assisted: true
