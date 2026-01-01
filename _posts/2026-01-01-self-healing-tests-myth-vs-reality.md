@@ -1,6 +1,8 @@
 ---
+layout: post
 title: "Self-Healing Tests: Myth vs Reality"
 date: 2026-01-01
+ai_assisted: true
 ---
 
 Self-healing tests promise to cut maintenance costs significantly, yet only a fraction of organisations fully capitalise on these savings. This claim positions self-healing tests as potentially transformative for software development. Despite the potential, scepticism remains about the true effectiveness of these solutions in automating the maintenance process without human intervention.
