@@ -2,6 +2,7 @@
 layout: post
 title: "Self-Healing Tests: Myth vs Reality"
 date: 2026-01-01
+categories: [quality-engineering, test-automation]
 ai_assisted: true
 ---
 
