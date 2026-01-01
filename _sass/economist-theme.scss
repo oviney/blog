@@ -122,6 +122,12 @@ body {
   max-width: $content-max-width;
   margin: 0 auto;
   padding: $spacing-xl $spacing-md;
+  
+  // For article pages with sidebar, allow wider layout
+  &:has(.article-layout) {
+    max-width: $wide-max-width;
+    padding: $spacing-lg;
+  }
 }
 
 .page-wide {
@@ -215,26 +221,24 @@ blockquote {
 
 // Two-column article layout
 .article-layout {
+  width: 100%;
   max-width: $wide-max-width;
   margin: 0 auto;
-  padding: $spacing-lg;
+  padding: 0;
   display: grid;
   grid-template-columns: 1fr;
   gap: $spacing-xl;
   
   @media (min-width: 1024px) {
-    grid-template-columns: 1fr 320px;
+    grid-template-columns: minmax(0, 680px) 320px;
     gap: $spacing-xl * 1.5;
   }
 }
 
 // Economist-style article
 .economist-article {
-  max-width: $content-max-width;
-  
-  @media (min-width: 1024px) {
-    max-width: 680px;
-  }
+  max-width: 100%;
+  min-width: 0;
 }
 
 .article-header {
