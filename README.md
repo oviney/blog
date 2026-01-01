@@ -1,5 +1,9 @@
 # Ouray's Tech Blog
 
+[![Deploy Jekyll site to Pages](https://github.com/oviney/blog/actions/workflows/jekyll.yml/badge.svg)](https://github.com/oviney/blog/actions/workflows/jekyll.yml)
+[![Test Jekyll Build](https://github.com/oviney/blog/actions/workflows/test-build.yml/badge.svg)](https://github.com/oviney/blog/actions/workflows/test-build.yml)
+[![Quality Tests](https://github.com/oviney/blog/actions/workflows/test-quality.yml/badge.svg)](https://github.com/oviney/blog/actions/workflows/test-quality.yml)
+
 Software engineering insights on quality, testing, and AI - written in The Economist's signature style.
 
 **Theme:** Custom Economist-inspired design system  
@@ -25,6 +29,28 @@ bundle exec jekyll serve
 # Visit http://localhost:4000
 ```
 
+**Testing Locally:**
+
+```bash
+# Install testing dependencies
+npm install
+
+# Create baseline screenshots (first time only)
+npm run test:visual:reference
+
+# Run visual regression tests
+npm run test:visual
+
+# Run accessibility audit
+npm run test:a11y
+
+# Run all tests
+npm test
+```
+
+**Pre-commit Hook:**
+The pre-commit hook automatically validates Jekyll builds before commits. This catches build errors locally before pushing to GitHub.
+
 ## Publishing
 
 Content is published via Git:
@@ -39,9 +65,16 @@ GitHub Actions automatically builds and deploys changes to GitHub Pages.
 
 **Build & Deployment:**
 - Triggers on push to `main` branch
-- Uses Jekyll 4.3.2 with Minimal Mistakes theme
+- Uses Jekyll 4.3.2 with custom Economist theme
 - Deployment time: 1-2 minutes
 - Monitor progress: https://github.com/oviney/blog/actions
+
+**Quality Gates:**
+- ✅ Pre-commit: Jekyll build validation (local)
+- ✅ CI: Jekyll build test + HTML validation
+- ✅ CI: Visual regression testing (BackstopJS)
+- ✅ CI: Accessibility testing (pa11y-ci WCAG 2.1 AA)
+- ✅ Deployment: Automated to GitHub Pages
 
 ## Custom Theme
 
