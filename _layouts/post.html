@@ -6,6 +6,12 @@ layout: default
   <article class="economist-article">
     <header class="article-header">
       {% if page.categories %}
+      <!-- Category Tag (Economist Style - Prominent) -->
+      <div class="category-tag">
+        <span class="tag">{{ page.categories | first | upcase | replace: '-', ' ' }}</span>
+      </div>
+
+      <!-- Breadcrumb Navigation (Secondary) -->
       <div class="article-breadcrumb">
         <a href="{{ '/blog/' | relative_url }}" class="category-link">{{ page.categories | first | capitalize }}</a>
         {% if page.title %}

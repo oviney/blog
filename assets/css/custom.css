@@ -156,3 +156,21 @@
 .read-more-link:hover {
   text-decoration: underline;
 }
+
+/* Category Tag (Economist Style - Issue #15 Fix) */
+.category-tag {
+  margin-bottom: 1rem;
+}
+
+.category-tag .tag {
+  display: inline-block;
+  background-color: #e3120b;  /* Economist red */
+  color: #fff;
+  font-family: 'DejaVu Sans', Arial, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.75rem;
+  text-transform: uppercase;
+  border-radius: 0;  /* Sharp corners, Economist style */
+}
