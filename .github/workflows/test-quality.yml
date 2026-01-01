@@ -1,0 +1,52 @@
+name: Visual Regression & Accessibility Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build Jekyll site
+        run: bundle exec jekyll build
+      
+      - name: Start Jekyll server
+        run: |
+          bundle exec jekyll serve --port 4000 --detach
+          sleep 5
+      
+      - name: Run visual regression tests
+        run: npm run test:visual
+        continue-on-error: true
+      
+      - name: Run accessibility tests
+        run: npm run test:a11y
+      
+      - name: Upload visual regression report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-report
+          path: backstop_data/html_report/
+          retention-days: 7
