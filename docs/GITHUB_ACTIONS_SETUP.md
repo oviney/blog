@@ -2,9 +2,36 @@
 
 ## Required: Enable GitHub Actions for Pages Deployment
 
-Before the GitHub Actions workflow can deploy your site, you need to update the repository settings:
+Before the GitHub Actions workflow can deploy your site, you need to update the repository settings.
 
-### Steps:
+### Option 1: Automated with Playwright MCP Bridge (Recommended)
+
+If you have the Playwright MCP Bridge Chrome extension installed:
+
+1. **Configure VS Code MCP** (one-time setup):
+   - Edit `~/Library/Application Support/Code/User/mcp.json`:
+   ```json
+   {
+     "servers": {
+       "playwright": {
+         "command": "npx",
+         "args": [
+           "@playwright/mcp@latest",
+           "--extension"
+         ]
+       }
+     },
+     "inputs": []
+   }
+   ```
+   - Reload VS Code (`Cmd+Shift+P` → "Reload Window")
+
+2. **Enable GitHub Actions via Copilot**:
+   - Ask Copilot to navigate to repository settings
+   - Copilot will use your authenticated browser session
+   - Settings change automated through MCP Bridge
+
+### Option 2: Manual Configuration (30 seconds)
 
 1. Go to your repository: https://github.com/oviney/blog
 

@@ -29,10 +29,12 @@ If any check fails, commit is blocked until fixed.
 git push origin main
 ```
 
-### 4. GitHub Pages Deploys Automatically
-- Deployment takes 1-2 minutes
-- Uses GitHub's Jekyll environment (no SSL issues)
-- Fetches remote theme successfully
+### 4. GitHub Actions Builds and Deploys
+- GitHub Actions workflow triggers on push to main
+- Build with Jekyll 4.3.2 and all plugins (~45 seconds)
+- Deploy to GitHub Pages (~30 seconds)
+- Total deployment time: 1-2 minutes
+- View progress: https://github.com/oviney/blog/actions
 
 ### 5. Verify on Production
 Visit https://www.viney.ca/ to see changes live.
@@ -52,11 +54,12 @@ The `.git/hooks/pre-commit` script catches:
 - Missing required metadata
 - Broken internal links
 
-### GitHub Pages Handles Deployment
-- Consistent build environment
+### GitHub Actions Handles Build & Deployment
+- Jekyll 4.3.2 with full plugin support
+- Consistent build environment (Ubuntu)
 - No local SSL/certificate issues
-- Automatic theme fetching
-- CDN distribution
+- Complete build logs for debugging
+- Minimal Mistakes theme support
 
 ### Blog QA Agent Learns from Issues
 - Self-improving validation

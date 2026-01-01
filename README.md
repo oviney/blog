@@ -2,6 +2,10 @@
 
 Software engineering insights on quality, testing, and AI - written in The Economist's signature style.
 
+**Theme:** [Minimal Mistakes](https://mmistakes.github.io/minimal-mistakes/) v4.27.3  
+**Build:** Jekyll 4.3.2 via GitHub Actions  
+**Deployment:** GitHub Pages
+
 ## About
 
 Professional commentary on software quality engineering, test automation, and emerging technologies. 
@@ -30,7 +34,13 @@ git commit -m "Publish: Article title"
 git push origin main
 ```
 
-GitHub Pages automatically deploys changes.
+GitHub Actions automatically builds and deploys changes to GitHub Pages.
+
+**Build & Deployment:**
+- Triggers on push to `main` branch
+- Uses Jekyll 4.3.2 with Minimal Mistakes theme
+- Deployment time: 1-2 minutes
+- Monitor progress: https://github.com/oviney/blog/actions
 
 ## Project Structure
 
