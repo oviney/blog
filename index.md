@@ -27,9 +27,9 @@ I write about the intersection of quality engineering strategy and hands-on tech
 
 {% assign latest_post = site.posts | first %}
 <div class="featured-post">
-  <h3><a href="{{ latest_post.url | relative_url }}" style="color: #1a1a1a;">{{ latest_post.title }}</a></h3>
-  <p class="post-meta" style="color: #4d4d4d;">Published {{ latest_post.date | date: "%B %d, %Y" }}</p>
-  <p style="color: #1a1a1a;">{{ latest_post.excerpt | strip_html | truncatewords: 50 }}</p>
+  <h3><a href="{{ latest_post.url | relative_url }}">{{ latest_post.title }}</a></h3>
+  <p class="post-meta">Published {{ latest_post.date | date: "%B %d, %Y" }}</p>
+  <p class="post-excerpt">{{ latest_post.excerpt | strip_html | truncatewords: 50 }}</p>
   <p><a href="{{ latest_post.url | relative_url }}" class="read-more">Read more →</a></p>
 </div>
 

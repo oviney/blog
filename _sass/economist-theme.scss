@@ -779,8 +779,15 @@ blockquote {
   
   .post-excerpt {
     font-size: 1.1rem;
-    color: $text-secondary;
+    color: $text-primary; // Use primary text color for better contrast
     margin-bottom: $spacing-md;
+  }
+  
+  .post-meta {
+    font-family: $font-sans;
+    font-size: 0.9rem;
+    color: $text-secondary; // #4d4d4d - WCAG AA compliant
+    margin: $spacing-sm 0;
   }
   
   .read-more {
@@ -879,10 +886,10 @@ blockquote {
     padding-top: $spacing-lg;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     font-size: 0.85rem;
-    color: $text-primary; // WCAG AA compliant
+    color: rgba(255, 255, 255, 0.9); // Light text on dark background
     
     p {
-      color: $text-primary; // Ensure all paragraph text meets contrast requirements
+      color: rgba(255, 255, 255, 0.9); // Ensure all paragraph text is visible on dark background
     }
   }
 }
