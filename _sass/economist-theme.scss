@@ -10,7 +10,7 @@
 // Colors
 $economist-red: #E3120B;
 $text-primary: #1a1a1a;
-$text-secondary: #666666;
+$text-secondary: #595959; // WCAG AA compliant (4.5:1+ contrast)
 $text-tertiary: #767676; // Changed from #999999 for WCAG AA contrast (4.5:1 minimum)
 $border-color: #E1E4E8;
 $background-light: #F8F8F8;
@@ -786,7 +786,7 @@ blockquote {
   .read-more {
     font-family: $font-sans;
     font-weight: 600;
-    color: #c10a05; // Darker red for contrast (meets WCAG AA 4.5:1)
+    color: #a00900; // WCAG AA compliant dark red (4.5:1+ contrast)
     text-decoration: underline;
     
     &:hover {
@@ -879,7 +879,11 @@ blockquote {
     padding-top: $spacing-lg;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     font-size: 0.85rem;
-    color: $text-secondary; // Changed from $text-tertiary for WCAG compliance
+    color: $text-primary; // WCAG AA compliant
+    
+    p {
+      color: $text-primary; // Ensure all paragraph text meets contrast requirements
+    }
   }
 }
 
