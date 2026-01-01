@@ -44,6 +44,12 @@ npm run test:visual
 # Run accessibility audit
 npm run test:a11y
 
+# Run Lighthouse performance/SEO tests
+npm run test:lighthouse
+
+# Run security audit
+npm run test:security
+
 # Run all tests
 npm test
 ```
@@ -74,6 +80,8 @@ GitHub Actions automatically builds and deploys changes to GitHub Pages.
 - ✅ CI: Jekyll build test + HTML validation
 - ✅ CI: Visual regression testing (BackstopJS)
 - ✅ CI: Accessibility testing (pa11y-ci WCAG 2.1 AA)
+- ✅ CI: Performance testing (Lighthouse CI - Performance, SEO, Best Practices)
+- ✅ CI: Security audit (npm audit)
 - ✅ Deployment: Automated to GitHub Pages
 
 ## Custom Theme
