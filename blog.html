@@ -22,7 +22,6 @@ permalink: /blog/
           {% endfor %}
         </span>
       {% endif %}
-      <span class="reading-time"> • {% include read-time.html content=post.content %}</span>
     </div>
     
     <p class="post-excerpt">{{ post.content | markdownify | strip_html | truncatewords: 50 }}</p>
