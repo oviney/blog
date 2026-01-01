@@ -54,7 +54,7 @@ layout: default
   {% if page.tags %}
   <div class="tag-list">
     {% for tag in page.tags %}
-    <a href="{{ '/blog/' | relative_url }}#{{ tag | slugify }}" class="tag">{{ tag }}</a>
+    <span class="tag">{{ tag }}</span>
     {% endfor %}
   </div>
   {% endif %}

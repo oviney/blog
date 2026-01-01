@@ -2,8 +2,8 @@
 layout: post
 title: "Understanding OpenDNS: Cybersecurity Protection"
 date: 2023-12-28
-categories: Home Network Security
-tags: OpenDNS Home Security Network Security Cyber Security
+categories: [home-network, security]
+tags: [opendns, security, network]
 author: Ouray Viney
 ai_assisted: true
 classes: wide
