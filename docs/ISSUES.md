@@ -3,12 +3,14 @@
 ## 🐛 Active Bugs (2026-01-05)
 
 ### BUG-004: Related Articles Not Filtered by Category
-**Status:** IN PROGRESS
+**Status:** FIXED ✅
 **Reporter:** ouray
 **Assigned To:** Creative Director
 **Date Reported:** 2026-01-05
+**Date Fixed:** 2026-01-05
 **Priority:** P1 (High)
 **Sprint:** 2026-01 Sprint 1
+**Commit:** 9699505
 
 **Description:**
 The "More from [category]" section on article pages shows ALL posts instead of filtering by the current post's category. This defeats the purpose of related articles and provides poor UX.
@@ -26,20 +28,27 @@ The "More from [category]" section on article pages shows ALL posts instead of f
 **Actual Behavior:**
 - Shows all posts without category filtering
 
+**Solution Implemented:**
+- Added Liquid logic to filter posts by category using `where_exp`
+- Separated posts into same-category and other-category arrays
+- Concatenated arrays (same category first) and limited to 6
+- Current post excluded using `post.url != page.url`
+- Falls back gracefully to other categories if insufficient same-category posts
+
 **Impact:**
-- Users see irrelevant related articles
-- Reduces engagement and navigation quality
-- Breaks The Economist's UX pattern
+- Users now see truly related articles from same category
+- Improved engagement and navigation quality
+- Matches The Economist's UX pattern
 
 **Related Files:**
-- `_layouts/post.html` (lines 50-70, related articles section)
+- `_layouts/post.html` (lines 59-88)
 
 **Acceptance Criteria:**
-- [ ] Related articles filtered by current post's category
-- [ ] Current post excluded from related list
-- [ ] Minimum 3, maximum 6 related posts shown
-- [ ] Fallback to other categories if < 3 in same category
-- [ ] Tested on all existing posts
+- [x] Related articles filtered by current post's category
+- [x] Current post excluded from related list
+- [x] Minimum 3, maximum 6 related posts shown
+- [x] Fallback to other categories if < 3 in same category
+- [x] Tested on all existing posts
 
 ---
 
