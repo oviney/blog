@@ -1,7 +1,7 @@
 ---
 name: QA Gatekeeper - Testing & CI/CD Pipeline
 description: Quality assurance workflow for PR reviews, CI pipeline monitoring, and production verification
-version: 1.1.0
+version: 1.2.0
 triggers:
   - PR created for bug fix or feature
   - Need to review code changes
@@ -104,7 +104,51 @@ Run npm run test:a11y
 
 **CRITICAL:** Never guess at fixes. Always pull logs first.
 
-### tep-by-Step Instructions
+#### 0e. Distinguish Expected vs Unexpected Failures
+
+**Visual Regression Failures:**
+
+When BackstopJS reports mismatches, determine if they're expected:
+
+**Expected (Design Changes):**
+- PR is for a design update (e.g., issue #33 - blog layout)
+- High mismatch percentages (>10%) across multiple scenarios
+- Changes align with issue's acceptance criteria
+- Before/after screenshots show intentional visual improvements
+
+**Action:** Approve references after visual verification (see Section 2.5)
+
+**Unexpected (Regressions):**
+- Small mismatch percentages (<5%)
+- Changes unrelated to PR scope
+- Visual bugs or broken layouts
+- Alignment/spacing issues
+
+**Action:** Fix the code to restore expected appearance
+
+**Accessibility False Positives:**
+
+When Pa11y fails but you believe colors are compliant:
+
+```bash
+# Check compiled CSS for actual color values
+grep -A5 "selector-name" _site/assets/css/styles.css
+
+# Verify contrast ratio at https://webaim.org/resources/contrastchecker/
+# Required: 4.5:1 (AA) or 7:1 (AAA)
+```
+
+**If colors ARE compliant in code:**
+1. Comment findings on PR with contrast ratio proof
+2. Trigger fresh CI build (may be caching issue)
+3. If still fails, investigate CI environment rendering
+
+**If colors NOT compliant:**
+1. Fix color values in SCSS
+2. Document change in PR comment
+3. Push and verify CI passes
+
+### Step-by-Step Instructions
 
 ### 1. PR Review Process
 
@@ -253,6 +297,60 @@ gh api repos/oviney/blog/pages
 # - CNAME conflict
 # - Build size > 1GB
 ```
+
+### 2.5 Update Visual Regression References
+
+**When to Update References:**
+- Design changes are intentional (e.g., layout updates, theme changes)
+- Visual tests fail with high mismatch percentages (>10%)
+- Changes match PR's acceptance criteria
+- Before/after screenshots are verified as improvements
+
+**Approval Workflow:**
+
+#### Option A: Local Approval (Recommended)
+```bash
+# 1. Ensure branch is checked out locally
+git checkout bugfix/GH-33-blog-layout
+
+# 2. Build Jekyll site
+bundle exec jekyll build
+
+# 3. Start server
+bundle exec jekyll serve --config _config_dev.yml --detach
+
+# 4. Run visual tests to generate new screenshots
+npm run test:visual
+
+# 5. Review the report (opens in browser)
+# Check backstop_data/html_report/index.html
+
+# 6. If all changes look correct, approve
+npm run test:visual:approve
+
+# 7. Commit the updated reference images
+git add backstop_data/bitmaps_reference/
+git commit -m "test: update BackstopJS references for new blog layout"
+git push origin bugfix/GH-33-blog-layout
+
+# 8. Stop server
+pkill -f jekyll
+```
+
+**Important:**
+- ⚠️ Always review the HTML report before approving
+- ⚠️ Reference images are ~20MB - commit message should be clear
+- ⚠️ Only approve if visual changes are intentional
+
+#### Option B: Skip Visual Tests (Temporary)
+If you need to merge urgently and visual updates will be handled separately:
+1. Document decision in PR comment
+2. Create follow-up issue to update references
+3. Merge with failing visual tests (NOT RECOMMENDED)
+
+**Files Updated:**
+- `backstop_data/bitmaps_reference/*.png` - All reference screenshots
+- Typically 15 images (5 scenarios × 3 viewports)
 
 ### 3. Verify Production Deployment
 
@@ -475,6 +573,66 @@ else
 fi
 ```
 
+## Troubleshooting
+
+### Local Testing Environment Setup
+
+**If Pa11y fails to run locally:**
+```bash
+# Install Chrome for Puppeteer
+npx puppeteer browsers install chrome
+
+# Or use system Chrome
+# Set PUPPETEER_EXECUTABLE_PATH in your environment
+```
+
+**If BackstopJS fails with "no such directory":**
+```bash
+# You must run tests before approving
+npm run test:visual
+
+# Then approve
+npm run test:visual:approve
+```
+
+**If local tests pass but CI fails:**
+1. Check if CSS/JS is cached in CI
+2. Trigger fresh build with empty commit:
+   ```bash
+   git commit --allow-empty -m "chore: trigger CI rebuild"
+   git push
+   ```
+3. Compare compiled CSS locally vs CI artifacts
+4. Check CI environment versions (Ruby, Node, dependencies)
+
+**Color contrast verification:**
+```bash
+# Extract actual color from compiled CSS
+grep -A3 ".your-class" _site/assets/css/styles.css
+
+# Verify contrast ratio:
+# - Visit: https://webaim.org/resources/contrastchecker/
+# - Enter foreground and background colors
+# - Must meet 4.5:1 (AA) or 7:1 (AAA)
+```
+
+### Common CI False Positives
+
+**Accessibility:**
+- **Symptom:** Pa11y fails but colors are WCAG compliant in code
+- **Cause:** CSS caching, rendering differences, or outdated test environment
+- **Solution:** Verify colors in compiled CSS, document findings, trigger fresh build
+
+**Visual Regression:**
+- **Symptom:** All scenarios fail with high mismatch percentages
+- **Cause:** Intentional design changes without updated references
+- **Solution:** Review changes, approve with `backstop approve` (see Section 2.5)
+
+**Performance:**
+- **Symptom:** Lighthouse scores drop slightly (<5 points)
+- **Cause:** Network variance in CI environment
+- **Solution:** Re-run tests, check if consistent across runs
+
 ## Related Files
 
 - [`docs/skills/github-issues-workflow/SKILL.md`](../github-issues-workflow/SKILL.md) - Full bug workflow
@@ -514,6 +672,7 @@ fi
 
 ## Version History
 
+- **1.2.0** (2026-01-05): Added Section 0e (Expected vs Unexpected Failures), Section 2.5 (Update Visual Regression References), Troubleshooting section for local test environment and common false positives
 - **1.1.0** (2026-01-05): Added "Step 0: Diagnose CI Failures" - Always investigate logs before fixing
-- **1.0.0** (2026-01-05): Initial creation - QA workflow for PR reviews and CI monitoring
 - **1.0.0** (2026-01-05): Initial skill creation - QA Gatekeeper workflow for PR review, CI monitoring, and production verification
+
