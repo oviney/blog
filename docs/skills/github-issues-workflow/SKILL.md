@@ -74,9 +74,35 @@ gh issue list --repo oviney/blog --label "agent:creative-director"
 
 ### 1. User Reports Bug (GitHub Issue)
 
-**User creates new issue** at https://github.com/oviney/blog/issues/new
+**When user asks to log/report a bug, ALWAYS provide the bug template first.**
 
-**Template:**
+**Trigger phrases:**
+- "I found a bug"
+- "There's a problem with..."
+- "How do I report a bug?"
+- "What's the bug template?"
+- "I want to log a bug"
+
+**Agent response:**
+```
+Here's the bug template from .github/ISSUE_TEMPLATE/bug_report.yml:
+
+Required fields:
+- Priority: P0-P3 (Critical/High/Medium/Low)
+- Component: Layout/Design, Blog Posts, Navigation, Performance, SEO, Other
+- Bug Description: What's wrong? What did you expect?
+
+Optional fields:
+- Steps to Reproduce
+- Reference/Screenshots
+- Affected URL
+
+Go ahead and describe the bug - I'll help triage and create a GitHub issue.
+```
+
+**User creates new issue** at https://github.com/oviney/blog/issues/new (or Agent creates it)
+
+**Full Template Reference:**
 ```markdown
 **Bug Description:**
 [Clear description of what's broken]

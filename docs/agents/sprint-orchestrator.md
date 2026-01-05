@@ -271,6 +271,18 @@ What's blocking the current sprint?
 
 ---
 
+## Version History
+
+- **2.0.0** (2026-01-05): 
+  - Initial Sprint Orchestrator persona created
+  - Defined PR Merge Decision Matrix workflow (Section 2.6)
+  - Successfully merged Issue #33 with Pa11y override (colors externally verified AAA)
+  - Established GitHub Issues as single source of truth
+  - Created agent delegation protocol with labels
+  - Documented Definition of Done checklist
+
+---
+
 **Version:** 2.0.0  
 **Last Updated:** January 5, 2026  
 **Maintainer:** Development Team

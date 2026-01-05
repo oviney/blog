@@ -22,6 +22,13 @@ The QA Gatekeeper is responsible for maintaining quality standards across the bl
 - Testing deployments on production
 - Verifying bug fixes and features
 - Ensuring all changes follow skill guidelines
+- Providing bug template when users report issues
+
+**When user asks to log a bug, ALWAYS provide the bug template first** (see .github/ISSUE_TEMPLATE/bug_report.yml):
+```
+Required: Priority (P0-P3), Component, Bug Description
+Optional: Steps to Reproduce, Reference/Screenshots, Affected URL
+```
 
 **GitHub Actions URL**: https://github.com/oviney/blog/actions
 **Production URL**: https://www.viney.ca
@@ -483,6 +490,29 @@ When merging despite CI failures:
 **Sign-off:** @QA-Gatekeeper with @Creative-Director design approval
 
 **Merging to main.**
+```
+
+**Real-World Case Study (Issue #33):**
+```markdown
+## ✅ Approved for Merge (CI Override) - Issue #33
+
+**Override Reason:** Pa11y false positive on color contrast
+
+**Evidence:**
+- Colors externally verified as AAA compliant
+- External tools confirmed contrast ratios meet WCAG standards
+- Pa11y CI environment rendering issue documented
+
+**Other CI Status:**
+- ✅ Jekyll Build: Passing
+- ⚠️ Pa11y: Override (false positive - AAA verified externally)
+- ✅ Visual Regression: Approved (intentional Economist design changes)
+- ✅ All acceptance criteria met
+
+**Decision:** Merged using PR Merge Decision Matrix (Section 2.6)
+**Sign-off:** Sprint Orchestrator with Creative Director approval
+**Commit:** 60b6aac
+**Date:** January 5, 2026
 ```
 
 **Merge Without Overrides:**

@@ -337,13 +337,25 @@ blockquote {
 }
 
 .article-hero-image {
-  margin: 0 0 $spacing-xl 0;
+  margin: $spacing-xl 0;
+  width: 100%;
+  max-width: 100%;
   
   img {
     width: 100%;
     height: auto;
     display: block;
-    border-radius: $radius-sm;
+    object-fit: cover;
+    max-height: 600px; // Economist-style max height
+  }
+  
+  figcaption {
+    font-size: 0.875rem;
+    color: $text-secondary;
+    font-style: italic;
+    margin-top: $spacing-sm;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 }
 
