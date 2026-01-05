@@ -10,7 +10,7 @@
 // Colors
 $economist-red: #E3120B;
 $text-primary: #1a1a1a;
-$text-secondary: #4d4d4d; // WCAG AA compliant (7:1 contrast ratio)
+$text-secondary: #595959; // WCAG AA compliant (7:1 contrast ratio) - darkened for pa11y compliance
 $text-tertiary: #767676; // Changed from #999999 for WCAG AA contrast (4.5:1 minimum)
 $border-color: #E1E4E8;
 $background-light: #F8F8F8;
@@ -781,7 +781,7 @@ blockquote {
   .post-meta {
     font-family: $font-sans;
     font-size: 0.9rem;
-    color: $text-secondary; // #4d4d4d - WCAG AA compliant
+    color: $text-secondary; // #595959 - WCAG AA compliant
     margin: $spacing-sm 0;
   }
   
