@@ -42,6 +42,7 @@ echo "==================================="
 
 | Diagnostic Result | Fix Command | Wait Until Green |
 |------------------|-------------|------------------|
+| Ruby = 2.6.x (system) | **rbenv not initialized!** See Pitfall 3 below | ✅ |
 | Ruby ≠ 3.3.x | `rbenv local 3.3.6` | ✅ |
 | Bundler missing | `gem install bundler` | ✅ |
 | Jekyll missing | `bundle install` | ✅ |
@@ -141,10 +142,29 @@ git push origin main
 **Solution**: Kill existing process: `kill -9 $(lsof -ti:4000)`  
 **Why**: Previous Jekyll process didn't terminate cleanly
 
-### Pitfall 3: Wrong Ruby Version
-**Problem**: `connection_pool` gem requires Ruby >= 3.0  
-**Solution**: Switch to Ruby 3.3.6: `rbenv local 3.3.6`  
-**Check**: `ruby -v` should show `3.3.6`
+### Pitfall 3: rbenv Not Initialized (Ruby shows 2.6.x system version)
+**Problem**: Diagnostic shows `Ruby: ruby 2.6.10` (system Ruby instead of rbenv-managed version)  
+**Root Cause**: rbenv is not initialized in your shell (missing from ~/.zshrc)  
+**Solution**:
+```bash
+# 1. Add rbenv to ~/.zshrc (one-time setup)
+echo 'eval "$(rbenv init - zsh)"' >> ~/.zshrc
+
+# 2. Reload shell config
+source ~/.zshrc
+
+# 3. Verify rbenv is working
+rbenv versions  # Should show installed Ruby versions
+
+# 4. Set local Ruby version for this project
+cd /Users/ouray.viney/code/economist-blog-v5
+rbenv local 3.3.6
+
+# 5. Verify fix
+ruby -v  # Should now show 3.3.6, not 2.6.10
+```
+**Check**: `ruby -v` should show `ruby 3.3.6` (not 2.6.10)  
+**Token Cost**: This single pitfall caused the 5-iteration server start failure (5000 tokens wasted)
 
 ### Pitfall 4: Bypassing Pre-commit Hook
 **Problem**: Used `git commit --no-verify` to skip failing checks  
@@ -155,6 +175,45 @@ git push origin main
 **Solution**: Use variables from `_sass/economist-theme.scss` (e.g., `$economist-red`, `$spacing-unit`)
 
 ## Code Snippets/Patterns
+
+### Complete Environment Fix (From Diagnostic Failure)
+
+**When diagnostic shows**: `Ruby: ruby 2.6.10` + `Bundler: ❌ NOT INSTALLED`
+
+```bash
+# Step 1: Initialize rbenv in zsh (one-time setup)
+echo 'eval "$(rbenv init - zsh)"' >> ~/.zshrc
+source ~/.zshrc
+
+# Step 2: Verify rbenv is working
+rbenv versions
+# Should show: * 3.3.6 (set by /Users/ouray.viney/code/economist-blog-v5/.ruby-version)
+
+# Step 3: Set local Ruby version
+cd /Users/ouray.viney/code/economist-blog-v5
+rbenv local 3.3.6
+
+# Step 4: Verify Ruby version switched
+ruby -v
+# Should show: ruby 3.3.6 (not 2.6.10)
+
+# Step 5: Install bundler
+gem install bundler
+
+# Step 6: Install Jekyll and dependencies
+bundle install
+
+# Step 7: Re-run diagnostic to confirm all green
+echo "Ruby: $(ruby -v)"
+echo "Bundler: $(bundle -v)"
+echo "Jekyll: $(bundle exec jekyll -v)"
+# All should now show proper versions
+
+# Step 8: NOW start server (will succeed on first try)
+bundle exec jekyll serve --config _config_dev.yml --livereload
+```
+
+**Token Savings**: This workflow replaces 5+ failed iterations (5000 tokens) with 1 successful setup (500 tokens)
 
 ### Starting Local Server
 
