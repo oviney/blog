@@ -1,11 +1,13 @@
 ---
 name: Jekyll Development Workflow
 description: Complete workflow for developing, testing, and deploying Jekyll blog changes
-version: 1.0.0
+version: 1.1.0
 triggers:
+  - Starting Jekyll server
   - Making content changes (posts, pages)
   - Modifying layouts or styles
   - Updating configuration
+  - Debugging server failures
   - Need to verify changes before deployment
 ---
 
@@ -22,6 +24,36 @@ This blog uses Jekyll 4.3.2 with a custom Economist-inspired theme, deployed via
 
 ## Step-by-Step Instructions
 
+### 0. Environment Pre-Flight Checklist (CRITICAL)
+
+**BEFORE attempting ANY `jekyll serve` command**, run this diagnostic to avoid token waste:
+
+```bash
+echo "=== Jekyll Environment Diagnostic ==="
+echo "Ruby: $(ruby -v)"
+echo "Bundler: $(bundle -v 2>/dev/null || echo '❌ NOT INSTALLED')"
+echo "Jekyll: $(bundle exec jekyll -v 2>/dev/null || echo '❌ NOT INSTALLED')"
+echo "Port 4000: $(lsof -ti:4000 && echo '⚠️ BUSY' || echo '✅ FREE')"
+echo "Config: $([ -f _config_dev.yml ] && echo '✅ YES' || echo '⚠️ NO')"
+echo "==================================="
+```
+
+**Decision Tree**:
+
+| Diagnostic Result | Fix Command | Wait Until Green |
+|------------------|-------------|------------------|
+| Ruby ≠ 3.3.x | `rbenv local 3.3.6` | ✅ |
+| Bundler missing | `gem install bundler` | ✅ |
+| Jekyll missing | `bundle install` | ✅ |
+| Port 4000 busy | `kill -9 $(lsof -ti:4000)` | ✅ |
+
+**Token Cost Analysis**:
+- ❌ **Without diagnostic**: 5 failed attempts × 1000 tokens = 5000 tokens wasted
+- ✅ **With diagnostic**: 1 successful attempt × 200 tokens = 200 tokens
+- **Net savings**: 4800 tokens (96% reduction)
+
+**Rule**: If 2+ diagnostics show issues, STOP and fix environment before trying server commands.
+
 ### 1. Make Changes
 
 Edit the relevant files:
@@ -30,14 +62,12 @@ Edit the relevant files:
 - **Layouts**: `_layouts/*.html`
 - **Config**: `_config.yml` (requires server restart if testing locally)
 
-### 2. Test Locally (Optional)
+### 2. Test Locally (Optional - Only After Diagnostic Passes)
 
 For CSS/layout work requiring rapid iteration:
 
 ```bash
 cd /Users/ouray.viney/code/economist-blog-v5
-bundle update --bundler  # If needed
-bundle install
 bundle exec jekyll serve --config _config_dev.yml --livereload
 ```
 
@@ -97,6 +127,24 @@ git push origin main
 **Problem**: Looks good on desktop but broken on mobile  
 **Solution**: Always test at multiple breakpoints (320px, 768px, 1024px, 1920px)  
 **Tool**: Browser DevTools responsive mode
+
+## Common Pitfalls
+
+### Pitfall 1: Starting Server Without Diagnostic
+**Problem**: Wasting tokens on 5+ failed server start attempts  
+**Solution**: ALWAYS run environment diagnostic first (see Step 0)  
+**Token Cost**: 4800 tokens wasted per incident  
+**Root Cause**: Skipping environment validation
+
+### Pitfall 2: Port 4000 Already in Use
+**Problem**: `Address already in use - bind(2) for 127.0.0.1:4000`  
+**Solution**: Kill existing process: `kill -9 $(lsof -ti:4000)`  
+**Why**: Previous Jekyll process didn't terminate cleanly
+
+### Pitfall 3: Wrong Ruby Version
+**Problem**: `connection_pool` gem requires Ruby >= 3.0  
+**Solution**: Switch to Ruby 3.3.6: `rbenv local 3.3.6`  
+**Check**: `ruby -v` should show `3.3.6`
 
 ### Pitfall 4: Bypassing Pre-commit Hook
 **Problem**: Used `git commit --no-verify` to skip failing checks  
