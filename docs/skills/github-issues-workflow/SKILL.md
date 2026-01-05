@@ -20,6 +20,47 @@ This blog uses **GitHub Issues** (not docs/ISSUES.md) as the single source of tr
 
 ## Step-by-Step Instructions
 
+### 0. Invoking Agent from Existing GitHub Issue
+
+**When you return to dev environment and want to action a GitHub Issue:**
+
+#### Option 1: Tell Agent to Process Issue
+```
+User: "Process GitHub Issue #123"
+User: "Fix bug #123"
+User: "Work on issue #123"
+```
+
+**Agent automatically:**
+1. Fetches issue from https://github.com/oviney/blog/issues/123
+2. Reads title, description, labels, priority
+3. Activates correct agent persona based on labels
+4. Starts workflow at Step 2 (Triage) or Step 3 (Create Branch)
+
+#### Option 2: Direct Agent Assignment
+```
+User: "Creative Director, fix GitHub Issue #123"
+User: "QA Gatekeeper, triage issue #123"
+```
+
+**Agent:**
+1. Adopts specified persona
+2. Fetches issue details
+3. Continues from appropriate workflow step
+
+#### Option 3: Check All Open Issues
+```
+User: "What bugs are open?"
+User: "Show me P1 issues"
+User: "List all agent:creative-director issues"
+```
+
+**Agent:**
+1. Queries GitHub Issues API
+2. Filters by label/priority/assignee
+3. Lists issues with quick summary
+4. Asks which to work on
+
 ### 1. User Reports Bug (GitHub Issue)
 
 **User creates new issue** at https://github.com/oviney/blog/issues/new
@@ -372,6 +413,27 @@ Issue **auto-closes** when PR with `Closes #123` merges to main.
 
 ## Code Snippets/Patterns
 
+### Fetch GitHub Issue Details
+
+```bash
+# Get issue details via GitHub CLI
+gh issue view 123
+
+# Get issue details via API
+curl -s https://api.github.com/repos/oviney/blog/issues/123 | jq '.title, .body, .labels[].name'
+
+# List open issues with specific label
+gh issue list --label "agent:creative-director" --state open
+```
+
+### Agent Invocation Commands
+
+**User says** → **Agent action**:
+- "Process issue #123" → Fetch issue, determine agent, start workflow
+- "Show open P1 bugs" → Query GitHub, list P1 issues
+- "Creative Director fix #123" → Adopt Creative Director persona, start Step 3
+- "What bugs need QA Gatekeeper?" → List issues with agent:qa-gatekeeper label
+
 ### Quick Branch Creation
 
 ```bash
@@ -436,6 +498,61 @@ curl -s https://www.viney.ca/ | grep -i "error" && echo "❌ ERRORS FOUND" || ec
 - [ ] Verified on production (https://www.viney.ca/)
 - [ ] Issue auto-closed or manually closed
 - [ ] No rollbacks or hotfixes needed
+
+## Example Workflow (End-to-End)
+
+### Scenario: User logs bug, returns next day to fix it
+
+**Day 1 (Evening):**
+```
+User browses blog → Notices related articles showing wrong posts
+User goes to: https://github.com/oviney/blog/issues/new
+User creates Issue #123:
+  Title: "Related articles not filtered by category"
+  Labels: bug, P1:high
+  Description: [Full details]
+User closes laptop
+```
+
+**Day 2 (Morning):**
+```
+User: "What P1 bugs are open?"
+
+Agent (QA Gatekeeper activates):
+  → Queries GitHub Issues
+  → Lists: "#123 - Related articles not filtered by category (P1, bug, no agent assigned)"
+
+User: "Process issue #123"
+
+Agent (QA Gatekeeper):
+  → Fetches issue details
+  → Reproduces bug locally
+  → Confirms it's a layout issue
+  → Adds label: agent:creative-director
+  → Comments on issue: "Confirmed. Assigning to Creative Director"
+
+Agent (switches to Creative Director):
+  → Reads docs/skills/economist-theme/SKILL.md
+  → Creates branch: bugfix/GH-123-related-articles-filter
+  → Implements fix in _layouts/post.html
+  → Tests at all breakpoints
+  → Commits with "Closes #123"
+  → Pushes branch
+  → Creates PR
+
+Agent: "PR created: https://github.com/oviney/blog/pull/124. Ready for review."
+
+User: Reviews PR → Approves
+
+Agent (QA Gatekeeper):
+  → Merges PR to main
+  → Waits for GitHub Actions
+  → Verifies on production
+  → Comments: "✅ Verified on production"
+  → Issue auto-closes
+
+DONE. Total time: ~15 minutes.
+```
 
 ## Version History
 
