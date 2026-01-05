@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed - January 5, 2026
+- **Issue #33**: Blog layout now matches Economist design system
+  - Single-column layout with 1040px max-width (centered)
+  - Typography hierarchy: titles 1.75rem, excerpts 1.0625rem
+  - Economist-style date format (Jan 2nd 2026 | X min read)
+  - Horizontal card layout with 48-64px vertical spacing
+  - 280px images with 16:9 aspect ratio
+  - Default gray gradient SVG for posts without images
+  - Responsive breakpoints: 1024px, 768px, 320px
+  - Commit: 60b6aac
+
 ### Changed - December 31, 2025
 - **BREAKING**: Migrated from GitHub Pages automatic build to GitHub Actions custom workflow
 - **BREAKING**: Upgraded Jekyll from 3.10.0 to 4.3.2
