@@ -1,13 +1,15 @@
 ---
 name: GitHub Issues Bug Workflow
 description: Standard Agile process for bug reporting, triage, assignment, and resolution using GitHub Issues
-version: 1.1.0
+version: 1.2.0
 triggers:
   - User reports a bug
   - QA finds a defect
   - Production incident
   - Test failure
   - Need to track defect
+  - User asks "what should I work on next?"
+  - Need to query open issues
 ---
 
 ## Context
@@ -53,13 +55,22 @@ User: "QA Gatekeeper, triage issue #123"
 User: "What bugs are open?"
 User: "Show me P1 issues"
 User: "List all agent:creative-director issues"
+User: "What should we work on next?"
 ```
 
-**Agent:**
+**Agent (Sprint Orchestrator activates):**
 1. Queries GitHub Issues API
 2. Filters by label/priority/assignee
 3. Lists issues with quick summary
 4. Asks which to work on
+
+**Example:**
+```bash
+gh issue list --repo oviney/blog --state open --label P1
+gh issue list --repo oviney/blog --label "agent:creative-director"
+```
+
+**See also:** [Sprint Orchestrator Agent](../../agents/sprint-orchestrator.md) for backlog management and planning.
 
 ### 1. User Reports Bug (GitHub Issue)
 
@@ -636,7 +647,8 @@ User: Reviews PR → Approves
 Agent (QA Gatekeeper):
   → Merges PR to main
   → Waits for GitHub Actions
-  → Verifies on production
+  → Ve2.0** (2026-01-05): Added Sprint Orchestrator integration for backlog management, added planning triggers
+- **1.rifies on production
   → Comments: "✅ Verified on production"
   → Issue auto-closes
 

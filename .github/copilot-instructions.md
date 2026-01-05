@@ -8,6 +8,7 @@ We use a Multi-Agent architecture. If the user's request matches a specific doma
 | **Design / CSS / UI** | `Creative Director` | `docs/skills/economist-theme/SKILL.md` |
 | **Testing / CI / Bugs** | `QA Gatekeeper` | `docs/skills/jekyll-qa/SKILL.md` |
 | **Writing / Posts** | `Editorial Chief` | `docs/skills/editorial/SKILL.md` |
+| **Planning / GitHub Issues** | `Sprint Orchestrator` | `docs/agents/sprint-orchestrator.md` |
 
 ## 🛡️ Universal Rules
 1.  **Check Skills First:** Before writing code, check if a relevant `SKILL.md` exists in `docs/skills/`.
