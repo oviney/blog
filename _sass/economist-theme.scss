@@ -1048,7 +1048,7 @@ table {
 .topic-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: $spacing-lg;
+  gap: $spacing-md;
   margin-top: $spacing-xl;
 }
 
@@ -1056,19 +1056,23 @@ table {
   display: flex;
   flex-direction: column;
   background: $background-white;
+  border-bottom: 1px solid $border-color;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
   
   &:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
   }
 }
 
 .topic-card-image {
   display: block;
   width: 100%;
-  height: 200px;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   background: $background-light;
+  flex-shrink: 0;
   
   img {
     width: 100%;
@@ -1097,8 +1101,9 @@ table {
   padding: $spacing-md;
   display: flex;
   flex-direction: column;
-  gap: $spacing-sm;
-  flex: 1;
+  gap: $spacing-xs;
+  flex: 1 0 auto;
+  min-height: 0;
 }
 
 .topic-category {
@@ -1108,7 +1113,7 @@ table {
   color: $economist-red;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: $spacing-xs;
+  margin: 0;
 }
 
 .topic-card-title {
@@ -1117,7 +1122,7 @@ table {
   
   a {
     font-family: $font-serif;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 700;
     color: $text-primary;
     text-decoration: none;
@@ -1133,11 +1138,15 @@ table {
 
 .topic-card-excerpt {
   font-family: $font-serif;
-  font-size: 0.938rem;
+  font-size: 0.875rem;
   color: $text-secondary;
   line-height: $line-height-normal;
   margin: 0;
-  flex: 1 1 auto;
+  flex: 1 0 auto;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .topic-card-meta {
@@ -1146,8 +1155,9 @@ table {
   font-family: $font-sans;
   font-size: 0.813rem;
   color: $text-tertiary;
-  margin-top: auto;
-  padding-top: $spacing-sm;
+  margin-top: $spacing-xs;
+  padding-top: 0;
+  flex: 0 0 auto;
 }
 
 .topic-meta-item {
