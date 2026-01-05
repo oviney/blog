@@ -212,7 +212,58 @@ gh issue view 123 --repo oviney/blog
 cat docs/BUG_*.md  # e.g., docs/BUG_BLOG_LAYOUT.md
 ```
 
-#### 3b. Identify Ambiguities
+#### 3b. **VERIFY WHICH FILES TO CHANGE**
+
+**⚠️ CRITICAL ANTI-PATTERN FROM ISSUE #33:**
+- Issue described as "blog layout" bug
+- Requirement doc (BUG_BLOG_LAYOUT.md) said "The `/blog` page layout"
+- **BUT** actual intent was to fix individual BLOG POST layout (post.html)
+- Agent changed blog archive page (blog.html) → created regression
+- Wasted tokens on rollback and rework
+
+**BEFORE implementing, explicitly confirm:**
+
+1. **Which template/file needs to change?**
+   ```
+   - Blog archive page (blog.html) - lists all posts?
+   - Individual post layout (_layouts/post.html) - single post view?
+   - Homepage (index.md) - landing page?
+   - Other: __________
+   ```
+
+2. **Which URL is affected?**
+   ```
+   - /blog/ (archive listing)
+   - /blog/2026/01/post-title (individual post)
+   - / (homepage)
+   - Other: __________
+   ```
+
+3. **Show user example of current state**
+   ```bash
+   # Start server
+   bundle exec jekyll serve --livereload
+   
+   # Take screenshot or describe current layout
+   # "I see the blog archive at /blog/ shows a 3-column grid of cards"
+   # "Confirm: should I change THIS page, or the individual post view?"
+   ```
+
+**Template:**
+```markdown
+🔍 **Requirement Verification Before Implementation**
+
+Based on the issue description, I understand:
+- **File to change**: [blog.html / _layouts/post.html / index.md / other]
+- **Affected URL**: [/blog/ / /blog/2026/01/post-title / / other]
+- **Current state**: [describe what you see]
+
+**Is this correct?** Please confirm before I start coding.
+```
+
+**Wait for explicit user confirmation before proceeding.**
+
+#### 3c. Identify Ambiguities
 **Ask about:**
 - **Design Details**: Exact sizes, colors, fonts (if not fully specified)
 - **User Preferences**: Options or variations not clarified
@@ -288,20 +339,91 @@ cat docs/skills/jekyll-qa/SKILL.md
 - Test at all breakpoints (320px, 768px, 1024px)
 - Run local server to verify
 
-#### 4c. Test Fix
+#### 4c. Test Fix (MANDATORY BEFORE COMMIT)
+
+**⚠️ CRITICAL ANTI-PATTERN FROM ISSUE #33:**
+- Agent committed changes without visual testing
+- Relied only on Jekyll build success (pre-commit hook)
+- Build passing ≠ visual correctness
+- Created regression that wasn't caught until user review
+
+**MANDATORY TESTING SEQUENCE:**
+
+1. **Build Test** (prerequisite)
+   ```bash
+   bundle exec jekyll build
+   # Must pass before proceeding
+   ```
+
+2. **Visual Testing** (REQUIRED - not optional)
+   ```bash
+   # Start local server
+   bundle exec jekyll serve --config _config_dev.yml --livereload
+   
+   # Navigate to EXACT URL mentioned in issue
+   # - If issue mentions /blog/, test /blog/
+   # - If issue mentions post layout, test a post URL like /2026/01/02/post-title/
+   
+   # Open browser to http://localhost:4000
+   ```
+
+3. **Verify Against Acceptance Criteria** (checklist)
+   - [ ] Primary bug is fixed (the reported issue)
+   - [ ] No visual regressions on other pages
+   - [ ] Test at responsive breakpoints: 320px, 768px, 1024px
+   - [ ] Browser console shows 0 errors
+   - [ ] Typography/spacing matches specification
+   - [ ] Images load correctly
+   - [ ] Links work
+   - [ ] Hover states function
+
+4. **Test Related Pages** (regression prevention)
+   ```bash
+   # If you changed blog.html, also test:
+   # - / (homepage - uses same card components)
+   # - Individual post pages (might share styles)
+   
+   # If you changed _layouts/post.html, test:
+   # - Multiple post URLs (with/without images, categories, etc.)
+   # - Different post lengths
+   ```
+
+5. **Screenshot Evidence** (for PR)
+   - Take screenshots of before/after
+   - Test at mobile/tablet/desktop sizes
+   - Capture any edge cases
+
+**Do NOT commit until all visual testing is complete.**
+
+**Template for testing notes:**
+```markdown
+✅ **Testing Complete**
+
+**URLs Tested:**
+- http://localhost:4000/blog/ - ✅ 3-column grid displays correctly
+- http://localhost:4000/ - ✅ Homepage card layout unchanged
+- http://localhost:4000/2026/01/02/post-title/ - ✅ Hero image sized correctly
+
+**Responsive Testing:**
+- 320px (mobile) - ✅ Single column, proper spacing
+- 768px (tablet) - ✅ Two columns, images scale
+- 1024px (desktop) - ✅ Three columns, full layout
+
+**Regression Check:**
+- ✅ No visual changes to unrelated pages
+- ✅ 0 console errors
+- ✅ All links functional
+
+Ready for commit.
+```
+
+#### 4d. Run Automated Tests (if applicable)
 ```bash
-# Build test
-bundle exec jekyll build
-
-# Visual test
-bundle exec jekyll serve --livereload
-# Open http://localhost:4000 and verify fix
-
-# Run all tests (if applicable)
+# Run test suite (if changes affect tested code)
 npm test
 ```
 
-#### 4d. Commit to Branch
+#### 4e. Commit to Branch
 ```bash
 git add <files>
 git commit -m "fix(GH-123): brief description
@@ -615,6 +737,59 @@ gh label list --repo oviney/blog | grep "P1:high"
 - [ ] QA Gatekeeper triaged within 1 hour
 - [ ] Feature branch created (bugfix/GH-XXX)
 - [ ] Fix implemented on branch (not main)
+- [ ] **Visual testing completed BEFORE commit**
+- [ ] **Files to change confirmed with user BEFORE implementation**
+- [ ] PR created with screenshots
+- [ ] CI tests pass (GitHub Actions)
+- [ ] Code review approved
+- [ ] Merged to main
+- [ ] Verified on production (viney.ca)
+- [ ] Issue closed with "Closes #123" in commit
+
+## Anti-Patterns & Lessons Learned
+
+### Issue #33 - Blog Layout Regression (January 2026)
+
+**What Went Wrong:**
+1. ❌ **Misunderstood requirements**: Issue title said "blog layout" but meant individual post template, not blog archive
+2. ❌ **Changed wrong files**: Modified blog.html (archive page) instead of _layouts/post.html (post template)
+3. ❌ **Committed without visual testing**: Relied only on Jekyll build success, didn't verify visual output
+4. ❌ **Created regression**: Blog archive changed from 3-column grid to single-column horizontal layout
+5. ❌ **Wasted tokens**: Required rollback commit and rework
+
+**Root Causes:**
+- Ambiguous issue description ("blog layout" can mean multiple things)
+- Didn't confirm which file/URL to change before coding
+- Pre-commit hook only validates build, not visual correctness
+- No visual regression testing before commit
+
+**Prevention (now in workflow):**
+1. ✅ **Step 3b added**: "Verify Which Files to Change" - explicit confirmation with user
+2. ✅ **Step 4c expanded**: Mandatory visual testing sequence with checklist
+3. ✅ **Template provided**: "Requirement Verification Before Implementation"
+4. ✅ **Testing notes template**: Document what was tested before commit
+
+**Correct Approach:**
+```markdown
+Agent: "Based on issue #33, I see two possible interpretations:
+1. Change blog archive page (blog.html) at /blog/
+2. Change individual post layout (_layouts/post.html) at /2026/01/post-title/
+
+I've started the Jekyll server. The blog archive currently shows a 3-column 
+grid. Should I change THIS page, or the individual post template?"
+
+User: "The individual post template - not the archive."
+
+Agent: "✅ Confirmed. I'll modify _layouts/post.html and test at URLs like 
+/2026/01/02/post-title/. Will not touch blog.html."
+```
+
+**Lesson**: When issue describes a "page" or "layout", always clarify:
+- Which specific file/template?
+- Which URL path?
+- Show current state and confirm before changing
+
+**Impact**: ~2 hours wasted, regression introduced to production, reduced trust
 - [ ] All tests pass locally
 - [ ] PR created with proper description
 - [ ] Code review completed
