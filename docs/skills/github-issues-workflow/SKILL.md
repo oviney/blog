@@ -1,7 +1,7 @@
 ---
 name: GitHub Issues Bug Workflow
 description: Standard Agile process for bug reporting, triage, assignment, and resolution using GitHub Issues
-version: 1.0.0
+version: 1.1.0
 triggers:
   - User reports a bug
   - QA finds a defect
@@ -162,7 +162,56 @@ Add to issue description:
 - [ ] Works on mobile/tablet/desktop
 ```
 
-### 3. Assigned Agent Creates Branch
+### 3. Assigned Agent Asks Clarifying Questions (BEFORE Creating Branch)
+
+**CRITICAL STEP**: Before writing any code, agent must ask clarifying questions to avoid rework.
+
+#### 3a. Review Issue & Specifications
+```bash
+# Read issue details
+gh issue view 123 --repo oviney/blog
+
+# If spec file exists, read it
+cat docs/BUG_*.md  # e.g., docs/BUG_BLOG_LAYOUT.md
+```
+
+#### 3b. Identify Ambiguities
+**Ask about:**
+- **Design Details**: Exact sizes, colors, fonts (if not fully specified)
+- **User Preferences**: Options or variations not clarified
+- **Edge Cases**: Behavior for missing data, empty states
+- **Dependencies**: External resources needed (images, APIs)
+- **Responsive Behavior**: Mobile/tablet handling if unclear
+
+**Example questions (from issue #33):**
+```markdown
+**Clarifying Questions Before Implementation:**
+
+1. **Date Display Format**
+   - Spec mentions metadata but not date format
+   - Should we use "Jan 5, 2026" or "January 5, 2026" or "Jan 5th 2026"?
+   - Reference URL: [Economist article]
+
+2. **Category Colors**
+   - Should all categories use same gray color?
+   - Or different colors per category like Economist does?
+
+3. **Image Fallback**
+   - For posts without images, should we:
+     a) Use default gray gradient image?
+     b) Hide image container entirely?
+     c) Show placeholder icon?
+```
+
+#### 3c. Wait for User Response
+**Do not proceed until:**
+- [ ] User answers all clarifying questions
+- [ ] Design decisions are confirmed
+- [ ] Implementation approach is approved
+
+**Benefit**: Avoids wasted tokens on iterations and rework
+
+### 4. Assigned Agent Creates Branch
 
 **Agent checks out feature branch:**
 ```bash
@@ -193,7 +242,7 @@ git checkout -b bugfix/GH-123-related-articles-filter
 cat docs/skills/economist-theme/SKILL.md
 
 # QA Gatekeeper reads:
-cat docs/skills/jekyll-development/SKILL.md
+cat docs/skills/jekyll-qa/SKILL.md
 ```
 
 #### 4b. Implement Fix
@@ -475,10 +524,50 @@ gh pr create \
 curl -s https://www.viney.ca/ | grep -i "error" && echo "❌ ERRORS FOUND" || echo "✅ NO ERRORS"
 ```
 
+## GitHub Labels Setup
+
+**PREREQUISITE**: GitHub repository must have these labels configured before workflow can function.
+
+### Required Labels
+
+**Priority Labels:**
+```bash
+gh label create "P1:high" --repo oviney/blog --color "d73a4a" --description "High priority - impacts core functionality or brand"
+gh label create "P2:medium" --repo oviney/blog --color "fbca04" --description "Medium priority - important but not urgent"
+gh label create "P3:low" --repo oviney/blog --color "0e8a16" --description "Low priority - nice to have improvements"
+```
+
+**Agent Labels:**
+```bash
+gh label create "agent:creative-director" --repo oviney/blog --color "5319e7" --description "Assigned to Creative Director (CSS/Layout/Design)"
+gh label create "agent:qa-gatekeeper" --repo oviney/blog --color "1d76db" --description "Assigned to QA Gatekeeper (Testing/Quality/CI)"
+gh label create "agent:editorial-manager" --repo oviney/blog --color "c5def5" --description "Assigned to Editorial Manager (Content/Writing/SEO)"
+```
+
+**Type Labels** (GitHub defaults):
+- `bug` - Red
+- `enhancement` - Feature request
+- `documentation` - Doc updates
+- `question` - Need clarification
+
+### Verifying Labels
+```bash
+# List all labels
+gh label list --repo oviney/blog
+
+# Check if specific label exists
+gh label list --repo oviney/blog | grep "P1:high"
+```
+
+**If labels are missing during triage:**
+1. Agent should notify user
+2. User/agent creates labels using commands above
+3. Continue workflow
+
 ## Related Files
 
 - [`docs/skills/economist-theme/SKILL.md`](../economist-theme/SKILL.md) - Creative Director skill
-- [`docs/skills/jekyll-development/SKILL.md`](../jekyll-development/SKILL.md) - QA Gatekeeper skill
+- [`docs/skills/jekyll-qa/SKILL.md`](../jekyll-qa/SKILL.md) - QA Gatekeeper skill  
 - [`docs/skills/git-operations/SKILL.md`](../git-operations/SKILL.md) - Git workflow
 - [`.github/workflows/jekyll.yml`](../../.github/workflows/jekyll.yml) - CI/CD pipeline
 - [`docs/DEVELOPMENT_WORKFLOW.md`](../DEVELOPMENT_WORKFLOW.md) - Overall workflow
@@ -556,4 +645,5 @@ DONE. Total time: ~15 minutes.
 
 ## Version History
 
+- **1.1.0** (2026-01-05): Added clarifying questions step (Step 3), GitHub labels setup section, updated QA skill reference to jekyll-qa
 - **1.0.0** (2026-01-05): Initial creation - Established GitHub Issues as single source of truth for bug tracking
