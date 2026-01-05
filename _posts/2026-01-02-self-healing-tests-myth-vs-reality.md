@@ -3,7 +3,7 @@ layout: post
 title: "Self-Healing Tests: Myth vs Reality"
 date: 2026-01-02
 author: "The Economist"
-image: output/images/self-healing-tests-myth-vs-reality.png
+image: /assets/charts/self-healing-tests-myth-vs-reality.png
 categories: technology
 ---
 
@@ -19,9 +19,7 @@ However, the expectation of complete autonomy has been met with scepticism. Whil
 
 Implementing self-healing test technologies presents notable challenges. Despite their benefits, only a small fraction of organisations fully eliminate manual updates. Much of this shortfall can be attributed to technical and integration issues. In practice, these systems often require considerable fine-tuning and configuration to meet the diverse needs of complex software environments.
 
-![Adoption and Effectiveness of Self-Healing Tests](/assets/charts/self-healing-tests-myth-vs-reality.png)
-
-As the chart shows, while enterprise adoption is expected to reach 70% by 2025, the actual reduction in maintenance efforts averages around 60%. This suggests a misalignment between universal adoption and the anticipated effectiveness, highlighting that real-world applications can fall short of theoretical potential.
+While enterprise adoption is expected to reach 70% by 2025, the actual reduction in maintenance efforts averages around 60%. This suggests a misalignment between universal adoption and the anticipated effectiveness, highlighting that real-world applications can fall short of theoretical potential.
 
 ## Moving Beyond Vendor Narratives
 
