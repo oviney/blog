@@ -1,7 +1,7 @@
 ---
 name: Economist Theme Design System
 description: Guidelines for maintaining visual consistency with The Economist's design language
-version: 1.0.0
+version: 1.1.0
 triggers:
   - Adding new styles or components
   - Modifying existing SCSS
@@ -244,6 +244,106 @@ $spacing-unit: 16px;
 .huge-gap { margin-bottom: $spacing-unit * 4; }       // 64px
 ```
 
+## Date Formatting Patterns
+
+### Economist Date Format (Liquid)
+
+The Economist uses ordinal date format: "Jan 5th 2026|X min read"
+
+**Implementation:**
+```liquid
+{% assign day = post.date | date: "%-d" %}
+{{ post.date | date: "%b %-d" }}{% if day == '1' or day == '21' or day == '31' %}st{% elsif day == '2' or day == '22' %}nd{% elsif day == '3' or day == '23' %}rd{% else %}th{% endif %} {{ post.date | date: "%Y" }}
+```
+
+**Output examples:**
+- Jan 1st 2026
+- Jan 2nd 2026  
+- Jan 3rd 2026
+- Jan 5th 2026
+- Jan 21st 2026
+
+**Usage in meta tags:**
+```liquid
+<time class="topic-meta-date" datetime="{{ post.date | date_to_xmlschema }}">
+  {{ post.date | date: "%b %-d" }}{% assign day = post.date | date: "%-d" %}{% if day == '1' or day == '21' or day == '31' %}st{% elsif day == '2' or day == '22' %}nd{% elsif day == '3' or day == '23' %}rd{% else %}th{% endif %} {{ post.date | date: "%Y" }}
+</time>
+<span class="topic-meta-separator">|</span>
+<span class="topic-meta-item">{{ words | divided_by: 200 | plus: 1 }} min read</span>
+```
+
+**Styling:**
+```scss
+.topic-meta-date {
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  color: $text-tertiary;
+  font-weight: 400;
+}
+
+.topic-meta-separator {
+  color: $text-tertiary;
+  margin: 0 0.25rem;
+}
+```
+
+## Image Fallback Strategy
+
+### Default Blog Images
+
+For blog posts without featured images, use default fallback asset.
+
+**Default Image Location:**
+```
+assets/images/blog-default.svg
+```
+
+**SVG Format (1200x675 - 16:9 aspect ratio):**
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f6f6f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8e8e8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#grad)"/>
+</svg>
+```
+
+**Usage in Templates:**
+```liquid
+{% if post.image %}
+  <img src="{{ post.image | relative_url }}" alt="{{ post.title }}">
+{% else %}
+  <img src="/assets/images/blog-default.svg" alt="{{ post.title }}">
+{% endif %}
+```
+
+**Or simplified with OR operator:**
+```liquid
+<img src="{% if post.image %}{{ post.image | relative_url }}{% else %}/assets/images/blog-default.svg{% endif %}" alt="{{ post.title }}">
+```
+
+**Future Enhancement:**
+- economist-agents repo can generate custom theme images per post
+- Store in assets/images/generated/
+- Fallback chain: post.image → generated image → blog-default.svg
+
+**Styling:**
+```scss
+.topic-card-image {
+  width: 280px;  // Fixed width
+  aspect-ratio: 16 / 9;  // Always 16:9
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;  // Crop to fit
+  }
+}
+```
+
 ## Related Files
 
 - [`_sass/economist-theme.scss`](../../_sass/economist-theme.scss) - Main theme file (600+ lines)
@@ -266,4 +366,5 @@ $spacing-unit: 16px;
 
 ## Version History
 
+- **1.1.0** (2026-01-05): Added Economist date format patterns (ordinal suffixes), image fallback strategy, default blog-default.svg asset documentation
 - **1.0.0** (2026-01-05): Initial skill creation from README.md and AI_CODING_GUIDELINES.md
