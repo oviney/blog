@@ -31,12 +31,12 @@ QA Gatekeeper, review PR #35
 Editorial Chief, write a post about testing
 ```
 
-### 4. Sprint Orchestrator
+### 4. Flow Orchestrator
 **Domain:** Project Management / GitHub Issues / Status / Planning  
 **Skill File:** [`docs/agents/sprint-orchestrator.md`](sprint-orchestrator.md)  
 **Activation:**
 ```
-Sprint Orchestrator, what's next?
+Flow Orchestrator, what's next?
 What should we work on?
 Check GitHub Issues for P1 items
 ```
@@ -45,11 +45,11 @@ Check GitHub Issues for P1 items
 
 | User Says | Agent Activates |
 |-----------|-----------------|
-| "What should I work on next?" | Sprint Orchestrator |
+| "What should I work on next?" | Flow Orchestrator |
 | "Fix this CSS issue..." | Creative Director |
 | "Review this PR..." | QA Gatekeeper |
 | "Write a blog post about..." | Editorial Chief |
-| "What's blocking the sprint?" | Sprint Orchestrator |
+| "What's blocking the sprint?" | Flow Orchestrator |
 | "Update the theme..." | Creative Director |
 | "Run the tests..." | QA Gatekeeper |
 
@@ -77,7 +77,7 @@ All agents work with **GitHub Issues** at: https://github.com/oviney/blog/issues
 
 Agents hand off work to each other via GitHub Issue comments:
 
-**Sprint Orchestrator** → delegates to:
+**Flow Orchestrator** → delegates to:
 - Creative Director (for design tasks)
 - QA Gatekeeper (for verification)
 - Editorial Chief (for content)
@@ -86,7 +86,7 @@ Agents hand off work to each other via GitHub Issue comments:
 - QA Gatekeeper (for PR review)
 
 **QA Gatekeeper** → reports back to:
-- Sprint Orchestrator (issue verification)
+- Flow Orchestrator (issue verification)
 
 **Editorial Chief** → coordinates with:
 - Creative Director (visual content)
@@ -97,7 +97,7 @@ Agents hand off work to each other via GitHub Issue comments:
 Common sequential workflows for complex tasks:
 
 ### Pattern 1: Design Implementation & QA
-**Flow:** Creative Director → QA Gatekeeper → Sprint Orchestrator
+**Flow:** Creative Director → QA Gatekeeper → Flow Orchestrator
 
 1. **Creative Director** implements design changes
    - Creates PR with visual changes
@@ -114,7 +114,7 @@ Common sequential workflows for complex tasks:
    - Compares screenshots against issue acceptance criteria
    - Approves or requests design adjustments
 
-4. **Sprint Orchestrator** handles PR merge
+4. **Flow Orchestrator** handles PR merge
    - Ensures all approvals complete
    - Manages merge conflicts if any
    - Closes related issues
@@ -128,11 +128,11 @@ Common sequential workflows for complex tasks:
 3. **QA Gatekeeper** verifies published correctly
 
 ### Pattern 3: Bug Fix Verification
-**Flow:** (Any Agent) → QA Gatekeeper → Sprint Orchestrator
+**Flow:** (Any Agent) → QA Gatekeeper → Flow Orchestrator
 
 1. Agent fixes bug and creates PR
 2. **QA Gatekeeper** verifies fix in CI and production
-3. **Sprint Orchestrator** closes issue with verification notes
+3. **Flow Orchestrator** closes issue with verification notes
 
 **Key Principle:** Each agent focuses on their domain expertise, passing work forward when specialized knowledge is needed.
 
@@ -158,6 +158,6 @@ docs/
 ## Version History
 
 - **2.1.0** (2026-01-05): Added Multi-Agent Collaboration Patterns section documenting sequential workflows
-- **2.0.0** (2026-01-05): Updated Sprint Orchestrator to use GitHub Issues API (not local files)
-- **1.1.0** (2026-01-05): Added Sprint Orchestrator agent for project management
+- **2.0.0** (2026-01-05): Updated Flow Orchestrator to use GitHub Issues API (not local files)
+- **1.1.0** (2026-01-05): Added Flow Orchestrator agent for project management
 - **1.0.0** (2026-01-05): Initial roster with Creative Director, QA Gatekeeper, Editorial Chief

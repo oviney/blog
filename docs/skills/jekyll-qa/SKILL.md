@@ -510,7 +510,7 @@ When merging despite CI failures:
 - ✅ All acceptance criteria met
 
 **Decision:** Merged using PR Merge Decision Matrix (Section 2.6)
-**Sign-off:** Sprint Orchestrator with Creative Director approval
+**Sign-off:** Flow Orchestrator with Creative Director approval
 **Commit:** 60b6aac
 **Date:** January 5, 2026
 ```
