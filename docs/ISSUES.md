@@ -1,48 +1,5 @@
 # Jekyll Blog Issues & Enhancements
 
-## 🐛 Active Bugs (2026-01-05)
-
-### BUG-004: Related Articles Not Filtered by Category
-**Status:** IN PROGRESS
-**Reporter:** ouray
-**Assigned To:** Creative Director
-**Date Reported:** 2026-01-05
-**Priority:** P1 (High)
-**Sprint:** 2026-01 Sprint 1
-
-**Description:**
-The "More from [category]" section on article pages shows ALL posts instead of filtering by the current post's category. This defeats the purpose of related articles and provides poor UX.
-
-**Steps to Reproduce:**
-1. Visit http://127.0.0.1:4000/2026/01/02/self-healing-tests-myth-vs-reality.html
-2. Scroll to bottom "More from technology" section
-3. Observe: Shows posts from ALL categories, not just "technology"
-
-**Expected Behavior:**
-- Show only posts from same category as current post
-- If < 6 posts in category, show remaining from other categories
-- Current post should be excluded
-
-**Actual Behavior:**
-- Shows all posts without category filtering
-
-**Impact:**
-- Users see irrelevant related articles
-- Reduces engagement and navigation quality
-- Breaks The Economist's UX pattern
-
-**Related Files:**
-- `_layouts/post.html` (lines 50-70, related articles section)
-
-**Acceptance Criteria:**
-- [ ] Related articles filtered by current post's category
-- [ ] Current post excluded from related list
-- [ ] Minimum 3, maximum 6 related posts shown
-- [ ] Fallback to other categories if < 3 in same category
-- [ ] Tested on all existing posts
-
----
-
 ## ✅ Completed Issues (2025-12-31)
 
 ### BUG-001: Invalid YAML in _config.yml ✅
