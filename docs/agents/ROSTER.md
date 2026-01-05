@@ -92,6 +92,50 @@ Agents hand off work to each other via GitHub Issue comments:
 - Creative Director (visual content)
 - QA Gatekeeper (publish verification)
 
+## Multi-Agent Collaboration Patterns
+
+Common sequential workflows for complex tasks:
+
+### Pattern 1: Design Implementation & QA
+**Flow:** Creative Director → QA Gatekeeper → Sprint Orchestrator
+
+1. **Creative Director** implements design changes
+   - Creates PR with visual changes
+   - Posts before/after screenshots
+   - Tags QA Gatekeeper for review
+
+2. **QA Gatekeeper** diagnoses CI failures
+   - Distinguishes expected vs unexpected failures
+   - Verifies accessibility with external tools if needed
+   - Identifies need for design validation
+
+3. **Creative Director** (second pass) reviews visual regression
+   - Downloads CI artifacts
+   - Compares screenshots against issue acceptance criteria
+   - Approves or requests design adjustments
+
+4. **Sprint Orchestrator** handles PR merge
+   - Ensures all approvals complete
+   - Manages merge conflicts if any
+   - Closes related issues
+   - Updates sprint documentation
+
+### Pattern 2: Content Creation & Publishing
+**Flow:** Editorial Chief → Creative Director → QA Gatekeeper
+
+1. **Editorial Chief** writes content
+2. **Creative Director** adds visual elements
+3. **QA Gatekeeper** verifies published correctly
+
+### Pattern 3: Bug Fix Verification
+**Flow:** (Any Agent) → QA Gatekeeper → Sprint Orchestrator
+
+1. Agent fixes bug and creates PR
+2. **QA Gatekeeper** verifies fix in CI and production
+3. **Sprint Orchestrator** closes issue with verification notes
+
+**Key Principle:** Each agent focuses on their domain expertise, passing work forward when specialized knowledge is needed.
+
 ## File Structure
 
 ```
@@ -113,6 +157,7 @@ docs/
 
 ## Version History
 
+- **2.1.0** (2026-01-05): Added Multi-Agent Collaboration Patterns section documenting sequential workflows
 - **2.0.0** (2026-01-05): Updated Sprint Orchestrator to use GitHub Issues API (not local files)
 - **1.1.0** (2026-01-05): Added Sprint Orchestrator agent for project management
 - **1.0.0** (2026-01-05): Initial roster with Creative Director, QA Gatekeeper, Editorial Chief
