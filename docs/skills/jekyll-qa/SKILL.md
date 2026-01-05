@@ -1,13 +1,15 @@
 ---
 name: QA Gatekeeper - Testing & CI/CD Pipeline
 description: Quality assurance workflow for PR reviews, CI pipeline monitoring, and production verification
-version: 1.0.0
+version: 1.1.0
 triggers:
   - PR created for bug fix or feature
   - Need to review code changes
   - Monitor GitHub Actions pipeline
   - Verify deployment to production
   - Close verified issues
+  - CI tests failing
+  - Need to diagnose test failures
 ---
 
 ## Context
@@ -24,7 +26,85 @@ The QA Gatekeeper is responsible for maintaining quality standards across the bl
 **Jekyll Build Time**: ~30-60 seconds
 **Deployment Time**: ~2 minutes after merge
 
-## Step-by-Step Instructions
+## S0. Diagnose CI Failures (FIRST STEP)
+
+**When CI tests are failing, ALWAYS investigate before making changes.**
+
+#### 0a. Check PR Status
+```bash
+# View PR with CI status
+gh pr view 35 --repo oviney/blog --json statusCheckRollup
+
+# Or check specific workflow run
+gh run list --repo oviney/blog --branch bugfix/GH-33-blog-layout --limit 5
+```
+
+**Identify which tests failed:**
+- ✅ Jekyll Build (test)
+- ❌ Quality Tests (test) - **This is the failure**
+
+#### 0b. Get CI Logs
+```bash
+# Find the failing run ID
+gh run list --repo oviney/blog --workflow "Quality Tests" --limit 5
+
+# View full logs
+gh run view <run-id> --log --repo oviney/blog
+
+# Or open in browser
+gh run view <run-id> --web --repo oviney/blog
+```
+
+#### 0c. Identify Root Cause
+
+**Quality Tests workflow includes:**
+1. **Pa11y (Accessibility)** - WCAG 2.1 AA compliance
+   - Look for: "color contrast", "aria-label", "heading hierarchy"
+   - Error format: `Error: This element has insufficient contrast`
+   
+2. **Lighthouse (Performance)** - Core Web Vitals
+   - Look for: performance scores, FCP, LCP, CLS
+   - Error format: `Performance score: 85 (target: 90)`
+   
+3. **BackstopJS (Visual Regression)** - Screenshot diffs
+   - Look for: "Mismatch errors found", "visual regression"
+   - Error format: `Test 'homepage' failed with 5.2% mismatch`
+
+**Example log analysis:**
+```
+Run npm run test:a11y
+  pa11y-ci
+
+  ✖ http://localhost:4000/blog/
+    • Error: This element has insufficient contrast at its given color...
+      ├── selector: .topic-card-excerpt
+      ├── expected: 4.5:1
+      ├── actual: 3.8:1
+      
+  9 errors found
+```
+
+#### 0d. Document Findings
+
+**Before making any fixes, comment on PR or issue:**
+```markdown
+🔍 **CI Failure Diagnosis**
+
+**Failed Test:** Pa11y (Accessibility)
+**Error Count:** 9 violations
+**Root Cause:** Color contrast ratio on `.topic-card-excerpt` is 3.8:1 (need 4.5:1)
+
+**Affected Selectors:**
+- `.topic-card-excerpt` (9 instances)
+- Color: #4d4d4d on #ffffff background
+
+**Fix Required:** Darken text color to achieve 4.5:1 minimum contrast ratio
+**Recommended Color:** #595959 (provides 7:1 ratio)
+```
+
+**CRITICAL:** Never guess at fixes. Always pull logs first.
+
+### tep-by-Step Instructions
 
 ### 1. PR Review Process
 
@@ -434,4 +514,6 @@ fi
 
 ## Version History
 
+- **1.1.0** (2026-01-05): Added "Step 0: Diagnose CI Failures" - Always investigate logs before fixing
+- **1.0.0** (2026-01-05): Initial creation - QA workflow for PR reviews and CI monitoring
 - **1.0.0** (2026-01-05): Initial skill creation - QA Gatekeeper workflow for PR review, CI monitoring, and production verification
