@@ -1,0 +1,76 @@
+name: Bug Report
+description: Report a bug or defect
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this bug?
+      options:
+        - P0 - Critical (site broken)
+        - P1 - High (major feature broken)
+        - P2 - Medium (minor issue)
+        - P3 - Low (cosmetic)
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which part of the site is affected?
+      options:
+        - Layout/Design
+        - Blog Posts
+        - Navigation
+        - Performance
+        - SEO
+        - Other
+    validations:
+      required: true
+  
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: What's wrong? What did you expect to happen?
+      placeholder: The blog page layout doesn't match the design spec...
+    validations:
+      required: true
+  
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this bug?
+      placeholder: |
+        1. Navigate to /blog
+        2. Observe the spacing
+        3. Compare to reference design
+    validations:
+      required: false
+  
+  - type: textarea
+    id: reference
+    attributes:
+      label: Reference/Screenshots
+      description: Links to designs, screenshots, or documentation
+      placeholder: https://www.economist.com/topics/artificial-intelligence
+    validations:
+      required: false
+  
+  - type: input
+    id: url
+    attributes:
+      label: Affected URL
+      description: Which page has the bug?
+      placeholder: http://localhost:4000/blog/
+    validations:
+      required: false
