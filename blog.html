@@ -13,21 +13,9 @@ title: Blog Archive
   <div class="topic-grid">
     {% for post in site.posts %}
       <article class="topic-card">
-        {% if post.image %}
         <a href="{{ post.url | relative_url }}" class="topic-card-image">
-          <img src="{{ post.image | relative_url }}" alt="{{ post.title }}">
+          <img src="{% if post.image %}{{ post.image | relative_url }}{% else %}/assets/images/blog-default.svg{% endif %}" alt="{{ post.title }}">
         </a>
-        {% else %}
-        <a href="{{ post.url | relative_url }}" class="topic-card-image topic-card-image-placeholder" aria-label="{{ post.title }}">
-          <div class="placeholder-content" aria-hidden="true">
-            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-          </div>
-        </a>
-        {% endif %}
         
         <div class="topic-card-content">
           {% if post.categories %}
@@ -42,6 +30,8 @@ title: Blog Archive
           
           <div class="topic-card-meta">
             {% assign words = post.content | number_of_words %}
+            <time class="topic-meta-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d" }}{% assign day = post.date | date: "%-d" %}{% if day == '1' or day == '21' or day == '31' %}st{% elsif day == '2' or day == '22' %}nd{% elsif day == '3' or day == '23' %}rd{% else %}th{% endif %} {{ post.date | date: "%Y" }}</time>
+            <span class="topic-meta-separator">|</span>
             <span class="topic-meta-item">{{ words | divided_by: 200 | plus: 1 }} min read</span>
           </div>
         </div>
