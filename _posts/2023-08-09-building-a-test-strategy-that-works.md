@@ -3,6 +3,7 @@ layout: post
 title: "Building a Test Strategy That Actually Works"
 date: 2023-08-09
 categories: [quality-engineering, test-strategy]
+image: /assets/charts/test-strategy.png
 ai_assisted: true
 author: Ouray Viney
 classes: wide

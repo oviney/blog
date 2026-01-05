@@ -1,8 +1,60 @@
 # Development Workflow
 
+## Starting the Local Jekyll Server
+
+### Quick Start
+```bash
+cd /Users/ouray.viney/code/economist-blog-v5
+bundle exec jekyll serve
+```
+
+The server will start at: **http://127.0.0.1:4000/**
+
+### Expected Warnings (Safe to Ignore)
+
+When starting the server, you'll see these warnings that don't affect functionality:
+
+1. **CSV Warning**: 
+   ```
+   csv was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.
+   ```
+   - **Fix (optional)**: Add `gem 'csv'` to Gemfile
+
+2. **Faraday Middleware Warning**:
+   ```
+   To use retry middleware with Faraday v2.0+, install `faraday-retry` gem
+   ```
+   - **Fix (optional)**: Run `bundle add faraday-retry`
+
+3. **Sass Deprecation Warning**:
+   ```
+   Deprecation Warning [import]: Sass @import rules are deprecated
+   ```
+   - **Future task**: Migrate from @import to @use/@forward syntax
+   - **Impact**: None until Dart Sass 3.0.0
+
+### Successful Server Output
+```
+Configuration file: /Users/ouray.viney/code/economist-blog-v5/_config.yml
+            Source: /Users/ouray.viney/code/economist-blog-v5
+       Destination: /Users/ouray.viney/code/economist-blog-v5/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+       Jekyll Feed: Generating feed for posts
+                    done in 0.329 seconds.
+ Auto-regeneration: enabled for '/Users/ouray.viney/code/economist-blog-v5'
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+```
+
+### Stopping the Server
+Press `Ctrl-C` in the terminal to stop the server.
+
+---
+
 ## Local Development Without `jekyll serve`
 
-Due to SSL certificate issues with Ruby 3.3.6 and remote themes, local `jekyll serve` is not required. The pre-commit hook provides all necessary validation.
+The local server is now working, but the pre-commit hook workflow is still recommended for most development. The server is useful for rapid iteration on CSS/layout changes.
 
 ## Recommended Workflow
 
@@ -85,12 +137,13 @@ The `.git/hooks/pre-commit` script catches:
 - ✅ CSS/layout modifications
 - ✅ Daily development workflow
 
-### Use Local Preview (If Needed)
+### Use Local Jekyll Server
 - Complex theme development
 - Rapid iteration on layout
 - CSS experimentation
+- Real-time preview of changes
 
-**Note:** For local preview, would require Docker (not available) or fixing Ruby/SSL configuration.
+**Command:** `bundle exec jekyll serve` (see section above for details)
 
 ## Emergency: Bypass Pre-commit Hook
 

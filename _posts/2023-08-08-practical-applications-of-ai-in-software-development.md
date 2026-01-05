@@ -3,6 +3,7 @@ layout: post
 title: "Practical Applications of AI in Software Development"
 date: 2023-08-08
 categories: ai software-engineering
+image: /assets/charts/ai-software-development.png
 ai_assisted: true
 author: Ouray Viney
 classes: wide
