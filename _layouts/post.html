@@ -2,98 +2,98 @@
 layout: default
 ---
 
-<div class="article-layout">
-  <article class="economist-article">
-    <header class="article-header">
-      {% if page.categories %}
-      <!-- Category Tag (Economist Style - Prominent) -->
-      <div class="category-tag">
-        <span class="tag">{{ page.categories | first | upcase | replace: '-', ' ' }}</span>
-      </div>
-
-      <!-- Breadcrumb Navigation (Secondary) -->
-      <div class="article-breadcrumb">
-        <a href="{{ '/blog/' | relative_url }}" class="category-link">{{ page.categories | first | capitalize }}</a>
-        {% if page.title %}
-        <span class="separator">|</span>
-        <span class="subtitle-preview">{{ page.title }}</span>
-        {% endif %}
-      </div>
-      {% endif %}
-
-      <h1 class="article-title">{{ page.title }}</h1>
-
-      {% if page.subtitle %}
-      <h2 class="article-subtitle">{{ page.subtitle }}</h2>
-      {% endif %}
-
-      <div class="article-meta">
-        <div class="meta-group">
-          <time datetime="{{ page.date | date_to_xmlschema }}">
-            {{ page.date | date: "%b %-dth %Y" | replace: '1th', '1st' | replace: '2th', '2nd' | replace: '3th', '3rd' | replace: '11st', '11th' | replace: '12nd', '12th' | replace: '13rd', '13th' }}
-          </time>
-          <span class="separator">|</span>
-          <span class="location">{% if page.location %}{{ page.location | upcase }}{% endif %}</span>
-          <span class="separator">|</span>
-          <span class="read-time">
-            {% assign words = page.content | number_of_words %}
-            {{ words | divided_by: 180 | plus: 1 }} min read
-          </span>
-        </div>
-      </div>
-    </header>
-
-    {% if page.image %}
-    <figure class="article-image">
-      <img src="{{ page.image | relative_url }}" alt="{{ page.title }}">
-      {% if page.image_caption %}
-      <figcaption>{{ page.image_caption }}</figcaption>
-      {% endif %}
-    </figure>
+<article class="economist-article">
+  <header class="article-header">
+    {% if page.categories %}
+    <div class="article-category">
+      <a href="{{ '/blog/' | relative_url }}" class="category-link">{{ page.categories | first | capitalize | replace: '-', ' ' }}</a>
+    </div>
     {% endif %}
 
-    <div class="article-content">
-      {{ content }}
-    </div>
+    <h1 class="article-title">{{ page.title }}</h1>
 
-    {% if page.ai_assisted %}
-    <aside class="ai-disclosure">
-      <p><strong>AI-Assisted Content:</strong> This article was generated using AI technology following The Economist's editorial standards, with human review and fact-checking.</p>
-    </aside>
+    {% if page.excerpt %}
+    <h2 class="article-subtitle">{{ page.excerpt }}</h2>
     {% endif %}
 
-    <div class="article-footer">
-      <a href="{{ '/blog/' | relative_url }}" class="back-link">← Back to Blog</a>
+    <div class="article-meta">
+      {% if page.image %}
+      <div class="share-icons">
+        <button class="share-btn" aria-label="Share article"><span class="icon-share">Share</span></button>
+      </div>
+      {% endif %}
+      <time datetime="{{ page.date | date_to_xmlschema }}" class="meta-date">
+        {{ page.date | date: "%b %-d" }}{% assign day = page.date | date: "%-d" %}{% if day == "1" or day == "21" or day == "31" %}st{% elsif day == "2" or day == "22" %}nd{% elsif day == "3" or day == "23" %}rd{% else %}th{% endif %} {{ page.date | date: "%Y" }}
+      </time>
+      <span class="meta-separator">|</span>
+      <span class="meta-read-time">
+        {% assign words = page.content | number_of_words %}
+        {{ words | divided_by: 180 | plus: 1 }} min read
+      </span>
     </div>
-  </article>
+  </header>
 
-  {% if site.posts.size > 1 %}
-  <aside class="related-sidebar">
-    <h3>More from {{ page.categories | first | downcase | default: "quality-engineering" }}</h3>
-    <div class="related-list">
-      {% assign related_posts = site.posts | where_exp: "post", "post.url != page.url" | limit: 3 %}
-      {% for post in related_posts %}
-      <article class="related-item">
-        <div class="related-content">
-          {% if post.categories %}
-          <span class="related-category">{{ post.categories | first }}</span>
-          {% endif %}
-          <h4 class="related-title">
-            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-          </h4>
-          <p class="related-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
-          <div class="related-meta">
-            <span class="meta-date">{{ post.date | date: "%b %d, %Y" }}</span>
-            <span class="separator">|</span>
-            <span class="meta-read-time">
-              {% assign words = post.content | number_of_words %}
-              {{ words | divided_by: 180 | plus: 1 }} min read
-            </span>
-          </div>
-        </div>
-      </article>
-      {% endfor %}
-    </div>
+  {% if page.image %}
+  <figure class="article-hero-image">
+    <img src="{{ page.image | relative_url }}" alt="{{ page.title }}" loading="eager">
+  </figure>
+  {% endif %}
+
+  <div class="article-body">
+    {{ content }}
+  </div>
+
+  {% if page.ai_assisted %}
+  <aside class="article-disclosure">
+    <p><em>This article was created with AI assistance. All content has been reviewed and verified for accuracy.</em></p>
   </aside>
   {% endif %}
-</div>
+
+  <footer class="article-footer">
+    <div class="article-actions">
+      <button class="reuse-btn">Reuse this content</button>
+    </div>
+  </footer>
+</article>
+
+{% if site.posts.size > 1 %}
+<aside class="related-articles">
+  <h2 class="related-heading">More from {{ page.categories | first | capitalize | replace: '-', ' ' | default: "the blog" }}</h2>
+  <div class="related-grid">
+    {% assign current_category = page.categories | first %}
+    {% assign related_posts = site.posts | where_exp: "post", "post.url != page.url" %}
+    {% assign same_category_posts = "" | split: "" %}
+    {% assign other_posts = "" | split: "" %}
+    
+    {% comment %} Separate posts by category match {% endcomment %}
+    {% for post in related_posts %}
+      {% if post.categories contains current_category %}
+        {% assign same_category_posts = same_category_posts | push: post %}
+      {% else %}
+        {% assign other_posts = other_posts | push: post %}
+      {% endif %}
+    {% endfor %}
+    
+    {% comment %} Merge: same category first, then others {% endcomment %}
+    {% assign all_related = same_category_posts | concat: other_posts %}
+    
+    {% for post in all_related limit: 6 %}
+        <article class="related-card">
+          {% if post.image %}
+          <a href="{{ post.url | relative_url }}" class="related-image-link">
+            <img src="{{ post.image | relative_url }}" alt="{{ post.title }}" loading="lazy">
+          </a>
+          {% endif %}
+          <div class="related-content">
+            <h3 class="related-title">
+              <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+            </h3>
+            {% if post.excerpt %}
+            <p class="related-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
+            {% endif %}
+          </div>
+        </article>
+    {% endfor %}
+  </div>
+</aside>
+{% endif %}
