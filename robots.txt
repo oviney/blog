@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Allow search engines to index all content
+Disallow: /test-results/
+Disallow: /backstop_data/
+Disallow: /.lighthouseci/
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /.github/
+Disallow: /docs/
+
+# Sitemap location
+Sitemap: http://localhost:4000/sitemap.xml
+
+# Crawl delay (optional, helps with server load)
+Crawl-delay: 1

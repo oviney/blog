@@ -24,7 +24,7 @@ ai_disclosure: >-
   Some articles on this blog are generated with AI assistance using a multi-agent system
   designed to match The Economist's editorial standards. All content undergoes human review,
   fact-checking, and editorial approval before publication.
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "http://localhost:4000" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: oviney
 github_username:  oviney
 
