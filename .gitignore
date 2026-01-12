@@ -15,6 +15,15 @@ backstop_data/html_report/
 .playwright-mcp/
 .lighthouseci/
 
+# Playwright
+test-results/
+playwright-report/
+*.webm
+*.png
+**/screenshots/
+**/videos/
+playwright-healing-report.md
+
 # Python
 __pycache__/
 *.py[cod]
@@ -46,4 +55,4 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
-*.swo
+*.swo.claude/settings.local.json

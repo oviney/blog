@@ -1,0 +1,173 @@
+# Playwright Healer Agent Configuration for Economist Blog v5
+# This configuration enables automatic test healing for common failures
+
+healer:
+  # Auto-healing settings
+  enabled: true
+  auto_commit: false  # Require human review for all fixes
+  create_pull_requests: true
+  confidence_threshold: 0.8
+
+  # Review process configuration
+  review_process:
+    github_pr: true
+    required_reviewers: true
+    auto_merge_threshold: 0.95  # Only auto-merge highest confidence fixes
+
+  # Categories requiring human review
+  human_review_required:
+    - breaking_changes      # Layout or functionality changes
+    - accessibility_impacts # Changes affecting a11y
+    - navigation_changes    # Menu or routing modifications
+    - new_selectors        # Brand new element selectors
+    - multiple_failures    # More than 5 failures in single run
+
+  # Auto-healing strategies
+  strategies:
+    # Locator healing - most common use case
+    locator_healing:
+      enabled: true
+      priority_order:
+        - role_based       # Prefer getByRole() selectors
+        - label_based      # getByLabel(), getByPlaceholder()
+        - text_based       # getByText() for stable content
+        - test_id_based    # data-testid attributes
+        - css_fallback     # CSS selectors as last resort
+
+      # Specific selector patterns for this blog
+      blog_patterns:
+        navigation: 'nav[role="navigation"], .main-nav, header nav'
+        post_content: '.post-content, .article-content, main'
+        post_title: '.post-title, .article-title, h1'
+        post_meta: '.post-meta, .article-meta, [class*="meta"]'
+        category: '.category, .post-category, [class*="category"]'
+        related_posts: '.related-posts, .related, .sidebar'
+
+    # Content healing - handle dynamic content
+    content_healing:
+      enabled: true
+      flexible_text_matching: true
+      date_format_tolerance: true
+      read_time_tolerance: 2  # ±2 minutes acceptable variance
+
+    # Viewport healing - handle responsive layout changes
+    viewport_healing:
+      enabled: true
+      viewport_tolerance: 50  # 50px tolerance for layout shifts
+      responsive_breakpoints:
+        mobile: 320
+        tablet: 768
+        desktop: 1920
+
+  # Healing triggers
+  triggers:
+    # When to attempt healing
+    on_failure: true
+    on_flaky_test: true
+    on_timeout: true
+    on_selector_not_found: true
+
+    # Retry configuration
+    max_healing_attempts: 3
+    retry_delay_ms: 1000
+    exponential_backoff: true
+
+  # Reporting and monitoring
+  reporting:
+    healing_success_rate: true
+    failed_healing_alerts: true
+    weekly_summary: true
+    slack_notifications: false  # Disabled for now
+
+    # Metrics to track
+    metrics:
+      - healing_success_percentage
+      - common_failure_patterns
+      - selector_stability_score
+      - test_maintenance_time_saved
+
+  # Integration with existing workflow
+  integration:
+    run_after_test_failure: true
+    create_healing_branch: true
+    branch_naming: 'playwright-healing/{timestamp}'
+    commit_message_template: |
+      fix(tests): auto-heal Playwright test failures
+
+      Healer Agent automatically fixed the following issues:
+      {healing_summary}
+
+      Confidence: {confidence_score}
+
+      Co-Authored-By: Playwright Healer Agent <noreply@playwright.dev>
+
+# Blog-specific healing patterns
+blog_specific_rules:
+  # Economist-style content patterns
+  economist_patterns:
+    # Date formatting variations
+    date_selectors:
+      - '.post-date'
+      - '.publish-date'
+      - '[class*="date"]'
+
+    # Category badge variations
+    category_selectors:
+      - '.category'
+      - '.post-category'
+      - '.breadcrumb'
+      - '[class*="category"]'
+
+    # AI disclosure variations
+    ai_disclosure_selectors:
+      - '.ai-disclosure'
+      - '.ai-assisted'
+      - '[class*="ai-"]'
+      - '[data-ai]'
+
+  # Common failure patterns and solutions
+  failure_patterns:
+    # Multiple H1 elements (site title + article title)
+    multiple_h1_issue:
+      problem: 'strict mode violation: multiple H1 elements'
+      solution: 'Use more specific selector like .article-title or add first()'
+      auto_fix: true
+
+    # Navigation structure variations
+    navigation_changes:
+      problem: 'navigation elements not found'
+      solution: 'Try alternative nav selectors: nav, .main-nav, header nav'
+      auto_fix: true
+
+    # Missing metadata graceful handling
+    metadata_optional:
+      problem: 'metadata elements expected but not found'
+      solution: 'Make metadata checks conditional with count() > 0'
+      auto_fix: true
+
+    # Image loading issues
+    image_fallbacks:
+      problem: 'hero images or default backgrounds not found'
+      solution: 'Add conditional checks for image existence'
+      auto_fix: true
+
+# Environment-specific settings
+environments:
+  ci:
+    # GitHub Actions specific settings
+    github_actions:
+      healing_timeout_ms: 300000  # 5 minutes max for healing
+      parallel_healing: false     # Avoid conflicts in parallel jobs
+      artifact_upload: true       # Upload healing reports
+
+  local:
+    # Local development settings
+    interactive_healing: true     # Prompt for confirmation
+    immediate_feedback: true     # Show healing progress
+    detailed_logging: true       # Verbose healing logs
+
+# Future enhancements
+roadmap:
+  ml_powered_healing: false      # Placeholder for ML-based healing
+  cross_browser_healing: false   # Multi-browser healing patterns
+  visual_regression_healing: false  # BackstopJS integration healing
