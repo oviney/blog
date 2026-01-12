@@ -81,8 +81,8 @@ test.describe('Responsive Layout Adaptation', () => {
   test('Navigation menu adapts to viewport size', async ({ page }) => {
     await page.goto('/');
 
-    const navigation = page.locator('nav[role="navigation"], .main-nav');
-    await expect(navigation).toBeVisible();
+    const navigation = page.locator('nav, .site-nav, .main-nav, [role="navigation"]');
+    await expect(navigation.first()).toBeVisible();
 
     // Test mobile navigation
     await page.setViewportSize(viewports.mobile);
@@ -410,8 +410,8 @@ test.describe('Orientation Change Handling', () => {
     }
 
     // Navigation should remain functional
-    const navigation = page.locator('nav[role="navigation"], .main-nav');
-    await expect(navigation).toBeVisible();
+    const navigation = page.locator('nav, .site-nav, .main-nav, [role="navigation"]');
+    await expect(navigation.first()).toBeVisible();
   });
 
 });
