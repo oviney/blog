@@ -55,4 +55,12 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
-*.swo.claude/settings.local.json
+*.swo
+
+# Claude settings
+.claude/settings.local.json
+
+# Healing monitoring (runtime data)
+healing-metrics/
+healing-reports/
+healing-success-report.md

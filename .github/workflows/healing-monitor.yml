@@ -1,0 +1,124 @@
+name: Healing Success Monitor
+
+on:
+  schedule:
+    # Run twice daily at 6am and 6pm UTC
+    - cron: '0 6,18 * * *'
+  workflow_dispatch:
+    inputs:
+      force_analysis:
+        description: 'Force deep healing analysis'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  monitor-healing:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Setup Ruby and Bundler
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.1'
+        bundler-cache: true
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        npx playwright install --with-deps
+
+    - name: Start Jekyll server
+      run: |
+        bundle exec jekyll serve --port 4000 --detach
+        sleep 5
+
+    - name: Run healing monitoring suite
+      run: |
+        npm run monitor:healing
+      env:
+        CI: true
+        NODE_ENV: production
+
+    - name: Generate healing trend report
+      run: |
+        npm run analyze:healing-trends
+
+    - name: Check for healing degradation
+      run: |
+        npm run alert:healing-degradation
+
+    - name: Upload healing metrics
+      uses: actions/upload-artifact@v4
+      with:
+        name: healing-metrics-${{ github.run_number }}
+        path: |
+          healing-metrics/
+          healing-reports/
+        retention-days: 90
+
+    - name: Commit healing metrics (if changed)
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "Healing Monitor"
+        git add healing-metrics/ healing-reports/ || true
+        git diff --staged --quiet || git commit -m "📊 Healing metrics update $(date -u +"%Y-%m-%d %H:%M")" || true
+        git push || true
+
+    - name: Create healing alert issue (if needed)
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const title = `🚨 Healing Success Rate Degradation Alert - ${new Date().toISOString().split('T')[0]}`;
+          const body = `
+          ## 🚨 Healing Success Rate Alert
+
+          The automated healing monitoring has detected a potential degradation in test success rate.
+
+          **Detection Time**: ${new Date().toISOString()}
+          **Workflow Run**: ${{ github.run_id }}
+          **Monitoring Job**: Failed during execution
+
+          ### 📊 Investigation Required
+
+          Please review the healing metrics and test results to identify:
+
+          1. **Success Rate Changes**: Compare current vs. baseline success rates
+          2. **New Failure Patterns**: Identify any new recurring test failures
+          3. **Healing Pattern Effectiveness**: Check if existing healing rules are working
+          4. **Site Changes**: Verify if recent code changes affected test reliability
+
+          ### 🔧 Recommended Actions
+
+          - [ ] Review latest healing metrics in artifacts
+          - [ ] Run manual test analysis: \`npm run analyze:failures\`
+          - [ ] Check for new healing opportunities
+          - [ ] Update healing patterns if needed
+          - [ ] Validate CI/CD pipeline health
+
+          ### 📈 Monitoring Resources
+
+          - **Metrics Dashboard**: Check healing-reports/ directory
+          - **Trend Analysis**: Review healing-metrics/ historical data
+          - **Test Logs**: Examine workflow artifacts for detailed results
+
+          _This alert was generated automatically by the Healing Success Monitor._
+          `;
+
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: title,
+            body: body,
+            labels: ['healing-alert', 'monitoring', 'bug']
+          });

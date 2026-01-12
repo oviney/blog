@@ -21,7 +21,11 @@
     "test:agents:generate": "playwright generate --from-specs=specs/",
     "test:agents:heal": "playwright heal --interactive",
     "test:security": "npm audit --audit-level=moderate",
-    "pretest": "echo 'Ensure Jekyll is running on port 4000 before running tests'"
+    "pretest": "echo 'Ensure Jekyll is running on port 4000 before running tests'",
+    "monitor:healing": "node scripts/healing-monitor.js",
+    "analyze:healing-trends": "node scripts/analyze-healing-trends.js",
+    "analyze:failures": "node scripts/analyze-failures.js",
+    "alert:healing-degradation": "node scripts/check-healing-degradation.js"
   },
   "repository": {
     "type": "git",
