@@ -25,7 +25,11 @@
     "monitor:healing": "node scripts/healing-monitor.js",
     "analyze:healing-trends": "node scripts/analyze-healing-trends.js",
     "analyze:failures": "node scripts/analyze-failures.js",
-    "alert:healing-degradation": "node scripts/check-healing-degradation.js"
+    "alert:healing-degradation": "node scripts/check-healing-degradation.js",
+    "alert:system": "node scripts/alert-system.js",
+    "dashboard": "node scripts/dashboard-server.js",
+    "dashboard:dev": "node scripts/dashboard-server.js",
+    "monitoring:full": "npm run monitor:healing && npm run alert:system"
   },
   "repository": {
     "type": "git",

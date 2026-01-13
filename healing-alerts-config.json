@@ -1,0 +1,36 @@
+{
+  "thresholds": {
+    "critical": 75,
+    "warning": 81.1,
+    "degradation": -5,
+    "consecutive_failures": 3
+  },
+  "channels": {
+    "console": true,
+    "file": true,
+    "webhook": false,
+    "email": false,
+    "slack": false
+  },
+  "settings": {
+    "webhook_url": "",
+    "email_smtp": {
+      "host": "",
+      "port": 587,
+      "secure": false,
+      "auth": {
+        "user": "",
+        "pass": ""
+      }
+    },
+    "slack_webhook": "",
+    "cooldown_minutes": 30,
+    "retry_attempts": 3
+  },
+  "notifications": {
+    "on_recovery": true,
+    "on_degradation": true,
+    "on_critical": true,
+    "on_improvement": true
+  }
+}
