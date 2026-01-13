@@ -376,9 +376,9 @@ jobs:
 
         ## 📈 Assessment
 
-        ${STATUS = "healthy" && echo "🎉 **Excellent**: Healing system is performing optimally!" || echo ""}
-        ${STATUS = "warning" && echo "⚠️ **Attention**: Success rate below target - monitoring for improvement" || echo ""}
-        ${STATUS = "critical" && echo "🚨 **Action Required**: Critical success rate threshold breached" || echo ""}
+        $(if [ "$STATUS" = "healthy" ]; then echo "🎉 **Excellent**: Healing system is performing optimally!"; fi)
+        $(if [ "$STATUS" = "warning" ]; then echo "⚠️ **Attention**: Success rate below target - monitoring for improvement"; fi)
+        $(if [ "$STATUS" = "critical" ]; then echo "🚨 **Action Required**: Critical success rate threshold breached"; fi)
 
         ## 🔧 Quick Actions
 
