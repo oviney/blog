@@ -1,0 +1,9 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Economist-inspired favicon with red background -->
+  <rect width="32" height="32" fill="#E3120B"/>
+  <!-- Simple geometric pattern -->
+  <rect x="8" y="8" width="16" height="3" fill="white"/>
+  <rect x="8" y="13" width="12" height="3" fill="white"/>
+  <rect x="8" y="18" width="14" height="3" fill="white"/>
+  <rect x="8" y="23" width="8" height="3" fill="white"/>
+</svg>
