@@ -27,10 +27,10 @@
     "analyze:failures": "node scripts/analyze-failures.js",
     "alert:healing-degradation": "node scripts/check-healing-degradation.js",
     "alert:system": "node scripts/alert-system.js",
-    "dashboard": "echo 'Dashboard available at: https://oviney.github.io/blog/' && npx serve docs --port 8081",
-    "dashboard:dev": "npx serve docs --port 8081",
+    "dashboard": "echo 'Dashboard available at: https://oviney.github.io/blog/dashboard/' && npx serve dashboard --port 8081",
+    "dashboard:dev": "npx serve dashboard --port 8081",
     "monitoring:full": "npm run monitor:healing && npm run alert:system",
-    "deploy:dashboard": "echo 'Dashboard automatically deployed via GitHub Pages at: https://oviney.github.io/blog/' && echo 'Trigger deployment by pushing to main branch or running: gh workflow run healing-monitor.yml'"
+    "deploy:dashboard": "echo 'Dashboard automatically available at: https://oviney.github.io/blog/dashboard/' && echo 'Data updates by pushing to main branch or running: gh workflow run healing-monitor.yml'"
   },
   "repository": {
     "type": "git",
