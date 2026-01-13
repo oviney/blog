@@ -101,6 +101,9 @@ exclude:
   - package-lock.json
   - CHANGELOG.md
 
+include:
+  - dashboard/
+
 # collections:
 #     authors:
 #         output: true
