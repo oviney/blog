@@ -1,9 +1,22 @@
-name: Healing Success Monitor
+name: 🎭 Playwright Healing Success Monitor
 
 on:
   schedule:
-    # Run twice daily at 6am and 6pm UTC
-    - cron: '0 6,18 * * *'
+    # Run every 4 hours for active monitoring
+    - cron: '0 */4 * * *'
+  push:
+    branches: [ main ]
+    paths:
+      - 'tests/playwright-agents/**'
+      - 'scripts/healing-monitor.js'
+      - 'scripts/alert-system.js'
+      - '.github/workflows/healing-monitor.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'tests/playwright-agents/**'
+      - 'scripts/healing-monitor.js'
+      - 'scripts/alert-system.js'
   workflow_dispatch:
     inputs:
       force_analysis:
@@ -11,114 +24,369 @@ on:
         required: false
         default: 'false'
         type: boolean
+      alert_webhooks:
+        description: 'Send alerts to configured webhooks'
+        required: false
+        default: 'true'
+        type: boolean
+
+env:
+  NODE_ENV: production
+  CI: true
+  HEALING_WEBHOOK_URL: ${{ secrets.HEALING_WEBHOOK_URL }}
 
 jobs:
   monitor-healing:
+    name: 🔍 Healing Effectiveness Monitor
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    outputs:
+      success-rate: ${{ steps.monitor.outputs.success-rate }}
+      trend: ${{ steps.monitor.outputs.trend }}
+      status: ${{ steps.monitor.outputs.status }}
 
     steps:
-    - name: Checkout repository
+    - name: 📥 Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-    - name: Setup Node.js
+    - name: 🚀 Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'npm'
 
-    - name: Setup Ruby and Bundler
+    - name: 💎 Setup Ruby and Bundler
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.1'
+        ruby-version: '3.3'
         bundler-cache: true
 
-    - name: Install dependencies
+    - name: 📦 Install dependencies
       run: |
         npm ci
         npx playwright install --with-deps
 
-    - name: Start Jekyll server
+    - name: 🏗️ Build Jekyll site
+      run: bundle exec jekyll build
+
+    - name: 🌐 Start Jekyll server
       run: |
         bundle exec jekyll serve --port 4000 --detach
-        sleep 5
+        sleep 10
+        curl -f http://localhost:4000/ || (echo "Jekyll server failed to start" && exit 1)
 
-    - name: Run healing monitoring suite
+    - name: 🎯 Run comprehensive healing monitoring
+      id: monitor
       run: |
-        npm run monitor:healing
+        echo "Running healing monitoring suite..."
+        npm run monitoring:full
+
+        # Extract metrics for workflow outputs
+        SUCCESS_RATE=$(node -e "
+          const fs = require('fs');
+          try {
+            const data = JSON.parse(fs.readFileSync('healing-metrics/cumulative.json', 'utf8'));
+            console.log(data.summary.currentSuccessRate || 0);
+          } catch(e) { console.log(0); }
+        ")
+
+        TREND=$(node -e "
+          const fs = require('fs');
+          try {
+            const data = JSON.parse(fs.readFileSync('healing-metrics/cumulative.json', 'utf8'));
+            console.log(data.summary.trend || 'unknown');
+          } catch(e) { console.log('unknown'); }
+        ")
+
+        STATUS="healthy"
+        if (( $(echo "$SUCCESS_RATE < 75" | bc -l) )); then
+          STATUS="critical"
+        elif (( $(echo "$SUCCESS_RATE < 81.1" | bc -l) )); then
+          STATUS="warning"
+        fi
+
+        echo "success-rate=$SUCCESS_RATE" >> $GITHUB_OUTPUT
+        echo "trend=$TREND" >> $GITHUB_OUTPUT
+        echo "status=$STATUS" >> $GITHUB_OUTPUT
+
+        echo "✅ Monitoring complete: $SUCCESS_RATE% success rate ($STATUS)"
       env:
         CI: true
         NODE_ENV: production
 
-    - name: Generate healing trend report
+    - name: 📊 Generate comprehensive reports
       run: |
+        echo "Generating healing trend analysis..."
         npm run analyze:healing-trends
 
-    - name: Check for healing degradation
-      run: |
-        npm run alert:healing-degradation
+        echo "Analyzing failure patterns..."
+        npm run analyze:failures
 
-    - name: Upload healing metrics
+        echo "Checking for healing degradation..."
+        npm run alert:system
+
+    - name: 🔍 Validate healing effectiveness
+      run: |
+        echo "Validating healing patterns..."
+
+        # Check if we have enough data points
+        TOTAL_RUNS=$(node -e "
+          const fs = require('fs');
+          try {
+            const data = JSON.parse(fs.readFileSync('healing-metrics/cumulative.json', 'utf8'));
+            console.log(data.summary.totalRuns || 0);
+          } catch(e) { console.log(0); }
+        ")
+
+        if [ "$TOTAL_RUNS" -lt 3 ]; then
+          echo "⚠️ Not enough data points for trend analysis ($TOTAL_RUNS runs)"
+        else
+          echo "📈 Sufficient data for analysis ($TOTAL_RUNS runs)"
+        fi
+
+    - name: 📤 Upload comprehensive healing data
       uses: actions/upload-artifact@v4
+      if: always()
       with:
-        name: healing-metrics-${{ github.run_number }}
+        name: healing-data-${{ github.run_number }}-${{ steps.monitor.outputs.success-rate }}pct
         path: |
           healing-metrics/
           healing-reports/
+          healing-alerts/
+          playwright-report/
+          test-results/
         retention-days: 90
 
-    - name: Commit healing metrics (if changed)
+    - name: 📊 Create healing status badge
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "Healing Monitor"
-        git add healing-metrics/ healing-reports/ || true
-        git diff --staged --quiet || git commit -m "📊 Healing metrics update $(date -u +"%Y-%m-%d %H:%M")" || true
-        git push || true
+        SUCCESS_RATE="${{ steps.monitor.outputs.success-rate }}"
+        STATUS="${{ steps.monitor.outputs.status }}"
+        TREND="${{ steps.monitor.outputs.trend }}"
 
-    - name: Create healing alert issue (if needed)
-      if: failure()
+        # Create badge data
+        mkdir -p .github/badges
+
+        # Success rate badge
+        if [ "$STATUS" = "healthy" ]; then
+          COLOR="brightgreen"
+        elif [ "$STATUS" = "warning" ]; then
+          COLOR="yellow"
+        else
+          COLOR="red"
+        fi
+
+        echo "{
+          \"schemaVersion\": 1,
+          \"label\": \"healing success\",
+          \"message\": \"${SUCCESS_RATE}%\",
+          \"color\": \"$COLOR\"
+        }" > .github/badges/healing-success.json
+
+        # Trend badge
+        TREND_COLOR="blue"
+        if [ "$TREND" = "improving" ]; then
+          TREND_COLOR="brightgreen"
+          TREND_ICON="📈"
+        elif [ "$TREND" = "degrading" ]; then
+          TREND_COLOR="orange"
+          TREND_ICON="📉"
+        else
+          TREND_ICON="➡️"
+        fi
+
+        echo "{
+          \"schemaVersion\": 1,
+          \"label\": \"trend\",
+          \"message\": \"$TREND_ICON $TREND\",
+          \"color\": \"$TREND_COLOR\"
+        }" > .github/badges/healing-trend.json
+
+        echo "Created status badges with $SUCCESS_RATE% success rate ($STATUS trend: $TREND)"
+
+    - name: 💾 Commit healing data (if on main branch)
+      if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+      run: |
+        git config --local user.email "healing-monitor@github.com"
+        git config --local user.name "🎭 Healing Monitor"
+
+        # Add healing data
+        git add healing-metrics/ healing-reports/ healing-alerts/ .github/badges/ || true
+
+        if ! git diff --staged --quiet; then
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+          git commit -m "📊 healing: ${{ steps.monitor.outputs.success-rate }}% success rate (${{ steps.monitor.outputs.trend }}) - $TIMESTAMP
+
+          - Success Rate: ${{ steps.monitor.outputs.success-rate }}%
+          - Trend: ${{ steps.monitor.outputs.trend }}
+          - Status: ${{ steps.monitor.outputs.status }}
+          - Workflow: ${{ github.run_id }}
+
+          Co-Authored-By: Healing Monitor <healing-monitor@github.com>"
+
+          git push || echo "⚠️ Failed to push healing data (may be protected branch)"
+        else
+          echo "ℹ️ No changes to commit"
+        fi
+
+    - name: 🚨 Send webhook alert (if configured)
+      if: inputs.alert_webhooks == 'true' && env.HEALING_WEBHOOK_URL && (steps.monitor.outputs.status == 'critical' || steps.monitor.outputs.status == 'warning')
+      run: |
+        curl -X POST "$HEALING_WEBHOOK_URL" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "alert_type": "${{ steps.monitor.outputs.status }}",
+            "severity": "${{ steps.monitor.outputs.status == 'critical' && 'high' || 'medium' }}",
+            "title": "🎭 Healing Success Rate Alert",
+            "message": "Success rate: ${{ steps.monitor.outputs.success-rate }}% (Status: ${{ steps.monitor.outputs.status }}, Trend: ${{ steps.monitor.outputs.trend }})",
+            "details": {
+              "success_rate": ${{ steps.monitor.outputs.success-rate }},
+              "trend": "${{ steps.monitor.outputs.trend }}",
+              "status": "${{ steps.monitor.outputs.status }}",
+              "workflow_run": "${{ github.run_id }}",
+              "repository": "${{ github.repository }}",
+              "branch": "${{ github.ref_name }}"
+            },
+            "timestamp": "${{ github.event.head_commit.timestamp }}",
+            "source": "github-actions-healing-monitor"
+          }' \
+          --fail || echo "⚠️ Webhook notification failed"
+
+    - name: 🚨 Create GitHub issue alert (if critical)
+      if: steps.monitor.outputs.status == 'critical' || failure()
       uses: actions/github-script@v7
       with:
         script: |
-          const title = `🚨 Healing Success Rate Degradation Alert - ${new Date().toISOString().split('T')[0]}`;
-          const body = `
-          ## 🚨 Healing Success Rate Alert
+          const successRate = '${{ steps.monitor.outputs.success-rate }}' || 'unknown';
+          const trend = '${{ steps.monitor.outputs.trend }}' || 'unknown';
+          const status = '${{ steps.monitor.outputs.status }}' || 'failed';
+          const runId = '${{ github.run_id }}';
 
-          The automated healing monitoring has detected a potential degradation in test success rate.
+          const title = `🚨 CRITICAL: Healing Success Rate Alert - ${successRate}% (${new Date().toISOString().split('T')[0]})`;
 
+          const body = `## 🚨 Critical Healing Success Rate Alert
+
+          **Current Status**: ⚠️ ${status.toUpperCase()}
+          **Success Rate**: ${successRate}%
+          **Trend**: ${trend}
           **Detection Time**: ${new Date().toISOString()}
-          **Workflow Run**: ${{ github.run_id }}
-          **Monitoring Job**: Failed during execution
+          **Workflow Run**: [${runId}](https://github.com/${{ github.repository }}/actions/runs/${runId})
 
-          ### 📊 Investigation Required
+          ### 📊 Alert Details
 
-          Please review the healing metrics and test results to identify:
+          ${status === 'critical' ?
+            '🚨 **CRITICAL**: Success rate has fallen below 75% minimum threshold.' :
+            '⚠️ **WARNING**: Success rate below target 81.1% threshold or monitoring failure detected.'
+          }
 
-          1. **Success Rate Changes**: Compare current vs. baseline success rates
-          2. **New Failure Patterns**: Identify any new recurring test failures
-          3. **Healing Pattern Effectiveness**: Check if existing healing rules are working
-          4. **Site Changes**: Verify if recent code changes affected test reliability
+          ### 🔍 Immediate Investigation Required
 
-          ### 🔧 Recommended Actions
+          1. **🔎 Check Latest Run**: Review workflow artifacts and test results
+          2. **📈 Analyze Trends**: Examine healing-metrics/ for degradation patterns
+          3. **🧪 Test Validation**: Verify test environment and dependencies
+          4. **🔧 Healing Patterns**: Check if existing patterns need updates
 
-          - [ ] Review latest healing metrics in artifacts
-          - [ ] Run manual test analysis: \`npm run analyze:failures\`
-          - [ ] Check for new healing opportunities
-          - [ ] Update healing patterns if needed
-          - [ ] Validate CI/CD pipeline health
+          ### 🚀 Recommended Actions
 
-          ### 📈 Monitoring Resources
+          - [ ] **Download artifacts**: Review healing-data-${runId} for detailed metrics
+          - [ ] **Run local analysis**: \`npm run analyze:failures\` and \`npm run analyze:healing-trends\`
+          - [ ] **Check recent changes**: Review commits for test-affecting modifications
+          - [ ] **Validate environment**: Ensure CI environment matches development setup
+          - [ ] **Update healing patterns**: Apply new patterns if recurring failures found
+          - [ ] **Monitor recovery**: Track subsequent runs for improvement
 
-          - **Metrics Dashboard**: Check healing-reports/ directory
-          - **Trend Analysis**: Review healing-metrics/ historical data
-          - **Test Logs**: Examine workflow artifacts for detailed results
+          ### 📋 Monitoring Resources
 
-          _This alert was generated automatically by the Healing Success Monitor._
+          - **🎭 Dashboard**: Local healing dashboard at http://localhost:8081
+          - **📊 Metrics API**: \`curl http://localhost:8081/api/status\`
+          - **📈 Trend Analysis**: Check healing-reports/ directory in artifacts
+          - **🔧 Alert System**: Run \`npm run alert:system\` locally for detailed analysis
+
+          ### 🏆 Success Baseline
+
+          - **Target**: ≥81.1% success rate (healing effectiveness baseline)
+          - **Minimum**: ≥75% success rate (critical threshold)
+          - **Trend Goal**: Stable or improving trend direction
+
+          ---
+
+          _Alert generated by 🎭 Playwright Healing Success Monitor_
+          _Workflow: [${{ github.workflow }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})_
           `;
 
-          github.rest.issues.create({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            title: title,
-            body: body,
-            labels: ['healing-alert', 'monitoring', 'bug']
-          });
+          try {
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['🚨 healing-alert', '🎭 monitoring', status === 'critical' ? '🔥 critical' : '⚠️ warning']
+            });
+
+            console.log('✅ Alert issue created successfully');
+          } catch (error) {
+            console.error('❌ Failed to create alert issue:', error.message);
+          }
+
+  # Job for generating status summary
+  status-summary:
+    name: 📋 Generate Status Summary
+    needs: monitor-healing
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+    - name: 📊 Create workflow summary
+      run: |
+        SUCCESS_RATE="${{ needs.monitor-healing.outputs.success-rate }}"
+        TREND="${{ needs.monitor-healing.outputs.trend }}"
+        STATUS="${{ needs.monitor-healing.outputs.status }}"
+
+        # Determine emoji and color based on status
+        if [ "$STATUS" = "healthy" ]; then
+          EMOJI="✅"
+          COLOR="green"
+        elif [ "$STATUS" = "warning" ]; then
+          EMOJI="⚠️"
+          COLOR="yellow"
+        else
+          EMOJI="🚨"
+          COLOR="red"
+        fi
+
+        # Trend emoji
+        case "$TREND" in
+          "improving") TREND_EMOJI="📈" ;;
+          "degrading") TREND_EMOJI="📉" ;;
+          *) TREND_EMOJI="➡️" ;;
+        esac
+
+        cat >> $GITHUB_STEP_SUMMARY << EOF
+        # 🎭 Playwright Healing Success Monitor
+
+        ## 📊 Current Status: $EMOJI $STATUS
+
+        | Metric | Value | Target |
+        |--------|--------|--------|
+        | **Success Rate** | $EMOJI $SUCCESS_RATE% | ≥81.1% |
+        | **Trend** | $TREND_EMOJI $TREND | Stable/Improving |
+        | **Status** | $EMOJI $STATUS | Healthy |
+
+        ## 📈 Assessment
+
+        ${STATUS = "healthy" && echo "🎉 **Excellent**: Healing system is performing optimally!" || echo ""}
+        ${STATUS = "warning" && echo "⚠️ **Attention**: Success rate below target - monitoring for improvement" || echo ""}
+        ${STATUS = "critical" && echo "🚨 **Action Required**: Critical success rate threshold breached" || echo ""}
+
+        ## 🔧 Quick Actions
+
+        - 📊 **Monitor Dashboard**: \`npm run dashboard\` (http://localhost:8081)
+        - 🔍 **Analyze Trends**: \`npm run analyze:healing-trends\`
+        - 🚨 **Check Alerts**: \`npm run alert:system\`
+        - 📋 **View Reports**: Check healing-reports/ directory
+
+        ---
+        _Generated by 🎭 Playwright Healing Success Monitor at $(date -u)_
+        EOF

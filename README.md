@@ -3,6 +3,10 @@
 [![Deploy Jekyll site to Pages](https://github.com/oviney/blog/actions/workflows/jekyll.yml/badge.svg)](https://github.com/oviney/blog/actions/workflows/jekyll.yml)
 [![Test Jekyll Build](https://github.com/oviney/blog/actions/workflows/test-build.yml/badge.svg)](https://github.com/oviney/blog/actions/workflows/test-build.yml)
 [![Quality Tests](https://github.com/oviney/blog/actions/workflows/test-quality.yml/badge.svg)](https://github.com/oviney/blog/actions/workflows/test-quality.yml)
+[![Healing Monitor](https://github.com/oviney/blog/actions/workflows/healing-monitor.yml/badge.svg)](https://github.com/oviney/blog/actions/workflows/healing-monitor.yml)
+
+![Healing Success](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/blog/main/.github/badges/healing-success.json)
+![Healing Trend](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/blog/main/.github/badges/healing-trend.json)
 
 Software engineering insights on quality, testing, and AI - written in The Economist's signature style.
 
