@@ -401,8 +401,15 @@ blockquote {
   img {
     max-width: 100%;
     height: auto;
-    margin: $spacing-xl 0;
+    margin: $spacing-lg 0;
     display: block;
+
+    // Reduce margins for chart images
+    &[src*="/charts/"] {
+      margin: $spacing-md 0;
+      border-radius: $radius-sm;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
   }
   
   figure {
