@@ -66,7 +66,7 @@ jobs:
 
     - name: 📦 Install dependencies
       run: |
-        npm ci
+        npm ci --include=dev
         npx playwright install --with-deps
 
     - name: 🏗️ Build Jekyll site
