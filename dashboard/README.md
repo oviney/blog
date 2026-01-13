@@ -1,41 +1,39 @@
 # Playwright Healing Dashboard
 
-This directory contains the static GitHub Pages dashboard for monitoring Playwright test healing effectiveness.
+This directory contains the healing monitoring dashboard for Playwright test automation.
 
-## Dashboard Features
+## Files
 
-- **Real-time Metrics**: Success rates, test counts, and performance data
-- **Trend Analysis**: Visual charts showing healing improvements over time
-- **Status Monitoring**: Health indicators and alerts
-- **Auto-refresh**: Updates every 5 minutes with latest data
+- `index.html` - Static HTML dashboard with Chart.js visualizations
+- `dashboard-data.json` - Generated JSON data file (updated by GitHub Actions)
 
-## How it Works
+## Features
 
-1. **GitHub Actions** runs the healing monitor workflow every 4 hours
-2. **Dashboard Data** is generated as `dashboard-data.json` with current metrics
-3. **GitHub Pages** serves the static dashboard at your repository's Pages URL
-4. **Live Dashboard** fetches data and updates charts automatically
+- Real-time healing success rate monitoring
+- Historical trend analysis with interactive charts
+- Test results visualization
+- Auto-refresh every 5 minutes
+- Responsive design matching Economist theme
 
-## Accessing the Dashboard
+## Access
 
-The dashboard is automatically deployed to: `https://[your-username].github.io/[repo-name]/`
+**Live Dashboard**: [https://oviney.github.io/blog/dashboard/](https://oviney.github.io/blog/dashboard/)
 
-## Local Development
-
-To test the dashboard locally:
-
+**Local Development**:
 ```bash
-# Serve the docs folder locally
-npx serve docs
-# Or use Python
-python -m http.server 8000 --directory docs
+npm run dashboard:dev  # Serves on localhost:8081
 ```
 
-## Data Sources
+## Data Updates
 
-- Healing metrics from GitHub Actions workflows
-- Test results from Playwright test runs
-- Success rate calculations from cumulative data
-- Trend analysis from historical workflow data
+The dashboard data is automatically updated every 4 hours by the GitHub Actions healing monitor workflow. The workflow:
 
-The dashboard gracefully falls back to demo data when GitHub API data is unavailable, making it perfect for development and preview.
+1. Runs Playwright tests and healing analysis
+2. Generates current metrics and historical trends
+3. Updates `dashboard-data.json` with latest data
+4. Commits changes back to the repository
+5. Dashboard automatically reflects new data on next load
+
+## Navigation
+
+The dashboard is accessible from the main blog navigation menu via the "📊 Dashboard" link.
