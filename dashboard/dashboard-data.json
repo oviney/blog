@@ -1,0 +1,39 @@
+{
+  "timestamp": "2026-01-13T21:10:34+00:00",
+  "metrics": {
+    "totalTests": 135,
+    "passingTests": 0,
+    "healingSuccessRate": 0,
+    "lastRunDuration": 284
+  },
+  "trend": [
+  {
+    "date": "2026-01-10",
+    "successRate": 89.2,
+    "totalTests": 130,
+    "passingTests": 116
+  },
+  {
+    "date": "2026-01-11",
+    "successRate": 91.5,
+    "totalTests": 132,
+    "passingTests": 121
+  },
+  {
+    "date": "2026-01-12",
+    "successRate": 93.1,
+    "totalTests": 134,
+    "passingTests": 125
+  },
+  {
+    "date": "$(date +%Y-%m-%d)",
+    "successRate": $SUCCESS_RATE,
+    "totalTests": 135,
+    "passingTests": $(node -e "console.log(Math.round(135 * $SUCCESS_RATE / 100))")
+  }
+],
+  "status": "unknown",
+  "repository": "oviney/blog",
+  "workflowRun": "20972672591",
+  "lastUpdated": "2026-01-13T21:10:34+00:00"
+}
