@@ -58,11 +58,10 @@ class HealingMonitor {
       // Use 'list' reporter instead of 'line' for better compatibility
       const playwrightOutput = execSync('npm run test:playwright -- --reporter=list', {
         encoding: 'utf8',
-        timeout: 300000,
-        stdio: 'pipe' // Explicitly capture output
+        timeout: 300000
       });
 
-      results.suites.playwright = this.parsePlaywrightLineOutput(playwrightOutput);
+      results.suites.playwright = this.parsePlaywrightOutput(playwrightOutput);
 
     } catch (error) {
       console.warn('⚠️ Playwright tests failed, capturing partial results...');
@@ -112,8 +111,8 @@ class HealingMonitor {
     return results;
   }
 
-  parsePlaywrightLineOutput(output) {
-    // Parse line reporter output format
+  parsePlaywrightOutput(output) {
+    // Parse Playwright reporter output format (works with both 'line' and 'list' reporters)
     const lines = output.split('\n');
 
     // Look for summary line like "90 passed (41.1s)" or "21 failed"
@@ -142,7 +141,7 @@ class HealingMonitor {
     }
 
     // Extract failed test information from the output
-    const failedTests = this.extractFailedTestsFromLineOutput(lines);
+    const failedTests = this.extractFailedTests(lines);
 
     return {
       passed,
@@ -155,7 +154,7 @@ class HealingMonitor {
     };
   }
 
-  extractFailedTestsFromLineOutput(lines) {
+  extractFailedTests(lines) {
     const failedTests = [];
 
     for (let i = 0; i < lines.length; i++) {
