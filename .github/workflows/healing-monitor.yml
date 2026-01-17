@@ -67,7 +67,12 @@ jobs:
     - name: 📦 Install dependencies
       run: |
         npm ci --include=dev
-        npx playwright install --with-deps
+        npx playwright install --with-deps chromium
+
+    - name: ✅ Verify Playwright installation
+      run: |
+        npx playwright --version
+        npx playwright install-deps
 
     - name: 🏗️ Build Jekyll site
       run: bundle exec jekyll build
@@ -75,8 +80,26 @@ jobs:
     - name: 🌐 Start Jekyll server
       run: |
         bundle exec jekyll serve --port 4000 --detach
-        sleep 10
-        curl -f http://localhost:4000/ || (echo "Jekyll server failed to start" && exit 1)
+        
+        # Wait for server with proper verification (30 attempts = 60 seconds max)
+        echo "Waiting for Jekyll server to start..."
+        for i in {1..30}; do
+          if curl -f -s http://localhost:4000/ > /dev/null 2>&1; then
+            echo "✅ Jekyll server is ready (attempt $i)"
+            break
+          fi
+          echo "Waiting... attempt $i/30"
+          sleep 2
+        done
+        
+        # Final verification
+        if ! curl -f http://localhost:4000/ > /dev/null 2>&1; then
+          echo "❌ Jekyll server failed to start after 60 seconds"
+          exit 1
+        fi
+        
+        echo "Server is ready, waiting 1 more second for full initialization..."
+        sleep 1
 
     - name: 🎯 Run comprehensive healing monitoring
       id: monitor

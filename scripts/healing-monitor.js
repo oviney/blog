@@ -41,18 +41,34 @@ class HealingMonitor {
 
     const startTime = Date.now();
 
-    // Run Playwright tests with line output for better parsing
+    // Run Playwright tests with better error diagnostics
     console.log('📊 Running Playwright test suite...');
     try {
-      const playwrightOutput = execSync('npm run test:playwright -- --reporter=line', {
+      // Add diagnostic check for Playwright version
+      const versionCheck = execSync('npx playwright --version', { encoding: 'utf8' });
+      console.log('Playwright version:', versionCheck.trim());
+      
+      // Test server connectivity first
+      const serverCheck = execSync('curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/', { 
         encoding: 'utf8',
-        timeout: 300000 // 5 minutes timeout
+        timeout: 5000 
+      });
+      console.log('Server response code:', serverCheck.trim());
+      
+      // Use 'list' reporter instead of 'line' for better compatibility
+      const playwrightOutput = execSync('npm run test:playwright -- --reporter=list', {
+        encoding: 'utf8',
+        timeout: 300000,
+        stdio: 'pipe' // Explicitly capture output
       });
 
       results.suites.playwright = this.parsePlaywrightLineOutput(playwrightOutput);
 
     } catch (error) {
       console.warn('⚠️ Playwright tests failed, capturing partial results...');
+      console.error('Error details:', error.message);
+      console.error('stdout:', error.stdout);
+      console.error('stderr:', error.stderr);
 
       // Try to extract results from error output
       const output = error.stdout || error.stderr || error.message || '';

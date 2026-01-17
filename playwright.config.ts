@@ -78,10 +78,11 @@ export default defineConfig({
   ],
 
   /* Run your local Jekyll server before starting the tests */
-  webServer: {
+  /* In CI, server is started manually in workflow, so disable webServer */
+  webServer: process.env.CI ? undefined : {
     command: 'bundle exec jekyll serve --port 4000 --detach',
     port: 4000,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     stdout: 'pipe',
     stderr: 'pipe',
     timeout: 120 * 1000, // 2 minutes for Jekyll to start
