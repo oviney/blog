@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-01-17T12:10:22+00:00",
+  "timestamp": "2026-01-17T16:11:19+00:00",
   "metrics": {
     "totalTests": 135,
-    "passingTests": 0,
-    "healingSuccessRate": 0,
+    "passingTests": 119,
+    "healingSuccessRate": 88.1,
     "lastRunDuration": 284
   },
   "trend": [
@@ -32,8 +32,8 @@
     "passingTests": $(node -e "console.log(Math.round(135 * $SUCCESS_RATE / 100))")
   }
 ],
-  "status": "unknown",
+  "status": "healthy",
   "repository": "oviney/blog",
-  "workflowRun": "21094011297",
-  "lastUpdated": "2026-01-17T12:10:22+00:00"
+  "workflowRun": "21097113511",
+  "lastUpdated": "2026-01-17T16:11:19+00:00"
 }
