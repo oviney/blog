@@ -1,51 +1,57 @@
 ---
-layout: page
+layout: default
 title: Test Automation
 permalink: /test-automation/
 ---
 
-# Test Automation
+<div class="topic-page">
+  <header class="topic-header">
+    <h1 class="topic-title">Test Automation</h1>
+    <p class="topic-description">Strategies, frameworks, and practices for building test automation that delivers lasting value</p>
+  </header>
 
-Test automation is a force multiplier for quality engineering teams—when implemented strategically. This page covers the principles, patterns, and practices that separate effective automation programs from expensive shelfware.
+  {% assign ta_posts = site.posts | where_exp: "post", "post.categories contains 'quality-engineering' or post.categories contains 'test-automation' or post.categories contains 'test-strategy'" %}
 
-## Manual vs. Automated Testing
+  {% if ta_posts.size > 0 %}
+  <div class="topic-grid">
+    {% for post in ta_posts %}
+      <article class="topic-card">
+        {% if post.image %}
+        <a href="{{ post.url | relative_url }}" class="topic-card-image">
+          <img src="{{ post.image | relative_url }}" alt="{{ post.title }}">
+        </a>
+        {% else %}
+        <a href="{{ post.url | relative_url }}" class="topic-card-image topic-card-image-placeholder" aria-label="{{ post.title }}">
+          <div class="placeholder-content" aria-hidden="true">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </div>
+        </a>
+        {% endif %}
 
-Manual testing provides exploratory depth and contextual judgment. Automated testing provides repeatability and speed. The question isn't which is better—it's which applies to each testing scenario. Exploratory testing, usability evaluation, and edge-case discovery benefit from human insight. Regression suites, API contracts, and performance baselines benefit from automation.
+        <div class="topic-card-content">
+          {% if post.categories %}
+          <div class="topic-category">{{ post.categories | first }}</div>
+          {% endif %}
 
-## Testing Types and Their Automation Fit
+          <h2 class="topic-card-title">
+            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          </h2>
 
-**Unit Testing:** High automation value. Fast feedback, isolated scope, foundational to CI/CD.
+          <p class="topic-card-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
 
-**Integration Testing:** High automation value. Validates component interactions and API contracts.
-
-**Regression Testing:** Core automation use case. Repetitive by nature, critical for release confidence.
-
-**Performance Testing:** Requires automation for load generation and metrics collection at scale.
-
-**UI Testing:** Selective automation. High maintenance cost; focus on critical user journeys.
-
-**Exploratory Testing:** Manual. Human judgment and creativity cannot be automated.
-
-## Automation Principles
-
-**Shift Left:** Integrate automation early in development. Defects found in unit tests cost 10x less to fix than those found in production.
-
-**Design for Maintainability:** Automation code is production code. Apply the same standards: version control, code review, refactoring.
-
-**Optimize for Reliability:** Flaky tests erode trust. A 95% pass rate means 5% noise that teams learn to ignore.
-
-**Plan for Scale:** Architecture decisions made early constrain future options. Design frameworks that accommodate growth.
-
-**Measure ROI:** Track automation effectiveness: time saved, defect detection rate, maintenance cost. Justify investment with data.
-
-## Framework Selection Criteria
-
-When selecting automation tools and frameworks, evaluate against:
-
-1. Team skill availability
-2. Integration with existing CI/CD pipeline
-3. Vendor support and community activity
-4. Total cost of ownership (licensing, training, maintenance)
-5. Scalability requirements
-
-The best tool is the one your team will actually use effectively.
+          <div class="topic-card-meta">
+            {% assign words = post.content | number_of_words %}
+            <span class="topic-meta-item">{{ words | divided_by: 200 | plus: 1 }} min read</span>
+          </div>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="topic-empty">No articles yet. Check back soon or explore the <a href="/blog/">full archive</a>.</p>
+  {% endif %}
+</div>

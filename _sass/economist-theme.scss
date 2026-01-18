@@ -1196,6 +1196,18 @@ table {
   }
 }
 
+.topic-empty {
+  font-family: $font-serif;
+  font-size: 1.125rem;
+  color: $text-secondary;
+  text-align: center;
+  padding: $spacing-xl * 2 0;
+
+  a {
+    color: $economist-red;
+  }
+}
+
 // Responsive behavior for topic page
 @media (max-width: 1024px) {
   .topic-grid {
