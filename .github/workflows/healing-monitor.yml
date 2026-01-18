@@ -443,8 +443,12 @@ jobs:
         TREND="${{ needs.monitor-healing.outputs.trend || 'unknown' }}"
         STATUS="${{ needs.monitor-healing.outputs.status || 'unknown' }}"
 
-        # Get historical data from git log (last 10 workflow runs)
-        HISTORICAL_DATA=$(cat << 'EOJSON'
+        # Calculate current day's metrics
+        CURRENT_DATE=$(date +%Y-%m-%d)
+        CURRENT_PASSING=$(node -e "console.log(Math.round(135 * $SUCCESS_RATE / 100))")
+
+        # Get historical data with properly substituted current day
+        HISTORICAL_DATA=$(cat << EOJSON
         [
           {
             "date": "2026-01-10",
@@ -465,22 +469,24 @@ jobs:
             "passingTests": 125
           },
           {
-            "date": "$(date +%Y-%m-%d)",
+            "date": "$CURRENT_DATE",
             "successRate": $SUCCESS_RATE,
             "totalTests": 135,
-            "passingTests": $(node -e "console.log(Math.round(135 * $SUCCESS_RATE / 100))")
+            "passingTests": $CURRENT_PASSING
           }
         ]
         EOJSON
         )
 
         # Create dashboard data JSON
+        TIMESTAMP=$(date -u --iso-8601=seconds)
+
         cat > dashboard/dashboard-data.json << EOJSON
         {
-          "timestamp": "$(date -u --iso-8601=seconds)",
+          "timestamp": "$TIMESTAMP",
           "metrics": {
             "totalTests": 135,
-            "passingTests": $(node -e "console.log(Math.round(135 * $SUCCESS_RATE / 100))"),
+            "passingTests": $CURRENT_PASSING,
             "healingSuccessRate": $SUCCESS_RATE,
             "lastRunDuration": 284
           },
@@ -488,7 +494,7 @@ jobs:
           "status": "$STATUS",
           "repository": "${{ github.repository }}",
           "workflowRun": "${{ github.run_id }}",
-          "lastUpdated": "$(date -u --iso-8601=seconds)"
+          "lastUpdated": "$TIMESTAMP"
         }
         EOJSON
 
