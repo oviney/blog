@@ -1300,6 +1300,126 @@ table {
 }
 
 // ============================================
+// STATIC PAGES (About, Software Engineering, etc.)
+// ============================================
+
+.static-page {
+  max-width: $content-max-width;
+  margin: 0 auto;
+  padding: $spacing-xl $spacing-md;
+
+  @media (min-width: 768px) {
+    padding: $spacing-xl $spacing-lg;
+  }
+}
+
+.page-content {
+  h1 {
+    font-family: $font-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 0 $spacing-lg 0;
+    color: $text-primary;
+    letter-spacing: -0.02em;
+
+    @media (min-width: 768px) {
+      font-size: 3rem;
+    }
+  }
+
+  h2 {
+    font-family: $font-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: $spacing-xl 0 $spacing-md 0;
+    line-height: 1.3;
+    color: $text-primary;
+  }
+
+  h3 {
+    font-family: $font-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: $spacing-lg 0 $spacing-sm 0;
+    color: $text-primary;
+  }
+
+  p {
+    font-family: $font-serif;
+    font-size: 1.125rem;
+    line-height: 1.8;
+    margin: 0 0 $spacing-lg 0;
+    color: $text-primary;
+  }
+
+  ul, ol {
+    font-family: $font-serif;
+    font-size: 1.125rem;
+    line-height: 1.8;
+    margin: 0 0 $spacing-lg 0;
+    padding-left: $spacing-lg;
+    color: $text-primary;
+
+    li {
+      margin-bottom: $spacing-sm;
+    }
+  }
+
+  strong {
+    font-weight: 700;
+    color: $text-primary;
+  }
+
+  a {
+    color: $economist-red;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid $border-color;
+    margin: $spacing-xl 0;
+  }
+
+  blockquote {
+    margin: $spacing-xl 0;
+    padding-left: $spacing-lg;
+    border-left: 3px solid $economist-red;
+    font-style: italic;
+    color: $text-secondary;
+  }
+
+  code {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+    background: $background-light;
+    padding: 0.2em 0.4em;
+    border-radius: $radius-sm;
+  }
+
+  pre {
+    background: $background-light;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    padding: $spacing-md;
+    overflow-x: auto;
+    margin: $spacing-lg 0;
+
+    code {
+      background: none;
+      padding: 0;
+    }
+  }
+}
+
+// ============================================
 // RELATED SIDEBAR (Post page)
 // ============================================
 
