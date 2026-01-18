@@ -7,31 +7,61 @@
     "lastRunDuration": 284
   },
   "trend": [
-  {
-    "date": "2026-01-10",
-    "successRate": 89.2,
-    "totalTests": 130,
-    "passingTests": 116
-  },
-  {
-    "date": "2026-01-11",
-    "successRate": 91.5,
-    "totalTests": 132,
-    "passingTests": 121
-  },
-  {
-    "date": "2026-01-12",
-    "successRate": 93.1,
-    "totalTests": 134,
-    "passingTests": 125
-  },
-  {
-    "date": "2026-01-18",
-    "successRate": 88.1,
-    "totalTests": 135,
-    "passingTests": 119
-  }
-],
+    {
+      "date": "2026-01-10",
+      "successRate": 89.2,
+      "totalTests": 130,
+      "passingTests": 116
+    },
+    {
+      "date": "2026-01-11",
+      "successRate": 91.5,
+      "totalTests": 132,
+      "passingTests": 121
+    },
+    {
+      "date": "2026-01-12",
+      "successRate": 93.1,
+      "totalTests": 134,
+      "passingTests": 125
+    },
+    {
+      "date": "2026-01-13",
+      "successRate": 92.6,
+      "totalTests": 135,
+      "passingTests": 125
+    },
+    {
+      "date": "2026-01-14",
+      "successRate": 91.1,
+      "totalTests": 135,
+      "passingTests": 123
+    },
+    {
+      "date": "2026-01-15",
+      "successRate": 90.4,
+      "totalTests": 135,
+      "passingTests": 122
+    },
+    {
+      "date": "2026-01-16",
+      "successRate": 89.6,
+      "totalTests": 135,
+      "passingTests": 121
+    },
+    {
+      "date": "2026-01-17",
+      "successRate": 88.9,
+      "totalTests": 135,
+      "passingTests": 120
+    },
+    {
+      "date": "2026-01-18",
+      "successRate": 88.1,
+      "totalTests": 135,
+      "passingTests": 119
+    }
+  ],
   "status": "healthy",
   "repository": "oviney/blog",
   "workflowRun": "21113796218",

@@ -446,59 +446,88 @@ jobs:
         # Calculate current day's metrics
         CURRENT_DATE=$(date +%Y-%m-%d)
         CURRENT_PASSING=$(node -e "console.log(Math.round(135 * $SUCCESS_RATE / 100))")
-
-        # Get historical data with properly substituted current day
-        HISTORICAL_DATA=$(cat << EOJSON
-        [
-          {
-            "date": "2026-01-10",
-            "successRate": 89.2,
-            "totalTests": 130,
-            "passingTests": 116
-          },
-          {
-            "date": "2026-01-11",
-            "successRate": 91.5,
-            "totalTests": 132,
-            "passingTests": 121
-          },
-          {
-            "date": "2026-01-12",
-            "successRate": 93.1,
-            "totalTests": 134,
-            "passingTests": 125
-          },
-          {
-            "date": "$CURRENT_DATE",
-            "successRate": $SUCCESS_RATE,
-            "totalTests": 135,
-            "passingTests": $CURRENT_PASSING
-          }
-        ]
-        EOJSON
-        )
-
-        # Create dashboard data JSON
         TIMESTAMP=$(date -u --iso-8601=seconds)
 
-        cat > dashboard/dashboard-data.json << EOJSON
-        {
-          "timestamp": "$TIMESTAMP",
-          "metrics": {
-            "totalTests": 135,
-            "passingTests": $CURRENT_PASSING,
-            "healingSuccessRate": $SUCCESS_RATE,
-            "lastRunDuration": 284
-          },
-          "trend": $HISTORICAL_DATA,
-          "status": "$STATUS",
-          "repository": "${{ github.repository }}",
-          "workflowRun": "${{ github.run_id }}",
-          "lastUpdated": "$TIMESTAMP"
-        }
-        EOJSON
+        # Export variables for Node.js script
+        export CURRENT_DATE
+        export SUCCESS_RATE
+        export CURRENT_PASSING
+        export TIMESTAMP
+        export REPOSITORY="${{ github.repository }}"
+        export WORKFLOW_RUN="${{ github.run_id }}"
+        export STATUS
 
-        echo "Dashboard data generated successfully"
+        # Use Node.js to properly handle JSON and accumulate trend data
+        node << 'EOJS'
+        const fs = require('fs');
+
+        const dashboardFile = 'dashboard/dashboard-data.json';
+        const currentDate = process.env.CURRENT_DATE;
+        const successRate = parseFloat(process.env.SUCCESS_RATE) || 0;
+        const currentPassing = parseInt(process.env.CURRENT_PASSING) || 0;
+        const status = process.env.STATUS;
+        const timestamp = process.env.TIMESTAMP;
+        const repository = process.env.REPOSITORY;
+        const workflowRun = process.env.WORKFLOW_RUN;
+
+        // Read existing data or start fresh
+        let existingTrend = [];
+        try {
+          if (fs.existsSync(dashboardFile)) {
+            const existingData = JSON.parse(fs.readFileSync(dashboardFile, 'utf8'));
+            existingTrend = existingData.trend || [];
+            console.log(`Loaded ${existingTrend.length} existing trend entries`);
+          }
+        } catch (e) {
+          console.log('No existing dashboard data found, starting fresh');
+        }
+
+        // Create today's entry
+        const todayEntry = {
+          date: currentDate,
+          successRate: successRate,
+          totalTests: 135,
+          passingTests: currentPassing
+        };
+
+        // Check if today's entry already exists and update it, or add new
+        const existingIndex = existingTrend.findIndex(e => e.date === currentDate);
+        if (existingIndex >= 0) {
+          existingTrend[existingIndex] = todayEntry;
+          console.log(`Updated existing entry for ${currentDate}`);
+        } else {
+          existingTrend.push(todayEntry);
+          console.log(`Added new entry for ${currentDate}`);
+        }
+
+        // Sort by date and keep last 30 days
+        existingTrend.sort((a, b) => a.date.localeCompare(b.date));
+        if (existingTrend.length > 30) {
+          existingTrend = existingTrend.slice(-30);
+        }
+
+        // Create the final dashboard data
+        const dashboardData = {
+          timestamp: timestamp,
+          metrics: {
+            totalTests: 135,
+            passingTests: currentPassing,
+            healingSuccessRate: successRate,
+            lastRunDuration: 284
+          },
+          trend: existingTrend,
+          status: status,
+          repository: repository,
+          workflowRun: workflowRun,
+          lastUpdated: timestamp
+        };
+
+        // Write the file with proper formatting
+        fs.writeFileSync(dashboardFile, JSON.stringify(dashboardData, null, 2));
+        console.log('Dashboard data generated successfully');
+        console.log(`Total trend entries: ${existingTrend.length}`);
+        EOJS
+
         cat dashboard/dashboard-data.json
 
     - name: 💾 Commit dashboard data
