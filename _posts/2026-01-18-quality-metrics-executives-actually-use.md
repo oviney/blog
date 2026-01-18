@@ -4,7 +4,7 @@ title: "The Disconnect in Quality Metrics: Financial Focus vs Operational Realit
 date: 2026-01-18
 author: "The Economist"
 categories: ["Quality Engineering"]
-image: output/images/quality-metrics-executives-actually-use.png
+image: /assets/charts/quality-metrics-executives-actually-use.png
 ---
 
 According to the ASQ Global State of Quality 2024 report, only 13% of executives rely on defect escape rate as a primary quality metric, highlighting a pervasive disconnect between operational realities and executive priorities. Despite technological advances and sophisticated metrics available, the executive focus remains steadfastly anchored in traditional measures.
