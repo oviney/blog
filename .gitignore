@@ -22,6 +22,7 @@ playwright-report/
 *.webm
 *.png
 !assets/charts/*.png
+!assets/images/*.png
 **/screenshots/
 **/videos/
 playwright-healing-report.md
