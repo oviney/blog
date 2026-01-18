@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-18T12:14:44+00:00",
+  "timestamp": "2026-01-18T14:48:53+00:00",
   "metrics": {
     "totalTests": 135,
     "passingTests": 119,
@@ -26,14 +26,14 @@
     "passingTests": 125
   },
   {
-    "date": "$(date +%Y-%m-%d)",
-    "successRate": $SUCCESS_RATE,
+    "date": "2026-01-18",
+    "successRate": 88.1,
     "totalTests": 135,
-    "passingTests": $(node -e "console.log(Math.round(135 * $SUCCESS_RATE / 100))")
+    "passingTests": 119
   }
 ],
   "status": "healthy",
   "repository": "oviney/blog",
-  "workflowRun": "21111462526",
-  "lastUpdated": "2026-01-18T12:14:44+00:00"
+  "workflowRun": "21113509949",
+  "lastUpdated": "2026-01-18T14:48:53+00:00"
 }
