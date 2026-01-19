@@ -135,13 +135,14 @@ body {
 }
 
 .main-content {
-  max-width: none;
-  margin: 0;
-  padding: 0;
-  
-  // For article pages, ensure full width
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 $spacing-md;
+
+  // For article pages, allow wider content
   &:has(.economist-article) {
-    width: 100%;
+    max-width: 100%;
+    padding: 0;
   }
 }
 
