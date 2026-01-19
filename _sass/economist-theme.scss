@@ -486,6 +486,18 @@ blockquote {
 
 // Also apply chart sizing to article-content (the actual class used)
 .article-content {
+  // Drop cap - large first letter like The Economist (2 lines high)
+  > p:first-of-type::first-letter {
+    float: left;
+    font-family: $font-serif;
+    font-size: 3.2em;
+    line-height: 1;
+    padding-right: 0.08em;
+    margin-top: 0.05em;
+    font-weight: 400;
+    color: $text-primary;
+  }
+
   img[src*="/charts/"] {
     max-width: 500px !important; // Override any other styles
     margin: $spacing-md auto; // Center with reduced margins
