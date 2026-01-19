@@ -67,13 +67,19 @@ body {
   color: $text-primary;
   padding: $spacing-md 0;
   border-bottom: 1px solid $border-color;
-  
+  display: flex;
+  justify-content: center;
+
   .site-title {
     font-family: $font-serif;
     font-size: 1.0625rem;
     font-weight: 400;
     margin: 0;
-    padding: 0 0 0 148px;
+    padding: 0;
+    width: 100%;
+    max-width: 900px;
+    text-align: left;
+    padding-left: $spacing-md;
     
     a {
       display: inline-block;
@@ -95,14 +101,17 @@ body {
   border-bottom: 1px solid $border-color;
   padding: 0;
   font-family: $font-sans;
-  
+  display: flex;
+  justify-content: center;
+
   ul {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 0 $spacing-md;
     display: flex;
     flex-wrap: wrap;
-    padding-left: calc(148px - #{$spacing-md});
+    width: 100%;
+    max-width: 900px;
     
     li {
       margin: 0;
