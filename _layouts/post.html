@@ -2,98 +2,133 @@
 layout: default
 ---
 
-<div class="article-layout">
-  <article class="economist-article">
-    <header class="article-header">
+<article class="economist-article">
+  <header class="article-header">
+    {% if page.categories %}
+    <!-- Section + Rubric (Economist Style) -->
+    <div class="article-section-line">
+      <a href="{{ '/blog/' | relative_url }}" class="section-link">{{ page.categories | first | capitalize }}</a>
+      <span class="section-separator">|</span>
+      <span class="article-rubric">{{ page.rubric | default: page.title | truncatewords: 4 }}</span>
+    </div>
+    {% endif %}
+
+    <h1 class="article-title">{{ page.title }}</h1>
+
+    {% if page.subtitle %}
+    <h2 class="article-subtitle">{{ page.subtitle }}</h2>
+    {% endif %}
+
+    <!-- Action buttons (Save/Share) -->
+    <div class="article-actions-top">
+      <button class="action-btn" onclick="navigator.clipboard.writeText(window.location.href); this.innerHTML='<span class=\'action-icon\'>✓</span> Copied';">
+        <span class="action-icon">↗</span>
+        <span>Share</span>
+      </button>
+    </div>
+  </header>
+
+  {% if page.image %}
+  <figure class="article-hero-image">
+    <img src="{{ page.image | relative_url }}" alt="{{ page.title }}">
+    {% if page.image_caption %}
+    <figcaption class="image-credit">{{ page.image_caption | upcase }}</figcaption>
+    {% else %}
+    <figcaption class="image-credit">ILLUSTRATION</figcaption>
+    {% endif %}
+  </figure>
+  {% endif %}
+
+  <!-- Date and read time below image -->
+  <div class="article-meta">
+    <time datetime="{{ page.date | date_to_xmlschema }}">
+      {{ page.date | date: "%b %-dth %Y" | replace: '1th', '1st' | replace: '2th', '2nd' | replace: '3th', '3rd' | replace: '11st', '11th' | replace: '12nd', '12th' | replace: '13rd', '13th' }}
+    </time>
+    <span class="meta-separator">|</span>
+    <span class="read-time">
+      {% assign words = page.content | number_of_words %}
+      {{ words | divided_by: 180 | plus: 1 }} min read
+    </span>
+  </div>
+
+  <hr class="article-divider">
+
+  <div class="article-content">
+    {{ content }}
+  </div>
+
+  <!-- Explore more tags -->
+  <div class="explore-more">
+    <h3>Explore more</h3>
+    <nav class="topic-tags-nav">
       {% if page.categories %}
-      <!-- Category Tag (Economist Style - Prominent) -->
-      <div class="category-tag">
-        <span class="tag">{{ page.categories | first | upcase | replace: '-', ' ' }}</span>
-      </div>
+      {% for category in page.categories %}
+      <a href="{{ '/blog/' | relative_url }}" class="topic-tag-link">{{ category | capitalize }}</a>
+      {% endfor %}
+      {% endif %}
+      {% if page.tags %}
+      {% for tag in page.tags limit: 3 %}
+      <a href="{{ '/blog/' | relative_url }}" class="topic-tag-link">{{ tag | capitalize }}</a>
+      {% endfor %}
+      {% endif %}
+    </nav>
+  </div>
 
-      <!-- Breadcrumb Navigation (Secondary) -->
-      <div class="article-breadcrumb">
-        <a href="{{ '/blog/' | relative_url }}" class="category-link">{{ page.categories | first | capitalize }}</a>
-        {% if page.title %}
-        <span class="separator">|</span>
-        <span class="subtitle-preview">{{ page.title }}</span>
+  <!-- Bottom action bar -->
+  <div class="article-actions-bottom">
+    <button class="action-btn" onclick="navigator.clipboard.writeText(window.location.href); this.innerHTML='<span class=\'action-icon\'>✓</span> Copied';">
+      <span class="action-icon">↗</span>
+      <span>Share</span>
+    </button>
+  </div>
+</article>
+
+{% if site.posts.size > 1 %}
+<!-- More from Section -->
+<section class="more-from-section">
+  <div class="more-from-header">
+    <h2>More from {{ page.categories | first | capitalize | default: "Quality Engineering" }} →</h2>
+  </div>
+
+  <div class="more-from-grid">
+    {% assign related_posts = site.posts | where_exp: "post", "post.url != page.url" | limit: 6 %}
+
+    {% if related_posts.size > 0 %}
+    <!-- Featured article (first one, larger) -->
+    {% assign featured = related_posts | first %}
+    <article class="more-from-featured">
+      {% if featured.image %}
+      <a href="{{ featured.url | relative_url }}" class="featured-image-link">
+        <img src="{{ featured.image | relative_url }}" alt="{{ featured.title }}">
+      </a>
+      {% endif %}
+      <div class="featured-content">
+        <h3><a href="{{ featured.url | relative_url }}">{{ featured.title }}</a></h3>
+        <p class="featured-excerpt">{{ featured.excerpt | strip_html | truncatewords: 25 }}</p>
+      </div>
+    </article>
+
+    <!-- Smaller articles grid -->
+    <div class="more-from-list">
+      {% for post in related_posts offset: 1 limit: 5 %}
+      <article class="more-from-item">
+        {% if post.image %}
+        <a href="{{ post.url | relative_url }}" class="item-image-link">
+          <img src="{{ post.image | relative_url }}" alt="{{ post.title }}">
+        </a>
         {% endif %}
-      </div>
-      {% endif %}
-
-      <h1 class="article-title">{{ page.title }}</h1>
-
-      {% if page.subtitle %}
-      <h2 class="article-subtitle">{{ page.subtitle }}</h2>
-      {% endif %}
-
-      <div class="article-meta">
-        <div class="meta-group">
-          <time datetime="{{ page.date | date_to_xmlschema }}">
-            {{ page.date | date: "%b %-dth %Y" | replace: '1th', '1st' | replace: '2th', '2nd' | replace: '3th', '3rd' | replace: '11st', '11th' | replace: '12nd', '12th' | replace: '13rd', '13th' }}
-          </time>
-          <span class="separator">|</span>
-          <span class="location">{% if page.location %}{{ page.location | upcase }}{% endif %}</span>
-          <span class="separator">|</span>
-          <span class="read-time">
-            {% assign words = page.content | number_of_words %}
-            {{ words | divided_by: 180 | plus: 1 }} min read
-          </span>
-        </div>
-      </div>
-    </header>
-
-    {% if page.image %}
-    <figure class="article-hero-image">
-      <img src="{{ page.image | relative_url }}" alt="{{ page.title }}">
-      {% if page.image_caption %}
-      <figcaption>{{ page.image_caption }}</figcaption>
-      {% endif %}
-    </figure>
-    {% endif %}
-
-    <div class="article-content">
-      {{ content }}
-    </div>
-
-    {% if page.ai_assisted %}
-    <aside class="ai-disclosure">
-      <p><strong>AI-Assisted Content:</strong> This article was generated using AI technology following The Economist's editorial standards, with human review and fact-checking.</p>
-    </aside>
-    {% endif %}
-
-    <div class="article-footer">
-      <a href="{{ '/blog/' | relative_url }}" class="back-link">← Back to Blog</a>
-    </div>
-  </article>
-
-  {% if site.posts.size > 1 %}
-  <aside class="related-sidebar">
-    <h3>More from {{ page.categories | first | downcase | default: "quality-engineering" }}</h3>
-    <div class="related-list">
-      {% assign related_posts = site.posts | where_exp: "post", "post.url != page.url" | limit: 3 %}
-      {% for post in related_posts %}
-      <article class="related-item">
-        <div class="related-content">
-          {% if post.categories %}
-          <span class="related-category">{{ post.categories | first }}</span>
-          {% endif %}
-          <h4 class="related-title">
-            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-          </h4>
-          <p class="related-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
-          <div class="related-meta">
-            <span class="meta-date">{{ post.date | date: "%b %d, %Y" }}</span>
-            <span class="separator">|</span>
-            <span class="meta-read-time">
-              {% assign words = post.content | number_of_words %}
-              {{ words | divided_by: 180 | plus: 1 }} min read
-            </span>
-          </div>
+        <div class="item-content">
+          <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+          <p class="item-excerpt">{{ post.excerpt | strip_html | truncatewords: 15 }}</p>
         </div>
       </article>
       {% endfor %}
     </div>
-  </aside>
-  {% endif %}
-</div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<footer class="article-footer">
+  <a href="{{ '/blog/' | relative_url }}" class="back-link">← Back to Blog</a>
+</footer>
