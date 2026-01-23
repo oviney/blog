@@ -14,6 +14,7 @@ class HealingMonitor {
     this.reportsDir = path.join(process.cwd(), 'healing-reports');
     this.timestamp = new Date().toISOString();
     this.date = this.timestamp.split('T')[0];
+    this.TOTAL_PLAYWRIGHT_TESTS = 111; // Total number of Playwright tests in the suite
 
     // Ensure directories exist
     [this.metricsDir, this.reportsDir].forEach(dir => {
@@ -41,45 +42,59 @@ class HealingMonitor {
 
     const startTime = Date.now();
 
-    // Run Playwright tests with better error diagnostics
-    console.log('📊 Running Playwright test suite...');
+    // Read Playwright results from JSON reporter instead of re-running tests
+    console.log('📊 Reading Playwright test results...');
     try {
-      // Add diagnostic check for Playwright version
-      const versionCheck = execSync('npx playwright --version', { encoding: 'utf8' });
-      console.log('Playwright version:', versionCheck.trim());
+      const resultsPath = path.join(process.cwd(), 'test-results', '.last-run.json');
       
-      // Test server connectivity first
-      const serverCheck = execSync('curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/', { 
-        encoding: 'utf8',
-        timeout: 5000 
-      });
-      console.log('Server response code:', serverCheck.trim());
-      
-      // Use 'list' reporter instead of 'line' for better compatibility
-      const playwrightOutput = execSync('npm run test:playwright -- --reporter=list', {
-        encoding: 'utf8',
-        timeout: 300000
-      });
-
-      results.suites.playwright = this.parsePlaywrightOutput(playwrightOutput);
-
+      if (fs.existsSync(resultsPath)) {
+        const playwrightData = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+        results.suites.playwright = this.parsePlaywrightResults(playwrightData);
+        const total = results.suites.playwright.passed + results.suites.playwright.failed;
+        console.log(`✅ Playwright results loaded: ${results.suites.playwright.passed}/${total}`);
+      } else {
+        // Fallback: Try to read from playwright-report/index.html or other artifacts
+        console.warn('⚠️ Playwright results file not found, attempting to parse from reporter output');
+        
+        // Check if we can find results in playwright-report directory
+        const reportDir = path.join(process.cwd(), 'playwright-report');
+        if (fs.existsSync(reportDir)) {
+          // Parse results from HTML report or other available data
+          results.suites.playwright = this.parsePlaywrightReportDir(reportDir);
+        } else {
+          console.warn('⚠️ No Playwright results available, using defaults');
+          results.suites.playwright = {
+            passed: 0,
+            failed: this.TOTAL_PLAYWRIGHT_TESTS,
+            skipped: 0,
+            successRate: 0,
+            executionTime: 0,
+            failedTests: [],
+            status: 'unknown',
+            note: 'Results not available - tests may not have run'
+          };
+        }
+      }
     } catch (error) {
-      console.warn('⚠️ Playwright tests failed, capturing partial results...');
-      console.error('Error details:', error.message);
-      console.error('stdout:', error.stdout);
-      console.error('stderr:', error.stderr);
-
-      // Try to extract results from error output
-      const output = error.stdout || error.stderr || error.message || '';
-      results.suites.playwright = this.parsePlaywrightFailure(output);
+      console.error('⚠️ Error reading Playwright results:', error.message);
+      results.suites.playwright = {
+        passed: 0,
+        failed: this.TOTAL_PLAYWRIGHT_TESTS,
+        skipped: 0,
+        successRate: 0,
+        executionTime: 0,
+        failedTests: [],
+        status: 'error',
+        note: `Error: ${error.message}`
+      };
     }
 
-    // Run BackstopJS visual tests
+    // Run BackstopJS visual tests (keep existing logic)
     console.log('🖼️ Running BackstopJS visual tests...');
     try {
       execSync('npm run test:visual', { encoding: 'utf8' });
       results.suites.visual = {
-        passed: 15, // Known BackstopJS test count
+        passed: 15,
         failed: 0,
         successRate: 100,
         status: 'pass'
@@ -209,7 +224,7 @@ class HealingMonitor {
     const failedMatch = output.match(/(\d+) failed/);
 
     const passed = passedMatch ? parseInt(passedMatch[1]) : 0;
-    const failed = failedMatch ? parseInt(failedMatch[1]) : 111; // Default to known test count
+    const failed = failedMatch ? parseInt(failedMatch[1]) : this.TOTAL_PLAYWRIGHT_TESTS;
 
     return {
       passed,
@@ -220,6 +235,31 @@ class HealingMonitor {
       failedTests: [],
       status: 'fail',
       note: 'Parsed from failure output'
+    };
+  }
+
+  parsePlaywrightReportDir(reportDir) {
+    // Helper method to parse results from playwright-report directory
+    try {
+      // Look for data.json or other result files in the report directory
+      const dataFile = path.join(reportDir, 'data.json');
+      if (fs.existsSync(dataFile)) {
+        const data = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+        return this.parsePlaywrightResults(data);
+      }
+    } catch (error) {
+      console.warn('⚠️ Could not parse playwright report directory:', error.message);
+    }
+    
+    return {
+      passed: 0,
+      failed: this.TOTAL_PLAYWRIGHT_TESTS,
+      skipped: 0,
+      successRate: 0,
+      executionTime: 0,
+      failedTests: [],
+      status: 'unknown',
+      note: 'Could not parse results from report directory'
     };
   }
 
