@@ -122,27 +122,27 @@ jobs:
           fi
           
           # Provide progress feedback
-          if [ $((i % 10)) -eq 0 ]; then
+          if [ $((i % 15)) -eq 0 ]; then
             echo "Still waiting for server... attempt $i/60 ($(($i * 2))s elapsed)"
             echo "Process status: $(ps -p $JEKYLL_PID -o pid,stat,etime,cmd --no-headers || echo 'Process not found')"
           fi
           
-          # Timeout check
-          if [ $i -eq 60 ]; then
-            echo "❌ ERROR: Jekyll server failed to respond after 120 seconds"
-            echo "=== Jekyll process status ==="
-            ps aux | grep jekyll || echo "No Jekyll processes found"
-            echo "=== Port 4000 status ==="
-            (netstat -tuln 2>/dev/null || ss -tuln 2>/dev/null) | grep 4000 || echo "Port 4000 not in use"
-            echo "=== Last 100 lines of Jekyll logs ==="
-            tail -100 "$JEKYLL_LOG"
-            echo "=== Directory permissions ==="
-            ls -la _site/ || echo "_site directory not created"
-            exit 1
-          fi
-          
           sleep 2
         done
+        
+        # Check if server started successfully
+        if ! curl -f -s http://localhost:4000/ > /dev/null 2>&1; then
+          echo "❌ ERROR: Jekyll server failed to respond after 120 seconds"
+          echo "=== Jekyll process status ==="
+          ps aux | grep jekyll || echo "No Jekyll processes found"
+          echo "=== Port 4000 status ==="
+          (netstat -tuln 2>/dev/null || ss -tuln 2>/dev/null) | grep 4000 || echo "Port 4000 not in use"
+          echo "=== Last 100 lines of Jekyll logs ==="
+          tail -100 "$JEKYLL_LOG"
+          echo "=== Directory permissions ==="
+          ls -la _site/ || echo "_site directory not created"
+          exit 1
+        fi
         
         echo "Server fully initialized, waiting 1 more second for stability..."
         sleep 1
