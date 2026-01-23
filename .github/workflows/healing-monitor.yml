@@ -109,7 +109,7 @@ jobs:
             echo "=== Last 100 lines of Jekyll logs ==="
             tail -100 "$JEKYLL_LOG"
             echo "=== Port 4000 status ==="
-            netstat -tuln | grep 4000 || ss -tuln | grep 4000 || echo "Port 4000 not in use"
+            (netstat -tuln 2>/dev/null || ss -tuln 2>/dev/null) | grep 4000 || echo "Port 4000 not in use"
             exit 1
           fi
           
@@ -133,7 +133,7 @@ jobs:
             echo "=== Jekyll process status ==="
             ps aux | grep jekyll || echo "No Jekyll processes found"
             echo "=== Port 4000 status ==="
-            netstat -tuln | grep 4000 || ss -tuln | grep 4000 || echo "Port 4000 not in use"
+            (netstat -tuln 2>/dev/null || ss -tuln 2>/dev/null) | grep 4000 || echo "Port 4000 not in use"
             echo "=== Last 100 lines of Jekyll logs ==="
             tail -100 "$JEKYLL_LOG"
             echo "=== Directory permissions ==="
@@ -240,9 +240,14 @@ jobs:
           if kill -0 $JEKYLL_PID 2>/dev/null; then
             echo "Stopping Jekyll server (PID: $JEKYLL_PID)"
             kill $JEKYLL_PID || true
-            sleep 1
-            # Force kill if still running
-            kill -9 $JEKYLL_PID 2>/dev/null || true
+            sleep 2
+            # Force kill if still running after graceful shutdown attempt
+            if kill -0 $JEKYLL_PID 2>/dev/null; then
+              echo "Process still running, forcing termination..."
+              kill -9 $JEKYLL_PID 2>/dev/null || true
+            else
+              echo "Process terminated gracefully"
+            fi
           fi
         fi
         
