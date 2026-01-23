@@ -49,11 +49,47 @@ jobs:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+        run: |
+          echo "🌐 Installing Playwright browsers..."
+          
+          # Install only chromium since that's what playwright.config.ts uses
+          npx playwright install chromium chromium-headless-shell
+          
+          # Verify installation succeeded by checking for browser binary
+          PLAYWRIGHT_CACHE="$HOME/.cache/ms-playwright"
+          
+          if [ ! -d "$PLAYWRIGHT_CACHE" ]; then
+            echo "❌ ERROR: Playwright cache directory not created"
+            exit 1
+          fi
+          
+          # Check for chromium installation (either regular or headless shell)
+          CHROMIUM_FOUND=false
+          for dir in "$PLAYWRIGHT_CACHE"/chromium-* "$PLAYWRIGHT_CACHE"/chromium_headless_shell-*; do
+            if [ -d "$dir" ]; then
+              echo "✅ Found Playwright browser: $dir"
+              CHROMIUM_FOUND=true
+            fi
+          done
+          
+          if [ "$CHROMIUM_FOUND" = false ]; then
+            echo "❌ ERROR: Chromium browser binary not found after installation"
+            echo "Cache contents:"
+            ls -la "$PLAYWRIGHT_CACHE" || echo "Cache directory is empty"
+            exit 1
+          fi
+          
+          echo "✅ Playwright browsers installed and verified successfully"
 
       - name: Run Playwright E2E tests
         id: playwright
-        run: npm run test:playwright
+        run: |
+          # Final verification before running tests
+          if ! npx playwright --version; then
+            echo "❌ ERROR: Playwright not properly installed"
+            exit 1
+          fi
+          npm run test:playwright
         continue-on-error: true
 
       - name: 📊 Monitor healing effectiveness
