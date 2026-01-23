@@ -79,27 +79,76 @@ jobs:
 
     - name: 🌐 Start Jekyll server
       run: |
-        bundle exec jekyll serve --port 4000 --detach
+        # Create log file for Jekyll output
+        JEKYLL_LOG="/tmp/jekyll-server.log"
         
-        # Wait for server with proper verification (30 attempts = 60 seconds max)
-        echo "Waiting for Jekyll server to start..."
-        for i in {1..30}; do
-          if curl -f -s http://localhost:4000/ > /dev/null 2>&1; then
-            echo "✅ Jekyll server is ready (attempt $i)"
-            break
-          fi
-          echo "Waiting... attempt $i/30"
-          sleep 2
-        done
+        echo "🚀 Starting Jekyll server..."
         
-        # Final verification
-        if ! curl -f http://localhost:4000/ > /dev/null 2>&1; then
-          echo "❌ Jekyll server failed to start after 60 seconds"
+        # Start Jekyll server with output capture (not using --detach to preserve logs)
+        bundle exec jekyll serve --port 4000 > "$JEKYLL_LOG" 2>&1 &
+        JEKYLL_PID=$!
+        
+        echo "Jekyll process started with PID: $JEKYLL_PID"
+        
+        # Verify the process is still running after a brief moment
+        sleep 2
+        if ! kill -0 $JEKYLL_PID 2>/dev/null; then
+          echo "❌ ERROR: Jekyll process died immediately after starting"
+          echo "=== Jekyll logs ==="
+          cat "$JEKYLL_LOG"
           exit 1
         fi
         
-        echo "Server is ready, waiting 1 more second for full initialization..."
+        echo "✅ Jekyll process is running, waiting for server to be ready..."
+        
+        # Wait for server with extended timeout (60 attempts = 120 seconds)
+        for i in {1..60}; do
+          # Check if process is still alive
+          if ! kill -0 $JEKYLL_PID 2>/dev/null; then
+            echo "❌ ERROR: Jekyll process crashed during startup (attempt $i/60)"
+            echo "=== Last 100 lines of Jekyll logs ==="
+            tail -100 "$JEKYLL_LOG"
+            echo "=== Port 4000 status ==="
+            (netstat -tuln 2>/dev/null || ss -tuln 2>/dev/null) | grep 4000 || echo "Port 4000 not in use"
+            exit 1
+          fi
+          
+          # Check if server is responding
+          if curl -f -s http://localhost:4000/ > /dev/null 2>&1; then
+            echo "✅ Jekyll server is ready and responding (attempt $i/60)"
+            echo "=== Server startup logs ==="
+            tail -50 "$JEKYLL_LOG"
+            break
+          fi
+          
+          # Provide progress feedback
+          if [ $((i % 15)) -eq 0 ]; then
+            echo "Still waiting for server... attempt $i/60 ($(($i * 2))s elapsed)"
+            echo "Process status: $(ps -p $JEKYLL_PID -o pid,stat,etime,cmd --no-headers || echo 'Process not found')"
+          fi
+          
+          sleep 2
+        done
+        
+        # Check if server started successfully
+        if ! curl -f -s http://localhost:4000/ > /dev/null 2>&1; then
+          echo "❌ ERROR: Jekyll server failed to respond after 120 seconds"
+          echo "=== Jekyll process status ==="
+          ps aux | grep jekyll || echo "No Jekyll processes found"
+          echo "=== Port 4000 status ==="
+          (netstat -tuln 2>/dev/null || ss -tuln 2>/dev/null) | grep 4000 || echo "Port 4000 not in use"
+          echo "=== Last 100 lines of Jekyll logs ==="
+          tail -100 "$JEKYLL_LOG"
+          echo "=== Directory permissions ==="
+          ls -la _site/ || echo "_site directory not created"
+          exit 1
+        fi
+        
+        echo "Server fully initialized, waiting 1 more second for stability..."
         sleep 1
+        
+        # Save Jekyll PID for cleanup
+        echo "$JEKYLL_PID" > /tmp/jekyll.pid
 
     - name: 🎯 Run comprehensive healing monitoring
       id: monitor
@@ -182,6 +231,30 @@ jobs:
           playwright-report/
           test-results/
         retention-days: 90
+
+    - name: 🛑 Stop Jekyll server
+      if: always()
+      run: |
+        if [ -f /tmp/jekyll.pid ]; then
+          JEKYLL_PID=$(cat /tmp/jekyll.pid)
+          if kill -0 $JEKYLL_PID 2>/dev/null; then
+            echo "Stopping Jekyll server (PID: $JEKYLL_PID)"
+            kill $JEKYLL_PID || true  # Send SIGTERM for graceful shutdown
+            sleep 2
+            # Force kill if still running after graceful shutdown attempt
+            if kill -0 $JEKYLL_PID 2>/dev/null; then
+              echo "Process still running, forcing termination..."
+              kill -9 $JEKYLL_PID 2>/dev/null || true  # Send SIGKILL
+            else
+              echo "Process terminated gracefully"
+            fi
+          fi
+        fi
+        
+        # Clean up any orphaned Jekyll processes
+        pkill -f "jekyll serve" || true
+        
+        echo "✅ Jekyll server cleanup complete"
 
     - name: 📊 Create healing status badge
       run: |
