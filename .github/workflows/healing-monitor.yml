@@ -84,7 +84,7 @@ jobs:
         
         echo "🚀 Starting Jekyll server..."
         
-        # Start Jekyll server with output capture
+        # Start Jekyll server with output capture (not using --detach to preserve logs)
         bundle exec jekyll serve --port 4000 > "$JEKYLL_LOG" 2>&1 &
         JEKYLL_PID=$!
         
@@ -239,12 +239,12 @@ jobs:
           JEKYLL_PID=$(cat /tmp/jekyll.pid)
           if kill -0 $JEKYLL_PID 2>/dev/null; then
             echo "Stopping Jekyll server (PID: $JEKYLL_PID)"
-            kill $JEKYLL_PID || true
+            kill $JEKYLL_PID || true  # Send SIGTERM for graceful shutdown
             sleep 2
             # Force kill if still running after graceful shutdown attempt
             if kill -0 $JEKYLL_PID 2>/dev/null; then
               echo "Process still running, forcing termination..."
-              kill -9 $JEKYLL_PID 2>/dev/null || true
+              kill -9 $JEKYLL_PID 2>/dev/null || true  # Send SIGKILL
             else
               echo "Process terminated gracefully"
             fi
