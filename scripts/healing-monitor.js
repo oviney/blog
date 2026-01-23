@@ -14,6 +14,7 @@ class HealingMonitor {
     this.reportsDir = path.join(process.cwd(), 'healing-reports');
     this.timestamp = new Date().toISOString();
     this.date = this.timestamp.split('T')[0];
+    this.TOTAL_PLAYWRIGHT_TESTS = 111; // Total number of Playwright tests in the suite
 
     // Ensure directories exist
     [this.metricsDir, this.reportsDir].forEach(dir => {
@@ -49,7 +50,8 @@ class HealingMonitor {
       if (fs.existsSync(resultsPath)) {
         const playwrightData = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
         results.suites.playwright = this.parsePlaywrightResults(playwrightData);
-        console.log(`✅ Playwright results loaded: ${results.suites.playwright.passed}/${results.suites.playwright.passed + results.suites.playwright.failed}`);
+        const total = results.suites.playwright.passed + results.suites.playwright.failed;
+        console.log(`✅ Playwright results loaded: ${results.suites.playwright.passed}/${total}`);
       } else {
         // Fallback: Try to read from playwright-report/index.html or other artifacts
         console.warn('⚠️ Playwright results file not found, attempting to parse from reporter output');
@@ -63,7 +65,7 @@ class HealingMonitor {
           console.warn('⚠️ No Playwright results available, using defaults');
           results.suites.playwright = {
             passed: 0,
-            failed: 111,
+            failed: this.TOTAL_PLAYWRIGHT_TESTS,
             skipped: 0,
             successRate: 0,
             executionTime: 0,
@@ -77,7 +79,7 @@ class HealingMonitor {
       console.error('⚠️ Error reading Playwright results:', error.message);
       results.suites.playwright = {
         passed: 0,
-        failed: 111,
+        failed: this.TOTAL_PLAYWRIGHT_TESTS,
         skipped: 0,
         successRate: 0,
         executionTime: 0,
@@ -222,7 +224,7 @@ class HealingMonitor {
     const failedMatch = output.match(/(\d+) failed/);
 
     const passed = passedMatch ? parseInt(passedMatch[1]) : 0;
-    const failed = failedMatch ? parseInt(failedMatch[1]) : 111; // Default to known test count
+    const failed = failedMatch ? parseInt(failedMatch[1]) : this.TOTAL_PLAYWRIGHT_TESTS;
 
     return {
       passed,
@@ -251,7 +253,7 @@ class HealingMonitor {
     
     return {
       passed: 0,
-      failed: 111,
+      failed: this.TOTAL_PLAYWRIGHT_TESTS,
       skipped: 0,
       successRate: 0,
       executionTime: 0,

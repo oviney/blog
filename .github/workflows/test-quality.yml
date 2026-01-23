@@ -66,10 +66,9 @@ jobs:
           # Check for chromium installation (either regular or headless shell)
           CHROMIUM_FOUND=false
           for dir in "$PLAYWRIGHT_CACHE"/chromium-* "$PLAYWRIGHT_CACHE"/chromium_headless_shell-*; do
-            if [ -d "$dir" ]; then
-              echo "✅ Found Playwright browser: $dir"
-              CHROMIUM_FOUND=true
-            fi
+            [ -d "$dir" ] || continue
+            echo "✅ Found Playwright browser: $dir"
+            CHROMIUM_FOUND=true
           done
           
           if [ "$CHROMIUM_FOUND" = false ]; then
