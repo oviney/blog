@@ -150,6 +150,18 @@ jobs:
         # Save Jekyll PID for cleanup
         echo "$JEKYLL_PID" > /tmp/jekyll.pid
 
+    - name: 🧪 Run Playwright tests
+      run: |
+        echo "🎭 Running Playwright test suite..."
+        npx playwright test --reporter=json,html --output=test-results || true
+
+        # Create .last-run.json from results if it doesn't exist
+        if [ -f "test-results/results.json" ]; then
+          cp test-results/results.json test-results/.last-run.json
+        fi
+
+        echo "✅ Playwright tests completed"
+
     - name: 🎯 Run comprehensive healing monitoring
       id: monitor
       run: |
