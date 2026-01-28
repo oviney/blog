@@ -153,11 +153,20 @@ jobs:
     - name: 🧪 Run Playwright tests
       run: |
         echo "🎭 Running Playwright test suite..."
-        npx playwright test --reporter=json,html --output=test-results || true
+        mkdir -p test-results
 
-        # Create .last-run.json from results if it doesn't exist
-        if [ -f "test-results/results.json" ]; then
-          cp test-results/results.json test-results/.last-run.json
+        # Run Playwright with JSON output to file
+        PLAYWRIGHT_JSON_OUTPUT_NAME=test-results/.last-run.json npx playwright test --reporter=json,html || true
+
+        # Verify results file was created
+        if [ -f "test-results/.last-run.json" ]; then
+          echo "✅ Playwright results saved to test-results/.last-run.json"
+          echo "📊 Results summary:"
+          node -e "const r=require('./test-results/.last-run.json'); console.log('Passed:', r.stats?.expected || 0, 'Failed:', r.stats?.unexpected || 0)"
+        else
+          echo "⚠️ Results file not created, trying alternative approach..."
+          # Alternative: run with json reporter outputting to file
+          npx playwright test --reporter=json > test-results/.last-run.json 2>&1 || true
         fi
 
         echo "✅ Playwright tests completed"
