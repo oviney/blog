@@ -194,27 +194,58 @@ class HealingMonitor {
 
   parsePlaywrightResults(data) {
     const stats = data.stats || {};
-    const tests = data.tests || [];
 
-    const failedTests = tests
-      .filter(test => test.outcome !== 'expected')
-      .map(test => ({
-        title: test.title,
-        file: test.location?.file?.split('/').slice(-1)[0] || 'unknown',
-        error: test.results?.[0]?.error?.message || 'Unknown error',
-        location: test.location
-      }));
+    // Playwright JSON reporter uses 'expected' for passed and 'unexpected' for failed
+    const passed = stats.passed || stats.expected || 0;
+    const failed = stats.failed || stats.unexpected || 0;
+    const skipped = stats.skipped || 0;
 
+    // Collect failed tests from suites structure (Playwright JSON format)
+    const failedTests = [];
+    const collectFailedTests = (suites) => {
+      for (const suite of (suites || [])) {
+        for (const spec of (suite.specs || [])) {
+          for (const test of (spec.tests || [])) {
+            if (test.status === 'unexpected' || test.status === 'failed') {
+              failedTests.push({
+                title: spec.title || test.title,
+                file: spec.file?.split('/').slice(-1)[0] || 'unknown',
+                error: test.results?.[0]?.error?.message || 'Test failed',
+                location: spec.file
+              });
+            }
+          }
+        }
+        // Recursively check nested suites
+        if (suite.suites) {
+          collectFailedTests(suite.suites);
+        }
+      }
+    };
+    collectFailedTests(data.suites);
+
+    // Also check legacy 'tests' array format
+    const legacyTests = data.tests || [];
+    for (const test of legacyTests) {
+      if (test.outcome !== 'expected' && test.status !== 'passed') {
+        failedTests.push({
+          title: test.title,
+          file: test.location?.file?.split('/').slice(-1)[0] || 'unknown',
+          error: test.results?.[0]?.error?.message || 'Unknown error',
+          location: test.location
+        });
+      }
+    }
+
+    const total = passed + failed;
     return {
-      passed: stats.passed || 0,
-      failed: stats.failed || 0,
-      skipped: stats.skipped || 0,
-      successRate: stats.passed && (stats.passed + stats.failed) > 0
-        ? Math.round((stats.passed / (stats.passed + stats.failed)) * 100 * 100) / 100
-        : 0,
+      passed,
+      failed,
+      skipped,
+      successRate: total > 0 ? Math.round((passed / total) * 100 * 100) / 100 : 0,
       executionTime: Math.round((stats.duration || 0) / 1000),
       failedTests,
-      status: (stats.failed || 0) === 0 ? 'pass' : 'fail'
+      status: failed === 0 ? 'pass' : 'fail'
     };
   }
 
