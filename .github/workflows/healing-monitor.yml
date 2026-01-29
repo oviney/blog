@@ -65,6 +65,9 @@ jobs:
         bundler-cache: true
 
     - name: 📦 Install dependencies
+      env:
+        PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
+        PUPPETEER_SKIP_DOWNLOAD: 'true'
       run: |
         npm ci --include=dev
         npx playwright install --with-deps chromium
