@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-28T20:11:23+00:00",
+  "timestamp": "2026-03-29T00:35:34+00:00",
   "metrics": {
     "totalTests": 135,
     "passingTests": 0,
@@ -7,12 +7,6 @@
     "lastRunDuration": 284
   },
   "trend": [
-    {
-      "date": "2026-02-27",
-      "successRate": 0,
-      "totalTests": 135,
-      "passingTests": 0
-    },
     {
       "date": "2026-02-28",
       "successRate": 0,
@@ -186,10 +180,16 @@
       "successRate": 0,
       "totalTests": 135,
       "passingTests": 0
+    },
+    {
+      "date": "2026-03-29",
+      "successRate": 0,
+      "totalTests": 135,
+      "passingTests": 0
     }
   ],
   "status": "unknown",
   "repository": "oviney/blog",
-  "workflowRun": "23693322305",
-  "lastUpdated": "2026-03-28T20:11:23+00:00"
+  "workflowRun": "23697732565",
+  "lastUpdated": "2026-03-29T00:35:34+00:00"
 }
