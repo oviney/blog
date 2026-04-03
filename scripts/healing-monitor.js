@@ -45,7 +45,7 @@ class HealingMonitor {
     // Read Playwright results from JSON reporter instead of re-running tests
     console.log('📊 Reading Playwright test results...');
     try {
-      const resultsPath = path.join(process.cwd(), 'test-results', '.last-run.json');
+      const resultsPath = path.join(process.cwd(), 'test-results', 'results.json');
       
       if (fs.existsSync(resultsPath)) {
         const playwrightData = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));

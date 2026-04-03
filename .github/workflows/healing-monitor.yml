@@ -159,14 +159,14 @@ jobs:
         mkdir -p test-results
 
         # Run Playwright using config file reporters (json, html, github, list)
-        # playwright.config.ts defines JSON output at test-results/.last-run.json
+        # playwright.config.ts defines JSON output at test-results/results.json
         npx playwright test || true
 
         # Verify results file was created
-        if [ -f "test-results/.last-run.json" ]; then
-          echo "✅ Playwright results saved to test-results/.last-run.json"
+        if [ -f "test-results/results.json" ]; then
+          echo "✅ Playwright results saved to test-results/results.json"
           echo "📊 Results summary:"
-          node -e "const r=require('./test-results/.last-run.json'); console.log('Passed:', r.stats?.expected || 0, 'Failed:', r.stats?.unexpected || 0)"
+          node -e "const r=require('./test-results/results.json'); console.log('Passed:', r.stats?.expected || 0, 'Failed:', r.stats?.unexpected || 0)"
         else
           echo "❌ Results file not created — check playwright.config.ts reporter settings"
         fi
