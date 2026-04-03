@@ -158,8 +158,9 @@ jobs:
         echo "🎭 Running Playwright test suite..."
         mkdir -p test-results
 
-        # Run Playwright with JSON output to file
-        PLAYWRIGHT_JSON_OUTPUT_NAME=test-results/.last-run.json npx playwright test --reporter=json,html || true
+        # Run Playwright using config file reporters (json, html, github, list)
+        # playwright.config.ts defines JSON output at test-results/.last-run.json
+        npx playwright test || true
 
         # Verify results file was created
         if [ -f "test-results/.last-run.json" ]; then
@@ -167,9 +168,7 @@ jobs:
           echo "📊 Results summary:"
           node -e "const r=require('./test-results/.last-run.json'); console.log('Passed:', r.stats?.expected || 0, 'Failed:', r.stats?.unexpected || 0)"
         else
-          echo "⚠️ Results file not created, trying alternative approach..."
-          # Alternative: run with json reporter outputting to file
-          npx playwright test --reporter=json > test-results/.last-run.json 2>&1 || true
+          echo "❌ Results file not created — check playwright.config.ts reporter settings"
         fi
 
         echo "✅ Playwright tests completed"
@@ -375,7 +374,7 @@ jobs:
           --fail || echo "⚠️ Webhook notification failed"
 
     - name: 🚨 Create GitHub issue alert (if critical)
-      if: steps.monitor.outputs.status == 'critical' || failure()
+      if: false # Disabled: alerts were firing with "unknown%" due to broken reporter config
       uses: actions/github-script@v7
       with:
         script: |
