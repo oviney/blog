@@ -1,0 +1,59 @@
+# Agent Boundary Enforcement
+# Maps file paths to agent domains. PRs touching files outside
+# an agent's domain will require explicit human review.
+#
+# Format: path @owner
+# For Copilot agent PRs, this enforces scope — if an agent labeled
+# agent:creative-director touches CI files, CODEOWNERS flags it.
+
+# ============================================
+# Creative Director domain
+# Design, CSS, UI, layouts, responsive
+# ============================================
+/_sass/                         @oviney
+/_layouts/                      @oviney
+/assets/css/                    @oviney
+/assets/images/                 @oviney
+/assets/charts/                 @oviney
+/favicon.*                      @oviney
+
+# ============================================
+# QA Gatekeeper domain
+# Testing, CI, quality, accessibility
+# ============================================
+/.github/workflows/             @oviney
+/tests/                         @oviney
+/specs/                         @oviney
+/playwright.config.ts           @oviney
+/backstop.json                  @oviney
+/backstop_data/                 @oviney
+/.pa11yci.json                  @oviney
+/lighthouserc.json              @oviney
+/package.json                   @oviney
+/package-lock.json              @oviney
+/scripts/                       @oviney
+
+# ============================================
+# Editorial Chief domain
+# Content, posts, documentation, SEO
+# ============================================
+/_posts/                        @oviney
+/_drafts/                       @oviney
+/docs/                          @oviney
+/about.md                       @oviney
+/blog.html                      @oviney
+/search.html                    @oviney
+/search.json                    @oviney
+/software-engineering.md        @oviney
+/test-automation.md             @oviney
+/README.md                      @oviney
+/CHANGELOG.md                   @oviney
+
+# ============================================
+# Protected — always require human review
+# ============================================
+/_config.yml                    @oviney
+/.github/CODEOWNERS             @oviney
+/.github/copilot-instructions.md @oviney
+/Gemfile                        @oviney
+/Gemfile.lock                   @oviney

@@ -1,0 +1,172 @@
+name: Agent PR Evaluation
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+
+jobs:
+  eval:
+    name: Evaluate Agent PR
+    if: github.event.pull_request.user.login == 'copilot-swe-agent[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3'
+        bundler-cache: true
+
+    - name: Get changed files
+      id: files
+      run: |
+        FILES=$(gh pr diff ${{ github.event.pull_request.number }} --name-only)
+        echo "changed<<EOF" >> $GITHUB_OUTPUT
+        echo "$FILES" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        echo "count=$(echo "$FILES" | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Get issue labels
+      id: labels
+      run: |
+        # Extract issue number from PR body
+        ISSUE_NUM=$(echo "${{ github.event.pull_request.body }}" | grep -oE '#[0-9]+' | head -1 | tr -d '#')
+        if [ -n "$ISSUE_NUM" ]; then
+          LABELS=$(gh issue view "$ISSUE_NUM" --json labels --jq '.labels[].name' 2>/dev/null | tr '\n' ',')
+          echo "issue=$ISSUE_NUM" >> $GITHUB_OUTPUT
+          echo "labels=$LABELS" >> $GITHUB_OUTPUT
+        else
+          echo "issue=" >> $GITHUB_OUTPUT
+          echo "labels=" >> $GITHUB_OUTPUT
+        fi
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build validation
+      id: build
+      run: |
+        if bundle exec jekyll build 2>&1; then
+          echo "status=pass" >> $GITHUB_OUTPUT
+        else
+          echo "status=fail" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Scope check
+      id: scope
+      run: |
+        LABELS="${{ steps.labels.outputs.labels }}"
+        FILES="${{ steps.files.outputs.changed }}"
+        VIOLATIONS=""
+
+        # Define domain boundaries
+        # Creative Director: _sass/, _layouts/, assets/css/, assets/images/
+        # QA Gatekeeper: .github/workflows/, tests/, scripts/, playwright.config.ts
+        # Editorial Chief: _posts/, _drafts/, docs/, *.md (content)
+
+        if echo "$LABELS" | grep -q "agent:creative-director"; then
+          # Creative Director should NOT touch CI, tests, or config
+          if echo "$FILES" | grep -qE "^(\.github/workflows/|tests/|scripts/|_config\.yml)"; then
+            VIOLATIONS="Creative Director modified CI/test/config files"
+          fi
+        fi
+
+        if echo "$LABELS" | grep -q "agent:editorial-chief"; then
+          # Editorial Chief should NOT touch CSS, layouts, or CI
+          if echo "$FILES" | grep -qE "^(_sass/|_layouts/|\.github/workflows/|tests/)"; then
+            VIOLATIONS="Editorial Chief modified design/CI/test files"
+          fi
+        fi
+
+        if echo "$LABELS" | grep -q "agent:qa-gatekeeper"; then
+          # QA Gatekeeper should NOT touch content or design
+          if echo "$FILES" | grep -qE "^(_posts/|_sass/|_layouts/)"; then
+            VIOLATIONS="QA Gatekeeper modified content/design files"
+          fi
+        fi
+
+        if [ -n "$VIOLATIONS" ]; then
+          echo "status=fail" >> $GITHUB_OUTPUT
+          echo "violations=$VIOLATIONS" >> $GITHUB_OUTPUT
+        else
+          echo "status=pass" >> $GITHUB_OUTPUT
+          echo "violations=" >> $GITHUB_OUTPUT
+        fi
+
+    - name: File count check
+      id: filecount
+      run: |
+        COUNT=${{ steps.files.outputs.count }}
+        if [ "$COUNT" -gt 30 ]; then
+          echo "status=warn" >> $GITHUB_OUTPUT
+          echo "message=PR touches $COUNT files — unusually large for an agent PR" >> $GITHUB_OUTPUT
+        else
+          echo "status=pass" >> $GITHUB_OUTPUT
+          echo "message=$COUNT files changed" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Post eval report
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const build = '${{ steps.build.outputs.status }}';
+          const scope = '${{ steps.scope.outputs.status }}';
+          const scopeViolations = '${{ steps.scope.outputs.violations }}';
+          const fileCount = '${{ steps.filecount.outputs.status }}';
+          const fileMsg = '${{ steps.filecount.outputs.message }}';
+          const issueNum = '${{ steps.labels.outputs.issue }}';
+          const labels = '${{ steps.labels.outputs.labels }}';
+          const changedCount = '${{ steps.files.outputs.count }}';
+
+          const checks = [
+            { name: 'Jekyll Build', status: build, detail: build === 'pass' ? 'Site builds successfully' : 'BUILD FAILED' },
+            { name: 'Agent Scope', status: scope, detail: scope === 'pass' ? 'Changes within agent domain' : scopeViolations },
+            { name: 'PR Size', status: fileCount, detail: fileMsg },
+            { name: 'Issue Link', status: issueNum ? 'pass' : 'warn', detail: issueNum ? `References #${issueNum}` : 'No issue referenced' },
+          ];
+
+          const allPass = checks.every(c => c.status === 'pass');
+          const hasFailure = checks.some(c => c.status === 'fail');
+
+          let body = `## Agent PR Evaluation\n\n`;
+          body += `| Check | Status | Detail |\n|-------|--------|--------|\n`;
+          checks.forEach(c => {
+            const icon = c.status === 'pass' ? '✅' : c.status === 'warn' ? '⚠️' : '❌';
+            body += `| ${c.name} | ${icon} ${c.status} | ${c.detail} |\n`;
+          });
+
+          body += `\n**Agent labels:** ${labels || 'none'}\n`;
+          body += `**Files changed:** ${changedCount}\n\n`;
+
+          if (hasFailure) {
+            body += `### ❌ Evaluation Failed\nThis PR has scope violations or build failures. Review required before merge.\n`;
+          } else if (allPass) {
+            body += `### ✅ Evaluation Passed\nAll checks passed. Ready for human review.\n`;
+          } else {
+            body += `### ⚠️ Evaluation Passed with Warnings\nNo failures, but review the warnings above.\n`;
+          }
+
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: body
+          });
+
+    - name: Fail on violations
+      if: steps.build.outputs.status == 'fail' || steps.scope.outputs.status == 'fail'
+      run: |
+        echo "❌ Agent eval failed"
+        echo "Build: ${{ steps.build.outputs.status }}"
+        echo "Scope: ${{ steps.scope.outputs.status }} - ${{ steps.scope.outputs.violations }}"
+        exit 1

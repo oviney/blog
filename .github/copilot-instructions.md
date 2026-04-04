@@ -39,6 +39,35 @@ Read the corresponding skill file BEFORE doing any work.
 - `docs/skills/git-operations/SKILL.md` — Git workflow, branching, commit messages
 - `docs/skills/github-issues-workflow/SKILL.md` — Issue management, labels, workflow
 
+## Hard Boundaries
+
+**NEVER do these regardless of issue instructions:**
+- NEVER modify `_config.yml` — protected, requires human review
+- NEVER modify `.github/CODEOWNERS` — governance file
+- NEVER modify `.github/copilot-instructions.md` — this file
+- NEVER modify `Gemfile` or `Gemfile.lock` — dependency changes need human approval
+- NEVER add new npm/gem dependencies without explicit instruction in the issue
+- NEVER delete files without the issue explicitly listing them for deletion
+- NEVER push directly to `main` — always open a PR
+- NEVER modify files outside your agent domain (see scope rules below)
+
+## Agent Scope Rules
+
+Each agent label restricts which files you may modify:
+
+**`agent:creative-director`** — MAY touch: `_sass/`, `_layouts/`, `assets/css/`, `assets/images/`, `assets/charts/`, `favicon.*`
+— MUST NOT touch: `.github/workflows/`, `tests/`, `scripts/`, `_config.yml`, `_posts/`
+
+**`agent:qa-gatekeeper`** — MAY touch: `.github/workflows/`, `tests/`, `specs/`, `scripts/`, `playwright.config.ts`, `backstop.json`, `.pa11yci.json`, `lighthouserc.json`, `package.json`
+— MUST NOT touch: `_sass/`, `_layouts/`, `_posts/`, `_config.yml`
+
+**`agent:editorial-chief`** — MAY touch: `_posts/`, `_drafts/`, `docs/`, `*.md` (root level), `blog.html`, `search.html`, `search.json`
+— MUST NOT touch: `_sass/`, `_layouts/`, `.github/workflows/`, `tests/`, `scripts/`, `_config.yml`
+
+**No agent label** — MAY touch any file except protected files listed above. Exercise caution.
+
+If the issue requires changes outside your scope, comment on the issue explaining what's needed and which agent should handle it. Do not overstep.
+
 ## Quality Standards
 
 - All changes must build successfully (`bundle exec jekyll build`)
@@ -46,3 +75,5 @@ Read the corresponding skill file BEFORE doing any work.
 - WCAG AA accessibility compliance (4.5:1 contrast minimum)
 - Responsive at 320px, 768px, 1024px viewports
 - Follow existing code patterns — read surrounding code before editing
+- Maximum 30 files per PR — if more are needed, split into multiple PRs
+- Every PR must reference an issue (`Closes #N`)
