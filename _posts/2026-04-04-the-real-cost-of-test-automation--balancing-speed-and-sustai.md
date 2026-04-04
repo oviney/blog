@@ -4,7 +4,7 @@ title: "The Real Cost of Test Automation: Balancing Speed and Sustainability"
 date: 2026-04-04
 author: "The Economist"
 categories: ["Quality Engineering", "Test Automation"]
-image: /assets/images/the-real-cost-of-test-automation.png
+image: /assets/images/blog-default.svg
 summary: "An incisive look at how maintenance burdens temper the promise of test automation’s speed gains."
 ---
 
