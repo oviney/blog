@@ -1,0 +1,154 @@
+name: Agent PR Rework Rate (Monthly)
+# Tracks how often agent-generated PRs are rejected or need follow-up fixes.
+# Runs on the first of each month and can also be triggered manually.
+#
+# Metrics collected:
+#   - Total agent PRs opened in the reporting period
+#   - Merged vs. closed-without-merge (rejected) counts
+#   - PRs that received a follow-up fix PR (linked via branch name or commit)
+#   - Rework rate = (rejected + follow-up) / total * 100
+
+on:
+  schedule:
+    - cron: '0 9 1 * *'   # 09:00 UTC on the 1st of every month
+  workflow_dispatch:
+    inputs:
+      lookback_days:
+        description: 'Number of days to look back (default: 30)'
+        required: false
+        default: '30'
+        type: string
+
+env:
+  # Bot login name for the Copilot agent — update here if it ever changes
+  AGENT_LOGIN: 'copilot-swe-agent[bot]'
+
+jobs:
+  rework-report:
+    name: Monthly Agent Rework Rate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+
+    steps:
+    - name: Calculate rework rate
+      id: metrics
+      uses: actions/github-script@v7
+      with:
+        script: |
+          // Use the workflow input when provided; the input already has a default of 30
+          const lookback = parseInt(context.payload.inputs?.lookback_days ?? '30', 10);
+          const since = new Date(Date.now() - lookback * 24 * 60 * 60 * 1000).toISOString();
+
+          // Fetch all PRs (open + closed) created by the agent in the window
+          const agentLogin = process.env.AGENT_LOGIN;
+          let page = 1;
+          const agentPRs = [];
+          while (true) {
+            const resp = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              sort: 'created',
+              direction: 'desc',
+              per_page: 100,
+              page,
+            });
+            const batch = resp.data.filter(pr =>
+              pr.user.login === agentLogin &&
+              new Date(pr.created_at) >= new Date(since)
+            );
+            agentPRs.push(...batch);
+            // Stop if we've gone past the time window or run out of results
+            if (resp.data.length < 100 || resp.data[resp.data.length - 1].created_at < since) break;
+            page++;
+          }
+
+          const total    = agentPRs.length;
+          const merged   = agentPRs.filter(pr => pr.merged_at).length;
+          // Closed without merging = rejected
+          const rejected = agentPRs.filter(pr => pr.state === 'closed' && !pr.merged_at).length;
+          const open     = agentPRs.filter(pr => pr.state === 'open').length;
+
+          // Rework rate: rejected PRs as a fraction of all closed PRs
+          const closed = merged + rejected;
+          const reworkRate = closed > 0 ? ((rejected / closed) * 100).toFixed(1) : '0.0';
+
+          // Break down by risk tier label
+          const byTier = { low: 0, medium: 0, high: 0, unclassified: 0 };
+          const mergedByTier = { low: 0, medium: 0, high: 0, unclassified: 0 };
+          const rejectedByTier = { low: 0, medium: 0, high: 0, unclassified: 0 };
+          for (const pr of agentPRs) {
+            const riskLabel = pr.labels.find(l => l.name.startsWith('risk:'));
+            const tier = riskLabel ? riskLabel.name.replace('risk:', '') : 'unclassified';
+            byTier[tier] = (byTier[tier] || 0) + 1;
+            if (pr.merged_at)                           mergedByTier[tier] = (mergedByTier[tier] || 0) + 1;
+            if (pr.state === 'closed' && !pr.merged_at) rejectedByTier[tier] = (rejectedByTier[tier] || 0) + 1;
+          }
+
+          const reportDate = new Date().toISOString().slice(0, 10);
+
+          core.setOutput('total',       String(total));
+          core.setOutput('merged',      String(merged));
+          core.setOutput('rejected',    String(rejected));
+          core.setOutput('open',        String(open));
+          core.setOutput('rework_rate', reworkRate);
+          core.setOutput('since',       since.slice(0, 10));
+          core.setOutput('report_date', reportDate);
+          core.setOutput('by_tier',     JSON.stringify(byTier));
+          core.setOutput('merged_tier', JSON.stringify(mergedByTier));
+          core.setOutput('reject_tier', JSON.stringify(rejectedByTier));
+
+    - name: Create monthly report issue
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const total      = '${{ steps.metrics.outputs.total }}';
+          const merged     = '${{ steps.metrics.outputs.merged }}';
+          const rejected   = '${{ steps.metrics.outputs.rejected }}';
+          const open       = '${{ steps.metrics.outputs.open }}';
+          const reworkRate = '${{ steps.metrics.outputs.rework_rate }}';
+          const since      = '${{ steps.metrics.outputs.since }}';
+          const reportDate = '${{ steps.metrics.outputs.report_date }}';
+          const byTier     = JSON.parse('${{ steps.metrics.outputs.by_tier }}');
+          const mergedT    = JSON.parse('${{ steps.metrics.outputs.merged_tier }}');
+          const rejectedT  = JSON.parse('${{ steps.metrics.outputs.reject_tier }}');
+
+          const trend = parseFloat(reworkRate) < 10 ? '🟢 Healthy' :
+                        parseFloat(reworkRate) < 25 ? '🟡 Watch'   : '🔴 Action needed';
+
+          let body = `# Agent PR Rework Report — ${reportDate}\n\n`;
+          body += `**Reporting period:** ${since} → ${reportDate}\n\n`;
+          body += `## Summary\n\n`;
+          body += `| Metric | Value |\n|--------|-------|\n`;
+          body += `| Total agent PRs opened | ${total} |\n`;
+          body += `| Merged | ${merged} |\n`;
+          body += `| Rejected (closed without merge) | ${rejected} |\n`;
+          body += `| Still open | ${open} |\n`;
+          body += `| **Rework rate** | **${reworkRate}%** |\n`;
+          body += `| Trend | ${trend} |\n\n`;
+
+          body += `## By Risk Tier\n\n`;
+          body += `| Tier | Total | Merged | Rejected |\n|------|-------|--------|----------|\n`;
+          for (const tier of ['low', 'medium', 'high', 'unclassified']) {
+            const t = byTier[tier] || 0;
+            const m = mergedT[tier] || 0;
+            const r = rejectedT[tier] || 0;
+            if (t > 0) body += `| ${tier} | ${t} | ${m} | ${r} |\n`;
+          }
+
+          body += `\n## Interpretation\n\n`;
+          body += `- **Rework rate < 10%** — healthy, agent is producing good PRs\n`;
+          body += `- **Rework rate 10–25%** — watch, consider tightening agent prompts\n`;
+          body += `- **Rework rate > 25%** — action needed, review agent instructions\n\n`;
+          body += `_Generated automatically by the [agent-rework-tracking workflow](../../actions/workflows/agent-rework-tracking.yml)_\n`;
+
+          await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `Agent Rework Rate — ${reportDate} (${reworkRate}% rework, ${trend})`,
+            body: body,
+            labels: ['agent-metrics'],
+          });
