@@ -1,7 +1,10 @@
 ---
+layout: post
 title: "Is AI Really Slashing Testing Costs or Just Hiding Them?"
 date: 2026-04-04
 author: "The Economist"
+categories: ["Quality Engineering", "AI Testing"]
+image: /assets/images/blog-default.svg
 summary: "AI in software testing delivers notable efficiency gains but conceals significant hidden costs that temper its impact on overall expenses."
 ---
 
