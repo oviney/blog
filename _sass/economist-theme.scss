@@ -1128,6 +1128,132 @@ table {
 }
 
 // ============================================
+// HERO POST (HOMEPAGE FEATURED)
+// ============================================
+
+.hero-post {
+  margin-bottom: $spacing-xl * 1.5;
+  padding-bottom: $spacing-xl;
+  border-bottom: 1px solid $border-color;
+}
+
+.hero-post-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  margin-bottom: $spacing-lg;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.02);
+  }
+}
+
+.hero-post-category {
+  font-family: $font-sans;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $economist-red;
+  margin-bottom: $spacing-xs;
+}
+
+.hero-post-title {
+  font-family: $font-serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: $line-height-tight;
+  margin: 0 0 $spacing-sm 0;
+
+  a {
+    color: $text-primary;
+    text-decoration: none;
+
+    &:hover {
+      color: $economist-red;
+    }
+  }
+}
+
+.hero-post-subtitle {
+  font-family: $font-serif;
+  font-size: 1.25rem;
+  color: $text-secondary;
+  margin: 0 0 $spacing-sm 0;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.hero-post-excerpt {
+  font-family: $font-serif;
+  font-size: 1.125rem;
+  line-height: $line-height-relaxed;
+  color: $text-secondary;
+  margin: 0 0 $spacing-md 0;
+}
+
+.hero-post-meta {
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  color: $text-tertiary;
+  margin-bottom: $spacing-md;
+
+  .meta-separator {
+    margin: 0 0.5rem;
+  }
+}
+
+.hero-post-cta {
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $economist-red;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.home-recent {
+  margin-bottom: $spacing-xl;
+}
+
+.home-recent-heading {
+  font-family: $font-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 $spacing-lg 0;
+  padding-bottom: $spacing-sm;
+  border-bottom: 2px solid $economist-red;
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .hero-post-title {
+    font-size: 1.75rem;
+  }
+
+  .hero-post-excerpt {
+    font-size: 1rem;
+  }
+
+  .hero-post-image {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+// ============================================
 // TOPIC PAGE (BLOG INDEX)
 // ============================================
 

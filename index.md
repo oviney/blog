@@ -22,45 +22,74 @@ title: Quality Engineering Insights
     </ul>
   </section>
 
-  <section class="home-latest">
-    <h2>Latest from the Blog</h2>
-    {% assign latest_post = site.posts | first %}
-    <article class="topic-card">
-      {% if latest_post.image %}
-      <a href="{{ latest_post.url | relative_url }}" class="topic-card-image">
-        <img src="{{ latest_post.image | relative_url }}" alt="{{ latest_post.title }}">
-      </a>
-      {% else %}
-      <a href="{{ latest_post.url | relative_url }}" class="topic-card-image topic-card-image-placeholder" aria-label="{{ latest_post.title }}">
-        <div class="placeholder-content" aria-hidden="true">
-          <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-        </div>
-      </a>
+  {% assign hero_post = site.posts | where: "featured", true | first %}
+  {% unless hero_post %}
+    {% assign hero_post = site.posts | first %}
+  {% endunless %}
+
+  <section class="hero-post">
+    {% if hero_post.image %}
+    <a href="{{ hero_post.url | relative_url }}" class="hero-post-image">
+      <img src="{{ hero_post.image | relative_url }}" alt="{{ hero_post.title }}">
+    </a>
+    {% endif %}
+
+    <div class="hero-post-content">
+      {% if hero_post.categories %}
+      <div class="hero-post-category">{{ hero_post.categories | first }}</div>
       {% endif %}
-      
-      <div class="topic-card-content">
-        {% if latest_post.categories %}
-        <div class="topic-category">{{ latest_post.categories | first }}</div>
-        {% endif %}
-        
-        <h3 class="topic-card-title">
-          <a href="{{ latest_post.url | relative_url }}">{{ latest_post.title }}</a>
-        </h3>
-        
-        <p class="topic-card-excerpt">{{ latest_post.excerpt | strip_html | truncatewords: 20 }}</p>
-        
-        <div class="topic-card-meta">
-          <span class="topic-meta-item">{{ latest_post.date | date: "%B %d, %Y" }}</span>
-          {% assign words = latest_post.content | number_of_words %}
-          <span class="topic-meta-item">{{ words | divided_by: 200 | plus: 1 }} min read</span>
-        </div>
+
+      <h2 class="hero-post-title">
+        <a href="{{ hero_post.url | relative_url }}">{{ hero_post.title }}</a>
+      </h2>
+
+      {% if hero_post.subtitle %}
+      <p class="hero-post-subtitle">{{ hero_post.subtitle }}</p>
+      {% endif %}
+
+      <p class="hero-post-excerpt">{{ hero_post.excerpt | strip_html | truncatewords: 40 }}</p>
+
+      <div class="hero-post-meta">
+        <time datetime="{{ hero_post.date | date_to_xmlschema }}">
+          {{ hero_post.date | date: "%B %-d, %Y" }}
+        </time>
+        <span class="meta-separator">|</span>
+        {% assign words = hero_post.content | number_of_words %}
+        <span>{{ words | divided_by: 200 | plus: 1 }} min read</span>
       </div>
-    </article>
-    
+
+      <a href="{{ hero_post.url | relative_url }}" class="hero-post-cta">Read more &rarr;</a>
+    </div>
+  </section>
+
+  {% assign remaining_posts = site.posts | where_exp: "post", "post.url != hero_post.url" %}
+  {% if remaining_posts.size > 0 %}
+  <section class="home-recent">
+    <h2 class="home-recent-heading">More from the Blog</h2>
+    <div class="topic-grid">
+      {% for post in remaining_posts limit: 3 %}
+      <article class="topic-card">
+        {% if post.image %}
+        <a href="{{ post.url | relative_url }}" class="topic-card-image">
+          <img src="{{ post.image | relative_url }}" alt="{{ post.title }}">
+        </a>
+        {% endif %}
+        <div class="topic-card-content">
+          {% if post.categories %}
+          <div class="topic-category">{{ post.categories | first }}</div>
+          {% endif %}
+          <h3 class="topic-card-title">
+            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          </h3>
+          <p class="topic-card-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
+          <div class="topic-card-meta">
+            <span class="topic-meta-item">{{ post.date | date: "%B %-d, %Y" }}</span>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
     <p class="view-all"><a href="/blog/">View all posts &rarr;</a></p>
   </section>
+  {% endif %}
 </div>
