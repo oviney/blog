@@ -43,4 +43,13 @@ I believe quality engineering is a strategic function, not just a testing cost c
 
 ---
 
-**Connect:** [LinkedIn](https://linkedin.com/in/ourayviney) | [GitHub](https://github.com/oviney)
+<div class="connect-cta">
+  <h3>Connect with me</h3>
+  <p>I'm always interested in conversations about quality engineering strategy, test automation, and engineering leadership.</p>
+  <div class="connect-links">
+    <a href="https://linkedin.com/in/ourayviney" class="connect-link connect-link-linkedin">LinkedIn</a>
+    <a href="https://github.com/oviney" class="connect-link connect-link-github">GitHub</a>
+    <a href="https://twitter.com/oviney" class="connect-link connect-link-twitter">Twitter</a>
+    <a href="mailto:ouray@viney.ca" class="connect-link connect-link-email">Email</a>
+  </div>
+</div>

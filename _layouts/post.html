@@ -129,6 +129,39 @@ layout: default
 </section>
 {% endif %}
 
+<section class="author-bio">
+  <div class="author-bio-content">
+    <h4 class="author-bio-name">{{ page.author | default: site.author.name }}</h4>
+    <p class="author-bio-text">{{ site.author.bio }}</p>
+    <div class="author-bio-links">
+      <a href="https://linkedin.com/in/ourayviney">LinkedIn</a>
+      <a href="https://github.com/{{ site.github_username }}">GitHub</a>
+      <a href="https://twitter.com/{{ site.twitter_username }}">Twitter</a>
+    </div>
+  </div>
+</section>
+
+{% if site.giscus %}
+<section class="post-comments">
+  <h3 class="comments-heading">Discussion</h3>
+  <script src="https://giscus.app/client.js"
+    data-repo="{{ site.giscus.repo }}"
+    data-repo-id="{{ site.giscus.repo_id }}"
+    data-category="{{ site.giscus.category }}"
+    data-category-id="{{ site.giscus.category_id }}"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="en"
+    crossorigin="anonymous"
+    async>
+  </script>
+</section>
+{% endif %}
+
 <footer class="article-footer">
   <a href="{{ '/blog/' | relative_url }}" class="back-link">← Back to Blog</a>
 </footer>

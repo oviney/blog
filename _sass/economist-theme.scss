@@ -860,6 +860,118 @@ blockquote {
 }
 
 // ============================================
+// AUTHOR BIO (POST FOOTER)
+// ============================================
+
+.author-bio {
+  border-top: 1px solid $border-color;
+  border-bottom: 1px solid $border-color;
+  padding: $spacing-lg 0;
+  margin: $spacing-xl 0;
+}
+
+.author-bio-name {
+  font-family: $font-sans;
+  font-size: 1rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 $spacing-xs 0;
+}
+
+.author-bio-text {
+  font-family: $font-serif;
+  font-size: 0.9375rem;
+  color: $text-secondary;
+  line-height: $line-height-normal;
+  margin: 0 0 $spacing-sm 0;
+}
+
+.author-bio-links {
+  display: flex;
+  gap: $spacing-md;
+
+  a {
+    font-family: $font-sans;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: $economist-red;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// ============================================
+// CONNECT CTA (ABOUT PAGE)
+// ============================================
+
+.connect-cta {
+  background: $background-light;
+  border-left: 4px solid $economist-red;
+  padding: $spacing-lg;
+  margin-top: $spacing-xl;
+
+  h3 {
+    font-family: $font-sans;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 $spacing-xs 0;
+  }
+
+  p {
+    font-family: $font-serif;
+    font-size: 0.9375rem;
+    color: $text-secondary;
+    line-height: $line-height-normal;
+    margin: 0 0 $spacing-md 0;
+  }
+}
+
+.connect-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.connect-link {
+  display: inline-block;
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $background-white;
+  background: $text-primary;
+  padding: $spacing-xs $spacing-sm;
+  text-decoration: none;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: $economist-red;
+  }
+}
+
+// ============================================
+// COMMENTS (GISCUS)
+// ============================================
+
+.post-comments {
+  margin: $spacing-xl 0;
+}
+
+.comments-heading {
+  font-family: $font-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 $spacing-md 0;
+  padding-bottom: $spacing-xs;
+  border-bottom: 2px solid $economist-red;
+  display: inline-block;
+}
+
+// ============================================
 // FEATURED POST
 // ============================================
 
