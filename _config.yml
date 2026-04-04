@@ -104,6 +104,13 @@ exclude:
 include:
   - dashboard/
 
+# Giscus comments (GitHub Discussions-based)
+giscus:
+  repo: "oviney/blog"
+  repo_id: "R_kgDOIvarPQ"
+  category: "Announcements"
+  category_id: "DIC_kwDOIvarPc4C6AMG"
+
 # collections:
 #     authors:
 #         output: true
