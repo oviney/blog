@@ -1216,6 +1216,181 @@ table {
 }
 
 // ============================================
+// NEWSLETTER SIGNUP
+// ============================================
+
+.newsletter-signup {
+  background: $background-light;
+  border-top: 3px solid $economist-red;
+  padding: $spacing-lg;
+  margin: $spacing-xl 0;
+}
+
+.newsletter-heading {
+  font-family: $font-sans;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 $spacing-xs 0;
+}
+
+.newsletter-text {
+  font-family: $font-serif;
+  font-size: 0.9375rem;
+  color: $text-secondary;
+  line-height: $line-height-normal;
+  margin: 0 0 $spacing-md 0;
+}
+
+.newsletter-form {
+  display: flex;
+  gap: 0;
+  max-width: 500px;
+}
+
+.newsletter-input {
+  flex: 1;
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  padding: $spacing-xs $spacing-sm;
+  border: 2px solid $border-color;
+  border-right: none;
+  border-radius: 0;
+  outline: none;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: $economist-red;
+  }
+}
+
+.newsletter-button {
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: $background-white;
+  background: $economist-red;
+  border: 2px solid $economist-red;
+  padding: $spacing-xs $spacing-md;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: color.adjust($economist-red, $lightness: -10%);
+  }
+}
+
+.newsletter-rss-fallback {
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $economist-red;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+@media (max-width: 480px) {
+  .newsletter-form {
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  .newsletter-input {
+    border-right: 2px solid $border-color;
+  }
+}
+
+// ============================================
+// SEARCH
+// ============================================
+
+.search-container {
+  max-width: $content-max-width;
+}
+
+.search-input {
+  width: 100%;
+  font-family: $font-serif;
+  font-size: 1.125rem;
+  padding: $spacing-sm $spacing-md;
+  border: 2px solid $border-color;
+  border-radius: 0;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: $economist-red;
+  }
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+}
+
+.search-results {
+  margin-top: $spacing-lg;
+}
+
+.search-result {
+  padding: $spacing-md 0;
+  border-bottom: 1px solid $border-color;
+
+  &:first-child {
+    border-top: 1px solid $border-color;
+  }
+}
+
+.search-result-category {
+  font-family: $font-sans;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $economist-red;
+}
+
+.search-result-title {
+  font-family: $font-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: $spacing-xs 0;
+
+  a {
+    color: $text-primary;
+    text-decoration: none;
+
+    &:hover {
+      color: $economist-red;
+    }
+  }
+}
+
+.search-result-excerpt {
+  font-family: $font-serif;
+  font-size: 0.9375rem;
+  color: $text-secondary;
+  line-height: $line-height-normal;
+  margin: 0 0 $spacing-xs 0;
+}
+
+.search-result-date {
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  color: $text-tertiary;
+}
+
+.search-no-results {
+  font-family: $font-serif;
+  font-size: 1rem;
+  color: $text-secondary;
+  padding: $spacing-lg 0;
+}
+
+// ============================================
 // UTILITIES
 // ============================================
 

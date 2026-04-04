@@ -3,7 +3,8 @@ layout: post
 title: "AI-Assisted Code Generation: A New Era in Software Development"
 date: 2026-01-18
 author: "The Economist"
-categories: ["Quality Engineering", "AI Testing", "Software Engineering"]
+categories: ["Software Engineering"]
+tags: [ai, code-generation]
 image: /assets/images/ai-assisted-development-the-new-industrial-revolut.png
 ---
 

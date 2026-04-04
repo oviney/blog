@@ -10,7 +10,7 @@ permalink: /software-engineering/
     <p class="topic-description">Systematic methods, architectural decisions, and engineering practices that distinguish sustainable software from ad-hoc coding</p>
   </header>
 
-  {% assign se_posts = site.posts | where_exp: "post", "post.categories contains 'technology' or post.categories contains 'software-engineering' or post.categories contains 'ai'" %}
+  {% assign se_posts = site.posts | where_exp: "post", "post.categories contains 'Software Engineering'" %}
 
   {% if se_posts.size > 0 %}
   <div class="topic-grid">

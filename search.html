@@ -1,0 +1,57 @@
+---
+layout: default
+title: Search
+permalink: /search/
+---
+
+<div class="topic-page">
+  <header class="topic-header">
+    <h1 class="topic-title">Search</h1>
+  </header>
+
+  <div class="search-container">
+    <input type="text" id="search-input" class="search-input" placeholder="Search articles..." autocomplete="off" autofocus>
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var searchInput = document.getElementById('search-input');
+  var resultsContainer = document.getElementById('search-results');
+  var posts = [];
+
+  fetch('{{ "/search.json" | relative_url }}')
+    .then(function(response) { return response.json(); })
+    .then(function(data) { posts = data; });
+
+  searchInput.addEventListener('input', function() {
+    var query = this.value.toLowerCase().trim();
+    resultsContainer.innerHTML = '';
+
+    if (query.length < 2) return;
+
+    var results = posts.filter(function(post) {
+      return post.title.toLowerCase().indexOf(query) !== -1 ||
+             post.content.toLowerCase().indexOf(query) !== -1 ||
+             post.categories.join(' ').toLowerCase().indexOf(query) !== -1;
+    });
+
+    if (results.length === 0) {
+      resultsContainer.innerHTML = '<p class="search-no-results">No articles found for "' + query + '"</p>';
+      return;
+    }
+
+    results.forEach(function(post) {
+      var article = document.createElement('article');
+      article.className = 'search-result';
+      article.innerHTML =
+        '<span class="search-result-category">' + (post.categories[0] || '') + '</span>' +
+        '<h3 class="search-result-title"><a href="' + post.url + '">' + post.title + '</a></h3>' +
+        '<p class="search-result-excerpt">' + post.content + '</p>' +
+        '<span class="search-result-date">' + post.date + '</span>';
+      resultsContainer.appendChild(article);
+    });
+  });
+})();
+</script>

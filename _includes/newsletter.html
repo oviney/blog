@@ -1,0 +1,12 @@
+<aside class="newsletter-signup">
+  <h3 class="newsletter-heading">Stay informed</h3>
+  <p class="newsletter-text">Get new articles on quality engineering, test automation, and software leadership delivered to your inbox.</p>
+  {% if site.newsletter_url %}
+  <form action="{{ site.newsletter_url }}" method="post" class="newsletter-form">
+    <input type="email" name="email" placeholder="Your email address" required class="newsletter-input" aria-label="Email address">
+    <button type="submit" class="newsletter-button">Subscribe</button>
+  </form>
+  {% else %}
+  <a href="{{ '/feed.xml' | relative_url }}" class="newsletter-rss-fallback">Subscribe via RSS &rarr;</a>
+  {% endif %}
+</aside>

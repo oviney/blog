@@ -62,6 +62,8 @@ title: Quality Engineering Insights
     </div>
   </section>
 
+  {% include newsletter.html %}
+
   {% assign remaining_posts = site.posts | where_exp: "post", "post.url != hero_post.url" %}
   {% if remaining_posts.size > 0 %}
   <section class="home-recent">

@@ -10,7 +10,7 @@ permalink: /test-automation/
     <p class="topic-description">Strategies, frameworks, and practices for building test automation that delivers lasting value</p>
   </header>
 
-  {% assign ta_posts = site.posts | where_exp: "post", "post.categories contains 'quality-engineering' or post.categories contains 'test-automation' or post.categories contains 'test-strategy'" %}
+  {% assign ta_posts = site.posts | where_exp: "post", "post.categories contains 'Quality Engineering' or post.categories contains 'Test Automation'" %}
 
   {% if ta_posts.size > 0 %}
   <div class="topic-grid">

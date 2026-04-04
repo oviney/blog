@@ -4,7 +4,8 @@ title: "Self-Healing Tests: Myth vs Reality"
 date: 2026-01-02
 author: "The Economist"
 image: /assets/charts/self-healing-tests-myth-vs-reality.png
-categories: technology
+categories: ["Test Automation"]
+tags: [self-healing, ai]
 ---
 
 Eighty-five percent of software organisations using self-healing tests report a marked decrease in maintenance time, according to ISTQB's 2023 survey. Yet, only 30% of companies achieve complete autonomy from manual test updates, as found by InfoQ's recent analysis. This dichotomy raises questions about the gap between expectation and reality in the use of self-healing technologies.
