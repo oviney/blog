@@ -28,21 +28,28 @@ title: Blog Archive
           </div>
         </a>
         {% endif %}
-        
+
         <div class="topic-card-content">
           {% if post.categories %}
-          <div class="topic-category">{{ post.categories | first }}</div>
+          <span class="topic-category-badge">{{ post.categories | first }}</span>
           {% endif %}
-          
+
           <h2 class="topic-card-title">
             <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
           </h2>
-          
+
           <p class="topic-card-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
-          
+
           <div class="topic-card-meta">
-            {% assign words = post.content | number_of_words %}
-            <span class="topic-meta-item">{{ words | divided_by: 200 | plus: 1 }} min read</span>
+            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%B %-d, %Y" }}</time>
+            <span class="topic-meta-item">
+              {% assign words = post.content | number_of_words %}
+              {{ words | divided_by: 200 | plus: 1 }} min read
+            </span>
+          </div>
+
+          <div class="topic-card-author">
+            <span class="topic-card-author-name">{{ post.author | default: site.author.name }}</span>
           </div>
         </div>
       </article>

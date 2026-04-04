@@ -1360,6 +1360,19 @@ table {
   margin: 0 0 $spacing-xs 0;
 }
 
+.topic-category-badge {
+  display: inline-block;
+  font-family: $font-sans;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $economist-red;
+  border-bottom: 2px solid $economist-red;
+  padding-bottom: 2px;
+  margin-bottom: $spacing-xs;
+}
+
 .topic-card-title {
   margin: 0 0 $spacing-sm 0;
   flex: 0 0 auto;
@@ -1418,10 +1431,24 @@ article.topic-card h2 a,
 }
 
 .topic-meta-item {
-  &:not(:last-child)::after {
-    content: '•';
-    margin-left: $spacing-sm;
+  &:not(:last-child)::before {
+    content: '|';
+    margin-right: $spacing-xs;
+    color: $border-color;
   }
+}
+
+.topic-card-author {
+  margin-top: auto;
+  padding-top: $spacing-xs;
+}
+
+.topic-card-author-name {
+  font-family: $font-sans;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: $text-secondary;
+  letter-spacing: 0.02em;
 }
 
 .topic-empty {
