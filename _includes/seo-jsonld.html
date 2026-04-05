@@ -23,7 +23,7 @@
   },
   "author": {
     "@type": "Person",
-    "name": "Ouray Viney",
+    "name": {{ site.author.name | default: site.title | jsonify }},
     "url": {{ site.url | jsonify }}
   },
   "publisher": {
