@@ -213,9 +213,11 @@ test.describe('Homepage Responsive Layout', () => {
     const secondBox = await secondCard.boundingBox();
 
     if (firstBox && secondBox) {
-      // Side-by-side layout: cards should have similar Y positions
+      // Side-by-side layout: cards should have similar Y positions.
+      // Allow up to 50px difference to account for slight rendering offsets.
+      const LAYOUT_TOLERANCE_PX = 50;
       const yDiff = Math.abs(firstBox.y - secondBox.y);
-      expect(yDiff).toBeLessThan(50);
+      expect(yDiff).toBeLessThan(LAYOUT_TOLERANCE_PX);
     }
   });
 

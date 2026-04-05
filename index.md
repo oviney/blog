@@ -24,7 +24,7 @@ title: Quality Engineering Insights
       {% endif %}
 
       <h1 class="hero-post-title">
-        <a href="{{ hero_post.url | relative_url }}">{{ hero_post.title }}</a>
+        <a href="{{ hero_post.url | relative_url }}"><span class="sr-only">Latest post: </span>{{ hero_post.title }}</a>
       </h1>
 
       {% if hero_post.subtitle %}
@@ -132,8 +132,8 @@ title: Quality Engineering Insights
         <p class="home-bio-text">{{ site.author.bio }}</p>
         <div class="home-bio-links">
           <a href="{{ '/about/' | relative_url }}" class="home-bio-link">About me</a>
-          <a href="https://linkedin.com/in/ourayviney" class="home-bio-link" rel="noopener noreferrer" target="_blank">LinkedIn</a>
-          <a href="https://github.com/{{ site.github_username }}" class="home-bio-link" rel="noopener noreferrer" target="_blank">GitHub</a>
+          <a href="https://linkedin.com/in/ourayviney" class="home-bio-link" rel="noopener noreferrer" target="_blank" aria-label="LinkedIn (opens in new tab)">LinkedIn</a>
+          <a href="https://github.com/{{ site.github_username }}" class="home-bio-link" rel="noopener noreferrer" target="_blank" aria-label="GitHub (opens in new tab)">GitHub</a>
           <a href="{{ '/feed.xml' | relative_url }}" class="home-bio-link">RSS Feed</a>
         </div>
       </div>

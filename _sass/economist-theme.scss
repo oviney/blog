@@ -37,6 +37,7 @@ $line-height-relaxed: 1.8;
 // Border radius
 $radius-sm: 4px;
 $radius-md: 6px;
+$bio-avatar-size: 80px;
 
 // ============================================
 // RESET & BASE STYLES
@@ -1917,9 +1918,9 @@ article.topic-card h2 a,
 }
 
 .home-bio-avatar {
-  width: 80px;
-  height: 80px;
-  min-width: 80px;
+  width: $bio-avatar-size;
+  height: $bio-avatar-size;
+  min-width: $bio-avatar-size;
   border-radius: 50%;
   background: $economist-red;
   color: $background-white;
