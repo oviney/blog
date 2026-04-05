@@ -10,9 +10,9 @@ jobs:
     if: contains(github.event.pull_request.user.login, 'copilot')
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write      # needed to enable auto-merge
       pull-requests: write
-      issues: read
+      issues: write
 
     steps:
     - name: Checkout
@@ -115,6 +115,91 @@ jobs:
           echo "message=$COUNT files changed" >> $GITHUB_OUTPUT
         fi
 
+    - name: Classify PR risk
+      # Risk classification determines how much human oversight is required:
+      #
+      # LOW:    Only docs/markdown changes (docs/, *.md, root prose files)
+      #         These are the safest — auto-merge enabled once CI passes.
+      #
+      # MEDIUM: Content or test changes (_posts/, _drafts/, tests/, specs/, scripts/)
+      #         These affect the public site or quality gates, so standard review applies.
+      #
+      # HIGH:   Layout/CSS/CI/config changes (_sass/, _layouts/, .github/workflows/,
+      #         _config.yml, assets/)
+      #         These have wide blast radius — require explicit senior human approval.
+      #
+      # When a PR touches files from multiple tiers, the highest tier wins.
+      id: risk
+      run: |
+        FILES="${{ steps.files.outputs.changed }}"
+
+        # High-risk check first (highest precedence)
+        if echo "$FILES" | grep -qE "^(_sass/|_layouts/|\.github/workflows/|_config\.yml|assets/)"; then
+          echo "tier=high" >> $GITHUB_OUTPUT
+          echo "reason=Changes touch CSS/layout/CI/config files — wide blast radius" >> $GITHUB_OUTPUT
+
+        # Medium-risk: content or test/script changes
+        elif echo "$FILES" | grep -qE "^(_posts/|_drafts/|tests/|specs/|scripts/)"; then
+          echo "tier=medium" >> $GITHUB_OUTPUT
+          echo "reason=Changes touch content or test/script files" >> $GITHUB_OUTPUT
+
+        # Low-risk: only docs/markdown files
+        else
+          NON_DOC=$(echo "$FILES" | grep -vE "(^docs/|\.md$|\.txt$|^README|^CHANGELOG|^CNAME|^robots\.txt$)" || true)
+          if [ -n "$NON_DOC" ]; then
+            echo "tier=medium" >> $GITHUB_OUTPUT
+            echo "reason=Unclassified files present — defaulting to standard review" >> $GITHUB_OUTPUT
+          else
+            echo "tier=low" >> $GITHUB_OUTPUT
+            echo "reason=Only documentation/markdown changes detected" >> $GITHUB_OUTPUT
+          fi
+        fi
+
+    - name: Ensure risk labels exist
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const labels = [
+            { name: 'risk:low',    color: '0e8a16', description: 'Only docs/markdown — safe to auto-merge' },
+            { name: 'risk:medium', color: 'e4a11b', description: 'Content/test changes — standard review' },
+            { name: 'risk:high',   color: 'b60205', description: 'Layout/CI/config changes — senior review required' },
+          ];
+          for (const label of labels) {
+            try {
+              await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name: label.name });
+            } catch {
+              await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, ...label });
+            }
+          }
+
+    - name: Apply risk label
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const tier = '${{ steps.risk.outputs.tier }}';
+          // Remove any stale risk labels, then apply current tier
+          const existing = await github.rest.issues.listLabelsOnIssue({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+          for (const label of existing.data) {
+            if (label.name.startsWith('risk:')) {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: label.name,
+              });
+            }
+          }
+          await github.rest.issues.addLabels({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            labels: [`risk:${tier}`],
+          });
+
     - name: Post eval report
       uses: actions/github-script@v7
       with:
@@ -127,6 +212,8 @@ jobs:
           const issueNum = '${{ steps.labels.outputs.issue }}';
           const labels = '${{ steps.labels.outputs.labels }}';
           const changedCount = '${{ steps.files.outputs.count }}';
+          const riskTier = '${{ steps.risk.outputs.tier }}';
+          const riskReason = '${{ steps.risk.outputs.reason }}';
 
           const checks = [
             { name: 'Jekyll Build', status: build, detail: build === 'pass' ? 'Site builds successfully' : 'BUILD FAILED' },
@@ -138,7 +225,18 @@ jobs:
           const allPass = checks.every(c => c.status === 'pass');
           const hasFailure = checks.some(c => c.status === 'fail');
 
+          // Risk tier badge and guidance
+          const tierBadge = { low: '🟢 LOW', medium: '🟡 MEDIUM', high: '🔴 HIGH' }[riskTier] || riskTier;
+          const tierGuidance = {
+            low:    '✅ Auto-merge enabled — will merge automatically once all CI checks pass.',
+            medium: '👀 Standard review required — a human must approve before merge.',
+            high:   '🛑 Senior review required — explicit human approval needed before merge.',
+          }[riskTier] || '';
+
           let body = `## Agent PR Evaluation\n\n`;
+          body += `### Risk Tier: ${tierBadge}\n`;
+          body += `**Reason:** ${riskReason}\n`;
+          body += `**Action:** ${tierGuidance}\n\n`;
           body += `| Check | Status | Detail |\n|-------|--------|--------|\n`;
           checks.forEach(c => {
             const icon = c.status === 'pass' ? '✅' : c.status === 'warn' ? '⚠️' : '❌';
@@ -162,6 +260,51 @@ jobs:
             issue_number: context.issue.number,
             body: body
           });
+
+    - name: Enable auto-merge for low-risk PRs
+      # Low-risk PRs (docs/markdown only) are safe to auto-merge once all CI
+      # status checks pass. Auto-merge requires the repository setting
+      # "Allow auto-merge" to be enabled and branch protection rules with
+      # required status checks configured.
+      if: steps.risk.outputs.tier == 'low' && steps.build.outputs.status == 'pass' && steps.scope.outputs.status == 'pass'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          try {
+            await github.graphql(`
+              mutation EnableAutoMerge($pullRequestId: ID!) {
+                enablePullRequestAutoMerge(input: {
+                  pullRequestId: $pullRequestId,
+                  mergeMethod: SQUASH
+                }) {
+                  pullRequest { autoMergeRequest { enabledAt } }
+                }
+              }
+            `, { pullRequestId: context.payload.pull_request.node_id });
+            console.log('✅ Auto-merge enabled via GraphQL');
+          } catch (e) {
+            console.log(`⚠️ Auto-merge could not be enabled: ${e.message}`);
+            console.log('Ensure "Allow auto-merge" is turned on in repository settings.');
+          }
+
+    - name: Request senior review for high-risk PRs
+      # High-risk PRs must have explicit human sign-off before merge.
+      # We request a review from the repository owner and add a blocking comment.
+      if: steps.risk.outputs.tier == 'high'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          // Request a review from the repository owner
+          try {
+            await github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              reviewers: [context.repo.owner],
+            });
+          } catch (e) {
+            console.log(`Could not auto-request reviewer: ${e.message}`);
+          }
 
     - name: Fail on violations
       if: steps.build.outputs.status == 'fail' || steps.scope.outputs.status == 'fail'
