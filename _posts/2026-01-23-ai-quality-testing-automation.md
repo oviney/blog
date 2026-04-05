@@ -1,10 +1,13 @@
 ---
 layout: post
 title: "AI in Quality Testing: Bridging the Adoption Gap"
+subtitle: "AI can halve testing time. Only 15% of companies have fully embraced it."
 date: 2026-01-23
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering"]
-image: /assets/images/ai-quality-testing-automation.png
+tags: [ai, testing]
+image: /assets/charts/ai-quality-testing-automation.png
+ai_assisted: true
 ---
 
 AI quality testing tools can halve software testing time, according to the Capgemini Research Institute. Yet despite the promise of rapid and efficient software validation, only 15% of companies have fully embraced AI within their quality testing processes. This considerable gap between potential and current adoption underscores the hesitancy prevailing among many in the tech industry.

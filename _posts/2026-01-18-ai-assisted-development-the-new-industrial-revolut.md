@@ -1,11 +1,13 @@
 ---
 layout: post
 title: "AI-Assisted Code Generation: A New Era in Software Development"
+subtitle: "Machines now write half the code. Most companies have barely noticed."
 date: 2026-01-18
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Software Engineering"]
 tags: [ai, code-generation]
-image: /assets/images/ai-assisted-development-the-new-industrial-revolut.png
+image: /assets/charts/ai-assisted-development-the-new-industrial-revolut.png
+ai_assisted: true
 ---
 
 AI-assisted code generation can reduce development time by up to 50%, according to research by McKinsey & Company. Yet, this seismic shift in software engineering tools remains underutilised, with only 10% of companies fully realising such efficiencies. This discrepancy highlights the nascent status of this technology, one that promises a profound change in the way software is built and maintained.

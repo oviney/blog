@@ -1,10 +1,13 @@
 ---
 layout: post
 title: "The Economics of Test Automation: A Strategic Imperative"
+subtitle: "Automation can cut testing costs by 40%. Most organisations never see that return."
 date: 2026-01-19
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering"]
-image: /assets/images/the-surprising-economics-of-test-automation-roi.png
+tags: [test-automation, roi]
+image: /assets/charts/the-surprising-economics-of-test-automation-roi.png
+ai_assisted: true
 ---
 
 Test automation can dramatically reduce testing costs, with some organisations seeing reductions of up to 40%, according to the Capgemini World Quality Report of 2023. However, the financial benefits are not uniformly distributed across industries. As test automation becomes more widespread, understanding where it delivers the greatest return on investment (ROI) and the factors influencing these outcomes is crucial for businesses aiming to enhance their software development processes.

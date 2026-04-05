@@ -1,10 +1,13 @@
 ---
 layout: post
 title: "Why Most Digital Transformations Fail to Deliver"
+subtitle: "Seventy percent of digital transformations miss their targets. The problem is rarely the technology."
 date: 2026-01-18
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering"]
-image: /assets/images/why-most-digital-transformations-fail-to-deliver-r.png
+tags: [digital-transformation, strategy]
+image: /assets/charts/why-most-digital-transformations-fail-to-deliver-r.png
+ai_assisted: true
 ---
 
 Seventy percent of digital transformations fail to achieve their intended goals, according to McKinsey & Company. This stark statistic highlights the pervasive challenge businesses face as they navigate the complexities of digital transformation. With companies spending an average of 10% of revenue annually on these initiatives, the stakes are high. The main culprits behind these failures often include lack of executive buy-in and an overemphasis on technology at the expense of integrating people and process changes effectively.
