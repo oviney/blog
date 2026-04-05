@@ -1,0 +1,5 @@
+# Production overrides — merged with _config.yml during CI build.
+# See .github/workflows/jekyll.yml for usage.
+sass:
+  style: compressed
+  quiet_deps: true

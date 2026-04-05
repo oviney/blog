@@ -15,7 +15,7 @@ title: Quality Engineering
     <article class="econ-article-card">
       {% if post.image and post.image != "/assets/images/blog-default.svg" %}
       <a href="{{ post.url | relative_url }}" class="econ-card-image-link">
-        <img src="{{ post.image | relative_url }}" alt="{{ post.title }}" class="econ-card-image" loading="lazy">
+        {% include responsive-image.html src=post.image alt=post.title loading="lazy" class="econ-card-image" %}
       </a>
       {% endif %}
 

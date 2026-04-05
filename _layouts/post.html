@@ -30,7 +30,8 @@ layout: default
 
   {% if page.image %}
   <figure class="article-hero-image">
-    <img src="{{ page.image | relative_url }}" alt="{{ page.title }}">
+    {% assign _hero_alt = page.image_alt | default: page.title %}
+    {% include responsive-image.html src=page.image alt=_hero_alt %}
     {% if page.image_caption %}
     <figcaption class="image-credit">{{ page.image_caption | upcase }}</figcaption>
     {% else %}
@@ -99,7 +100,7 @@ layout: default
     <article class="more-from-featured">
       {% if featured.image %}
       <a href="{{ featured.url | relative_url }}" class="featured-image-link">
-        <img src="{{ featured.image | relative_url }}" alt="{{ featured.title }}">
+        {% include responsive-image.html src=featured.image alt=featured.title loading="lazy" %}
       </a>
       {% endif %}
       <div class="featured-content">
@@ -114,7 +115,7 @@ layout: default
       <article class="more-from-item">
         {% if post.image %}
         <a href="{{ post.url | relative_url }}" class="item-image-link">
-          <img src="{{ post.image | relative_url }}" alt="{{ post.title }}">
+          {% include responsive-image.html src=post.image alt=post.title loading="lazy" %}
         </a>
         {% endif %}
         <div class="item-content">

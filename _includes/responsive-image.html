@@ -1,0 +1,21 @@
+{% comment %}
+  Responsive image include with WebP source and PNG fallback.
+  Usage:
+    {% include responsive-image.html src=page.image alt=page.title %}
+    {% include responsive-image.html src=post.image alt=post.title loading="lazy" class="econ-card-image" %}
+
+  Parameters:
+    src     — image path (required)
+    alt     — alt text (required)
+    loading — "lazy" or "eager" (optional, defaults to eager)
+    class   — CSS class applied to the <img> element (optional)
+{% endcomment %}{% assign _webp_src = include.src | replace: '.png', '.webp' %}{% if _webp_src != include.src %}<picture>
+  <source srcset="{{ _webp_src | relative_url }}" type="image/webp">
+  <img src="{{ include.src | relative_url }}"
+       alt="{{ include.alt }}"
+       {% if include.loading %}loading="{{ include.loading }}"{% endif %}
+       {% if include.class %}class="{{ include.class }}"{% endif %}>
+</picture>{% else %}<img src="{{ include.src | relative_url }}"
+     alt="{{ include.alt }}"
+     {% if include.loading %}loading="{{ include.loading }}"{% endif %}
+     {% if include.class %}class="{{ include.class }}"{% endif %}>{% endif %}
