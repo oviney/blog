@@ -4,7 +4,7 @@ title: "The coder's crutch: why AI-assisted development is creating more problem
 date: 2023-08-08
 author: "The Economist"
 categories: ["Software Engineering"]
-image: /assets/images/blog-default.svg
+image: /assets/images/ai-coders-crutch.png
 ---
 
 GitHub reports that its Copilot tool now generates 46% of all code written on its platform. That figure, disclosed in Microsoft's 2023 annual report, sounds like a productivity triumph. Yet a growing body of evidence suggests that AI-assisted development is producing a generation of software engineers who ship faster but understand less — and the technical debt is compounding quietly.
