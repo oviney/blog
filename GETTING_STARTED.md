@@ -70,7 +70,32 @@ npm run test:visual:reference
 
 ## Pre-commit Hook
 
-A pre-commit hook runs automatically on `git commit`. It validates Jekyll builds for content changes and skips the build for docs-only changes. No setup is required — the hook is included in the repository.
+A pre-commit hook runs automatically on `git commit`. It validates content quality for any `_posts/` files staged in the commit. No manual setup is required — the hook activates automatically via `git config core.hooksPath`.
+
+### What is validated
+
+For each staged post the hook checks:
+
+| Check | Behaviour |
+|-------|-----------|
+| Required front matter (`title`, `date`, `author`, `categories`, `image`, `description`) | **Blocks commit** if any field is missing |
+| Image file exists (`/assets/images/*.png` or `*.webp`) | **Blocks commit** if the file is absent |
+| Valid category (`Quality Engineering`, `Software Engineering`, `Test Automation`, `Security`) | **Blocks commit** if an unknown category is used |
+| Title length (≤ 60 chars recommended for SEO) | Warning only |
+| Description length (≤ 160 chars recommended for SEO) | Warning only |
+
+### Running validation manually
+
+```bash
+# Validate only staged posts (same as pre-commit)
+bash scripts/validate-posts.sh
+
+# Validate all posts in _posts/
+bash scripts/validate-posts.sh --all
+
+# Validate specific files
+bash scripts/validate-posts.sh _posts/2026-04-05-my-post.md
+```
 
 ## Deploying Changes
 
