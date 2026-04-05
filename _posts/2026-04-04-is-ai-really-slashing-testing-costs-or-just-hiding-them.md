@@ -4,7 +4,7 @@ title: "The testing tax: how AI shifted costs without reducing them"
 date: 2026-04-04
 author: "The Economist"
 categories: ["Quality Engineering", "AI Testing"]
-image: /assets/images/blog-default.svg
+image: /assets/images/testing-tax-shifted-costs.png
 ---
 
 IBM's Institute for Business Value surveyed 2,500 technology executives in 2025 and found that 71% had deployed AI testing tools. Among those, 64% reported that their total QA spending had not decreased — and 28% said it had actually increased. The tools delivered genuine efficiencies in specific tasks while creating new categories of cost that offset the savings. AI did not reduce the testing tax. It restructured it.
