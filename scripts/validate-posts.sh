@@ -55,6 +55,7 @@ extract_frontmatter() {
 }
 
 # ── Helper: check if a category value is valid ───────────────────────────────
+# Linear search over a small static list (4 valid categories); acceptable here.
 
 is_valid_category() {
   local cat="$1"
@@ -172,6 +173,8 @@ validate_post() {
       #     - Quality Engineering
       #     - Test Automation
       # Grab up to 10 lines after the `categories:` key, extract `- item` lines.
+      # The -A 10 limit is sufficient for any realistic post; blogs rarely have
+      # more than a handful of categories.
       cats_line=$(echo "$fm" | { grep -A 10 "^categories:" || true; } | \
         tail -n +2 | \
         awk '/^[[:space:]]*-[[:space:]]/{gsub(/^[[:space:]]*-[[:space:]]*/,""); print; next} /^[a-z]/{exit}' | \
@@ -244,7 +247,7 @@ else
     if [[ -f "$arg" ]]; then
       FILES+=("$arg")
     else
-      echo "Warning: file not found: $arg" >&2
+    echo "Error: file not found: $arg" >&2
     fi
   done
 fi
