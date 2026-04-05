@@ -34,7 +34,15 @@ jobs:
       - name: Start Jekyll server
         run: |
           bundle exec jekyll serve --port 4000 --detach
-          sleep 5
+          echo "Waiting for Jekyll server to be ready..."
+          for i in $(seq 1 30); do
+            if curl -s http://localhost:4000/ > /dev/null; then
+              echo "Jekyll server is ready after ${i}s"
+              break
+            fi
+            sleep 1
+          done
+          curl -f http://localhost:4000/ || { echo "Jekyll server failed to start"; exit 1; }
       
       - name: Run visual regression tests
         run: npm run test:visual
