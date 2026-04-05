@@ -12,7 +12,7 @@ This directory contains the healing monitoring dashboard for Playwright test aut
 - Real-time healing success rate monitoring
 - Historical trend analysis with interactive charts
 - Test results visualization
-- Auto-refresh every 5 minutes
+- Page auto-refresh every 5 minutes (data updates every 4 hours via GitHub Actions)
 - Responsive design matching Economist theme
 
 ## Access
