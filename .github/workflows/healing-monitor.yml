@@ -375,7 +375,7 @@ jobs:
 
     - name: 🚨 Create GitHub issue alert (if critical)
       if: false # Disabled: alerts were firing with "unknown%" due to broken reporter config
-      uses: actions/github-script@v7
+      uses: actions/github-script@v8
       with:
         script: |
           const successRate = '${{ steps.monitor.outputs.success-rate }}' || 'unknown';
