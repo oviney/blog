@@ -1,11 +1,13 @@
 ---
 layout: post
 title: "The ROI of AI-Driven Test Automation: Hype Meets Hard Numbers"
+subtitle: "A rigorous assessment of AI-powered test automation reveals measured returns and persistent challenges amid soaring expectations."
 date: 2026-04-04
-author: "The Economist"
-categories: ["Quality Engineering", "Test Automation"]
-image: /assets/images/roi-ai-driven-test-automation.png
-summary: "A rigorous assessment of AI-powered test automation reveals measured returns and persistent challenges amid soaring expectations."
+author: "Ouray Viney"
+categories: ["Quality Engineering"]
+tags: [test-automation, roi, ai]
+image: /assets/images/the-roi-of-ai-driven-test-automation--separating-hype-from-r.png
+ai_assisted: true
 ---
 
 The siren call of artificial intelligence promises to transform software testing from a labourious bottleneck into a seamless, self-optimising engine of quality assurance. Headlines trumpet AI’s prowess in eradicating defects, slashing test times and delivering instant returns on investment (ROI). Yet beneath the glossy veneer lurks a more cautious reality: AI in test automation is a potent tool, but it requires patience, savvy integration, and human oversight to truly pay dividends.
