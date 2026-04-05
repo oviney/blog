@@ -5,6 +5,7 @@ date: 2026-04-04
 author: "The Economist"
 categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/the-roi-of-ai-driven-test-automation--separating-hype-from-r.png
+description: "The AI testing market is growing at 35.7% annually. But only 38% of organisations using AI testing tools report positive ROI within the first 18 months."
 ---
 
 The AI testing market is growing at 35.7% annually, from $1.1 billion in 2023 to a projected $4.8 billion by 2028, according to MarketsandMarkets. Gartner predicts that 75% of large enterprises will use AI-powered test automation by 2025, up from 35% in 2021. These are the numbers that appear in vendor pitch decks. The numbers that do not appear tell a different story: Capgemini's World Quality Report found that only 38% of organisations using AI testing tools reported positive ROI within the first 18 months.

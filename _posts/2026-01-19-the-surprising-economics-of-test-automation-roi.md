@@ -5,6 +5,7 @@ date: 2026-01-19
 author: "The Economist"
 categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/the-surprising-economics-of-test-automation-roi.png
+description: "Forrester tracked 15 enterprise test automation programmes. Median ROI reached 143%, but payback took 23 months—and 4 programmes never broke even."
 ---
 
 Forrester's 2025 Total Economic Impact analysis tracked 15 enterprise test automation programmes over three years and found that the median ROI was 143% — a strong return by any capital allocation standard. It also found that the median time to positive ROI was 23 months, that 4 of the 15 programmes never reached breakeven, and that the variance between the best and worst performers was a factor of twelve. Test automation ROI is real. It is also wildly unpredictable, poorly measured, and routinely misrepresented in the business cases used to justify it.

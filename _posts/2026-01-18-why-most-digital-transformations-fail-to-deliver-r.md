@@ -5,6 +5,7 @@ date: 2026-01-18
 author: "The Economist"
 categories: ["Quality Engineering", "Software Engineering"]
 image: /assets/images/digital-transformation-secret.png
+description: "McKinsey's data shows 70% of digital transformations fail their stated objectives. Why the failure rate persists despite a decade of accumulated wisdom."
 ---
 
 McKinsey has been tracking digital transformation success rates since 2018, and the headline number has barely moved: 70% of initiatives fail to meet their stated objectives. In its 2023 update, the consultancy surveyed 1,500 executives across 20 industries and found that the average transformation consumed 10% of annual revenue over three years while delivering less than half the projected value. The persistence of this failure rate, despite a decade of accumulated wisdom, suggests the problem is structural, not informational.
