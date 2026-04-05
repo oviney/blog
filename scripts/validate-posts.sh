@@ -247,7 +247,7 @@ else
     if [[ -f "$arg" ]]; then
       FILES+=("$arg")
     else
-      error "file not found: $arg" >&2
+      error "file not found: $arg"
       (( ERRORS++ )) || true
     fi
   done
