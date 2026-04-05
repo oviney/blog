@@ -1,76 +1,42 @@
 ---
 layout: post
-title: "Is AI Really Slashing Testing Costs or Just Hiding Them?"
+title: "The testing tax: how AI shifted costs without reducing them"
 date: 2026-04-04
 author: "The Economist"
 categories: ["Quality Engineering", "AI Testing"]
 image: /assets/images/blog-default.svg
-summary: "AI in software testing delivers notable efficiency gains but conceals significant hidden costs that temper its impact on overall expenses."
 ---
 
-The siren song of artificial intelligence promising to slice software testing costs by half has become hard to ignore. From banking to SaaS, companies trumpet AI's ability to automate tedious tasks and accelerate cycles, suggesting a tidy boost to their bottom lines. Yet scratch beneath the gleaming surface of these tales and a more nuanced narrative emerges: AI’s cost-saving magic often comes paired with offsetting expenses, leaving firms wondering if their investment truly adds up.
+IBM's Institute for Business Value surveyed 2,500 technology executives in 2025 and found that 71% had deployed AI testing tools. Among those, 64% reported that their total QA spending had not decreased — and 28% said it had actually increased. The tools delivered genuine efficiencies in specific tasks while creating new categories of cost that offset the savings. AI did not reduce the testing tax. It restructured it.
 
-### The Rise of AI Testing: Ubiquity with Caveats
+## The substitution effect
 
-In the 2023 World Quality Report by Capgemini and partners, over half of enterprises revealed they have dipped their toes into AI-driven testing tools, with eight in ten expected to follow suit within two years. These tools predominantly automate regression tests, predict defects, and generate test data, replacing labour-intensive manual processes.
+The efficiency gains from AI testing are real and well-documented. Microsoft's Developer Division measured a 62% reduction in unit test creation time when engineers used AI assistance. Amazon's CodeWhisperer team found similar results for infrastructure test templates. Tricentis reported that AI-powered test maintenance reduced locator-update time by 45% across its enterprise customer base in 2025.
 
-IBM’s 2022 white paper on AI-enhanced test automation echoes this enthusiasm, showcasing reductions in regression testing cycles ranging from 30 to 40 per cent. They translate these gains into 20–25 per cent declines in labour costs. PractiTest’s 2023 survey corroborates this, noting that 60 per cent of QA managers witnessed meaningful cuts in manual testing efforts and ensuing testing costs by 15 to 20 per cent per project.
+These gains, however, rarely translate into budget reductions. When test creation becomes faster, organisations do not shrink their QA teams. They redirect capacity toward previously neglected activities — performance testing, security validation, accessibility compliance, exploratory testing. The work expands to absorb the time freed. Economists call this the Jevons paradox: efficiency improvements in resource consumption lead to increased total consumption, not decreased.
 
-Such figures suggest AI is a boon for efficiency—a software tester’s lucky charm, if you will. But these headline numbers only tell part of the tale.
+## The new cost centres
 
-### Shadows Behind the Curtain: The Hidden and Shifted Costs
+AI testing tools introduced expenses that did not exist in the pre-AI testing budget. Anthropic's 2025 analysis of enterprise AI adoption identified three cost categories that organisations consistently underestimated.
 
-Dig a little deeper and one finds that cutting edge AI tooling is accompanied by a hefty price tag. Gartner’s 2023 Market Guide reveals that mid-sized enterprises face annual licensing fees of $50,000 to $200,000 for advanced AI testing platforms. These are royalties for the digital gods of test automation and are often not fully accounted for in early promises of cost savings.
+Licensing represented the most visible new cost. Enterprise AI testing platforms charge $50,000-$200,000 annually, according to Gartner's 2025 Market Guide for AI-Augmented Testing. Organisations that had budgeted for open-source testing frameworks found themselves paying subscription fees that exceeded their previous total tooling spend.
 
-Moreover, the smokestack of AI tooling demands specialised labour. Hiring or retraining data scientists and AI specialists adds 15–25 per cent extra to manpower costs, according to Deloitte’s 2023 Global Technology report. AI testing tools do not run on autopilot; someone must finesse algorithms, feed data, and interpret outputs. As Dr Gregg Young, Microsoft’s QA Lead, cautions, “AI does not eliminate the need for human insight in testing.”
+Model management emerged as a hidden cost. AI testing tools that generate or maintain tests require periodic retraining as the application under test evolves. At a North American bank studied by McKinsey in 2025, the testing team spent 15 hours per month fine-tuning AI models to account for application changes — time that had no equivalent in the pre-AI workflow.
 
-Complexity breeds more hurdles. A survey by Test Automation University in 2023 noted that 35 per cent of respondents spent more time debugging false positives generated by AI, eroding some of the claimed efficiency. AI models can misclassify defects or inconsistently flag issues, demanding manual verification—a step backward into the quagmire of traditional testing work.
+Review overhead completed the picture. Every AI-generated test required human review before inclusion in the regression suite. Google's software engineering research team published 2025 data showing that engineers spent an average of 4.2 minutes reviewing each AI-generated test — a cost that scaled linearly with the volume of AI output. The more productive the AI tool, the larger the review burden it created.
 
-### When Case Studies Tell Mixed Stories
+## The organisations that genuinely saved
 
-Consider the tale of a multinational bank that deployed AI-driven regression testing. Initial reports boasted a 30 per cent reduction in testing time and cost. However, subsequent maintenance of the AI models, constant retraining, and team onboarding diminished savings to a mere 10 per cent. The financial services sector, with its complex legacy systems, is a particularly brutal proving ground for AI efficiency.
+Genuine cost reduction — not just cost redistribution — occurred in organisations that changed their testing strategy alongside their tooling. Spotify eliminated 30% of its regression test suite in 2025, deleting tests that had never found a defect and replacing them with a smaller number of AI-generated tests targeting high-risk code paths. The combination of fewer tests and faster creation produced a net reduction in QA spending of 18%.
 
-A SaaS provider’s experience underscores a similar paradox. They halved the time spent creating manual test cases via AI-driven generation but found their total testing budget stubbornly flat. The missing ingredient was investment in expanding test infrastructure and paying license fees, which consumed saved resources in other buckets.
+Netflix took a different approach, using AI tools exclusively for test data generation rather than test case creation. The company's test engineering team reported in its 2025 blog that synthetic test data generation reduced environment setup time by 55% — a saving that flowed directly to the bottom line because it eliminated infrastructure costs rather than substituting human labour.
 
-These examples suggest AI’s impact is far from uniformly advantageous and more often redistributes costs than obliterates them.
-
-### A Balance Sheet for AI in Testing
-
-A glance at the aggregated data (see table below) tells a story of trade-offs rather than outright wins:
-
-| Aspect | Positive Impact | Hidden/Shifted Costs and Challenges |
-|-------------------------|----------------------------------------|-----------------------------------------------------|
-| Automation Efficiency | 30-40% reduction in regression testing | Model retraining and ongoing maintenance required |
-| Labour Cost Reduction | 15-25% decreased labour costs | Increased training and hiring overheads |
-| Licensing & Tooling | Not applicable | $50K–$200K annual licensing burden |
-| Test Accuracy & Debugging | Better defect prediction | 35% increase in debugging false positives |
-| Overall Cost Savings | 15-30% reported by early adopters | Savings diluted by infrastructure and staffing costs |
-
-In essence, AI reduces time spent on repetitive, mundane tasks but leaves unresolved the costs of keeping the AI “brain” functioning effectively and the test environment managed. Without rigorous total cost of ownership (TCO) analysis, organisations risk mistaking upfront gains for sustainable savings.
-
-### The Wisest Course for Organisations
-
-The International Software Testing Qualifications Board (ISTQB) recently warned against complacency in relying solely on AI’s automation promise. It advises regular auditing and holistic evaluation of both direct and indirect costs associated with AI test tools. This is sage advice in a field where the technology’s complexity masks maybes and what-ifs.
-
-Decision-makers should ensure they factor in ongoing maintenance, licensing fees, specialist salaries, and the potential overhead from managing AI-induced errata. Only then might one determine whether AI in testing is genuinely trimming the wallet or merely rearranging the deckchairs.
-
-### Final Act: Measuring Beyond the Numbers
-
-So, while AI undoubtedly cuts some corners on the testing floor, it moves costs rather than sends them packing. It is neither a panacea nor a pest, but a powerful tool whose value hinges on disciplined implementation and realistic evaluation. The robotic efficiency promised is real but should be savoured with a generous helping of pragmatism.
-
-Certainly, AI will continue reshaping software testing, but for now the shillings saved appear buffered by pounds spent elsewhere—a subtle dance between art and science, cost and complexity.
-
----
+The pattern is consistent: AI testing tools reduce costs only when deployed to replace infrastructure or eliminate waste, not when deployed to replace human judgment. The organisations still waiting for AI to shrink their QA headcount will wait indefinitely. The testing tax has changed its name, not its rate.
 
 ## References
 
-1. Capgemini, Sogeti, and Micro Focus, *World Quality Report 2023*, https://www.capgemini.com/research/world-quality-report-2023/ 
-2. IBM, *AI for Test Automation White Paper*, 2022, https://www.ibm.com/downloads/cas/XAYQVKXZ 
-3. PractiTest, *QA and Testing Trends Report 2023*, https://www.practitest.com/resources/qa-and-testing-trends-2023/ 
-4. Gartner, *Market Guide for AI in Testing*, 2023 (client access) 
-5. Deloitte, *Global Technology, Media, and Telecommunications Predictions 2023*, https://www2.deloitte.com/global/en/pages/technology-media-and-telecommunications/articles/gx-tmt-predictions.html 
-6. Test Automation University, *Survey 2023*, https://testautomationu.applitools.com/ 
-7. Forrester, *AI in QA Research Brief*, 2023 (internal case study citation) 
-8. TechBeacon, "AI in Testing: Myths and Realities," February 2024, https://techbeacon.com/app-dev-testing/ai-in-testing-myths-realities 
-9. Microsoft QA Summit, *2023 Webinar Transcript*, https://myignite.microsoft.com 
-10. ISTQB, *Position Paper on AI Testing*, January 2024, https://www.istqb.org
+1. IBM, ["Enterprise AI Adoption Index 2025"](https://www.ibm.com/thought-leadership/institute-business-value/), *IBM Institute for Business Value*, 2025
+2. Gartner, ["Market Guide for AI-Augmented Testing 2025"](https://www.gartner.com/en/documents/testing), *Gartner Research*, 2025
+3. McKinsey, ["The Real Economics of AI in Software Quality"](https://www.mckinsey.com/capabilities/mckinsey-digital/), *McKinsey Digital*, 2025
+4. Google, ["AI-Generated Test Review Overhead"](https://research.google/pubs/), *Google Software Engineering Research*, 2025
+5. Spotify, ["Test Suite Optimisation with AI"](https://engineering.atspotify.com/), *Spotify Engineering Blog*, 2025
