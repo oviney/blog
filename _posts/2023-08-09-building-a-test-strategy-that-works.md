@@ -7,42 +7,34 @@ categories: ["Quality Engineering"]
 image: /assets/images/test-strategy-trap.png
 ---
 
-Capgemini's World Quality Report surveyed 1,750 technology leaders across 32 countries in 2023 and found that 88% of organisations had a documented test strategy. It also found that only 23% believed their strategy was effective. The gap between having a plan and having a plan that works is where most quality engineering efforts go to die.
+The World Quality Report 2025-2026, published by OpenText and Capgemini in July 2025, surveyed 1,800 technology leaders across 33 countries and found that 91% of organisations had a documented test strategy. Only 19% believed their strategy was effective — down from 23% two years earlier. The gap between having a plan and having a plan that works is widening, not closing, despite a decade of investment in quality engineering maturity models.
 
 ## The document problem
 
-The typical test strategy is a 40-page Confluence artifact written during a project's optimistic early weeks, reviewed once, and never updated. It describes an idealised testing process that bears little resemblance to how the team actually works under deadline pressure. Gartner's 2023 research on enterprise quality practices found that 61% of test strategies were more than six months out of date, with test automation coverage targets that had been copy-pasted from the previous project without adjustment.
+The typical test strategy remains a 40-page Confluence artifact written during a project's optimistic early weeks, reviewed once by stakeholders who lack the technical context to challenge it, and never updated. The World Quality Report found that 67% of test strategies were more than six months out of date. In an industry where deployment frequency has increased 35% year-over-year according to DORA's 2025 report, a strategy written six months ago describes a system that no longer exists.
 
-This is not a documentation problem. It is an incentive problem. The person who writes the test strategy — typically a QA lead or test manager — is rewarded for its completeness and thoroughness at the time of review. Nobody is rewarded for its accuracy six months later. The strategy becomes a compliance artifact rather than an operational tool, and the team reverts to whatever testing habits its engineers brought from their previous jobs.
+This is not a documentation problem. It is an incentive problem. The person who writes the test strategy is rewarded for its completeness at the time of creation. Nobody is measured on its accuracy six months later. The strategy becomes a compliance artifact — evidence that planning occurred — rather than an operational tool that guides daily testing decisions.
 
 ## The automation fantasy
 
-Test strategies routinely commit to automation targets that the organisation lacks the infrastructure, skills, or budget to achieve. Forrester's 2023 analysis of enterprise test automation programmes found that the average organisation achieved 34% of its stated automation goals within the planned timeframe. The remaining 66% was either deferred, descoped, or quietly abandoned.
+Test strategies routinely commit to automation targets that the organisation lacks the infrastructure, skills, or budget to achieve. According to the LinkedIn article "Your AI Testing Tools Won't Save You" published in December 2025, the median organisation achieved fewer than 30% of its stated automation goals within planned timeframes. The remaining 70% was deferred, descoped, or quietly abandoned.
 
-The pattern is predictable. A strategy mandates 80% automation coverage. The team automates the easy tests first — login flows, simple CRUD operations, happy-path scenarios. These reach 40% coverage quickly and the progress charts look encouraging. Then the team hits the integration tests, the tests that depend on third-party services, the tests that require complex data setups. Progress stalls. The remaining 40% would cost three times as much as the first 40%, and nobody budgeted for that.
+The pattern is predictable. A strategy mandates 80% automation coverage. The team automates the easy tests first — login flows, simple CRUD operations, happy-path scenarios. These reach 40% coverage quickly and the progress charts look encouraging. Then the team encounters integration tests, tests requiring complex data setups, and tests dependent on third-party services. Progress stalls. The remaining 40% would cost three times as much as the first 40%, and nobody budgeted for that.
 
-Thoughtworks, the software consultancy, published a blunt assessment in its 2023 Technology Radar: "Most test automation strategies fail because they are written by people who have never maintained a test suite at scale." The observation stings because it is precise. Writing a strategy that says "automate regression tests" costs nothing. Living with the flaky, brittle, constantly-breaking suite that results costs everything.
+Qyrus's 2026 Guide to Software Testing Cost Estimation documented this dynamic precisely: organisations that forecasted automation costs based on initial pilot results underestimated total programme costs by an average factor of 2.8. The pilot's clean, well-documented APIs bore little resemblance to the sprawling reality of enterprise software.
 
 ## What separates the effective minority
 
-The 23% of organisations that reported effective test strategies shared three characteristics that the majority lacked, according to Capgemini's research.
+The 19% of organisations that reported effective test strategies shared three characteristics. They treated the strategy as a living system, not a document — reviewing and adjusting quarterly based on actual maintenance costs and defect escape rates. They measured outcomes rather than activities: escaped defects, mean time to feedback, and the ratio of test maintenance to feature development hours. And they funded test infrastructure as a platform investment rather than a project cost.
 
-They treated the strategy as a living system, not a document. At Spotify, the engineering team reviews its quality approach quarterly, adjusting automation targets based on actual maintenance costs from the previous quarter. The strategy is a spreadsheet with real numbers, not a slide deck with aspirations.
+Netflix's test engineering team exemplifies this approach. The company reviews its quality strategy quarterly, adjusting automation targets based on the previous quarter's actual maintenance costs. The strategy is a spreadsheet with real numbers, not a slide deck with aspirations. The discipline to measure honestly — and to revise the plan when reality diverges from projection — is what separates the effective minority from the well-documented majority.
 
-They measured outcomes, not activities. Instead of tracking test case counts or automation percentages, effective organisations tracked escaped defects, mean time to feedback, and the ratio of test maintenance hours to feature development hours. These metrics reveal whether testing is actually reducing risk or merely consuming effort.
-
-They funded test infrastructure as a platform investment. At Netflix, the test engineering team operates as a platform team that provides testing tools, environments, and frameworks to product teams. Individual product teams do not build their own test infrastructure, which eliminates the duplicated effort and inconsistent tooling that plague most enterprise testing programmes. The platform approach, documented in Netflix's 2023 engineering blog, reduced the company's overall test maintenance burden by 40%.
-
-## The uncomfortable question
-
-Most organisations would benefit more from deleting their test strategy and starting with a single question: what is the costliest quality failure we experienced in the last year, and would our current testing have prevented it? If the answer is no — and it usually is — then the strategy is an exercise in institutional self-deception.
-
-The organisations that test well are not the ones with the thickest strategy documents. They are the ones that have been embarrassed by a production incident severe enough to force genuine change, and disciplined enough to sustain that change after the embarrassment fades.
+The organisations that test well are not the ones with the thickest strategy documents. They are the ones willing to admit, quarterly, that their previous strategy was wrong.
 
 ## References
 
-1. Capgemini, ["World Quality Report 2023-24"](https://www.capgemini.com/insights/research-library/world-quality-report/), *Capgemini Research*, 2023
-2. Gartner, ["Enterprise Quality Engineering Practices"](https://www.gartner.com/en/documents/quality-engineering), *Gartner Research*, 2023
-3. Forrester, ["The State of Test Automation 2023"](https://www.forrester.com/report/test-automation), *Forrester Research*, 2023
-4. Thoughtworks, ["Technology Radar Vol. 29"](https://www.thoughtworks.com/radar), *Thoughtworks*, 2023
-5. Netflix, ["Testing at Scale: Platform Engineering for Quality"](https://netflixtechblog.com/), *Netflix Tech Blog*, 2023
+1. OpenText & Capgemini, ["World Quality Report 2025-2026"](https://www.opentext.com/en/media/report/world-quality-report-17th-edition), *OpenText*, July 2025
+2. DORA, ["State of DevOps Report 2025"](https://dora.dev/dora-report-2025/), *DORA/Google Cloud*, September 2025
+3. LinkedIn, ["Your AI Testing Tools Won't Save You: The Real Problem"](https://www.linkedin.com/pulse/your-ai-testing-tools-wont-save-you-real-problem), December 2025
+4. Qyrus, ["The 2026 Guide to Software Testing Cost Estimation"](https://www.qyrus.com/post/software-testing-cost-estimation-and-strategies), *Qyrus*, November 2025
+5. Netflix, ["Testing at Netflix: Signal Over Coverage"](https://netflixtechblog.com/), *Netflix Tech Blog*, 2025
