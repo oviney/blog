@@ -1,0 +1,40 @@
+{% comment %}
+  analytics.html — centralised analytics integrations.
+
+  Included once in _layouts/default.html inside <head>.
+
+  Services:
+  - Google Search Console: ownership verification meta tag
+      Configure: _data/analytics.yml → google_search_console_verification
+  - Google Analytics 4: page-view and engagement tracking
+      Configure: _config.yml → google_analytics
+  - Plausible Analytics: privacy-friendly, cookie-free analytics
+      Tracks page views, bounce rates, session duration, referrers,
+      and popular content with no personal data collected.
+      Configure: _data/analytics.yml → plausible_domain
+{% endcomment %}
+
+{% comment %}Google Search Console — HTML-tag ownership verification{% endcomment %}
+{% if site.data.analytics.google_search_console_verification != "" %}
+<meta name="google-site-verification" content="{{ site.data.analytics.google_search_console_verification }}">
+{% endif %}
+
+{% comment %}Google Analytics 4{% endcomment %}
+{% if site.google_analytics %}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics }}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '{{ site.google_analytics }}');
+</script>
+{% endif %}
+
+{% comment %}
+  Plausible Analytics — privacy-friendly, cookie-free, GDPR compliant.
+  Tracks: page views · bounce rates · session duration · referrers · popular content.
+  No personal data is stored; no consent banner required.
+{% endcomment %}
+{% if site.data.analytics.plausible_domain %}
+<script defer data-domain="{{ site.data.analytics.plausible_domain }}" src="https://plausible.io/js/script.js"></script>
+{% endif %}
