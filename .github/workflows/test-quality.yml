@@ -58,12 +58,12 @@ jobs:
 
       - name: Install Playwright browsers
         run: |
-          echo "🌐 Installing Playwright browsers..."
+          echo "🌐 Installing Playwright browsers (Chromium, Firefox, WebKit)..."
           
-          # Install only chromium since that's what playwright.config.ts uses
-          npx playwright install chromium chromium-headless-shell
+          # Install all browsers used by playwright.config.ts
+          npx playwright install chromium chromium-headless-shell firefox webkit
           
-          # Verify installation succeeded by checking for browser binary
+          # Verify installation succeeded by checking for browser binaries
           PLAYWRIGHT_CACHE="$HOME/.cache/ms-playwright"
           
           if [ ! -d "$PLAYWRIGHT_CACHE" ]; then
@@ -71,22 +71,41 @@ jobs:
             exit 1
           fi
           
-          # Check for chromium installation (either regular or headless shell)
+          # Check for each required browser installation
+          MISSING_BROWSERS=()
+          
           CHROMIUM_FOUND=false
           for dir in "$PLAYWRIGHT_CACHE"/chromium-* "$PLAYWRIGHT_CACHE"/chromium_headless_shell-*; do
             [ -d "$dir" ] || continue
-            echo "✅ Found Playwright browser: $dir"
+            echo "✅ Found Chromium: $dir"
             CHROMIUM_FOUND=true
           done
+          [ "$CHROMIUM_FOUND" = false ] && MISSING_BROWSERS+=("chromium")
           
-          if [ "$CHROMIUM_FOUND" = false ]; then
-            echo "❌ ERROR: Chromium browser binary not found after installation"
+          FIREFOX_FOUND=false
+          for dir in "$PLAYWRIGHT_CACHE"/firefox-*; do
+            [ -d "$dir" ] || continue
+            echo "✅ Found Firefox: $dir"
+            FIREFOX_FOUND=true
+          done
+          [ "$FIREFOX_FOUND" = false ] && MISSING_BROWSERS+=("firefox")
+          
+          WEBKIT_FOUND=false
+          for dir in "$PLAYWRIGHT_CACHE"/webkit-*; do
+            [ -d "$dir" ] || continue
+            echo "✅ Found WebKit: $dir"
+            WEBKIT_FOUND=true
+          done
+          [ "$WEBKIT_FOUND" = false ] && MISSING_BROWSERS+=("webkit")
+          
+          if [ ${#MISSING_BROWSERS[@]} -gt 0 ]; then
+            echo "❌ ERROR: Missing browsers after installation: ${MISSING_BROWSERS[*]}"
             echo "Cache contents:"
             ls -la "$PLAYWRIGHT_CACHE" || echo "Cache directory is empty"
             exit 1
           fi
           
-          echo "✅ Playwright browsers installed and verified successfully"
+          echo "✅ All Playwright browsers installed and verified successfully"
 
       - name: Run Playwright E2E tests
         id: playwright

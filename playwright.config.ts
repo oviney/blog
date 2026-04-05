@@ -67,15 +67,15 @@ export default defineConfig({
       },
     },
 
-    /* Optional: Test against other browsers - uncomment when ready */
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
-    // },
-    // {
-    //   name: 'webkit',
-    //   use: { ...devices['Desktop Safari'] },
-    // },
+    /* Cross-browser testing */
+    {
+      name: 'Desktop Firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'Desktop Safari',
+      use: { ...devices['Desktop Safari'] },
+    },
   ],
 
   /* Run your local Jekyll server before starting the tests */
