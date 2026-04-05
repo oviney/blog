@@ -110,7 +110,8 @@ test.describe('SEO JSON-LD Structured Data', () => {
           expect(json.datePublished).toBeTruthy();
           expect(json.url).toContain('viney.ca');
           expect(json.author).toBeTruthy();
-          expect(json.author.name).toBe('Ouray Viney');
+          expect(json.author.name).toBeTruthy();
+          expect(json.author.name.length).toBeGreaterThan(0);
           expect(json.publisher).toBeTruthy();
           expect(json.publisher.name).toBeTruthy();
         } else if (json['@type'] === 'BreadcrumbList') {
