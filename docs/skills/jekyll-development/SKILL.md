@@ -255,6 +255,57 @@ git commit --no-verify -m "Emergency fix"
 **When to use**: Testing hook behavior without committing  
 **Notes**: Useful for debugging hook issues
 
+## Known Constraints & Gotchas
+
+### Constraint 1: Pagination only works with `index.html` — not `permalink`
+
+`jekyll-paginate` requires the paginated page to be physically named `index.html` inside a directory. It **does not work** with a file that uses `permalink` front matter to fake a URL.
+
+| ❌ Broken | ✅ Correct |
+|-----------|-----------|
+| `blog.html` with `permalink: /blog/` | `blog/index.html` (no permalink needed) |
+
+**Why it matters**: If you use `paginator.posts` in a file like `blog.html` that has `permalink: /blog/`, the paginator object will be `nil` and no posts will render — even though the page loads and shows no error.
+
+**Fix**: Move (or create) the blog listing as `blog/index.html`. Delete `blog.html` with the permalink front matter.
+
+```
+# Wrong layout
+blog.html          ← paginator is nil here even with correct Liquid
+
+# Correct layout
+blog/
+  index.html       ← paginator works here
+```
+
+**Rule**: Whenever a Jekyll plugin depends on file location (paginator, collections with output), use directory structure (`dir/index.html`), not permalink front matter.
+
+### Constraint 2: Testing pagination locally
+
+After any change to the blog listing page, verify that `paginator.posts` is populated:
+
+```bash
+bundle exec jekyll build
+# Then check that the output file exists and contains post links:
+grep -c 'post-link\|article\|href' _site/blog/index.html
+```
+
+If `_site/blog/index.html` is missing or contains zero post entries, the paginator is not wired up correctly — check that the source file is `blog/index.html`, not `blog.html` with a permalink.
+
+### Constraint 3: Config changes require a full server restart
+
+`jekyll serve` does **not** hot-reload `_config.yml`. Stop the server (Ctrl+C) and restart after any config change.
+
+### Constraint 4: `paginate_path` must match the source directory
+
+If `_config.yml` sets:
+
+```yaml
+paginate_path: "/blog/page:num/"
+```
+
+…then the source file must be at `blog/index.html`. Mismatches between `paginate_path` and the source file location silently break pagination.
+
 ## Related Files
 
 - [`docs/DEVELOPMENT_WORKFLOW.md`](../DEVELOPMENT_WORKFLOW.md) - Full workflow documentation
