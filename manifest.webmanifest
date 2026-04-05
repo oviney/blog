@@ -1,0 +1,22 @@
+{
+  "name": "Ouray Viney's Blog",
+  "short_name": "QE Blog",
+  "description": "Quality Engineering, Test Automation, Software Engineering insights.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#E3120B",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}

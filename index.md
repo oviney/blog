@@ -14,7 +14,7 @@ title: Quality Engineering Insights
   <section class="hero-post">
     {% if hero_post.image %}
     <a href="{{ hero_post.url | relative_url }}" class="hero-post-image">
-      <img src="{{ hero_post.image | relative_url }}" alt="{{ hero_post.title }}">
+      {% include responsive-image.html src=hero_post.image alt=hero_post.title %}
     </a>
     {% endif %}
 
@@ -101,7 +101,7 @@ title: Quality Engineering Insights
       <article class="topic-card">
         {% if post.image %}
         <a href="{{ post.url | relative_url }}" class="topic-card-image">
-          <img src="{{ post.image | relative_url }}" alt="{{ post.title }}">
+          {% include responsive-image.html src=post.image alt=post.title loading="lazy" %}
         </a>
         {% endif %}
         <div class="topic-card-content">
