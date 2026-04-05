@@ -48,6 +48,6 @@
     "@playwright/test": "^1.57.0",
     "backstopjs": "^6.3.25",
     "lighthouse": "^12.8.2",
-    "pa11y-ci": "^4.0.1"
+    "pa11y-ci": "^4.1.0"
   }
 }
