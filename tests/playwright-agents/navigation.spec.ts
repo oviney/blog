@@ -511,7 +511,7 @@ test.describe('Mobile Navigation Specific Tests', () => {
       const contentBox = await mainContent.boundingBox();
 
       if (headerBox && contentBox) {
-        // Header should be above main content
+        // Header should be above main content; allow 1px sub-pixel rounding tolerance
         expect(headerBox.y + headerBox.height).toBeLessThanOrEqual(contentBox.y + 1);
       }
     }

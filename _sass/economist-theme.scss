@@ -1270,6 +1270,7 @@ table {
   }
 
   .nav-open .nav-toggle {
+    // Button height is 22px; middle is at 10px — translate bars to centre before rotating
     .nav-toggle__bar:nth-child(1) {
       transform: translateY(10px) rotate(45deg);
     }
