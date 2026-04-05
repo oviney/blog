@@ -1,0 +1,230 @@
+name: Agent Activity Report (Weekly)
+# Runs every Monday morning and posts a summary GitHub issue with:
+#   - PRs merged in the past 7 days (by author type: Copilot, Dependabot, human)
+#   - Issues opened and closed
+#   - Agent eval pass/fail rates (from agent-eval workflow runs)
+#   - Build success rate (from jekyll.yml workflow runs)
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'   # 09:00 UTC every Monday
+  workflow_dispatch:
+    inputs:
+      lookback_days:
+        description: 'Number of days to look back (default: 7)'
+        required: false
+        default: '7'
+        type: string
+
+env:
+  COPILOT_LOGIN: 'copilot-swe-agent[bot]'
+  DEPENDABOT_LOGIN: 'dependabot[bot]'
+
+jobs:
+  activity-report:
+    name: Weekly Agent Activity Report
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+      actions: read
+
+    steps:
+    - name: Collect metrics
+      id: metrics
+      uses: actions/github-script@v8
+      with:
+        script: |
+          const lookback = parseInt(context.payload.inputs?.lookback_days ?? '7', 10);
+          const since = new Date(Date.now() - lookback * 24 * 60 * 60 * 1000);
+          const sinceISO = since.toISOString();
+          const reportDate = new Date().toISOString().slice(0, 10);
+
+          // ── PRs merged in the window ──────────────────────────────────────
+          const copilotLogin   = process.env.COPILOT_LOGIN;
+          const dependabotLogin = process.env.DEPENDABOT_LOGIN;
+
+          let page = 1;
+          const mergedPRs = [];
+          while (true) {
+            const resp = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              sort: 'updated',
+              direction: 'desc',
+              per_page: 100,
+              page,
+            });
+            const batch = resp.data.filter(pr =>
+              pr.merged_at && new Date(pr.merged_at) >= since
+            );
+            mergedPRs.push(...batch);
+            // Stop when we've gone past the window or exhausted results
+            if (resp.data.length < 100 ||
+                (resp.data[resp.data.length - 1].updated_at < sinceISO)) break;
+            page++;
+          }
+
+          const prCopilot    = mergedPRs.filter(pr => pr.user.login === copilotLogin).length;
+          const prDependabot = mergedPRs.filter(pr => pr.user.login === dependabotLogin).length;
+          const prHuman      = mergedPRs.length - prCopilot - prDependabot;
+
+          // ── Issues opened / closed in the window ─────────────────────────
+          const issuesOpened = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'all',
+            since: sinceISO,
+            per_page: 100,
+          });
+          // listForRepo returns both issues and PRs; filter PRs out
+          const allIssues   = issuesOpened.data.filter(i => !i.pull_request);
+          const openedCount = allIssues.filter(i => new Date(i.created_at) >= since).length;
+          const closedCount = allIssues.filter(
+            i => i.state === 'closed' && i.closed_at && new Date(i.closed_at) >= since
+          ).length;
+
+          // ── Agent eval pass/fail (agent-eval workflow) ────────────────────
+          const evalRuns = await github.rest.actions.listWorkflowRuns({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            workflow_id: 'agent-eval.yml',
+            created: `>=${sinceISO.slice(0, 10)}`,
+            per_page: 100,
+          });
+          const evalTotal  = evalRuns.data.workflow_runs.length;
+          const evalPass   = evalRuns.data.workflow_runs.filter(r => r.conclusion === 'success').length;
+          const evalFail   = evalRuns.data.workflow_runs.filter(r =>
+            r.conclusion === 'failure' || r.conclusion === 'timed_out'
+          ).length;
+          const evalPassPct = evalTotal > 0
+            ? ((evalPass / evalTotal) * 100).toFixed(1)
+            : 'N/A';
+
+          // ── Build success rate (jekyll.yml) ───────────────────────────────
+          const buildRuns = await github.rest.actions.listWorkflowRuns({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            workflow_id: 'jekyll.yml',
+            created: `>=${sinceISO.slice(0, 10)}`,
+            per_page: 100,
+          });
+          const buildTotal   = buildRuns.data.workflow_runs.length;
+          const buildSuccess = buildRuns.data.workflow_runs.filter(r => r.conclusion === 'success').length;
+          const buildFail    = buildRuns.data.workflow_runs.filter(r =>
+            r.conclusion === 'failure' || r.conclusion === 'timed_out'
+          ).length;
+          const buildPct = buildTotal > 0
+            ? ((buildSuccess / buildTotal) * 100).toFixed(1)
+            : 'N/A';
+
+          const sinceDate = since.toISOString().slice(0, 10);
+
+          core.setOutput('report_date',    reportDate);
+          core.setOutput('since_date',     sinceDate);
+          core.setOutput('pr_total',       String(mergedPRs.length));
+          core.setOutput('pr_copilot',     String(prCopilot));
+          core.setOutput('pr_dependabot',  String(prDependabot));
+          core.setOutput('pr_human',       String(prHuman));
+          core.setOutput('issues_opened',  String(openedCount));
+          core.setOutput('issues_closed',  String(closedCount));
+          core.setOutput('eval_total',     String(evalTotal));
+          core.setOutput('eval_pass',      String(evalPass));
+          core.setOutput('eval_fail',      String(evalFail));
+          core.setOutput('eval_pass_pct',  evalPassPct);
+          core.setOutput('build_total',    String(buildTotal));
+          core.setOutput('build_success',  String(buildSuccess));
+          core.setOutput('build_fail',     String(buildFail));
+          core.setOutput('build_pct',      buildPct);
+
+    - name: Ensure monitoring label exists
+      uses: actions/github-script@v8
+      with:
+        script: |
+          try {
+            await github.rest.issues.getLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'monitoring',
+            });
+          } catch {
+            await github.rest.issues.createLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'monitoring',
+              color: 'ededed',
+              description: 'Automated monitoring and observability reports',
+            });
+          }
+
+    - name: Create weekly report issue
+      uses: actions/github-script@v8
+      with:
+        script: |
+          const reportDate   = '${{ steps.metrics.outputs.report_date }}';
+          const sinceDate    = '${{ steps.metrics.outputs.since_date }}';
+          const prTotal      = '${{ steps.metrics.outputs.pr_total }}';
+          const prCopilot    = '${{ steps.metrics.outputs.pr_copilot }}';
+          const prDependabot = '${{ steps.metrics.outputs.pr_dependabot }}';
+          const prHuman      = '${{ steps.metrics.outputs.pr_human }}';
+          const issuesOpened = '${{ steps.metrics.outputs.issues_opened }}';
+          const issuesClosed = '${{ steps.metrics.outputs.issues_closed }}';
+          const evalTotal    = '${{ steps.metrics.outputs.eval_total }}';
+          const evalPass     = '${{ steps.metrics.outputs.eval_pass }}';
+          const evalFail     = '${{ steps.metrics.outputs.eval_fail }}';
+          const evalPassPct  = '${{ steps.metrics.outputs.eval_pass_pct }}';
+          const buildTotal   = '${{ steps.metrics.outputs.build_total }}';
+          const buildSuccess = '${{ steps.metrics.outputs.build_success }}';
+          const buildFail    = '${{ steps.metrics.outputs.build_fail }}';
+          const buildPct     = '${{ steps.metrics.outputs.build_pct }}';
+
+          const buildHealth = buildPct === 'N/A' ? '⚪ No data' :
+                              parseFloat(buildPct) >= 95 ? '🟢 Healthy' :
+                              parseFloat(buildPct) >= 80 ? '🟡 Watch'   : '🔴 Degraded';
+
+          const evalHealth  = evalPassPct === 'N/A' ? '⚪ No data' :
+                              parseFloat(evalPassPct) >= 90 ? '🟢 Healthy' :
+                              parseFloat(evalPassPct) >= 70 ? '🟡 Watch'   : '🔴 Action needed';
+
+          let body = `# Agent Activity Report — ${reportDate}\n\n`;
+          body += `**Reporting period:** ${sinceDate} → ${reportDate}\n\n`;
+
+          body += `## PRs Merged\n\n`;
+          body += `| Author type | Count |\n|-------------|-------|\n`;
+          body += `| 🤖 Copilot agent | ${prCopilot} |\n`;
+          body += `| 🔄 Dependabot | ${prDependabot} |\n`;
+          body += `| 👤 Human | ${prHuman} |\n`;
+          body += `| **Total merged** | **${prTotal}** |\n\n`;
+
+          body += `## Issues\n\n`;
+          body += `| Metric | Count |\n|--------|-------|\n`;
+          body += `| Opened this week | ${issuesOpened} |\n`;
+          body += `| Closed this week | ${issuesClosed} |\n\n`;
+
+          body += `## Agent Eval Results\n\n`;
+          body += `| Metric | Value |\n|--------|-------|\n`;
+          body += `| Total runs | ${evalTotal} |\n`;
+          body += `| Passed | ${evalPass} |\n`;
+          body += `| Failed | ${evalFail} |\n`;
+          body += `| Pass rate | ${evalPassPct === 'N/A' ? 'N/A' : evalPassPct + '%'} |\n`;
+          body += `| Health | ${evalHealth} |\n\n`;
+
+          body += `## Build Success Rate\n\n`;
+          body += `| Metric | Value |\n|--------|-------|\n`;
+          body += `| Total deploys | ${buildTotal} |\n`;
+          body += `| Successful | ${buildSuccess} |\n`;
+          body += `| Failed | ${buildFail} |\n`;
+          body += `| Success rate | ${buildPct === 'N/A' ? 'N/A' : buildPct + '%'} |\n`;
+          body += `| Health | ${buildHealth} |\n\n`;
+
+          body += `_Generated automatically by the [agent-activity-report workflow](../../actions/workflows/agent-activity-report.yml)_\n`;
+
+          await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `Agent Activity Report — ${reportDate}`,
+            body: body,
+            labels: ['monitoring'],
+          });
