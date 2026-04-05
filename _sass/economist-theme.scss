@@ -15,6 +15,10 @@ $text-tertiary: #595959; // WCAG AAA compliant (7:1 contrast ratio)
 $border-color: #E1E4E8;
 $background-light: #F8F8F8;
 $background-white: #ffffff;
+$color-success: #2e7d32; // WCAG AA compliant green for confirmation states (copy buttons, etc.)
+$print-black: #000000;   // Print-specific: black text on white paper
+$print-white: #ffffff;   // Print-specific: white page background
+$print-muted: #555555;   // Print-specific: muted text for secondary info (URLs, captions)
 
 // Typography
 $font-serif: 'Merriweather', 'Georgia', 'Times New Roman', serif;
@@ -2661,5 +2665,331 @@ article.topic-card h2 a,
 
   @media (min-width: 768px) {
     padding: $spacing-lg;
+  }
+
+  .print-url {
+    display: none;
+  }
+}
+
+// ============================================
+// INTERACTIVE ELEMENTS
+// ============================================
+
+// Reading progress bar
+.reading-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: $economist-red;
+  z-index: 1100;
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+// Table of contents
+.toc-container {
+  background: $background-light;
+  border: 1px solid $border-color;
+  border-left: 3px solid $economist-red;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  margin: $spacing-lg 0;
+  max-width: $content-max-width;
+
+  details {
+    // inherits
+  }
+
+  .toc-title {
+    font-family: $font-sans;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: $text-primary;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    user-select: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::before {
+      content: "▶";
+      font-size: 0.6rem;
+      transition: transform 0.2s ease;
+      display: inline-block;
+    }
+  }
+
+  details[open] .toc-title::before {
+    transform: rotate(90deg);
+  }
+
+  .toc-list {
+    list-style: decimal;
+    padding: $spacing-sm 0 $spacing-xs $spacing-lg;
+    margin: $spacing-sm 0 0 0;
+  }
+
+  .toc-item {
+    margin: 0.3rem 0;
+
+    &.toc-item--sub {
+      margin-left: $spacing-md;
+      list-style-type: disc;
+    }
+  }
+
+  .toc-link {
+    font-family: $font-sans;
+    font-size: 0.875rem;
+    color: $text-secondary;
+    text-decoration: none;
+
+    &:hover {
+      color: $economist-red;
+      text-decoration: underline;
+    }
+  }
+}
+
+// Copy code button (appended to <pre> blocks by JS)
+.copy-code-btn {
+  position: absolute;
+  top: $spacing-xs;
+  right: $spacing-xs;
+  background: $background-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-sm;
+  color: $text-tertiary;
+  font-family: $font-sans;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  cursor: pointer;
+  line-height: 1.4;
+  opacity: 0;
+  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+
+  &.copied {
+    border-color: $color-success;
+    color: $color-success;
+    opacity: 1;
+  }
+}
+
+// Show copy button on pre:hover
+.article-content pre:hover .copy-code-btn,
+.article-content pre:focus-within .copy-code-btn {
+  opacity: 1;
+}
+
+// Back to top button
+.back-to-top {
+  position: fixed;
+  bottom: $spacing-lg;
+  right: $spacing-lg;
+  width: 44px;
+  height: 44px;
+  background: $economist-red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease, background-color 0.2s ease;
+  z-index: 999;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  &:hover {
+    background: color.adjust($economist-red, $lightness: -8%);
+  }
+
+  @media (min-width: 768px) {
+    bottom: $spacing-xl;
+    right: $spacing-xl;
+  }
+}
+
+// Enhanced share section (bottom of article)
+.share-section {
+  border-top: 1px solid $border-color;
+  padding-top: $spacing-lg;
+  margin-top: $spacing-xl;
+
+  .share-section-label {
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: $text-tertiary;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 $spacing-sm 0;
+  }
+
+  .share-buttons {
+    display: flex;
+    gap: $spacing-xs;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    background: $background-white;
+    font-family: $font-sans;
+    font-size: 0.8125rem;
+    color: $text-secondary;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+    line-height: 1.4;
+    white-space: nowrap;
+
+    &:hover {
+      border-color: $text-secondary;
+      color: $text-primary;
+      background: $background-light;
+    }
+
+    &.copied {
+      border-color: $color-success;
+      color: $color-success;
+    }
+
+    .share-icon {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// ============================================
+// PRINT STYLES
+// ============================================
+
+@media print {
+  // Hide interactive and non-essential elements
+  .reading-progress-bar,
+  .back-to-top,
+  .toc-container,
+  .share-section,
+  .article-actions-top,
+  .article-actions-bottom,
+  .more-from-section,
+  .author-bio,
+  .post-comments,
+  .site-nav,
+  .site-footer,
+  .newsletter-section,
+  .copy-code-btn,
+  .explore-more {
+    display: none !important;
+  }
+
+  body {
+    color: $print-black;
+    background: $print-white;
+    font-size: 12pt;
+    line-height: 1.6;
+  }
+
+  .page-header {
+    border-bottom: 2pt solid $print-black;
+    padding: 6pt 0;
+
+    .site-title a {
+      background: $print-white;
+      color: $print-black;
+      border: 2pt solid $print-black;
+      padding: 4pt 8pt;
+    }
+  }
+
+  .economist-article {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .article-title {
+    font-size: 22pt;
+    line-height: 1.2;
+    margin-bottom: 6pt;
+  }
+
+  .article-subtitle {
+    font-size: 14pt;
+    margin-bottom: 6pt;
+  }
+
+  .article-meta {
+    font-size: 9pt;
+    margin-bottom: 12pt;
+  }
+
+  .article-content {
+    max-width: 100%;
+    font-size: 11pt;
+    line-height: 1.6;
+  }
+
+  // Show full URL after links
+  .article-content a[href^="http"]::after,
+  .article-content a[href^="https"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: $print-muted;
+    word-break: break-all;
+  }
+
+  // Avoid page breaks inside headings and paragraphs
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+
+  p,
+  li {
+    page-break-inside: avoid;
+  }
+
+  .article-hero-image {
+    max-width: 60%;
+    margin: 12pt auto;
+  }
+
+  // Print URL in footer
+  .article-footer .print-url {
+    display: block;
+    font-size: 9pt;
+    color: $print-muted;
+    margin-top: 6pt;
+    font-style: italic;
+    word-break: break-all;
+  }
+
+  .article-footer .back-link {
+    display: none;
   }
 }
