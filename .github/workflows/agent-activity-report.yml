@@ -61,9 +61,14 @@ jobs:
               pr.merged_at && new Date(pr.merged_at) >= since
             );
             mergedPRs.push(...batch);
-            // Stop when we've gone past the window or exhausted results
+            // Stop when exhausted or the earliest merged_at in this batch is
+            // before our window (any later pages can only have older PRs).
+            const batchMerged = resp.data.filter(pr => pr.merged_at);
+            const oldestMergedAt = batchMerged.length > 0
+              ? batchMerged[batchMerged.length - 1].merged_at
+              : null;
             if (resp.data.length < 100 ||
-                (resp.data[resp.data.length - 1].updated_at < sinceISO)) break;
+                (oldestMergedAt && new Date(oldestMergedAt) < since)) break;
             page++;
           }
 
@@ -72,26 +77,24 @@ jobs:
           const prHuman      = mergedPRs.length - prCopilot - prDependabot;
 
           // ── Issues opened / closed in the window ─────────────────────────
-          const issuesOpened = await github.rest.issues.listForRepo({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            state: 'all',
-            since: sinceISO,
-            per_page: 100,
+          // Use the search API to get accurate counts regardless of pagination.
+          const sinceDate = since.toISOString().slice(0, 10);
+          const openedResp = await github.rest.search.issuesAndPullRequests({
+            q: `repo:${context.repo.owner}/${context.repo.repo} is:issue created:>=${sinceDate}`,
           });
-          // listForRepo returns both issues and PRs; filter PRs out
-          const allIssues   = issuesOpened.data.filter(i => !i.pull_request);
-          const openedCount = allIssues.filter(i => new Date(i.created_at) >= since).length;
-          const closedCount = allIssues.filter(
-            i => i.state === 'closed' && i.closed_at && new Date(i.closed_at) >= since
-          ).length;
+          const openedCount = openedResp.data.total_count;
+
+          const closedResp = await github.rest.search.issuesAndPullRequests({
+            q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:closed closed:>=${sinceDate}`,
+          });
+          const closedCount = closedResp.data.total_count;
 
           // ── Agent eval pass/fail (agent-eval workflow) ────────────────────
           const evalRuns = await github.rest.actions.listWorkflowRuns({
             owner: context.repo.owner,
             repo: context.repo.repo,
             workflow_id: 'agent-eval.yml',
-            created: `>=${sinceISO.slice(0, 10)}`,
+            created: `>=${sinceDate}`,
             per_page: 100,
           });
           const evalTotal  = evalRuns.data.workflow_runs.length;
@@ -108,7 +111,7 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             workflow_id: 'jekyll.yml',
-            created: `>=${sinceISO.slice(0, 10)}`,
+            created: `>=${sinceDate}`,
             per_page: 100,
           });
           const buildTotal   = buildRuns.data.workflow_runs.length;
@@ -119,8 +122,6 @@ jobs:
           const buildPct = buildTotal > 0
             ? ((buildSuccess / buildTotal) * 100).toFixed(1)
             : 'N/A';
-
-          const sinceDate = since.toISOString().slice(0, 10);
 
           core.setOutput('report_date',    reportDate);
           core.setOutput('since_date',     sinceDate);
