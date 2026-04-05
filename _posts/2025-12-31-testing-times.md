@@ -5,6 +5,7 @@ date: 2025-12-31
 author: "The Economist"
 categories: ["Quality Engineering", "AI Testing"]
 image: /assets/images/testing-times-renovation.png
+description: "80% of software teams will use AI testing tools by 2025. Vendors raised $2.3 billion. Yet defect rates remain unchanged. An examination of the gap."
 ---
 
 Tricentis research projects that 80% of software teams will use AI-assisted testing tools by the end of 2025 — a fourfold increase from 2021. Vendors have raised $2.3 billion in venture capital since 2022, according to CB Insights, promising self-healing scripts, autonomous test generation, and the obsolescence of manual testers. Yet by the measures that matter to engineering leaders, remarkably little has changed. The artificial intelligence revolution in software testing is real. The productivity revolution is not.

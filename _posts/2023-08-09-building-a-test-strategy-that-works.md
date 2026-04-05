@@ -5,6 +5,7 @@ date: 2023-08-09
 author: "The Economist"
 categories: ["Quality Engineering"]
 image: /assets/images/test-strategy-trap.png
+description: "88% of organisations have a documented test strategy. Only 23% believe it works. An examination of why quality plans fail before the first test runs."
 ---
 
 The World Quality Report 2025-2026, published by OpenText and Capgemini in July 2025, surveyed 1,800 technology leaders across 33 countries and found that 91% of organisations had a documented test strategy. Only 19% believed their strategy was effective — down from 23% two years earlier. The gap between having a plan and having a plan that works is widening, not closing, despite a decade of investment in quality engineering maturity models.

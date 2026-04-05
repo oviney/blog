@@ -5,6 +5,7 @@ date: 2026-01-23
 author: "The Economist"
 categories: ["Quality Engineering", "AI Testing"]
 image: /assets/images/ai-testing-adoption-gap.png
+description: "AI testing can halve validation time. The market is worth $1.8 billion. Only 15% of companies successfully scale beyond the pilot stage."
 ---
 
 Capgemini's Research Institute calculates that AI-powered testing tools can halve the time required for software validation. MarketsandMarkets valued the AI testing market at $1.8 billion in 2024 and projects 15.5% compound annual growth through 2028. The technology works, the money is flowing, and only 15% of companies have managed to make it stick. The other 85%, according to Capgemini's 2024 Quality Engineering Report, are stuck somewhere between pilot programmes that impressed and enterprise rollouts that stalled.

@@ -5,6 +5,7 @@ date: 2023-12-28
 author: "The Economist"
 categories: ["Quality Engineering", "Software Engineering"]
 image: /assets/images/dns-invisible-shield.png
+description: "Cisco blocks 7 million malicious DNS requests every minute. How the Domain Name System became cybersecurity's most underrated first line of defence."
 ---
 
 Cisco processes 620 billion DNS requests daily through its Umbrella platform, formerly OpenDNS. Each query is a chance to stop an attack before it starts — and the company claims to block 7 million malicious requests every minute. In an era when sophisticated threats slip past firewalls and endpoint agents with depressing regularity, the humble Domain Name System has become an unlikely sentinel.

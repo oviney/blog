@@ -5,6 +5,7 @@ date: 2026-01-18
 author: "The Economist"
 categories: ["Software Engineering", "AI Testing"]
 image: /assets/images/ai-assisted-development-the-new-industrial-revolut.png
+description: "82% of developers now use AI coding assistants. The productivity gains are uneven—senior engineers benefit most while junior developers risk the most."
 ---
 
 Stack Overflow's 2025 Developer Survey found that 82% of professional developers now use AI coding assistants — up from 44% just two years earlier. GitHub reports that Copilot generates over 50% of code on its platform. The adoption is near-universal. The benefits are not. A growing body of evidence suggests that AI-assisted development disproportionately helps senior engineers while creating new risks for junior developers, widening a professional gap that the technology was supposed to narrow.
