@@ -1,0 +1,123 @@
+name: Research Sweep (Biweekly)
+# Creates a structured research prompt as a GitHub issue on a biweekly schedule.
+# A human or Claude Code session fills in the findings; this workflow only
+# creates the prompt so nothing is missed.
+
+on:
+  schedule:
+    - cron: '0 9 1,15 * *'   # 09:00 UTC on the 1st and 15th of every month
+  workflow_dispatch:
+    inputs:
+      extra_topics:
+        description: 'Additional topics to include in this sweep (optional)'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  create-research-issue:
+    name: Create Research Prompt Issue
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+    - name: Ensure research labels exist
+      uses: actions/github-script@v8
+      with:
+        script: |
+          const labels = [
+            { name: 'research',     color: '0075ca', description: 'Research findings and recommendations' },
+            { name: 'enhancement',  color: 'a2eeef', description: 'New feature or request' },
+          ];
+          for (const label of labels) {
+            try {
+              await github.rest.issues.getLabel({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                name:  label.name,
+              });
+            } catch {
+              await github.rest.issues.createLabel({
+                owner:       context.repo.owner,
+                repo:        context.repo.repo,
+                name:        label.name,
+                color:       label.color,
+                description: label.description,
+              });
+            }
+          }
+
+    - name: Create research prompt issue
+      uses: actions/github-script@v8
+      with:
+        script: |
+          const today = new Date().toISOString().slice(0, 10);
+          const extraTopics = '${{ github.event.inputs.extra_topics }}';
+
+          let body = `# Research Sweep — ${today}\n\n`;
+          body += `> **Instructions for the researcher:** Work through each section below.\n`;
+          body += `> Replace the bullet-point prompts with your actual findings.\n`;
+          body += `> When complete, add the label \`agent:qa-gatekeeper\` or the appropriate agent label\n`;
+          body += `> so the right agent can action the improvements.\n\n`;
+          body += `---\n\n`;
+
+          body += `## 1. AI Agent Orchestration — New Developments\n\n`;
+          body += `**Research prompts:**\n`;
+          body += `- What new frameworks or patterns have emerged for multi-agent orchestration since the last sweep?\n`;
+          body += `- Are there any notable GitHub releases, blog posts, or papers on agent-to-agent communication, tool use, or memory?\n`;
+          body += `- How are teams handling agent escalation / handoff in production? Any new best practices?\n`;
+          body += `- Are there relevant updates to LangChain, AutoGen, CrewAI, or comparable orchestration libraries?\n\n`;
+          body += `**Findings:**\n`;
+          body += `<!-- Fill in findings here -->\n\n`;
+          body += `**Recommended improvements for this blog:**\n`;
+          body += `<!-- e.g., update AGENTS.md, add a new agent persona, revise skill files -->\n\n`;
+          body += `---\n\n`;
+
+          body += `## 2. GitHub Copilot Coding Agent — Updates\n\n`;
+          body += `**Research prompts:**\n`;
+          body += `- What new capabilities or bug fixes has GitHub shipped for Copilot Coding Agent since the last sweep?\n`;
+          body += `- Are there changes to how the agent handles file scope, branch management, or PR creation?\n`;
+          body += `- Any new prompt-engineering guidance from GitHub docs or the community?\n`;
+          body += `- Have the agent routing labels (\`agent:creative-director\`, \`agent:qa-gatekeeper\`, \`agent:editorial-chief\`) been superseded by new conventions?\n\n`;
+          body += `**Findings:**\n`;
+          body += `<!-- Fill in findings here -->\n\n`;
+          body += `**Recommended improvements for this blog:**\n`;
+          body += `<!-- e.g., update .github/copilot-instructions.md guidance, revise skill files -->\n\n`;
+          body += `---\n\n`;
+
+          body += `## 3. QE Automation — New Developments\n\n`;
+          body += `**Research prompts:**\n`;
+          body += `- What new Playwright, Backstop, Pa11y, or Lighthouse features are worth adopting?\n`;
+          body += `- Are there emerging patterns for self-healing tests, AI-assisted test generation, or flakiness detection?\n`;
+          body += `- Any relevant updates to the GitHub Actions ecosystem (e.g., new reusable action versions)?\n`;
+          body += `- What are the latest WCAG or accessibility guidelines changes that affect automated checking?\n\n`;
+          body += `**Findings:**\n`;
+          body += `<!-- Fill in findings here -->\n\n`;
+          body += `**Recommended improvements for this blog:**\n`;
+          body += `<!-- e.g., bump Playwright version, add new test scenarios, update pa11yci.json -->\n\n`;
+          body += `---\n\n`;
+
+          if (extraTopics) {
+            body += `## 4. Additional Topics\n\n`;
+            body += `> _Requested via manual trigger:_ ${extraTopics}\n\n`;
+            body += `**Findings:**\n`;
+            body += `<!-- Fill in findings here -->\n\n`;
+            body += `**Recommended improvements for this blog:**\n`;
+            body += `<!-- Fill in recommendations here -->\n\n`;
+            body += `---\n\n`;
+          }
+
+          body += `## Next Steps\n\n`;
+          body += `- [ ] Researcher completes findings above\n`;
+          body += `- [ ] Assign the appropriate agent label (\`agent:qa-gatekeeper\`, \`agent:creative-director\`, or \`agent:editorial-chief\`) based on which improvements are needed\n`;
+          body += `- [ ] Open follow-up issues for each actionable improvement, referencing this sweep\n\n`;
+          body += `_Generated automatically by the [research-sweep workflow](../../actions/workflows/research-sweep.yml)_\n`;
+
+          await github.rest.issues.create({
+            owner:  context.repo.owner,
+            repo:   context.repo.repo,
+            title:  `Research Sweep — ${today}`,
+            body:   body,
+            labels: ['research', 'enhancement'],
+          });
