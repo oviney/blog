@@ -11,14 +11,13 @@ title: Quality Engineering
   </header>
 
   <div class="econ-article-grid">
-    {% for post in site.posts %}
+    {% for post in paginator.posts %}
     <article class="econ-article-card">
       {% if post.image and post.image != "/assets/images/blog-default.svg" %}
       <a href="{{ post.url | relative_url }}" class="econ-card-image-link">
         {% include responsive-image.html src=post.image alt=post.title loading="lazy" class="econ-card-image" %}
       </a>
       {% endif %}
-
 
       {% if post.categories %}
       <span class="econ-card-category">{{ post.categories | first }}</span>
@@ -37,4 +36,24 @@ title: Quality Engineering
     </article>
     {% endfor %}
   </div>
+
+  {% if paginator.total_pages > 1 %}
+  <nav class="econ-pagination" role="navigation" aria-label="Pagination">
+    <div class="econ-pagination-inner">
+      {% if paginator.previous_page %}
+      <a href="{{ paginator.previous_page_path | relative_url }}" class="econ-pagination-link econ-pagination-prev" rel="prev">&larr; Previous</a>
+      {% else %}
+      <span class="econ-pagination-link econ-pagination-prev econ-pagination-disabled">&larr; Previous</span>
+      {% endif %}
+
+      <span class="econ-pagination-info">Page {{ paginator.page }} of {{ paginator.total_pages }}</span>
+
+      {% if paginator.next_page %}
+      <a href="{{ paginator.next_page_path | relative_url }}" class="econ-pagination-link econ-pagination-next" rel="next">Next &rarr;</a>
+      {% else %}
+      <span class="econ-pagination-link econ-pagination-next econ-pagination-disabled">Next &rarr;</span>
+      {% endif %}
+    </div>
+  </nav>
+  {% endif %}
 </div>
