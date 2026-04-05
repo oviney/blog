@@ -4,7 +4,7 @@ title: "Test automation's hidden ledger: the costs nobody budgets for"
 date: 2026-04-04
 author: "The Economist"
 categories: ["Quality Engineering", "Test Automation"]
-image: /assets/images/blog-default.svg
+image: /assets/images/automation-hidden-ledger.png
 ---
 
 Capgemini's World Quality Report surveyed 1,750 technology leaders in 2023 and found that test automation consumed 42% of their total QA budgets — up from 31% in 2020. The increase was not driven by expanding test suites. It was driven by the maintenance, infrastructure, and specialist labour required to keep existing automation running. Organisations are spending more on automation each year and, by their own assessment, getting proportionally less in return.
