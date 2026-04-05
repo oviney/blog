@@ -45,7 +45,7 @@
   "homepage": "https://github.com/oviney/blog#readme",
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
-    "@playwright/test": "^1.57.0",
+    "@playwright/test": "^1.59.1",
     "backstopjs": "^6.3.25",
     "lighthouse": "^12.8.2",
     "pa11y-ci": "^4.0.1"
