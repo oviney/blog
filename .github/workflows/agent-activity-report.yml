@@ -36,18 +36,20 @@ jobs:
       uses: actions/github-script@v8
       with:
         script: |
-          const lookback = parseInt(context.payload.inputs?.lookback_days ?? '7', 10);
+          const rawLookback = parseInt(context.payload.inputs?.lookback_days ?? '7', 10);
+          const lookback = (!isNaN(rawLookback) && rawLookback >= 1 && rawLookback <= 90)
+            ? rawLookback : 7;
           const since = new Date(Date.now() - lookback * 24 * 60 * 60 * 1000);
-          const sinceISO = since.toISOString();
           const reportDate = new Date().toISOString().slice(0, 10);
 
           // ── PRs merged in the window ──────────────────────────────────────
-          const copilotLogin   = process.env.COPILOT_LOGIN;
+          const copilotLogin    = process.env.COPILOT_LOGIN;
           const dependabotLogin = process.env.DEPENDABOT_LOGIN;
 
           let page = 1;
+          let hasMorePages = true;
           const mergedPRs = [];
-          while (true) {
+          while (hasMorePages) {
             const resp = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -57,18 +59,21 @@ jobs:
               per_page: 100,
               page,
             });
+            // Collect merged PRs within the window
             const batch = resp.data.filter(pr =>
               pr.merged_at && new Date(pr.merged_at) >= since
             );
             mergedPRs.push(...batch);
-            // Stop when exhausted or the earliest merged_at in this batch is
-            // before our window (any later pages can only have older PRs).
-            const batchMerged = resp.data.filter(pr => pr.merged_at);
-            const oldestMergedAt = batchMerged.length > 0
-              ? batchMerged[batchMerged.length - 1].merged_at
+            // Find the oldest merged_at on this page to decide whether to continue.
+            // Sort merged PRs ascending by merged_at so the last element is oldest.
+            const sortedMerged = resp.data
+              .filter(pr => pr.merged_at)
+              .sort((a, b) => new Date(a.merged_at) - new Date(b.merged_at));
+            const oldestMergedAt = sortedMerged.length > 0
+              ? new Date(sortedMerged[0].merged_at)
               : null;
-            if (resp.data.length < 100 ||
-                (oldestMergedAt && new Date(oldestMergedAt) < since)) break;
+            hasMorePages = resp.data.length === 100 &&
+              (oldestMergedAt === null || oldestMergedAt >= since);
             page++;
           }
 
