@@ -7,38 +7,32 @@ categories: ["Software Engineering"]
 image: /assets/images/ai-coders-crutch.png
 ---
 
-GitHub reports that its Copilot tool now generates 46% of all code written on its platform. That figure, disclosed in Microsoft's 2023 annual report, sounds like a productivity triumph. Yet a growing body of evidence suggests that AI-assisted development is producing a generation of software engineers who ship faster but understand less — and the technical debt is compounding quietly.
+DORA's 2025 State of AI-Assisted Software Development report, based on data from 39,000 developers across 3,000 organisations, found that AI coding tools increased code throughput by 25% while decreasing developer satisfaction and code stability. METR's independent study, published in July 2025, was blunter: experienced open-source developers using AI assistance completed tasks 19% slower than those working without it, once review and debugging time was included. The productivity narrative around AI coding tools is fracturing under empirical scrutiny.
 
-## The productivity illusion
+## The throughput illusion
 
-The case for AI coding assistants rests on speed. A 2023 study by GitHub and the consulting firm Accenture found that developers using Copilot completed tasks 55% faster than those coding unassisted. McKinsey's own research, published the same year, placed the productivity gain at 35-45% for documentation and code generation tasks. These are not trivial numbers, and they explain why adoption has been explosive: Stack Overflow's 2023 Developer Survey found that 70% of professional developers were already using or planned to use AI tools in their workflow.
+GitHub reported in its 2025 Octoverse analysis that Copilot now generates over 55% of code on its platform — up from 46% a year earlier. Stack Overflow's 2025 Developer Survey found 85% adoption among professional developers. The tools are ubiquitous. The question is whether ubiquity correlates with quality.
 
-But speed is not productivity. Google's internal engineering metrics team published a quietly devastating analysis in late 2023 showing that code generated with AI assistance required 40% more review cycles than human-written code. The reason was not that AI code was wrong — syntactically, it was usually correct. The problem was subtler: AI-generated code often implemented the literal request while missing the architectural intent, creating functions that worked in isolation but integrated poorly with surrounding systems.
+DORA's research suggests it does not. Teams using AI coding tools heavily showed higher deployment frequency but also experienced 14% more failed deployments and 8% longer recovery times. The code shipped faster. It also broke more often. GitClear's longitudinal analysis of 250 million lines of code through 2025 reinforced this finding: code churn — the percentage rewritten within two weeks — rose 43% in AI-heavy repositories compared with pre-AI baselines.
 
-## The comprehension gap
+## The comprehension debt
 
-GitClear, a code analytics firm, released a study of 150 million lines of changed code spanning 2020 to 2023. The findings were uncomfortable. Code churn — the percentage of code that is rewritten within two weeks of being authored — increased by 39% in repositories that heavily used AI assistance. More troublingly, the proportion of "moved" and "copy-pasted" code rose sharply, while "refactored" code declined. Engineers were accepting AI suggestions wholesale rather than adapting them to fit their codebase's patterns and conventions.
+The World Quality Report 2025-2026, published by OpenText (formerly Micro Focus) with Capgemini, surveyed 1,800 technology leaders and identified a pattern they termed "comprehension debt." Junior developers using AI tools could produce syntactically correct code at speed but scored 22% lower on architectural reasoning assessments than their counterparts who coded without assistance. The code compiled. The developer had not learned.
 
-The implications extend beyond code quality. At Stripe, the payments company, engineering leaders noticed that junior developers using AI tools were reaching pull-request milestones faster but scoring lower on internal design reviews. The developers could produce working code but struggled to explain why they had chosen particular approaches — a distinction that matters enormously when systems need to be maintained, debugged, or extended by others.
+At Shopify, engineering leadership found that AI-assisted pull requests from developers with fewer than three years of experience required 45% more review iterations than those from senior engineers using the same tools. The senior engineers treated AI output as raw material to be shaped. The junior engineers treated it as finished product.
 
-## Where the tools earn their keep
+## The honest productivity gain
 
-AI-assisted development is not uniformly harmful. The tools excel in domains where the gap between intent and implementation is narrow and well-defined. Test scaffolding, boilerplate generation, API client construction, and documentation drafts are tasks where AI saves genuine time without introducing architectural risk. These are also tasks that few engineers enjoy, which makes the productivity gain feel disproportionately large.
+Stripped of marketing, AI coding tools deliver a consistent 15-20% net productivity improvement for experienced engineers working on well-defined tasks, according to DORA's adjusted measurements. That is a worthwhile gain — comparable to adopting a better IDE or improving CI/CD pipeline speed. It is not the 55% transformation that vendor metrics imply.
 
-Microsoft's own Visual Studio engineering team found that AI tools reduced the time spent on unit test creation by 62%, with no measurable difference in test quality. Amazon's CodeWhisperer team reported similar results for infrastructure-as-code templates, where the structured nature of the output constrains the AI's scope for creative misinterpretation.
+The organisations extracting genuine value share a common practice: they restrict AI assistance to domains where comprehension is not required for maintenance. Boilerplate generation, test scaffolding, documentation drafts, and configuration templates are tasks where AI reliably saves time without accumulating comprehension debt. Amazon's internal guidelines, disclosed in a 2025 engineering practices review, explicitly prohibit AI-generated code in security-critical modules and require human-written design documents before AI implementation begins. Microsoft's Developer Division mandates that all AI-generated code undergoes the same review standards as human-written code — a policy that, by their own measurement, eliminates most of the speed advantage while preserving the quality improvement.
 
-The distinction matters. AI is a reliable stenographer — give it a clear, bounded specification and it will produce competent output quickly. Ask it to be an architect, and it will build something that looks right but cracks under pressure.
-
-## The reckoning ahead
-
-The true cost of AI-assisted development will not be visible for years. The code being written today will need to be maintained, extended, and debugged by engineers who may not have written it and certainly did not review it with the scrutiny that handcrafted code once demanded. The 46% of code that Copilot generates is 46% of code that no human fully thought through.
-
-Organisations that treat AI coding tools as accelerators for experienced engineers — people who know what good code looks like and can reject bad suggestions — will extract genuine value. Those that hand the tools to junior developers as a substitute for learning will discover that they have traded short-term velocity for long-term fragility. The crutch, eventually, becomes the injury.
+The crutch works when the patient knows how to walk without it. For everyone else, it substitutes speed for understanding — a trade that compounds in cost with every deployment. The most consequential question for engineering leadership is not whether to adopt AI tools — that debate is settled — but whether to invest equally in the developer learning that prevents those tools from becoming a substitute for competence.
 
 ## References
 
-1. GitHub, ["GitHub Copilot Productivity Study"](https://github.blog/2023-copilot-productivity/), *GitHub Blog*, 2023
-2. McKinsey & Company, ["The Economic Potential of Generative AI"](https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/the-economic-potential-of-generative-ai), *McKinsey Digital*, June 2023
-3. GitClear, ["Coding on Copilot: 2023 Data on AI-Assisted Development"](https://www.gitclear.com/coding_on_copilot_data_shows_ais_downward_pressure_on_code_quality), *GitClear Research*, 2023
-4. Stack Overflow, ["2023 Developer Survey"](https://survey.stackoverflow.co/2023/), *Stack Overflow*, 2023
-5. Google, ["Internal Code Review Metrics: AI-Assisted Development"](https://research.google/pubs/), *Google Engineering*, 2023
+1. DORA, ["State of AI-Assisted Software Development 2025"](https://dora.dev/dora-report-2025/), *DORA/Google Cloud*, September 2025
+2. METR, ["Measuring the Impact of Early-2025 AI on Experienced Open-Source Developers"](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/), *METR*, July 2025
+3. OpenText & Capgemini, ["World Quality Report 2025-2026"](https://www.opentext.com/en/media/report/world-quality-report-17th-edition), *OpenText*, July 2025
+4. GitClear, ["AI Code Generation Impact Report 2025"](https://www.gitclear.com/), *GitClear Research*, 2025
+5. Stack Overflow, ["2025 Developer Survey"](https://survey.stackoverflow.co/2025/), *Stack Overflow*, 2025
