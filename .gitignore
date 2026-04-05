@@ -38,6 +38,9 @@ venv/
 ENV/
 .venv
 
+# Content review runtime output
+content-review-report.md
+
 # Agent outputs
 content_queue.json
 board_decision.json
