@@ -106,7 +106,8 @@ layout: default
          target="_blank"
          rel="noopener noreferrer"
          aria-label="Share on Twitter / X">
-        <span class="share-icon">&#120143;</span>
+        <!-- &#120143; = Mathematical sans-serif bold italic X (𝕏), used as the Twitter/X brand mark -->
+        <span class="share-icon" aria-hidden="true">&#120143;</span>
         <span>Twitter</span>
       </a>
       <a class="share-btn share-btn--email"
@@ -205,7 +206,7 @@ layout: default
 
 <footer class="article-footer">
   <a href="{{ '/blog/' | relative_url }}" class="back-link">← Back to Blog</a>
-  <span class="print-url">{{ page.url | absolute_url }}</span>
+  <span class="print-url" aria-hidden="true">Online: {{ page.url | absolute_url }}</span>
 </footer>
 
 <script>
