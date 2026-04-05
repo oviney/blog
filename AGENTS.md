@@ -6,6 +6,39 @@ and how to hand off work to sibling agents.
 
 ---
 
+## Setup & Development
+
+```bash
+# Install dependencies
+bundle install
+npm install
+
+# Build the site (validation — run before every PR)
+bundle exec jekyll build
+
+# Start dev server (local preview at http://localhost:4000)
+bundle exec jekyll serve --port 4000
+
+# Run Playwright tests (requires dev server running)
+npx playwright test
+
+# Run a single test file
+npx playwright test tests/playwright-agents/navigation.spec.ts
+
+# Run tests for a specific viewport
+npx playwright test --project="Mobile Chrome"
+
+# Validate blog posts (staged files only)
+bash scripts/validate-posts.sh
+
+# Validate all posts
+bash scripts/validate-posts.sh --all
+```
+
+**Tech stack:** Jekyll (Ruby), SCSS, Vanilla JS, Playwright (TypeScript), GitHub Actions, GitHub Pages
+
+---
+
 ## Agent Roster
 
 ### 1. Creative Director
@@ -13,7 +46,7 @@ and how to hand off work to sibling agents.
 | Property | Value |
 |----------|-------|
 | **Label** | `agent:creative-director` |
-| **Skill file** | `docs/skills/economist-theme/SKILL.md` |
+| **Skill file** | `.github/skills/economist-theme/SKILL.md` |
 | **Domain** | Design, CSS, UI, layouts, responsive behaviour |
 | **May touch** | `_sass/`, `_layouts/`, `assets/css/`, `assets/images/`, `assets/charts/`, `favicon.*` |
 | **Must not touch** | `.github/workflows/`, `tests/`, `scripts/`, `_config.yml`, `_posts/` |
@@ -29,7 +62,7 @@ and how to hand off work to sibling agents.
 | Property | Value |
 |----------|-------|
 | **Label** | `agent:qa-gatekeeper` |
-| **Skill file** | `docs/skills/jekyll-qa/SKILL.md` |
+| **Skill file** | `.github/skills/jekyll-qa/SKILL.md` |
 | **Domain** | Testing, CI/CD, bugs, accessibility, performance |
 | **May touch** | `.github/workflows/`, `tests/`, `specs/`, `scripts/`, `playwright.config.ts`, `backstop.json`, `.pa11yci.json`, `lighthouserc.json`, `package.json` |
 | **Must not touch** | `_sass/`, `_layouts/`, `_posts/`, `_config.yml` |
@@ -45,7 +78,7 @@ and how to hand off work to sibling agents.
 | Property | Value |
 |----------|-------|
 | **Label** | `agent:editorial-chief` (alias: `agent:editorial-manager`) |
-| **Skill file** | `docs/skills/editorial/SKILL.md` |
+| **Skill file** | `.github/skills/editorial/SKILL.md` |
 | **Domain** | Content, blog posts, SEO, writing, documentation |
 | **May touch** | `_posts/`, `_drafts/`, `docs/`, `*.md` (root level), `blog.html`, `search.html`, `search.json` |
 | **Must not touch** | `_sass/`, `_layouts/`, `.github/workflows/`, `tests/`, `scripts/`, `_config.yml` |

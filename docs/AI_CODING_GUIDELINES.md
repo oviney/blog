@@ -4,11 +4,11 @@ This file provides guidance for AI coding assistants (like GitHub Copilot, Claud
 
 ## 🧠 AI Skills & Memory
 
-**IMPORTANT**: Before starting any task, check [`docs/skills/`](skills/) for relevant `SKILL.md` files. These contain learned patterns, known solutions, and best practices specific to this codebase.
+**IMPORTANT**: Before starting any task, check [`.github/skills/`](skills/) for relevant `SKILL.md` files. These contain learned patterns, known solutions, and best practices specific to this codebase.
 
 **Knowledge Persistence Rule**:
 - If you learn a new pattern or fix a recurring bug, you MUST create or update a skill file to persist that knowledge.
-- Use the template at [`docs/skills/_template/SKILL.md`](skills/_template/SKILL.md).
+- Use the template at [`.github/skills/_template/SKILL.md`](skills/_template/SKILL.md).
 - Skills are version-controlled and shared across sessions.
 
 **Existing Skills**:

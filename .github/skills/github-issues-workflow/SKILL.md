@@ -184,7 +184,7 @@ Add label based on domain:
 **Add comment:**
 ```markdown
 🤖 **Assigned to:** Creative Director
-📚 **Reference:** docs/skills/economist-theme/SKILL.md
+📚 **Reference:** .github/skills/economist-theme/SKILL.md
 🎯 **Sprint:** 2026-01 Sprint 1
 ```
 
@@ -327,10 +327,10 @@ git checkout -b bugfix/GH-123-related-articles-filter
 #### 4a. Read Relevant Skill File
 ```bash
 # Creative Director reads:
-cat docs/skills/economist-theme/SKILL.md
+cat .github/skills/economist-theme/SKILL.md
 
 # QA Gatekeeper reads:
-cat docs/skills/jekyll-qa/SKILL.md
+cat .github/skills/jekyll-qa/SKILL.md
 ```
 
 #### 4b. Implement Fix
@@ -725,9 +725,9 @@ gh label list --repo oviney/blog | grep "P1:high"
 
 ## Related Files
 
-- [`docs/skills/economist-theme/SKILL.md`](../economist-theme/SKILL.md) - Creative Director skill
-- [`docs/skills/jekyll-qa/SKILL.md`](../jekyll-qa/SKILL.md) - QA Gatekeeper skill  
-- [`docs/skills/git-operations/SKILL.md`](../git-operations/SKILL.md) - Git workflow
+- [`.github/skills/economist-theme/SKILL.md`](../economist-theme/SKILL.md) - Creative Director skill
+- [`.github/skills/jekyll-qa/SKILL.md`](../jekyll-qa/SKILL.md) - QA Gatekeeper skill  
+- [`.github/skills/git-operations/SKILL.md`](../git-operations/SKILL.md) - Git workflow
 - [`.github/workflows/jekyll.yml`](../../.github/workflows/jekyll.yml) - CI/CD pipeline
 - [`docs/DEVELOPMENT_WORKFLOW.md`](../DEVELOPMENT_WORKFLOW.md) - Overall workflow
 
@@ -833,7 +833,7 @@ Agent (QA Gatekeeper):
   → Comments on issue: "Confirmed. Assigning to Creative Director"
 
 Agent (switches to Creative Director):
-  → Reads docs/skills/economist-theme/SKILL.md
+  → Reads .github/skills/economist-theme/SKILL.md
   → Creates branch: bugfix/GH-123-related-articles-filter
   → Implements fix in _layouts/post.html
   → Tests at all breakpoints

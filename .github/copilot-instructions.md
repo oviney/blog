@@ -10,10 +10,10 @@ Read the corresponding skill file BEFORE doing any work.
 
 | Label | Agent Persona | Skill File | Domain |
 |-------|--------------|------------|--------|
-| `agent:creative-director` | Creative Director | `docs/skills/economist-theme/SKILL.md` | Design, CSS, UI, layouts, responsive |
-| `agent:qa-gatekeeper` | QA Gatekeeper | `docs/skills/jekyll-qa/SKILL.md` | Testing, CI, bugs, accessibility, performance |
-| `agent:editorial-chief` | Editorial Chief | `docs/skills/editorial/SKILL.md` | Content, blog posts, SEO, writing |
-| `agent:editorial-manager` | Editorial Chief | `docs/skills/editorial/SKILL.md` | Same as above (alias) |
+| `agent:creative-director` | Creative Director | `.github/skills/economist-theme/SKILL.md` | Design, CSS, UI, layouts, responsive |
+| `agent:qa-gatekeeper` | QA Gatekeeper | `.github/skills/jekyll-qa/SKILL.md` | Testing, CI, bugs, accessibility, performance |
+| `agent:editorial-chief` | Editorial Chief | `.github/skills/editorial/SKILL.md` | Content, blog posts, SEO, writing |
+| `agent:editorial-manager` | Editorial Chief | `.github/skills/editorial/SKILL.md` | Same as above (alias) |
 | No agent label | General | Read issue description and use best judgment | Documentation, refactoring, misc |
 
 ## Workflow
@@ -35,9 +35,9 @@ Read the corresponding skill file BEFORE doing any work.
 
 ## Additional Skills (reference as needed)
 
-- `docs/skills/jekyll-development/SKILL.md` — Jekyll server, build, Liquid templates
-- `docs/skills/git-operations/SKILL.md` — Git workflow, branching, commit messages
-- `docs/skills/github-issues-workflow/SKILL.md` — Issue management, labels, workflow
+- `.github/skills/jekyll-development/SKILL.md` — Jekyll server, build, Liquid templates
+- `.github/skills/git-operations/SKILL.md` — Git workflow, branching, commit messages
+- `.github/skills/github-issues-workflow/SKILL.md` — Issue management, labels, workflow
 
 ## Hard Boundaries
 

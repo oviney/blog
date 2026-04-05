@@ -61,7 +61,7 @@ git diff path/to/file
 git add path/to/file1 path/to/file2
 
 # Stage all changes in directory
-git add docs/skills/
+git add .github/skills/
 
 # Stage all changes
 git add .
@@ -140,7 +140,7 @@ git status
 git diff
 
 # Stage specific changes
-git add docs/skills/ docs/AI_CODING_GUIDELINES.md
+git add .github/skills/ docs/AI_CODING_GUIDELINES.md
 
 # Commit with descriptive message
 git commit -m "feat: implement Claude Skills persistence architecture"

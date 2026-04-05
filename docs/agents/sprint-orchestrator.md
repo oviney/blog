@@ -104,7 +104,7 @@ gh issue comment 36 --repo oviney/blog --body "🎯 **In Progress**
 - [ ] CHANGELOG.md updated
 - [ ] Production verified
 
-**Reference:** docs/skills/economist-theme/SKILL.md"
+**Reference:** .github/skills/economist-theme/SKILL.md"
 ```
 
 ### 4. Verification & Closure
@@ -347,7 +347,7 @@ gh issue list --repo oviney/blog --state closed --milestone "Sprint 1"
 - Labels for routing: `agent:*`, priority: `P0-P3`, type: `bug`/`enhancement`
 
 **File dependencies:**
-- [docs/skills/github-issues-workflow/SKILL.md](../skills/github-issues-workflow/SKILL.md) - Issue workflow
+- [.github/skills/github-issues-workflow/SKILL.md](../skills/github-issues-workflow/SKILL.md) - Issue workflow
 - [docs/SPRINT_X_RETROSPECTIVE.md](../SPRINT_1_RETROSPECTIVE.md) - Sprint tracking
 - [CHANGELOG.md](../../CHANGELOG.md) - Release history
 
