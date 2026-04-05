@@ -51,7 +51,7 @@ A custom design system (`_sass/economist-theme.scss`, 600+ lines) inspired by Th
 - **Layouts**: `default.html` wraps all pages; `post.html` extends it for articles
 - **Responsive**: Mobile-first SCSS with breakpoints at 768px and 1024px
 
-See [`docs/skills/economist-theme/SKILL.md`](docs/skills/economist-theme/SKILL.md) for design guidelines.
+See [`.github/skills/economist-theme/SKILL.md`](.github/skills/economist-theme/SKILL.md) for design guidelines.
 
 ### GitHub Actions
 
@@ -142,4 +142,4 @@ Changes to `main` must pass all automated checks before serving live traffic:
 - [GETTING_STARTED.md](GETTING_STARTED.md) — local setup and development workflow
 - [docs/CURRENT_STATE.md](docs/CURRENT_STATE.md) — current production state
 - [docs/DEVELOPMENT_WORKFLOW.md](docs/DEVELOPMENT_WORKFLOW.md) — day-to-day development guide
-- [docs/skills/README.md](docs/skills/README.md) — agent skill files index
+- [.github/skills/README.md](.github/skills/README.md) — agent skill files index

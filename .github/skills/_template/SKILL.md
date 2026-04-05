@@ -1,6 +1,6 @@
 ---
-name: Skill Name
-description: Brief description of what this skill helps with
+name: skill-name
+description: 'What this skill does. Use when TRIGGER1, TRIGGER2, or TRIGGER3.'
 version: 1.0.0
 triggers:
   - When to use this skill

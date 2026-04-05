@@ -6,7 +6,7 @@ This file lists all available agent personas in this workspace and how to activa
 
 ### 1. Creative Director
 **Domain:** Design / CSS / UI / Visual  
-**Skill File:** [`docs/skills/economist-theme/SKILL.md`](../skills/economist-theme/SKILL.md)  
+**Skill File:** [`.github/skills/economist-theme/SKILL.md`](../skills/economist-theme/SKILL.md)  
 **GitHub Label:** `agent:creative-director`  
 **Activation:**
 ```
@@ -15,7 +15,7 @@ Creative Director, fix issue #33
 
 ### 2. QA Gatekeeper
 **Domain:** Testing / CI / Quality / Bugs  
-**Skill File:** [`docs/skills/jekyll-qa/SKILL.md`](../skills/jekyll-qa/SKILL.md)  
+**Skill File:** [`.github/skills/jekyll-qa/SKILL.md`](../skills/jekyll-qa/SKILL.md)  
 **GitHub Label:** `agent:qa-gatekeeper`  
 **Activation:**
 ```
@@ -24,7 +24,7 @@ QA Gatekeeper, review PR #35
 
 ### 3. Editorial Chief
 **Domain:** Content / Writing / SEO / Posts  
-**Skill File:** [`docs/skills/editorial/SKILL.md`](../skills/editorial/SKILL.md)  
+**Skill File:** [`.github/skills/editorial/SKILL.md`](../skills/editorial/SKILL.md)  
 **GitHub Label:** `agent:editorial-chief`  
 **Activation:**
 ```

@@ -1,6 +1,6 @@
 ---
-name: Economist Theme Design System
-description: Guidelines for maintaining visual consistency with The Economist's design language
+name: economist-theme
+description: 'Design system for The Economist visual style. Use when modifying CSS, SCSS, layouts, responsive design, typography, or UI components.'
 version: 1.1.0
 triggers:
   - Adding new styles or components
