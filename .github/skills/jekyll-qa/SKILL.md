@@ -1,6 +1,6 @@
 ---
-name: QA Gatekeeper - Testing & CI/CD Pipeline
-description: Quality assurance workflow for PR reviews, CI pipeline monitoring, and production verification
+name: jekyll-qa
+description: 'QA and CI/CD pipeline management. Use when reviewing PRs, diagnosing CI failures, running Playwright tests, checking accessibility, or verifying production deploys.'
 version: 1.2.0
 triggers:
   - PR created for bug fix or feature
@@ -209,9 +209,9 @@ gh pr view 35 --repo oviney/blog
 
 #### 1b. Code Review Checklist
 - [ ] **Follows SKILL.md**: Check relevant skill file was followed
-  - Creative Director: `docs/skills/economist-theme/SKILL.md`
-  - Jekyll Dev: `docs/skills/jekyll-development/SKILL.md`
-  - Git Ops: `docs/skills/git-operations/SKILL.md`
+  - Creative Director: `.github/skills/economist-theme/SKILL.md`
+  - Jekyll Dev: `.github/skills/jekyll-development/SKILL.md`
+  - Git Ops: `.github/skills/git-operations/SKILL.md`
 - [ ] **No hardcoded values**: Uses SCSS variables, not magic numbers
 - [ ] **Proper commit format**: `fix(GH-XX): description\n\nCloses #XX`
 - [ ] **Tests included**: If applicable
@@ -637,7 +637,7 @@ If new patterns or lessons learned:
 #### 5b. Update Relevant SKILL.md
 ```bash
 # Open skill file
-code docs/skills/jekyll-qa/SKILL.md
+code .github/skills/jekyll-qa/SKILL.md
 
 # Add new section or update existing
 # Increment version number
@@ -651,7 +651,7 @@ code docs/skills/jekyll-qa/SKILL.md
 
 #### 5c. Commit Skill Update
 ```bash
-git add docs/skills/jekyll-qa/SKILL.md
+git add .github/skills/jekyll-qa/SKILL.md
 git commit -m "docs: update jekyll-qa SKILL to v1.1.0
 
 Added section on handling X scenario based on PR #35 learnings"
@@ -752,9 +752,9 @@ fi
 
 ## Related Files
 
-- [`docs/skills/github-issues-workflow/SKILL.md`](../github-issues-workflow/SKILL.md) - Full bug workflow
-- [`docs/skills/jekyll-development/SKILL.md`](../jekyll-development/SKILL.md) - Jekyll server operations
-- [`docs/skills/economist-theme/SKILL.md`](../economist-theme/SKILL.md) - Design system guidelines
+- [`.github/skills/github-issues-workflow/SKILL.md`](../github-issues-workflow/SKILL.md) - Full bug workflow
+- [`.github/skills/jekyll-development/SKILL.md`](../jekyll-development/SKILL.md) - Jekyll server operations
+- [`.github/skills/economist-theme/SKILL.md`](../economist-theme/SKILL.md) - Design system guidelines
 - [`.github/workflows/`](../../../.github/workflows/) - CI/CD configuration
 - [`package.json`](../../../package.json) - Test scripts
 

@@ -9,7 +9,7 @@
 - [ ] **Scope**: Changes match the issue label and agent domain
 - [ ] **Build**: `bundle exec jekyll build` passes
 - [ ] **No broken links**: Internal links verified
-- [ ] **Skill file consulted**: Agent followed the relevant `docs/skills/*/SKILL.md`
+- [ ] **Skill file consulted**: Agent followed the relevant `.github/skills/*/SKILL.md`
 - [ ] **No out-of-scope changes**: No files modified outside the agent's domain
 - [ ] **Conventions followed**: SCSS variables used, categories normalized, commit messages clear
 

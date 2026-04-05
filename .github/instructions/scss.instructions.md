@@ -1,4 +1,5 @@
 ---
+description: 'SCSS conventions for the Economist design system. Enforces variables-only styling, typography rules, and responsive breakpoints.'
 applyTo: "_sass/**/*.scss,assets/css/**/*.scss"
 ---
 

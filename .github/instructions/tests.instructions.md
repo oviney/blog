@@ -1,4 +1,5 @@
 ---
+description: 'Playwright test conventions including selectors, viewports, assertions, and defensive patterns.'
 applyTo: "tests/**/*.spec.ts,tests/**/*.test.ts,specs/**/*.spec.ts"
 ---
 
