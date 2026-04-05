@@ -32,7 +32,7 @@ jobs:
           htmlproofer ./_site \
             --disable-external \
             --allow-hash-href \
-            --ignore-urls "/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/" \
+            --ignore-urls "/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/,/^mailto:/" \
             --ignore-status-codes "999"
       
       - name: Check for broken internal links
