@@ -22,7 +22,10 @@ test.describe('Analytics Integration', () => {
 
     const src = await gaScript.getAttribute('src');
     expect(src).toContain('G-');       // measurement ID must be embedded
-    expect(src).toContain('async');    // async attribute should be set
+
+    // async is a boolean attribute on the element, not part of the URL
+    const asyncAttr = await gaScript.getAttribute('async');
+    expect(asyncAttr).not.toBeNull();
   });
 
   test('Google Analytics 4 gtag initialisation is present', async ({ page }) => {
@@ -100,9 +103,8 @@ test.describe('Analytics Integration', () => {
     await page.waitForLoadState('networkidle');
 
     const gscMeta = page.locator('meta[name="google-site-verification"]');
-    // Acceptable: 0 (not configured) or 1 (configured)
-    const tagCount = await gscMeta.count();
-    expect(tagCount).toBeGreaterThanOrEqual(0); // always passes — documents the expected behaviour
+    // The verification token in _data/analytics.yml is empty, so the tag must not be rendered.
+    await expect(gscMeta).toHaveCount(0);
   });
 
 });

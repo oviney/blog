@@ -15,7 +15,7 @@
 {% endcomment %}
 
 {% comment %}Google Search Console — HTML-tag ownership verification{% endcomment %}
-{% if site.data.analytics.google_search_console_verification != "" %}
+{% if site.data.analytics.google_search_console_verification and site.data.analytics.google_search_console_verification != '' %}
 <meta name="google-site-verification" content="{{ site.data.analytics.google_search_console_verification }}">
 {% endif %}
 
