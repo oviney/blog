@@ -1,0 +1,14 @@
+# Analytics configuration
+#
+# Plausible Analytics — privacy-friendly, cookie-free, GDPR compliant.
+# Tracks page views, bounce rates, session duration, referrers, and
+# popular content automatically. No personal data is collected.
+# Sign up at https://plausible.io and set the domain below.
+plausible_domain: "viney.ca"
+
+# Google Search Console verification.
+# Obtain your HTML-tag verification code from:
+#   https://search.google.com/search-console/ownership
+# Paste only the `content` value (not the full <meta> tag) here.
+# Leave blank to skip the tag.
+google_search_console_verification: ""
