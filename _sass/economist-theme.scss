@@ -2993,3 +2993,47 @@ article.topic-card h2 a,
     display: none;
   }
 }
+
+// ============================================
+// PAGINATION
+// ============================================
+
+.econ-pagination {
+  margin: 3rem 0 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid $border-color;
+}
+
+.econ-pagination-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.econ-pagination-link {
+  font-family: $font-sans;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: $economist-red;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  transition: color 0.2s;
+
+  &:hover {
+    color: color.adjust($economist-red, $lightness: -10%);
+    text-decoration: underline;
+  }
+}
+
+.econ-pagination-disabled {
+  color: $text-tertiary;
+  pointer-events: none;
+}
+
+.econ-pagination-info {
+  font-family: $font-sans;
+  font-size: 0.85rem;
+  color: $text-secondary;
+}

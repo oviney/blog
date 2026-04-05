@@ -35,6 +35,9 @@ permalink: /:year/:month/:day/:title/
 # Using custom Economist-inspired theme
 # remote_theme: "mmistakes/minimal-mistakes@4.27.3"
 
+paginate: 6
+paginate_path: "/blog/page:num/"
+
 plugins:
   - jekyll-feed
   - jekyll-remote-theme
