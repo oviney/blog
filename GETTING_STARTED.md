@@ -70,7 +70,13 @@ npm run test:visual:reference
 
 ## Pre-commit Hook
 
-A pre-commit hook runs automatically on `git commit`. It validates content quality for any `_posts/` files staged in the commit. No manual setup is required — the hook activates automatically via `git config core.hooksPath`.
+A pre-commit hook validates content quality for any `_posts/` files staged in the commit. Run the installer once after cloning:
+
+```bash
+bash scripts/install-hooks.sh
+```
+
+This sets `core.hooksPath = hooks` in your local `.git/config`, pointing git at the tracked `hooks/pre-commit` file. The hook is then active for every subsequent `git commit` in this repository.
 
 ### What is validated
 

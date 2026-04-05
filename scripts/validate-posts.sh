@@ -235,7 +235,7 @@ if [[ $# -eq 0 ]]; then
   # Default: only validate posts staged for this commit
   while IFS= read -r f; do
     [[ -n "$f" ]] && FILES+=("$REPO_ROOT/$f")
-  done < <(git -C "$REPO_ROOT" diff --cached --name-only --diff-filter=ACM | { grep "^_posts/.*\.md$" || true; })
+  done < <(git -C "$REPO_ROOT" diff --cached --name-only --diff-filter=ACMR | { grep "^_posts/.*\.md$" || true; })
 
 elif [[ "$1" == "--all" ]]; then
   while IFS= read -r f; do
@@ -247,13 +247,15 @@ else
     if [[ -f "$arg" ]]; then
       FILES+=("$arg")
     else
-    echo "Error: file not found: $arg" >&2
+      error "file not found: $arg" >&2
+      (( ERRORS++ )) || true
     fi
   done
 fi
 
 if [[ ${#FILES[@]} -eq 0 ]]; then
-  exit 0
+  # Still exit 1 if any file args were not found
+  (( ERRORS > 0 )) && exit 1 || exit 0
 fi
 
 # ── Run validation ────────────────────────────────────────────────────────────

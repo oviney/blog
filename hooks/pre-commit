@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# pre-commit hook — runs Jekyll post validation on staged _posts/ files.
+#
+# Installed via:  bash scripts/install-hooks.sh
+# Manual run:     bash scripts/validate-posts.sh
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+VALIDATE_SCRIPT="$REPO_ROOT/scripts/validate-posts.sh"
+
+if [[ -x "$VALIDATE_SCRIPT" ]]; then
+  # Only run when at least one _posts/ file is staged
+  STAGED_POSTS=$(git diff --cached --name-only --diff-filter=ACMR | { grep "^_posts/.*\.md$" || true; })
+  if [[ -n "$STAGED_POSTS" ]]; then
+    echo "Running post validation..."
+    "$VALIDATE_SCRIPT" || exit 1
+  fi
+else
+  echo "Warning: validate-posts.sh not found or not executable — skipping post validation" >&2
+fi
+
+exit 0
