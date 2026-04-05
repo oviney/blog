@@ -9,7 +9,7 @@ submit the sitemap, and run the monthly traffic review that feeds back into cont
 
 ## 1. Verify the Site in Google Search Console
 
-The blog supports HTML-tag verification via a meta tag injected in `<head>`.
+The blog supports HTML-tag verification via a meta tag rendered in `<head>`.
 
 ### Steps
 

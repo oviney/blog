@@ -9,7 +9,7 @@ body:
         ## Monthly Traffic Review
 
         Complete this checklist on the **first Monday of each month**.
-        See [docs/seo-feedback-loop.md](../docs/seo-feedback-loop.md) for full guidance.
+        See [docs/seo-feedback-loop.md](https://github.com/oviney/blog/blob/main/docs/seo-feedback-loop.md) for full guidance.
 
   - type: input
     id: review_period
