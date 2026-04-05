@@ -4,7 +4,7 @@ title: "Self-healing tests: the automation promise that keeps breaking"
 date: 2026-01-02
 author: "The Economist"
 categories: ["Test Automation", "AI Testing"]
-image: /assets/images/blog-default.svg
+image: /assets/images/self-healing-broken-promise.png
 ---
 
 Tricentis, the testing platform company, claims its self-healing technology reduces test maintenance by 80%. Mabl advertises "zero-maintenance testing." Functionize promises tests that "fix themselves." These are extraordinary claims — and the data, when it arrives from independent sources rather than vendor marketing, tells a more complicated story. ISTQB's 2023 global survey found that 85% of organisations using self-healing tests reported some decrease in maintenance time. But only 30% achieved what they had been promised: meaningful autonomy from manual test updates.
