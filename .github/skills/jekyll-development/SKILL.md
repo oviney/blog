@@ -1,6 +1,6 @@
 ---
-name: Jekyll Development Workflow
-description: Complete workflow for developing, testing, and deploying Jekyll blog changes
+name: jekyll-development
+description: 'Jekyll local development workflow. Use when starting the dev server, building the site, debugging Liquid templates, or troubleshooting Ruby/Bundler issues.'
 version: 1.1.0
 triggers:
   - Starting Jekyll server

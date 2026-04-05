@@ -1,6 +1,6 @@
 ---
-name: GitHub Issues Bug Workflow
-description: Standard Agile process for bug reporting, triage, assignment, and resolution using GitHub Issues
+name: github-issues-workflow
+description: 'Bug lifecycle from report to resolution. Use when triaging bugs, creating issue templates, managing labels, or following the defect workflow.'
 version: 1.2.0
 triggers:
   - User reports a bug

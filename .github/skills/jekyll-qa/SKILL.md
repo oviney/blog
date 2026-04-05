@@ -1,6 +1,6 @@
 ---
-name: QA Gatekeeper - Testing & CI/CD Pipeline
-description: Quality assurance workflow for PR reviews, CI pipeline monitoring, and production verification
+name: jekyll-qa
+description: 'QA and CI/CD pipeline management. Use when reviewing PRs, diagnosing CI failures, running Playwright tests, checking accessibility, or verifying production deploys.'
 version: 1.2.0
 triggers:
   - PR created for bug fix or feature

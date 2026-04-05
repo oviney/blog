@@ -1,6 +1,6 @@
 ---
-name: Git Operations & Workflow
-description: Standard git workflow for committing, branching, and pushing changes
+name: git-operations
+description: 'Git workflow conventions for this repo. Use when committing, branching, creating PRs, resolving merge conflicts, or pushing changes.'
 version: 1.0.0
 triggers:
   - Committing code changes

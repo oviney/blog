@@ -1,6 +1,6 @@
 ---
-name: Editorial Chief - Content & Publishing
-description: Content creation, blog post writing, SEO optimization, and editorial standards
+name: editorial
+description: 'Editorial standards for blog content. Use when writing posts, editing articles, managing SEO, updating documentation, or reviewing content quality.'
 version: 1.0.0
 triggers:
   - Write or edit a blog post
