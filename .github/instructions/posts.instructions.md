@@ -1,4 +1,5 @@
 ---
+description: 'Jekyll blog post conventions for front matter, categories, writing style, SEO, and image paths.'
 applyTo: "_posts/**/*.md,_drafts/**/*.md"
 ---
 
