@@ -7,7 +7,7 @@ on:
 jobs:
   eval:
     name: Evaluate Agent PR
-    if: github.event.pull_request.user.login == 'copilot-swe-agent[bot]'
+    if: contains(github.event.pull_request.user.login, 'copilot')
     runs-on: ubuntu-latest
     permissions:
       contents: read
