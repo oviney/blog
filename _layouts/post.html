@@ -250,15 +250,24 @@ layout: default
       return;
     }
 
+    var usedIds = {};
     headings.forEach(function (heading) {
-      // Ensure each heading has an id (kramdown sets these; this is a fallback)
+      // Ensure each heading has a unique id (kramdown sets these; this is a fallback)
       if (!heading.id) {
-        heading.id = heading.textContent
+        var base = heading.textContent
           .toLowerCase()
           .replace(/[^\w\s-]/g, '')
           .replace(/\s+/g, '-')
           .trim();
+        var candidate = base;
+        var counter = 1;
+        while (document.getElementById(candidate)) {
+          candidate = base + '-' + counter;
+          counter++;
+        }
+        heading.id = candidate;
       }
+      usedIds[heading.id] = true;
       var li = document.createElement('li');
       li.className = heading.tagName === 'H3' ? 'toc-item toc-item--sub' : 'toc-item';
       var link = document.createElement('a');

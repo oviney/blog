@@ -58,8 +58,8 @@ test.describe('Table of Contents', () => {
       return;
     }
 
-    // ToC should either be hidden (< 2 headings) or contain links
-    const isHidden = await toc.evaluate((el: HTMLElement) => el.style.display === 'none');
+    // Check computed display style to reliably detect hidden state
+    const isHidden = await toc.evaluate((el) => window.getComputedStyle(el).display === 'none');
     if (!isHidden) {
       const tocLinks = toc.locator('.toc-link');
       const linkCount = await tocLinks.count();
@@ -72,7 +72,7 @@ test.describe('Table of Contents', () => {
     await page.waitForLoadState('networkidle');
 
     const toc = page.locator('#toc');
-    const isHidden = await toc.evaluate((el: HTMLElement) => el.style.display === 'none');
+    const isHidden = await toc.evaluate((el) => window.getComputedStyle(el).display === 'none');
     if (isHidden) {
       console.log('ToC hidden (too few headings) — skipping anchor test');
       return;
@@ -289,22 +289,20 @@ test.describe('Print Styles', () => {
     await page.goto(POST_URL);
     await page.waitForLoadState('networkidle');
 
-    // Verify print styles exist in the stylesheet
-    const printStylesExist = await page.evaluate(() => {
-      for (const sheet of Array.from(document.styleSheets)) {
-        try {
-          for (const rule of Array.from(sheet.cssRules || [])) {
-            if (rule instanceof CSSMediaRule && rule.conditionText.includes('print')) {
-              return true;
-            }
-          }
-        } catch {
-          // Cross-origin stylesheet — skip
-        }
-      }
-      return false;
-    });
-    expect(printStylesExist).toBe(true);
+    // Emulate print media and check that key interactive elements are hidden
+    await page.emulateMedia({ media: 'print' });
+
+    const progressBar = page.locator('#reading-progress');
+    await expect(progressBar).toBeHidden();
+
+    const backToTop = page.locator('#back-to-top');
+    await expect(backToTop).toBeHidden();
+
+    const shareSection = page.locator('.share-section');
+    await expect(shareSection).toBeHidden();
+
+    // Restore screen media for subsequent tests
+    await page.emulateMedia({ media: 'screen' });
   });
 });
 
@@ -339,7 +337,7 @@ test.describe('Interactive Elements - Mobile', () => {
     const toc = page.locator('#toc');
     const tocCount = await toc.count();
     if (tocCount > 0) {
-      const isHidden = await toc.evaluate((el: HTMLElement) => el.style.display === 'none');
+      const isHidden = await toc.evaluate((el) => window.getComputedStyle(el).display === 'none');
       if (!isHidden) {
         await expect(toc).toBeVisible();
       }
