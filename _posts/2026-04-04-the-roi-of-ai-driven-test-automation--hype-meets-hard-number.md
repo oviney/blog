@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The ROI of AI-Driven Test Automation: Hype Meets Hard Numbers"
+description: "Forrester cites 125% average ROI over three years from AI-driven test automation. But 60% of firms face integration challenges. What the evidence really shows."
 subtitle: "A rigorous assessment of AI-powered test automation reveals measured returns and persistent challenges amid soaring expectations."
 date: 2026-04-04
 author: "Ouray Viney"

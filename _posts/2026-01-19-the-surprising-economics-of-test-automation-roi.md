@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The Economics of Test Automation: A Strategic Imperative"
+description: "Test automation can cut costs by 40% for some organisations. But returns vary by industry. A data-driven look at where automation delivers genuine ROI."
 subtitle: "Automation can cut testing costs by 40%. Most organisations never see that return."
 date: 2026-01-19
 author: "Ouray Viney"

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The Real Cost of Test Automation: Balancing Speed and Sustainability"
+description: "Test automation promises faster releases with fewer bugs. Many find ongoing maintenance costs bite deeply into budgets. How to balance speed and sustainability."
 date: 2026-04-04
 author: "The Economist"
 categories: ["Quality Engineering", "Test Automation"]

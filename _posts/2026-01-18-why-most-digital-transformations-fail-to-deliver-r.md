@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Digital transformation's dirty secret: the 70% that never deliver"
+description: "McKinsey finds 70% of digital transformations fail their stated objectives. A decade of evidence shows why the problem is structural, not informational."
 date: 2026-01-18
 author: "The Economist"
 categories: ["Quality Engineering", "Software Engineering"]

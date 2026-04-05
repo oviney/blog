@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "AI in Quality Testing: Bridging the Adoption Gap"
+description: "AI quality testing tools can halve software testing time. Yet only 15% of companies have fully embraced them. Why adoption lags so far behind the promise."
 subtitle: "AI can halve testing time. Only 15% of companies have fully embraced it."
 date: 2026-01-23
 author: "Ouray Viney"

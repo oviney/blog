@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The coder's crutch: why AI-assisted development is creating more problems than it solves"
+description: "GitHub Copilot generates 46% of all code. AI tools may create engineers who ship faster but understand less, as technical debt quietly compounds."
 date: 2023-08-08
 author: "The Economist"
 categories: ["Software Engineering"]

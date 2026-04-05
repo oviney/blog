@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Why AI Test Generation Tools Overpromise on Maintenance Savings"
+description: "Vendors promise AI test generation tools will cut maintenance by 70%. The reality is more prosaic. Why these tools systematically overpromise and underdeliver."
 date: 2026-04-05
 author: "The Economist"
 categories: ["Quality Engineering", "Test Automation"]

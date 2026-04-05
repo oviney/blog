@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Self-Healing Tests: Myth vs Reality"
+description: "85% of organisations using self-healing tests report reduced maintenance. Yet only 30% achieve full autonomy. Examining the gap between promise and reality."
 date: 2026-01-02
 author: "The Economist"
 image: /assets/charts/self-healing-tests-myth-vs-reality.png

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Testing times"
+description: "Four in five teams use AI in testing workflows. Yet test maintenance still consumes budgets and QA headcount has grown. Why adoption lags behind the promise."
 subtitle: "Artificial intelligence has conquered software testing. The productivity gains remain elusive."
 date: 2025-12-31
 last_modified_at: 2025-12-31

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The test strategy trap: why most quality plans fail before they start"
+description: "88% of organisations have a documented test strategy. Only 23% believe it works. Why most quality engineering plans fail before they start."
 date: 2023-08-09
 author: "The Economist"
 categories: ["Quality Engineering"]

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The invisible shield: how DNS became cybersecurity's first line of defence"
+description: "Cisco blocks 7 million malicious DNS requests per minute. How the Domain Name System became cybersecurity's most underrated first line of defence."
 date: 2023-12-28
 author: "The Economist"
 categories: ["Quality Engineering", "Software Engineering"]

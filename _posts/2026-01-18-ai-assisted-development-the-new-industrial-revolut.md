@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "AI-Assisted Code Generation: A New Era in Software Development"
+description: "AI code generation can cut development time by 50%, yet only 10% of companies fully realise these gains. Why the gap between potential and adoption persists."
 subtitle: "Machines now write half the code. Most companies have barely noticed."
 date: 2026-01-18
 author: "Ouray Viney"
