@@ -4,7 +4,7 @@ title: "Why AI Test Generation Tools Overpromise on Maintenance Savings"
 date: 2026-04-05
 author: "The Economist"
 categories: ["Quality Engineering", "Test Automation"]
-image: /assets/images/ai-test-generation-maintenance.png
+image: /assets/images/why-recent-ai-test-generation-tools-are-overpromising-on-mai.png
 summary: "Despite attractive vendor claims, recent AI-driven test generation tools have largely failed to reduce maintenance efforts in practical software engineering contexts."
 ---
 
