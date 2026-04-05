@@ -199,8 +199,8 @@ p {
   line-height: $line-height-relaxed;
 }
 
-// Drop cap for first paragraph
-article > p:first-of-type::first-letter {
+// Drop cap for first paragraph — scoped to article pages only
+.economist-article > .article-content > p:first-of-type::first-letter {
   font-size: 4rem;
   font-weight: 700;
   float: left;
@@ -440,10 +440,10 @@ blockquote {
 
 .article-body {
   font-size: 1.125rem;
-  line-height: 1.8;
+  line-height: 1.75;
   margin-bottom: $spacing-xl * 2;
   color: $text-primary;
-  
+
   // Drop cap for first paragraph
   > p:first-of-type::first-letter {
     font-size: 4rem;
@@ -454,9 +454,9 @@ blockquote {
     font-family: $font-serif;
     color: $text-primary;
   }
-  
+
   p {
-    margin: 0 0 $spacing-lg 0;
+    margin: 0 0 $spacing-md 0;
     font-family: $font-serif;
   }
   
@@ -1542,7 +1542,158 @@ table {
 }
 
 // ============================================
-// TOPIC PAGE (BLOG INDEX)
+// ECONOMIST TOPIC PAGE (NEW BLOG LISTING)
+// Matches: economist.com/topics/artificial-intelligence
+// ============================================
+
+.econ-topic-page {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: $spacing-xl 0;
+}
+
+.econ-topic-header {
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $border-color;
+}
+
+.econ-topic-title {
+  font-family: $font-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 $spacing-xs 0;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.econ-topic-tagline {
+  font-family: $font-serif;
+  font-size: 1rem;
+  font-style: normal;
+  color: $text-secondary;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.econ-article-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0 $spacing-xl * 1.25;
+}
+
+.econ-article-card {
+  padding: $spacing-md 0 $spacing-lg 0;
+  border-top: 1px solid $border-color;
+
+  // Override global link border-bottom for all links in cards
+  a {
+    border-bottom: none;
+  }
+
+  &:hover .econ-card-title a {
+    color: $economist-red;
+  }
+}
+
+.econ-card-image-link {
+  display: block;
+  margin-bottom: $spacing-sm;
+  overflow: hidden;
+}
+
+.econ-card-image {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.econ-card-category {
+  display: block;
+  font-family: $font-sans;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: $economist-red;
+  margin-bottom: 6px;
+}
+
+.econ-card-title {
+  font-family: $font-serif;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0 0 8px 0;
+
+  a {
+    color: $text-primary;
+    text-decoration: none;
+    border-bottom: none;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: $economist-red;
+      text-decoration: none;
+    }
+
+    &:visited {
+      color: $text-primary;
+    }
+  }
+}
+
+.econ-card-excerpt {
+  font-family: $font-serif;
+  font-size: 0.875rem;
+  color: $text-secondary;
+  line-height: 1.4;
+  margin: 0 0 8px 0;
+}
+
+.econ-card-meta {
+  font-family: $font-sans;
+  font-size: 0.75rem;
+  color: $text-tertiary;
+}
+
+// Responsive: tablet
+@media (max-width: 1024px) {
+  .econ-article-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 $spacing-lg;
+  }
+
+  .econ-topic-page {
+    padding: $spacing-xl $spacing-lg;
+  }
+}
+
+// Responsive: mobile
+@media (max-width: 768px) {
+  .econ-article-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .econ-topic-page {
+    padding: $spacing-lg $spacing-md;
+  }
+
+  .econ-topic-title {
+    font-size: 1.75rem;
+  }
+
+  .econ-card-image {
+    aspect-ratio: 3 / 2;
+  }
+}
+
+// ============================================
+// TOPIC PAGE (BLOG INDEX) — LEGACY
 // ============================================
 
 .topic-page {
