@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # fix-agent-merge-blockers.sh — Unblock Copilot-agent PRs on oviney/blog
 #
-# Fixes two independent misconfigurations that prevent agent PRs from merging:
+# Fixes one misconfiguration and prints a manual runbook for a second:
 #
 #   FIX 1 — dismiss_stale_reviews (branch protection on main)
 #     Reads the current branch-protection payload, patches
@@ -9,10 +9,11 @@
 #     then writes it back. Every other existing setting is preserved
 #     (read → modify → write; no hardcoded payload).
 #
-#   FIX 2 — workflow default permissions
-#     Sets default_workflow_permissions=write and
-#     can_approve_pull_request_reviews=true via the Actions workflow
-#     permissions API, if not already correct.
+#   INFO — Actions workflow permissions (read-only)
+#     Reports default_workflow_permissions and can_approve_pull_request_reviews
+#     for operator awareness.  No changes are made: can_approve_pull_request_reviews
+#     MUST stay false (security risk if set to true) and default_workflow_permissions
+#     is unrelated to the gate blocker.
 #
 #   RUNBOOK — Actions fork-PR approval policy (no REST API)
 #     GitHub does not expose the "Require approval for outside
@@ -137,43 +138,37 @@ fi
 
 echo ""
 
-# ── FIX 2: Actions default workflow permissions ───────────────────────────────
+# ── INFO: Actions default workflow permissions (read-only) ───────────────────
+#
+# These values are reported for operator awareness only.  The script does NOT
+# write to the workflow-permissions endpoint because:
+#
+#   default_workflow_permissions     — unrelated to the workflow-gate blocker.
+#   can_approve_pull_request_reviews — MUST remain false (the default).  Setting
+#     it to true would allow the GITHUB_TOKEN inside any Actions workflow to
+#     approve pull requests, enabling a workflow to self-approve and satisfy
+#     branch protection with no human in the loop.  That is a security risk
+#     unrelated to fixing #586.
+#
+# The actual fix for the gate blocker is the web-UI runbook printed below.
 
-echo "── Fix 2: Actions default workflow permissions ──────────────────────────"
+echo "── Info: Actions workflow permissions (read-only, no changes made) ─────"
 echo ""
 
 WORKFLOW_PERMS=$(gh api "/repos/${REPO}/actions/permissions/workflow" 2>/dev/null) || {
-  echo "  ⚠  Could not read workflow permissions — skipping."
+  echo "  ⚠  Could not read workflow permissions (may require admin scope)."
   WORKFLOW_PERMS="{}"
 }
 
 CURRENT_DEFAULT=$(echo "$WORKFLOW_PERMS" \
-  | jq -r '.default_workflow_permissions // "null"')
+  | jq -r '.default_workflow_permissions // "unavailable"')
 CURRENT_CAN_APPROVE=$(echo "$WORKFLOW_PERMS" \
-  | jq -r '.can_approve_pull_request_reviews // "null"')
+  | jq -r '.can_approve_pull_request_reviews // "unavailable"')
 
-echo "  default_workflow_permissions     : $CURRENT_DEFAULT"
-echo "  can_approve_pull_request_reviews : $CURRENT_CAN_APPROVE"
+echo "  default_workflow_permissions     : $CURRENT_DEFAULT  (informational)"
+echo "  can_approve_pull_request_reviews : $CURRENT_CAN_APPROVE  (informational)"
 echo ""
-
-if [[ "$CURRENT_DEFAULT" != "null" ]] && [[ "$CURRENT_CAN_APPROVE" != "null" ]]; then
-  if [[ "$CURRENT_DEFAULT" == "write" ]] && [[ "$CURRENT_CAN_APPROVE" == "true" ]]; then
-    echo "  ✓ Workflow permissions are already correct — no change needed."
-  else
-    gh api --method PUT "/repos/${REPO}/actions/permissions/workflow" \
-      --field default_workflow_permissions=write \
-      --field can_approve_pull_request_reviews=true > /dev/null
-    echo "  ✓ Updated:"
-    echo "      default_workflow_permissions     → write"
-    echo "      can_approve_pull_request_reviews → true"
-    CHANGED=1
-  fi
-else
-  echo "  ⚠  API returned no data — the endpoint may require admin:org scope"
-  echo "     (organisation repos only) or broader write permissions."
-  echo "     Skipping automatic update; follow the web-UI runbook below."
-fi
-
+echo "  No changes made — see comments in the script for rationale."
 echo ""
 
 # ── RUNBOOK: Actions fork-PR approval policy ─────────────────────────────────

@@ -175,9 +175,11 @@ exits 0 without making changes if a setting is already correct.
    existing setting (required status checks, review count, admin enforcement,
    restrictions, etc.).
 3. Confirms the write took effect.
-4. Sets `default_workflow_permissions = write` and
-   `can_approve_pull_request_reviews = true` via
-   `PUT /repos/{owner}/{repo}/actions/permissions/workflow`.
+4. Reports `default_workflow_permissions` and `can_approve_pull_request_reviews`
+   for operator awareness — **no changes are made** to these values.
+   `can_approve_pull_request_reviews` must remain `false`; enabling it would
+   allow workflow tokens to self-approve PRs, removing the human-approval
+   requirement.
 
 **What must be done manually (web UI):**
 
