@@ -1,0 +1,322 @@
+name: 🐛 Defect Tracker
+
+# Triggered when a label is added to an issue (defect intake), and on a
+# weekly schedule (escape-rate dashboard).
+
+on:
+  issues:
+    types: [labeled]
+  schedule:
+    - cron: '0 9 * * 1'   # Every Monday 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Job 1: Log a production escape
+  #   Fires when the "production" label is added to a bug issue.
+  #   Attributes the escape to a commit, appends a record to
+  #   docs/defect-log.json, commits it back to main, and comments on the issue.
+  # ─────────────────────────────────────────────────────────────────────────────
+  log-escape:
+    name: Log Production Escape
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'issues' &&
+      github.event.label.name == 'production'
+
+    steps:
+      - name: Verify issue has both bug and production labels
+        id: verify
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const labels = issue.labels.map(l => l.name);
+            const hasBug  = labels.includes('bug');
+            const hasProd = labels.includes('production');
+
+            if (!hasBug || !hasProd) {
+              core.setOutput('skip', 'true');
+              console.log(`Skipping: issue labels are [${labels.join(', ')}] — need both 'bug' and 'production'.`);
+              return;
+            }
+
+            // Parse affected URL from issue body
+            const body = issue.body || '';
+            const urlMatch  = body.match(/###\s*Affected Page \/ URL\s*\n+\s*(\S+)/);
+            const areaMatch = body.match(/###\s*Affected Requirement Area\s*\n+\s*(.+)/);
+
+            const affectedUrl = urlMatch  ? urlMatch[1].trim()  : 'unknown';
+            const areaRaw     = areaMatch ? areaMatch[1].trim() : '';
+            const areaName    = areaRaw
+              .replace(/\s*\(REQ-.*$/, '')
+              .trim()
+              .toLowerCase()
+              .replace(/\s+/g, '-') || 'general';
+            const reqIds      = [...areaRaw.matchAll(/REQ-[A-Z]+-\d+/g)].map(m => m[0]);
+
+            core.setOutput('skip',          'false');
+            core.setOutput('issue_number',  String(issue.number));
+            core.setOutput('issue_title',   issue.title);
+            core.setOutput('affected_url',  affectedUrl);
+            core.setOutput('affected_area', areaName);
+            core.setOutput('req_ids',       reqIds.join(','));
+
+      - name: Checkout repository
+        if: steps.verify.outputs.skip != 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Attribute escape to a commit
+        if: steps.verify.outputs.skip != 'true'
+        id: attr
+        env:
+          AFFECTED_URL: ${{ steps.verify.outputs.affected_url }}
+        run: |
+          # Map the affected URL to one or more file paths for git-log lookup.
+          SEARCH_PATHS=""
+          if echo "$AFFECTED_URL" | grep -qE "^(https?://[^/]+)?/[0-9]{4}/[0-9]{2}/[0-9]{2}/"; then
+            # Post permalink: /YYYY/MM/DD/slug/ → look in _posts/
+            SLUG=$(echo "$AFFECTED_URL" | sed 's|.*[0-9]\{4\}/[0-9]\{2\}/[0-9]\{2\}/||;s|/$||')
+            SEARCH_PATHS="_posts/*${SLUG}*"
+          elif echo "$AFFECTED_URL" | grep -qiE "(^|/)blog/?$"; then
+            SEARCH_PATHS="blog/index.html _layouts/post.html _sass/economist-theme.scss"
+          elif echo "$AFFECTED_URL" | grep -qiE "(^|/)search/?$"; then
+            SEARCH_PATHS="search.html search.json"
+          elif echo "$AFFECTED_URL" | grep -qiE "nav|menu|header"; then
+            SEARCH_PATHS="_layouts/default.html _includes/ _sass/economist-theme.scss"
+          else
+            SEARCH_PATHS="_layouts/ _sass/ _includes/"
+          fi
+
+          # Find the last commit that touched those paths (best-effort).
+          COMMIT_SHA=""
+          for P in $SEARCH_PATHS; do
+            CANDIDATE=$(git log --oneline -1 -- $P 2>/dev/null | awk '{print $1}')
+            if [ -n "$CANDIDATE" ]; then
+              COMMIT_SHA="$CANDIDATE"
+              break
+            fi
+          done
+
+          # Fall back to the last merge commit on main.
+          if [ -z "$COMMIT_SHA" ]; then
+            COMMIT_SHA=$(git log --oneline -1 --merges 2>/dev/null | awk '{print $1}')
+          fi
+
+          # Final fallback: most recent commit on the branch.
+          if [ -z "$COMMIT_SHA" ]; then
+            COMMIT_SHA=$(git log --oneline -1 | awk '{print $1}')
+          fi
+
+          echo "attributed_commit=${COMMIT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "Attributed escape to commit: ${COMMIT_SHA}"
+
+      - name: Append record to docs/defect-log.json
+        if: steps.verify.outputs.skip != 'true'
+        env:
+          ISSUE_NUMBER:   ${{ steps.verify.outputs.issue_number }}
+          ISSUE_TITLE:    ${{ steps.verify.outputs.issue_title }}
+          AFFECTED_AREA:  ${{ steps.verify.outputs.affected_area }}
+          REQ_IDS:        ${{ steps.verify.outputs.req_ids }}
+          COMMIT_SHA:     ${{ steps.attr.outputs.attributed_commit }}
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, re
+          from datetime import datetime, timezone
+
+          log_path = 'docs/defect-log.json'
+          try:
+              with open(log_path, 'r') as f:
+                  log = json.load(f)
+          except (FileNotFoundError, json.JSONDecodeError):
+              log = []
+
+          req_ids_raw = os.environ.get('REQ_IDS', '').strip()
+          req_ids = [r.strip() for r in req_ids_raw.split(',') if r.strip()] if req_ids_raw else []
+
+          entry = {
+              "issue":                    int(os.environ['ISSUE_NUMBER']),
+              "title":                    os.environ['ISSUE_TITLE'],
+              "detected":                 datetime.now(timezone.utc).strftime('%Y-%m-%d'),
+              "attributed_commit":        os.environ['COMMIT_SHA'],
+              "affected_area":            os.environ['AFFECTED_AREA'],
+              "req_ids":                  req_ids,
+              "regression_test_created":  False,
+          }
+
+          # Avoid duplicate entries for the same issue.
+          existing_issues = {e.get('issue') for e in log}
+          if entry['issue'] in existing_issues:
+              print(f"Issue #{entry['issue']} already logged — skipping duplicate.")
+          else:
+              log.append(entry)
+              with open(log_path, 'w') as f:
+                  json.dump(log, f, indent=2)
+                  f.write('\n')
+              print(f"Appended defect entry for issue #{entry['issue']} (commit {entry['attributed_commit']})")
+          PYEOF
+
+      - name: Commit defect log back to main
+        if: steps.verify.outputs.skip != 'true'
+        env:
+          ISSUE_NUMBER: ${{ steps.verify.outputs.issue_number }}
+          COMMIT_SHA:   ${{ steps.attr.outputs.attributed_commit }}
+        run: |
+          git config user.email "defect-tracker@github.com"
+          git config user.name  "Defect Tracker"
+
+          git add docs/defect-log.json
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit (entry may already exist)."
+            exit 0
+          fi
+
+          # Pull latest to minimise push conflicts.
+          git pull --rebase origin main || true
+
+          git commit -m "chore(defects): log production escape for issue #${ISSUE_NUMBER}
+
+          Attributed to commit ${COMMIT_SHA}.
+          Workflow run: ${{ github.run_id }}"
+
+          git push
+
+      - name: Comment on issue
+        if: steps.verify.outputs.skip != 'true'
+        uses: actions/github-script@v8
+        env:
+          COMMIT_SHA: ${{ steps.attr.outputs.attributed_commit }}
+        with:
+          script: |
+            const sha = process.env.COMMIT_SHA || 'unknown';
+            await github.rest.issues.createComment({
+              owner:        context.repo.owner,
+              repo:         context.repo.repo,
+              issue_number: context.issue.number,
+              body: `🐛 **Escape logged.** Attributed to commit \`${sha}\`. Regression test pending — Story C will generate it.\n\n_Defect record appended to \`docs/defect-log.json\`._`,
+            });
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Job 2: Weekly escape-rate dashboard
+  #   Runs every Monday 09:00 UTC (or on workflow_dispatch).
+  #   Reads docs/defect-log.json and writes a Markdown summary to
+  #   $GITHUB_STEP_SUMMARY so it appears in the workflow run detail page.
+  # ─────────────────────────────────────────────────────────────────────────────
+  escape-rate-summary:
+    name: Weekly Escape Rate Summary
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate escape rate report
+        run: |
+          python3 - <<'PYEOF'
+          import json, os
+          from datetime import datetime, timedelta, timezone
+
+          log_path = 'docs/defect-log.json'
+          try:
+              with open(log_path, 'r') as f:
+                  log = json.load(f)
+          except (FileNotFoundError, json.JSONDecodeError):
+              log = []
+
+          now          = datetime.now(timezone.utc)
+          week_ago     = now - timedelta(days=7)
+          four_wk_ago  = now - timedelta(days=28)
+
+          def parse_date(d):
+              try:
+                  return datetime.fromisoformat(d).replace(tzinfo=timezone.utc)
+              except Exception:
+                  return None
+
+          recent     = [e for e in log if parse_date(e.get('detected', '')) and parse_date(e['detected']) >= week_ago]
+          four_week  = [e for e in log if parse_date(e.get('detected', '')) and parse_date(e['detected']) >= four_wk_ago]
+          pending    = [e for e in log if not e.get('regression_test_created', False)]
+
+          area_counts = {}
+          for e in log:
+              area = e.get('affected_area', 'unknown')
+              area_counts[area] = area_counts.get(area, 0) + 1
+
+          lines = [
+              '## 🐛 Production Escape Rate — Weekly Summary',
+              f'> Generated: {now.strftime("%Y-%m-%d %H:%M UTC")}',
+              '',
+              '### Metrics',
+              '| Metric | Count |',
+              '|--------|-------|',
+              f'| Total escapes (all time) | {len(log)} |',
+              f'| Escapes this week | {len(recent)} |',
+              f'| Escapes last 28 days | {len(four_week)} |',
+              f'| Regression tests pending | {len(pending)} |',
+              '',
+          ]
+
+          if area_counts:
+              lines += [
+                  '### Escapes by Area',
+                  '| Area | Count |',
+                  '|------|-------|',
+              ]
+              for area, count in sorted(area_counts.items(), key=lambda x: -x[1]):
+                  lines.append(f'| {area} | {count} |')
+              lines.append('')
+
+          if recent:
+              lines += [
+                  "### This Week's Escapes",
+                  '| Issue | Title | Commit | Area |',
+                  '|-------|-------|--------|------|',
+              ]
+              for e in recent:
+                  num   = e.get('issue', '?')
+                  title = e.get('title', '').replace('|', '\\|')
+                  sha   = e.get('attributed_commit', 'unknown')
+                  area  = e.get('affected_area', 'unknown')
+                  lines.append(f'| #{num} | {title} | `{sha}` | {area} |')
+              lines.append('')
+          else:
+              lines += ['_No production escapes this week._ ✅', '']
+
+          if pending:
+              lines += [
+                  '### ⚠️ Regression Tests Pending (Story C)',
+                  '| Issue | Title | Commit |',
+                  '|-------|-------|--------|',
+              ]
+              for e in pending:
+                  num   = e.get('issue', '?')
+                  title = e.get('title', '').replace('|', '\\|')
+                  sha   = e.get('attributed_commit', 'unknown')
+                  lines.append(f'| #{num} | {title} | `{sha}` |')
+              lines.append('')
+
+          summary = '\n'.join(lines)
+          print(summary)
+
+          step_summary = os.environ.get('GITHUB_STEP_SUMMARY', '')
+          if step_summary:
+              with open(step_summary, 'a') as f:
+                  f.write(summary + '\n')
+          PYEOF

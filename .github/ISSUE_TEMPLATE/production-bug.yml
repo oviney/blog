@@ -1,0 +1,78 @@
+name: Production Bug Report
+description: Report a bug that reached the live site (viney.ca)
+title: "[PROD BUG]: "
+labels:
+  - bug
+  - production
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to report a bug that has escaped to production at **viney.ca**.
+        Submitting this issue triggers the defect-tracker workflow, which attributes the
+        escape to a commit and logs it for regression-test generation (Story C).
+
+  - type: input
+    id: affected_url
+    attributes:
+      label: Affected Page / URL
+      description: Full URL of the broken page on viney.ca (or localhost path during local repro).
+      placeholder: "https://viney.ca/blog/"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Numbered steps to reproduce the issue.
+      placeholder: |
+        1. Navigate to https://viney.ca/blog/
+        2. Resize browser to 320 px wide
+        3. Observe the navigation menu
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behaviour
+      description: What should happen?
+      placeholder: Navigation menu should remain accessible and usable at 320 px.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behaviour
+      description: What actually happens?
+      placeholder: Navigation links overlap and become unclickable at 320 px.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: req_area
+    attributes:
+      label: Affected Requirement Area
+      description: Which requirement area does this bug belong to?
+      options:
+        - Navigation (REQ-NAV-01)
+        - Blog / Post Layout (REQ-BLOG-01)
+        - Homepage (REQ-HOME-01)
+        - Search (REQ-SEARCH-01)
+        - Performance (REQ-PERF-01)
+        - Security (REQ-SEC-01)
+        - SEO (REQ-SEO-01)
+        - Accessibility (REQ-A11Y-01)
+        - Other (REQ-OTHER-01)
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots / Additional Context
+      description: Paste screenshots, console errors, or any other relevant information.
+    validations:
+      required: false
