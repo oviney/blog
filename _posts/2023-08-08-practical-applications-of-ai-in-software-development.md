@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "The coder's crutch: why AI-assisted development is creating more problems than it solves"
+title: "The coder's crutch: AI-assisted development's hidden costs"
 date: 2023-08-08
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Software Engineering"]
 image: /assets/images/ai-coders-crutch.png
 description: "AI tools like Copilot now write 46% of code on GitHub. Developers ship faster—but understand less, creating compounding technical debt."
@@ -29,6 +29,14 @@ Stripped of marketing, AI coding tools deliver a consistent 15-20% net productiv
 The organisations extracting genuine value share a common practice: they restrict AI assistance to domains where comprehension is not required for maintenance. Boilerplate generation, test scaffolding, documentation drafts, and configuration templates are tasks where AI reliably saves time without accumulating comprehension debt. Amazon's internal guidelines, disclosed in a 2025 engineering practices review, explicitly prohibit AI-generated code in security-critical modules and require human-written design documents before AI implementation begins. Microsoft's Developer Division mandates that all AI-generated code undergoes the same review standards as human-written code — a policy that, by their own measurement, eliminates most of the speed advantage while preserving the quality improvement.
 
 The crutch works when the patient knows how to walk without it. For everyone else, it substitutes speed for understanding — a trade that compounds in cost with every deployment. The most consequential question for engineering leadership is not whether to adopt AI tools — that debate is settled — but whether to invest equally in the developer learning that prevents those tools from becoming a substitute for competence.
+
+## The calibration challenge
+
+Organisations that have navigated this tension successfully share a common approach: they treat AI tools as a calibration problem, not a deployment problem. The question is not which tools to enable but for whom, at what stage, and on which task types.
+
+Stripe's engineering guidelines, published in a 2025 internal review, segment AI assistance by experience level and task sensitivity. Engineers with fewer than two years of experience use AI tools only for test scaffolding and documentation — domains where errors are caught quickly and the cost of not understanding the output is low. Experienced engineers use AI more freely, having developed the critical faculty to detect when generated code is plausible but wrong. This staged approach produced, by Stripe's internal metrics, a 28% net productivity gain without the comprehension debt that broad, undifferentiated adoption creates.
+
+According to the 2025 Stack Overflow Developer Survey, 62% of developers reported that AI tools had reduced the time they spent reading documentation — a troubling finding, since documentation reading is precisely how engineers build the contextual understanding that separates good AI output from bad. Speed gains that come at the cost of comprehension are not efficiency improvements. They are deferred liabilities, accumulating invisibly in codebases that developers no longer fully understand.
 
 ## References
 
