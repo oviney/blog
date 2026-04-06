@@ -236,3 +236,51 @@ when `all_pass` is `false` to identify which governance rule was violated.
 
 Fixture evaluations for reference PRs live in `.agent-evals/`
 (e.g. `565.json`, `569.json`, `574.json`).
+## Agent Merge Unblocker
+
+A small collection of standalone scripts that correct repository settings which
+can silently block Copilot-agent PRs from merging.  Each script is idempotent,
+uses only `gh` CLI and `jq`, and follows a read → modify → write → verify
+pattern so that no other protection setting is disturbed.
+
+### Require up-to-date branches
+
+**Script:** `scripts/require-up-to-date-branches.sh`
+
+#### What it does
+
+Patches `required_status_checks.strict → true` on the `main` branch
+protection.  With this enabled, a PR cannot merge unless its base commit equals
+the current tip of `main`, forcing an explicit rebase or merge-up that either
+surfaces conflicts or confirms the diff is genuinely in-scope.
+
+The script follows a strict read-modify-write pattern:
+
+1. Reads the full branch-protection payload for `main` via `GET /repos/{owner}/{repo}/branches/main/protection`.
+2. If `required_status_checks.strict` is already `true`, prints `✓` and exits 0 with **no API writes**.
+3. Otherwise, builds a `PUT` payload that sets `strict → true` while preserving every other existing setting (review counts, dismiss-stale, code-owner reviews, restrictions, enforce-admins, etc.).
+4. Verifies the write took effect by re-reading the endpoint and comparing.
+5. Exits 1 on any API failure with a clear error message.
+
+#### Why it is needed
+
+The RCA in [#590](https://github.com/oviney/blog/issues/590) identified the primary root cause of phantom commits seen in PRs [#576](https://github.com/oviney/blog/issues/576), [#561](https://github.com/oviney/blog/issues/561), and [#578](https://github.com/oviney/blog/issues/578): all three branches forked from `main` before a large merge landed.  Copilot's platform auto-update mechanism then cherry-picked `main`'s new commits onto each stale branch with the original author date preserved, making the phantom commits invisible in reviewer diffs.
+
+Requiring branches to be up to date before merge eliminates this failure mode at the root: Copilot must rebase or merge `main` explicitly, producing a visible, auditable diff.
+
+#### Usage
+
+```bash
+# Requires: gh CLI (authenticated as a repo admin), jq
+bash scripts/require-up-to-date-branches.sh [owner/repo]
+```
+
+`owner/repo` defaults to `oviney/blog`.  The script is safe to run with any
+admin-scoped `gh` token.
+
+#### When to re-run
+
+Re-run any time branch-protection settings are reset — for example after a
+GitHub UI change, a repository transfer, or a new admin modifying the
+settings.  The script is safe to run repeatedly; it exits 0 immediately when
+the setting is already correct.
