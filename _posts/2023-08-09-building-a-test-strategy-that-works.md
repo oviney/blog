@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "The test strategy trap: why most quality plans fail before they start"
+title: "The test strategy trap: why quality plans fail"
 date: 2023-08-09
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering"]
 image: /assets/images/test-strategy-trap.png
 description: "88% of organisations have a documented test strategy. Only 23% believe it works. An examination of why quality plans fail before the first test runs."
@@ -16,13 +16,15 @@ The typical test strategy remains a 40-page Confluence artifact written during a
 
 This is not a documentation problem. It is an incentive problem. The person who writes the test strategy is rewarded for its completeness at the time of creation. Nobody is measured on its accuracy six months later. The strategy becomes a compliance artifact — evidence that planning occurred — rather than an operational tool that guides daily testing decisions.
 
+One illustrative failure mode: a financial services firm with 1,200 engineers developed a 60-page test strategy in Q1 that mandated complete API contract testing across 47 microservices. By Q3, the teams responsible had quietly replaced it with ad hoc integration testing — not because the mandate was wrong, but because the strategy had been written without consulting the engineers responsible for third-party service integrations. Three of those services had no sandbox environment. The strategy had assumed they did.
+
 ## The automation fantasy
 
 Test strategies routinely commit to automation targets that the organisation lacks the infrastructure, skills, or budget to achieve. According to the LinkedIn article "Your AI Testing Tools Won't Save You" published in December 2025, the median organisation achieved fewer than 30% of its stated automation goals within planned timeframes. The remaining 70% was deferred, descoped, or quietly abandoned.
 
 The pattern is predictable. A strategy mandates 80% automation coverage. The team automates the easy tests first — login flows, simple CRUD operations, happy-path scenarios. These reach 40% coverage quickly and the progress charts look encouraging. Then the team encounters integration tests, tests requiring complex data setups, and tests dependent on third-party services. Progress stalls. The remaining 40% would cost three times as much as the first 40%, and nobody budgeted for that.
 
-Qyrus's 2026 Guide to Software Testing Cost Estimation documented this dynamic precisely: organisations that forecasted automation costs based on initial pilot results underestimated total programme costs by an average factor of 2.8. The pilot's clean, well-documented APIs bore little resemblance to the sprawling reality of enterprise software.
+Qyrus's 2026 Guide to Software Testing Cost Estimation documented this dynamic precisely: organisations that forecasted automation costs based on initial pilot results underestimated total programme costs by an average factor of 2.8. The pilot's clean, well-documented APIs bore little resemblance to the sprawling reality of enterprise software. The hidden costs of maintaining those automation assets compound the problem further — as explored in [Test automation's hidden ledger: the costs nobody budgets for](/2026/04/04/the-real-cost-of-test-automation--balancing-speed-and-sustai/).
 
 ## What separates the effective minority
 
@@ -30,7 +32,7 @@ The 19% of organisations that reported effective test strategies shared three ch
 
 Netflix's test engineering team exemplifies this approach. The company reviews its quality strategy quarterly, adjusting automation targets based on the previous quarter's actual maintenance costs. The strategy is a spreadsheet with real numbers, not a slide deck with aspirations. The discipline to measure honestly — and to revise the plan when reality diverges from projection — is what separates the effective minority from the well-documented majority.
 
-The organisations that test well are not the ones with the thickest strategy documents. They are the ones willing to admit, quarterly, that their previous strategy was wrong.
+The organisations that test well are not the ones with the thickest strategy documents. They are the ones willing to admit, quarterly, that their previous strategy was wrong. Strategy documents are only as useful as the feedback loops that keep them accurate — and most organisations have neither the cadence nor the metrics to close those loops before the strategy has already drifted into irrelevance.
 
 ## References
 
