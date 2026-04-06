@@ -1,0 +1,246 @@
+name: Auto-Regression Suite Growth
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  generate-regression-test:
+    name: Generate Playwright Regression Test
+    runs-on: ubuntu-latest
+    # Trigger when 'production' is applied to an existing 'bug' issue,
+    # OR when 'bug' is applied to an issue already labelled 'production'
+    if: |
+      (github.event.label.name == 'production' && contains(github.event.issue.labels.*.name, 'bug')) ||
+      (github.event.label.name == 'bug' && contains(github.event.issue.labels.*.name, 'production'))
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Extract issue metadata
+        id: issue
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Generate URL-safe slug from issue title (max 40 chars)
+          SLUG=$(printf '%s' "$ISSUE_TITLE" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed 's/[^a-z0-9]/-/g' \
+            | sed 's/-\{2,\}/-/g' \
+            | sed 's/^-\|-$//g' \
+            | cut -c1-40)
+          echo "slug=${SLUG}" >> "$GITHUB_OUTPUT"
+          echo "issue_number=${ISSUE_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "issue_url=${ISSUE_URL}" >> "$GITHUB_OUTPUT"
+          echo "repo=${REPO}" >> "$GITHUB_OUTPUT"
+
+          # Extract REQ IDs (e.g. REQ-NAV-01, REQ-SEO-02) from issue body
+          REQ_IDS=$(printf '%s' "$ISSUE_BODY" \
+            | grep -oE 'REQ-[A-Z]+-[0-9]+' \
+            | paste -sd ',' - || true)
+          if [ -z "$REQ_IDS" ]; then
+            REQ_IDS="REQ-UNKNOWN"
+          fi
+          echo "req_ids=${REQ_IDS}" >> "$GITHUB_OUTPUT"
+
+          # Derive group tag from first REQ ID prefix
+          FIRST_REQ=$(printf '%s' "$REQ_IDS" | cut -d',' -f1)
+          AREA_CODE=$(printf '%s' "$FIRST_REQ" \
+            | sed 's/REQ-\([A-Z]*\)-.*/\1/' \
+            | tr '[:upper:]' '[:lower:]')
+          case "$AREA_CODE" in
+            nav)      AREA="navigation" ;;
+            seo)      AREA="seo" ;;
+            content)  AREA="content" ;;
+            a11y)     AREA="accessibility" ;;
+            perf)     AREA="performance" ;;
+            *)        AREA="regression" ;;
+          esac
+          echo "area=${AREA}" >> "$GITHUB_OUTPUT"
+
+          # Extract first non-GitHub URL from issue body as the reproduction URL
+          REPRO_URL=$(printf '%s' "$ISSUE_BODY" \
+            | grep -oE 'https?://[^[:space:]>)]+' \
+            | grep -v 'github\.com' \
+            | head -1 || true)
+          if [ -z "$REPRO_URL" ]; then
+            REPRO_URL="https://www.viney.ca/"
+          fi
+          echo "repro_url=${REPRO_URL}" >> "$GITHUB_OUTPUT"
+
+          # Extract reproduction steps section and encode as base64 to preserve newlines
+          STEPS=$(printf '%s' "$ISSUE_BODY" \
+            | awk '/##.*[Ss]teps|##.*[Rr]eproduc/{found=1; next} found && /^##/{exit} found && NF{print}' \
+            | head -10 || true)
+          STEPS_B64=$(printf '%s' "$STEPS" | base64 -w 0 || true)
+          echo "steps_b64=${STEPS_B64}" >> "$GITHUB_OUTPUT"
+
+          echo "Extracted: issue=#${ISSUE_NUMBER} area=${AREA} req_ids=${REQ_IDS} slug=${SLUG}"
+
+      - name: Generate regression test file
+        id: gen-test
+        env:
+          ISSUE_NUMBER: ${{ steps.issue.outputs.issue_number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_URL: ${{ steps.issue.outputs.issue_url }}
+          SLUG: ${{ steps.issue.outputs.slug }}
+          AREA: ${{ steps.issue.outputs.area }}
+          REQ_IDS: ${{ steps.issue.outputs.req_ids }}
+          REPRO_URL: ${{ steps.issue.outputs.repro_url }}
+          STEPS_B64: ${{ steps.issue.outputs.steps_b64 }}
+          REPO: ${{ steps.issue.outputs.repo }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/generate-regression-test.js >> "$GITHUB_OUTPUT"
+
+      - name: Update defect-log.json (initial entry)
+        env:
+          ISSUE_NUMBER: ${{ steps.issue.outputs.issue_number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_URL: ${{ steps.issue.outputs.issue_url }}
+          AREA: ${{ steps.issue.outputs.area }}
+          REQ_IDS: ${{ steps.issue.outputs.req_ids }}
+          TEST_FILE: ${{ steps.gen-test.outputs.test_file }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/update-defect-log.js
+
+      - name: Create branch and push changes
+        id: branch
+        env:
+          ISSUE_NUMBER: ${{ steps.issue.outputs.issue_number }}
+          SLUG: ${{ steps.issue.outputs.slug }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          BRANCH="regression/issue-${ISSUE_NUMBER}-${SLUG}"
+          echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add tests/playwright-agents/regression/ docs/defect-log.json
+          git commit -m "test(regression): add Playwright regression for issue #${ISSUE_NUMBER}"
+          git push origin "$BRANCH"
+          echo "Pushed branch: ${BRANCH}"
+
+      - name: Create draft pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.issue.outputs.issue_number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_URL: ${{ steps.issue.outputs.issue_url }}
+          SLUG: ${{ steps.issue.outputs.slug }}
+          TEST_FILE: ${{ steps.gen-test.outputs.test_file }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          node scripts/generate-pr-body.js
+
+          PR_URL=$(gh pr create \
+            --repo "${REPO}" \
+            --title "test(regression): Playwright regression for issue #${ISSUE_NUMBER} — ${SLUG}" \
+            --body-file /tmp/pr-body.md \
+            --base main \
+            --head "${BRANCH}" \
+            --draft)
+
+          PR_NUMBER=$(printf '%s' "$PR_URL" | grep -oE '[0-9]+$')
+          echo "pr_number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "pr_url=${PR_URL}" >> "$GITHUB_OUTPUT"
+          echo "Created draft PR #${PR_NUMBER}: ${PR_URL}"
+
+      - name: Update defect-log.json with PR number
+        env:
+          ISSUE_NUMBER: ${{ steps.issue.outputs.issue_number }}
+          REGRESSION_PR: ${{ steps.pr.outputs.pr_number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          node scripts/update-defect-log.js
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/defect-log.json
+          git diff --cached --quiet \
+            || git commit -m "docs: record regression PR #${REGRESSION_PR} in defect-log for issue #${ISSUE_NUMBER}"
+          git push origin "$BRANCH"
+          echo "defect-log.json updated with PR #${REGRESSION_PR}"
+
+      - name: Comment on bug issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.issue.outputs.issue_number }}
+          PR_NUMBER: ${{ steps.pr.outputs.pr_number }}
+          PR_URL: ${{ steps.pr.outputs.pr_url }}
+          TEST_FILE: ${{ steps.gen-test.outputs.test_file }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          node - << 'EOF'
+          const fs = require('fs');
+          const body = [
+            `Regression test draft PR #${process.env.PR_NUMBER} opened.`,
+            ``,
+            `Auto-generated Playwright regression test: \`${process.env.TEST_FILE}\``,
+            `PR: ${process.env.PR_URL}`,
+            ``,
+            `Next steps:`,
+            `1. Review the generated test in the draft PR`,
+            `2. Verify the test reproduces the bug`,
+            `3. Confirm the test passes on the fixed code`,
+            `4. Merge the PR to close this coverage gap`,
+            ``,
+            `This is a skeleton test — human review is required before merging.`,
+          ].join('\n');
+          fs.writeFileSync('/tmp/issue-comment.md', body, 'utf8');
+          EOF
+
+          gh issue comment "${ISSUE_NUMBER}" \
+            --repo "${REPO}" \
+            --body-file /tmp/issue-comment.md
+
+          echo "Commented on issue #${ISSUE_NUMBER}"
+
+      - name: Generate regression coverage report
+        if: always()
+        env:
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/regression-coverage-report.js
