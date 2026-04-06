@@ -2,8 +2,8 @@
 layout: post
 title: "Testing times: why AI conquered QA without improving it"
 date: 2025-12-31
-author: "The Economist"
-categories: ["Quality Engineering", "AI Testing"]
+author: "Ouray Viney"
+categories: ["Quality Engineering"]
 image: /assets/images/testing-times-renovation.png
 description: "80% of software teams will use AI testing tools by 2025. Vendors raised $2.3 billion. Yet defect rates remain unchanged. An examination of the gap."
 ---
@@ -33,6 +33,8 @@ This shift creates a paradox for the profession. Junior testing roles — the tr
 ## The uncomfortable equilibrium
 
 Testing has reached an uncomfortable equilibrium where AI tools are too useful to abandon but too unreliable to trust without substantial human oversight. Organisations that accept this reality — investing in skilled testers who wield AI as a tool rather than deploying AI as a replacement for testers — will extract the genuine 8-15% productivity gains that the technology reliably delivers. Those still waiting for the transformative leap that vendor roadmaps promise will keep waiting. The revolution was always going to be a renovation.
+
+The financial implications of this equilibrium are significant. When AI tools deliver 8% net productivity gains but are marketed as delivering 40-60%, organisations that built headcount reductions into their business cases face an unpleasant reckoning. According to Gartner's 2025 survey of QA leaders, 44% reported that their AI testing investments had not delivered the cost reductions they had projected — not because the tools failed, but because the projections were unrealistic from the outset. Understanding what AI testing tools actually deliver, rather than what they promise, is the prerequisite to making sound investment decisions. The [hidden technical debt of test automation](/2026/01/18/the-hidden-technical-debt-of-test-automation/) compounds this challenge: organisations that automate at scale without accounting for the full maintenance burden discover that their AI investment has added complexity rather than removing it.
 
 ## References
 
