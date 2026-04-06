@@ -1,0 +1,405 @@
+name: 🤖 CI Orchestrator
+
+# Runs every 15 minutes and acts as conductor for oviney/blog (and optionally
+# oviney/economist-agents via ORCHESTRATOR_TOKEN).
+#
+# Responsibilities:
+#   1. PR lifecycle  — promote drafts, merge passing PRs, rebase conflicts,
+#                      close duplicate PRs
+#   2. Stall detection — initial-plan PRs idle >45 min → close + reassign
+#   3. Backlog dispatch — assign oldest unassigned P1/P2 to @copilot (max 6)
+#   4. Escalation  — idle >2h with unresolved state → needs-human-review
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # every 15 minutes
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview actions without executing them'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+
+env:
+  DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+  # Cross-repo token (optional — only needed for economist-agents operations)
+  ORCHESTRATOR_TOKEN: ${{ secrets.ORCHESTRATOR_TOKEN }}
+
+jobs:
+  orchestrate:
+    name: Orchestrator Run
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Run orchestrator
+        uses: actions/github-script@v7
+        env:
+          DRY_RUN: ${{ env.DRY_RUN }}
+          ORCHESTRATOR_TOKEN: ${{ env.ORCHESTRATOR_TOKEN }}
+        with:
+          # Use ORCHESTRATOR_TOKEN when available so cross-repo writes are
+          # authenticated; fall back to the built-in GITHUB_TOKEN.
+          github-token: ${{ secrets.ORCHESTRATOR_TOKEN || secrets.GITHUB_TOKEN }}
+          script: |
+            // ─────────────────────────────────────────────────────────────────
+            // Helpers
+            // ─────────────────────────────────────────────────────────────────
+            const DRY_RUN = process.env.DRY_RUN === 'true';
+            const NOW      = Date.now();
+            const MIN      = 60 * 1000;
+
+            function minutesAgo(dateStr) {
+              return (NOW - new Date(dateStr).getTime()) / MIN;
+            }
+
+            // Summary lines collected during the run
+            const taken   = [];
+            const skipped = [];
+
+            // Capacity counter for @copilot draft PRs
+            let activeCopilotDraftPRs = 0;
+            const MAX_COPILOT_CAPACITY = 6;
+
+            async function exec(description, fn) {
+              if (DRY_RUN) {
+                console.log(`[DRY-RUN] Would: ${description}`);
+                taken.push(`🔍 [dry-run] ${description}`);
+                return;
+              }
+              try {
+                await fn();
+                taken.push(`✅ ${description}`);
+              } catch (err) {
+                taken.push(`❌ ${description} — ${err.message}`);
+                core.warning(`${description}: ${err.message}`);
+              }
+            }
+
+            // ─────────────────────────────────────────────────────────────────
+            // Fetch all open PRs for this repo
+            // ─────────────────────────────────────────────────────────────────
+            const { data: allPRs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              state: 'open',
+              per_page: 100,
+            });
+
+            // ─────────────────────────────────────────────────────────────────
+            // Helper: get the latest commit for a PR
+            // ─────────────────────────────────────────────────────────────────
+            async function getLatestCommit(pr) {
+              const { data: commits } = await github.rest.pulls.listCommits({
+                owner:       context.repo.owner,
+                repo:        context.repo.repo,
+                pull_number: pr.number,
+                per_page:    100,
+              });
+              return commits.length > 0 ? commits[commits.length - 1] : null;
+            }
+
+            function isInitialPlanCommit(message) {
+              if (!message) return false;
+              const lower = message.trim().toLowerCase();
+              return lower === 'initial plan' || lower === 'chore: initial plan';
+            }
+
+            // ─────────────────────────────────────────────────────────────────
+            // 1. PR LIFECYCLE MANAGEMENT
+            // ─────────────────────────────────────────────────────────────────
+
+            // Track issues referenced by open PRs (for duplicate detection)
+            const issueRefMap = {};   // issueNumber → [pr, ...]
+
+            for (const pr of allPRs) {
+              const idleMin = minutesAgo(pr.updated_at);
+
+              // Count @copilot draft PRs for capacity
+              if (pr.draft && pr.user?.login === 'copilot[bot]') {
+                activeCopilotDraftPRs++;
+              }
+
+              // ── Build issue reference map (same-repo refs only) ─────────────
+              // Match bare #NNN references that are NOT preceded by a repo slug
+              // (e.g. "Closes #42" matches, "oviney/other-repo#42" does not).
+              const bodyIssueNums = [...(pr.body ?? '').matchAll(/(?<![/\w])#(\d+)/g)]
+                .map(m => parseInt(m[1], 10));
+              for (const n of bodyIssueNums) {
+                if (!issueRefMap[n]) issueRefMap[n] = [];
+                issueRefMap[n].push(pr);
+              }
+
+              // ── 1a. Promote idle draft PRs that have feature commits ───────
+              if (pr.draft) {
+                const commit = await getLatestCommit(pr);
+                const lastMsg = commit?.commit?.message ?? '';
+                if (!isInitialPlanCommit(lastMsg) && idleMin >= 15) {
+                  await exec(
+                    `Promoted blog#${pr.number} to ready (idle ${Math.round(idleMin)}min, feature commit present)`,
+                    () => github.rest.pulls.update({
+                      owner:       context.repo.owner,
+                      repo:        context.repo.repo,
+                      pull_number: pr.number,
+                      draft:       false,
+                    })
+                  );
+                } else if (isInitialPlanCommit(lastMsg)) {
+                  // ── 2. STALL DETECTION ─────────────────────────────────────
+                  if (idleMin >= 45) {
+                    const comment = `🚨 Stalled after ${Math.round(idleMin)} min with no progress — reassigning`;
+                    await exec(
+                      `Closed stalled blog#${pr.number} (initial plan, idle ${Math.round(idleMin)}min)`,
+                      async () => {
+                        await github.rest.issues.createComment({
+                          owner:       context.repo.owner,
+                          repo:        context.repo.repo,
+                          issue_number: pr.number,
+                          body:        comment,
+                        });
+                        await github.rest.pulls.update({
+                          owner:       context.repo.owner,
+                          repo:        context.repo.repo,
+                          pull_number: pr.number,
+                          state:       'closed',
+                        });
+                        // Re-open the source issue(s) and reassign to @copilot
+                        for (const issueNum of bodyIssueNums) {
+                          try {
+                            await github.rest.issues.update({
+                              owner:        context.repo.owner,
+                              repo:         context.repo.repo,
+                              issue_number: issueNum,
+                              state:        'open',
+                              assignees:    ['copilot[bot]'],
+                            });
+                          } catch (e) { core.debug(`Re-open issue #${issueNum}: ${e.message}`); }
+                        }
+                      }
+                    );
+                  } else {
+                    skipped.push(`blog#${pr.number} — still in initial plan phase (${Math.round(idleMin)} min), watching`);
+                  }
+                }
+                continue;  // rest of lifecycle only applies to ready PRs
+              }
+
+              // ── 1b. Merge ready PRs where all checks pass + no conflicts ───
+              // Fetch the full PR to get mergeable_state
+              const { data: fullPR } = await github.rest.pulls.get({
+                owner:       context.repo.owner,
+                repo:        context.repo.repo,
+                pull_number: pr.number,
+              });
+
+              if (fullPR.mergeable_state === 'clean') {
+                // Verify commit status / check runs
+                const { data: checkStatus } = await github.rest.repos.getCombinedStatusForRef({
+                  owner: context.repo.owner,
+                  repo:  context.repo.repo,
+                  ref:   pr.head.sha,
+                });
+                const { data: checkRuns } = await github.rest.checks.listForRef({
+                  owner: context.repo.owner,
+                  repo:  context.repo.repo,
+                  ref:   pr.head.sha,
+                });
+                const allRunsPass = checkRuns.check_runs.length > 0 &&
+                  checkRuns.check_runs.every(r => r.status === 'completed' && r.conclusion === 'success');
+                // total_count === 0 means no legacy status checks configured; rely on allRunsPass
+                const statusPass = checkStatus.state === 'success' || checkStatus.total_count === 0;
+
+                if (allRunsPass && statusPass) {
+                  await exec(
+                    `Merged blog#${pr.number} (all checks passed)`,
+                    () => github.rest.pulls.merge({
+                      owner:        context.repo.owner,
+                      repo:         context.repo.repo,
+                      pull_number:  pr.number,
+                      merge_method: 'squash',
+                    })
+                  );
+                } else {
+                  skipped.push(`blog#${pr.number} — checks still running or pending`);
+                }
+              } else if (fullPR.mergeable_state === 'behind') {
+                skipped.push(`blog#${pr.number} — branch behind main, waiting for rebase`);
+              } else if (fullPR.mergeable_state === 'unstable') {
+                skipped.push(`blog#${pr.number} — checks not yet passing`);
+              }
+
+              // ── 1c. Rebase conflicting PRs ──────────────────────────────
+              if (fullPR.mergeable === false || fullPR.mergeable_state === 'dirty') {
+                await exec(
+                  `Commented on blog#${pr.number} — CONFLICTING, requires manual rebase`,
+                  () => github.rest.issues.createComment({
+                    owner:        context.repo.owner,
+                    repo:         context.repo.repo,
+                    issue_number: pr.number,
+                    body:         '⚠️ This PR has merge conflicts that cannot be resolved automatically. Please rebase against `main` and force-push.',
+                  })
+                );
+              }
+
+              // ── 4. ESCALATION (idle >2h with unresolved state) ─────────────
+              if (idleMin >= 120) {
+                const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+                  owner:        context.repo.owner,
+                  repo:         context.repo.repo,
+                  issue_number: pr.number,
+                });
+                const alreadyLabelled = labels.some(l => l.name === 'needs-human-review');
+                if (!alreadyLabelled) {
+                  await exec(
+                    `Escalated blog#${pr.number} — idle ${Math.round(idleMin)} min, adding needs-human-review`,
+                    async () => {
+                      // Create the label if it doesn't exist
+                      try {
+                        await github.rest.issues.createLabel({
+                          owner: context.repo.owner,
+                          repo:  context.repo.repo,
+                          name:  'needs-human-review',
+                          color: 'e4e669',
+                        });
+                      } catch (e) { core.debug(`Create needs-human-review label: ${e.message}`); }
+                      await github.rest.issues.addLabels({
+                        owner:        context.repo.owner,
+                        repo:         context.repo.repo,
+                        issue_number: pr.number,
+                        labels:       ['needs-human-review'],
+                      });
+                      await github.rest.issues.createComment({
+                        owner:        context.repo.owner,
+                        repo:         context.repo.repo,
+                        issue_number: pr.number,
+                        body:         `⏰ This PR has been idle for ${Math.round(idleMin)} minutes with unresolved state. @oviney — please review.`,
+                      });
+                    }
+                  );
+                }
+              }
+            }
+
+            // ── 1d. Close duplicate PRs ─────────────────────────────────────
+            for (const [issueNum, prs] of Object.entries(issueRefMap)) {
+              if (prs.length < 2) continue;
+              // Sort by commit count descending; close the one(s) with fewer commits
+              const withCounts = await Promise.all(prs.map(async pr => {
+                const { data: commits } = await github.rest.pulls.listCommits({
+                  owner:       context.repo.owner,
+                  repo:        context.repo.repo,
+                  pull_number: pr.number,
+                  per_page:    100,
+                });
+                return { pr, count: commits.length };
+              }));
+              withCounts.sort((a, b) => b.count - a.count);
+              const winner = withCounts[0];
+              for (const { pr, count } of withCounts.slice(1)) {
+                await exec(
+                  `Closed blog#${pr.number} (duplicate of oviney/blog#${winner.pr.number} for issue #${issueNum}, fewer commits: ${count} vs ${winner.count})`,
+                  async () => {
+                    await github.rest.issues.createComment({
+                      owner:        context.repo.owner,
+                      repo:         context.repo.repo,
+                      issue_number: pr.number,
+                      body:         `🔄 Closing as duplicate: PR #${winner.pr.number} references the same issue (#${issueNum}) and has more commits (${winner.count} vs ${count}). Consolidating work there.`,
+                    });
+                    await github.rest.pulls.update({
+                      owner:       context.repo.owner,
+                      repo:        context.repo.repo,
+                      pull_number: pr.number,
+                      state:       'closed',
+                    });
+                  }
+                );
+              }
+            }
+
+            // ─────────────────────────────────────────────────────────────────
+            // 3. BACKLOG DISPATCH
+            // ─────────────────────────────────────────────────────────────────
+            const repos = [
+              { owner: context.repo.owner, repo: context.repo.repo },
+            ];
+            // Add economist-agents if token is available
+            if (process.env.ORCHESTRATOR_TOKEN) {
+              repos.push({ owner: 'oviney', repo: 'economist-agents' });
+            }
+
+            for (const target of repos) {
+              const repoLabel    = `${target.owner}/${target.repo}`;
+              const availableCap = MAX_COPILOT_CAPACITY - activeCopilotDraftPRs;
+              if (availableCap <= 0) {
+                skipped.push(`${repoLabel} backlog — @copilot at capacity (${activeCopilotDraftPRs}/${MAX_COPILOT_CAPACITY})`);
+                continue;
+              }
+
+              // Fetch unassigned P1/P2 issues (oldest first)
+              for (const priority of ['P1', 'P2']) {
+                let issues = [];
+                try {
+                  // github client already uses ORCHESTRATOR_TOKEN (set as github-token above)
+                  const resp = await github.rest.issues.listForRepo({
+                    owner:     target.owner,
+                    repo:      target.repo,
+                    state:     'open',
+                    labels:    priority,
+                    assignee:  'none',
+                    sort:      'created',
+                    direction: 'asc',
+                    per_page:  10,
+                  });
+                  issues = resp.data.filter(i => !i.pull_request);
+                } catch (err) {
+                  skipped.push(`${repoLabel} ${priority} fetch failed — ${err.message}`);
+                  continue;
+                }
+
+                for (const issue of issues) {
+                  const cap = MAX_COPILOT_CAPACITY - activeCopilotDraftPRs;
+                  if (cap <= 0) break;
+                  await exec(
+                    `Dispatched ${repoLabel}#${issue.number} to @copilot (${priority}, capacity available)`,
+                    async () => {
+                      await github.rest.issues.addAssignees({
+                        owner:        target.owner,
+                        repo:         target.repo,
+                        issue_number: issue.number,
+                        assignees:    ['copilot[bot]'],
+                      });
+                    }
+                  );
+                  activeCopilotDraftPRs++;
+                }
+              }
+            }
+
+            // ─────────────────────────────────────────────────────────────────
+            // Step Summary
+            // ─────────────────────────────────────────────────────────────────
+            const runTime = new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
+            const capacity = `${activeCopilotDraftPRs} / ${MAX_COPILOT_CAPACITY}`;
+            const modeTag  = DRY_RUN ? ' (dry-run)' : '';
+
+            const summary = [
+              `## Orchestrator Run — ${runTime}${modeTag}`,
+              '',
+              '### Actions taken',
+              taken.length ? taken.map(l => `- ${l}`).join('\n') : '- (none)',
+              '',
+              '### Skipped',
+              skipped.length ? skipped.map(l => `- ${l}`).join('\n') : '- (none)',
+              '',
+              '### Capacity',
+              `- Active @copilot PRs: ${capacity}`,
+            ].join('\n');
+
+            await core.summary.addRaw(summary).write();
+            console.log(summary);
