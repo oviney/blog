@@ -1,57 +1,62 @@
 #!/usr/bin/env bash
-# agent-status.sh — Quick check on Copilot agent activity
+# agent-status.sh — Fleet status check for Copilot Coding Agent
 #
-# Usage: bash scripts/agent-status.sh
+# Uses `gh agent-task list` (gh v2.80.0+, public preview) cross-referenced
+# with `gh pr list --state open` so cancelled/merged tasks are filtered out.
+#
+# Usage: bash scripts/agent-status.sh [repo]
 
 set -euo pipefail
 
-STALE_HOURS=2
-NOW=$(date +%s)
+REPO="${1:-oviney/blog}"
 
 echo ""
 echo "═══════════════════════════════════════════════════"
-echo " Agent Status Check — $(date '+%Y-%m-%d %H:%M')"
-echo "═══════════════════════════════════════════════════"
-
-echo ""
-echo "── Open PRs ──────────────────────────────────────"
-echo ""
-
-gh pr list --state open --json number,title,updatedAt,isDraft,author \
-  --jq '.[] | "\(.number)|\(.title)|\(.updatedAt)|\(if .isDraft then "DRAFT" else "OPEN" end)|\(.author.login)"' |
-while IFS='|' read -r num title updated status author; do
-  updated_epoch=$(date -juf "%Y-%m-%dT%H:%M:%SZ" "$updated" +%s 2>/dev/null || date -d "$updated" +%s 2>/dev/null || echo 0)
-  now_utc=$(date -u +%s)
-  hours_ago=$(( (now_utc - updated_epoch) / 3600 ))
-
-  if (( hours_ago > STALE_HOURS )); then
-    indicator="⚠️  STALE (${hours_ago}h)"
-  else
-    indicator="✅ Active (${hours_ago}h ago)"
-  fi
-
-  printf "  #%-4s [%s] %s\n" "$num" "$status" "$title"
-  printf "         %s — author: %s\n\n" "$indicator" "$author"
-done
-
-echo "── Assigned Issues (no PR yet) ─────────────────"
-echo ""
-
-gh issue list --state open --assignee "copilot-swe-agent[bot]" --json number,title,updatedAt \
-  --jq '.[] | "\(.number)|\(.title)|\(.updatedAt)"' |
-while IFS='|' read -r num title updated; do
-  # Check if a PR exists for this issue
-  pr_count=$(gh pr list --state open --search "linked:$num" --json number --jq 'length' 2>/dev/null || echo "0")
-
-  updated_epoch=$(date -juf "%Y-%m-%dT%H:%M:%SZ" "$updated" +%s 2>/dev/null || date -d "$updated" +%s 2>/dev/null || echo 0)
-  now_utc=$(date -u +%s)
-  hours_ago=$(( (now_utc - updated_epoch) / 3600 ))
-
-  if [[ "$pr_count" == "0" ]]; then
-    printf "  #%-4s %s\n" "$num" "$title"
-    printf "         ⚠️  No PR found — last activity: %sh ago\n\n" "$hours_ago"
-  fi
-done
-
+echo " Agent Fleet Status — $(date '+%Y-%m-%d %H:%M')"
+echo " Repo: $REPO"
 echo "═══════════════════════════════════════════════════"
 echo ""
+
+# Get list of open PR numbers for this repo
+OPEN_PRS=$(gh pr list --repo "$REPO" --state open --json number --jq '.[].number' | tr '\n' ' ')
+
+if [[ -z "${OPEN_PRS// }" ]]; then
+  echo "No open pull requests."
+  echo ""
+  exit 0
+fi
+
+# Cross-reference agent tasks with open PRs
+gh agent-task list 2>/dev/null | awk -F'\t' -v repo="$REPO" -v open_prs=" $OPEN_PRS " '
+BEGIN { ready=0; in_progress=0 }
+$3 == repo {
+  pr_num = $2; sub(/^#/, "", pr_num)
+
+  # Only include PRs that are still open
+  if (index(open_prs, " " pr_num " ") == 0) next
+
+  line = sprintf("  #%-5s %-22s %s\n", pr_num, $4, $1)
+  if ($4 ~ /Ready/) { ready_list = ready_list line; ready++ }
+  else { in_progress_list = in_progress_list line; in_progress++ }
+}
+END {
+  if (ready > 0) {
+    print "── Ready for review (action: REVIEW) ───────────"
+    print ""
+    printf "%s\n", ready_list
+  }
+  if (in_progress > 0) {
+    print "── In progress (action: WAIT) ──────────────────"
+    print ""
+    printf "%s\n", in_progress_list
+  }
+  if (ready + in_progress == 0) {
+    print "No active agent tasks on open PRs."
+    print ""
+  }
+  print "═══════════════════════════════════════════════════"
+  printf " Summary: %d ready for review | %d in progress\n", ready, in_progress
+  print "═══════════════════════════════════════════════════"
+  print ""
+}
+'
