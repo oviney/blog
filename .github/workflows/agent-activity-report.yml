@@ -17,7 +17,6 @@ on:
         type: string
 
 env:
-  COPILOT_LOGIN: 'copilot-swe-agent[bot]'
   DEPENDABOT_LOGIN: 'dependabot[bot]'
 
 jobs:
@@ -43,7 +42,6 @@ jobs:
           const reportDate = new Date().toISOString().slice(0, 10);
 
           // ── PRs merged in the window ──────────────────────────────────────
-          const copilotLogin    = process.env.COPILOT_LOGIN;
           const dependabotLogin = process.env.DEPENDABOT_LOGIN;
 
           let page = 1;
@@ -77,7 +75,12 @@ jobs:
             page++;
           }
 
-          const prCopilot    = mergedPRs.filter(pr => pr.user.login === copilotLogin).length;
+          // Bug fix: use case-insensitive login check + branch-prefix detection.
+          // The Copilot coding agent login is 'Copilot' (capital C), not 'copilot-swe-agent[bot]'.
+          const prCopilot    = mergedPRs.filter(pr =>
+            pr.user.login.toLowerCase().includes('copilot') ||
+            (pr.head?.ref || '').startsWith('copilot/')
+          ).length;
           const prDependabot = mergedPRs.filter(pr => pr.user.login === dependabotLogin).length;
           const prHuman      = mergedPRs.length - prCopilot - prDependabot;
 
@@ -107,8 +110,10 @@ jobs:
           const evalFail   = evalRuns.data.workflow_runs.filter(r =>
             r.conclusion === 'failure' || r.conclusion === 'timed_out'
           ).length;
-          const evalPassPct = evalTotal > 0
-            ? ((evalPass / evalTotal) * 100).toFixed(1)
+          // Bug fix: only count runs with a definitive outcome (success/failure).
+          // Using evalTotal (all runs) inflates the denominator with queued/in-progress runs.
+          const evalPassPct = (evalPass + evalFail) > 0
+            ? ((evalPass / (evalPass + evalFail)) * 100).toFixed(1)
             : 'N/A';
 
           // ── Build success rate (jekyll.yml) ───────────────────────────────
@@ -124,8 +129,11 @@ jobs:
           const buildFail    = buildRuns.data.workflow_runs.filter(r =>
             r.conclusion === 'failure' || r.conclusion === 'timed_out'
           ).length;
-          const buildPct = buildTotal > 0
-            ? ((buildSuccess / buildTotal) * 100).toFixed(1)
+          // Bug fix: only count runs with a definitive outcome (success/failure).
+          // Using buildTotal inflates the denominator with queued/cancelled/skipped runs,
+          // causing artificially low success rates when 0 builds have actually failed.
+          const buildPct = (buildSuccess + buildFail) > 0
+            ? ((buildSuccess / (buildSuccess + buildFail)) * 100).toFixed(1)
             : 'N/A';
 
           core.setOutput('report_date',    reportDate);
