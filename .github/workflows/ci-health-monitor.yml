@@ -1,0 +1,324 @@
+name: 🔍 CI Health Monitor
+
+# Monitors all main-branch workflow runs across oviney/blog (and optionally
+# oviney/economist-agents via CROSS_REPO_TOKEN).  When a workflow is found
+# failing it opens a GitHub Issue on oviney/blog for triage.  When the same
+# workflow goes green the issue is closed automatically.
+#
+# Secrets required
+# ─────────────────
+# CROSS_REPO_TOKEN (optional) — a fine-grained PAT with "Actions: read" and
+#   "Contents: read" permissions on oviney/economist-agents.  Without it,
+#   economist-agents monitoring is silently skipped.
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # Every 30 minutes
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  actions: read
+
+jobs:
+  check-ci-health:
+    name: Check CI Health
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Monitor CI health and manage issues
+        uses: actions/github-script@v8
+        env:
+          CROSS_REPO_TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
+        with:
+          script: |
+            // ── Configuration ──────────────────────────────────────────────────
+
+            // Issue target: all CI health issues are opened here.
+            const ISSUE_REPO = { owner: 'oviney', repo: 'blog' };
+
+            // Repos to monitor: blog uses the default token; economist-agents
+            // needs CROSS_REPO_TOKEN (see workflow header for details).
+            const MONITOR_REPOS = [
+              { owner: 'oviney', repo: 'blog',              token: 'default' },
+              { owner: 'oviney', repo: 'economist-agents',  token: 'cross'   },
+            ];
+
+            // Workflow files to skip — these are expected to require manual
+            // approval or are not production-critical automated pipelines.
+            const SKIP_WORKFLOW_FILES = new Set([
+              'copilot-setup-steps.yml',
+            ]);
+
+            // Conclusions that indicate a broken pipeline.
+            // `cancelled` and `skipped` are intentionally excluded — they are
+            // expected outcomes (e.g. concurrency cancellation, path filters)
+            // and do not indicate a broken workflow.
+            const FAILING_CONCLUSIONS = new Set(['failure', 'action_required', 'timed_out']);
+
+            const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
+
+            // ── Helpers ────────────────────────────────────────────────────────
+
+            /**
+             * Ensure a label exists on the issue repo; create it if missing.
+             */
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({ ...ISSUE_REPO, name });
+              } catch {
+                try {
+                  await github.rest.issues.createLabel({ ...ISSUE_REPO, name, color, description });
+                } catch (err) {
+                  core.warning(`Could not create label "${name}": ${err.message}`);
+                }
+              }
+            }
+
+            /**
+             * Return the URL of the most recent successful run for a workflow on
+             * main, or null if none exists.
+             */
+            async function getLastGoodRunUrl(octokit, owner, repo, workflowId) {
+              try {
+                const resp = await octokit.rest.actions.listWorkflowRuns({
+                  owner, repo, workflow_id: workflowId, branch: 'main', per_page: 20,
+                });
+                const good = resp.data.workflow_runs.find(r => r.conclusion === 'success');
+                return good ? good.html_url : null;
+              } catch {
+                return null;
+              }
+            }
+
+            /**
+             * Find the currently open CI-health issue for a given workflow.
+             * Uses the "ci" label to narrow the search, then matches on title.
+             * Paginates until all open CI issues are checked so duplicates are
+             * not created even when more than 100 CI issues are open at once.
+             */
+            async function findOpenIssue(repoLabel, workflowName) {
+              const expectedTitle = `ci: [${repoLabel}] ${workflowName} is failing on main`;
+              try {
+                let page = 1;
+                while (true) {
+                  const resp = await github.rest.issues.listForRepo({
+                    ...ISSUE_REPO,
+                    state: 'open',
+                    labels: 'ci',
+                    per_page: 100,
+                    page,
+                  });
+                  const found = resp.data.find(i => i.title === expectedTitle);
+                  if (found) return found;
+                  if (resp.data.length < 100) break;   // last page reached
+                  page++;
+                }
+                return null;
+              } catch {
+                return null;
+              }
+            }
+
+            /**
+             * Check all workflows in a repo and open / update / close issues.
+             */
+            async function processRepo(octokit, owner, repo) {
+              const repoLabel = `${owner}/${repo}`;
+              core.info(`\n=== Checking ${repoLabel} ===`);
+
+              // List all workflows in the repo.
+              let workflows;
+              try {
+                const resp = await octokit.rest.actions.listRepoWorkflows({ owner, repo });
+                workflows = resp.data.workflows;
+              } catch (err) {
+                core.warning(`Could not list workflows for ${repoLabel}: ${err.message}`);
+                return;
+              }
+
+              for (const wf of workflows) {
+                const wfFile = wf.path.split('/').pop();
+
+                if (SKIP_WORKFLOW_FILES.has(wfFile)) {
+                  core.info(`  [skip] ${wf.name}`);
+                  continue;
+                }
+
+                // Get the most recent completed run on main (up to 5 to skip
+                // any that are still queued / in-progress).
+                let latestRun;
+                try {
+                  const resp = await octokit.rest.actions.listWorkflowRuns({
+                    owner, repo, workflow_id: wf.id, branch: 'main', per_page: 20,
+                  });
+                  latestRun = resp.data.workflow_runs.find(r => r.conclusion !== null);
+                } catch (err) {
+                  core.warning(`  Could not fetch runs for "${wf.name}": ${err.message}`);
+                  continue;
+                }
+
+                if (!latestRun) {
+                  core.info(`  [no completed runs] ${wf.name}`);
+                  continue;
+                }
+
+                const isFailing = FAILING_CONCLUSIONS.has(latestRun.conclusion);
+                const isSuccess = latestRun.conclusion === 'success';
+                core.info(`  ${isFailing ? '🔴' : isSuccess ? '🟢' : '⚪'} ${wf.name}: ${latestRun.conclusion}`);
+
+                const existingIssue = await findOpenIssue(repoLabel, wf.name);
+
+                if (isFailing) {
+                  // ── How long has this run been failing? ─────────────────────
+                  // Use updated_at (when the run concluded) rather than
+                  // created_at (when it was triggered) so that long-running
+                  // workflows are not escalated before they even finish.
+                  const failedAt    = new Date(latestRun.updated_at);
+                  const runAgeMs    = Date.now() - failedAt.getTime();
+                  const isEscalate  = runAgeMs >= TWO_HOURS_MS;
+                  const hoursRed    = (runAgeMs / (1000 * 60 * 60)).toFixed(1);
+
+                  if (!existingIssue) {
+                    // ── Open a new issue ───────────────────────────────────────
+                    const lastGoodUrl = await getLastGoodRunUrl(octokit, owner, repo, wf.id);
+                    const labels = ['bug', 'ci'];
+                    if (isEscalate) labels.push('needs-human-review');
+
+                    let body = `## CI Failure Detected\n\n`;
+                    body += `| Field | Value |\n|-------|-------|\n`;
+                    body += `| **Repository** | \`${repoLabel}\` |\n`;
+                    body += `| **Workflow** | ${wf.name} (\`${wfFile}\`) |\n`;
+                    body += `| **Conclusion** | \`${latestRun.conclusion}\` |\n`;
+                    body += `| **Branch** | \`main\` |\n`;
+                    body += `| **Run number** | #${latestRun.run_number} |\n\n`;
+
+                    body += `### Failing Run\n\n`;
+                    body += `- **URL:** ${latestRun.html_url}\n`;
+                    body += `- **Started:** ${latestRun.created_at}\n`;
+                    body += `- **Failed at:** ${latestRun.updated_at}\n`;
+                    body += `- **Duration red:** ~${hoursRed}h\n\n`;
+
+                    if (lastGoodUrl) {
+                      body += `### Last Known Good Run\n\n`;
+                      body += `- **URL:** ${lastGoodUrl}\n\n`;
+                    }
+
+                    body += `### Suggested Next Steps\n\n`;
+                    body += `1. Review the [failing run](${latestRun.html_url}) for error details\n`;
+                    body += `2. Check recent commits on \`main\` for the root cause\n`;
+                    body += `3. Push a fix — this issue closes automatically when the workflow passes\n\n`;
+
+                    if (isEscalate) {
+                      body += `---\n\n`;
+                      body += `⚠️ **Escalation:** This workflow has been red for ~${hoursRed} hours. @oviney please review.\n\n`;
+                    }
+
+                    body += `_Opened automatically by the [CI Health Monitor](../../actions/workflows/ci-health-monitor.yml) workflow._`;
+
+                    try {
+                      const created = await github.rest.issues.create({
+                        ...ISSUE_REPO,
+                        title: `ci: [${repoLabel}] ${wf.name} is failing on main`,
+                        body,
+                        labels,
+                        assignees: ['copilot'],
+                      });
+                      core.info(`  ✅ Opened issue #${created.data.number}`);
+                    } catch (err) {
+                      // Assignee may be rejected if 'copilot' is not a collaborator;
+                      // retry without assignee so the issue is still created.
+                      try {
+                        const created = await github.rest.issues.create({
+                          ...ISSUE_REPO,
+                          title: `ci: [${repoLabel}] ${wf.name} is failing on main`,
+                          body,
+                          labels,
+                        });
+                        core.warning(`  ⚠️ Opened issue #${created.data.number} without assignee: ${err.message}`);
+                      } catch (err2) {
+                        core.error(`  Failed to create issue for "${wf.name}": ${err2.message}`);
+                      }
+                    }
+
+                  } else {
+                    // ── Issue already open — escalate if threshold reached ─────
+                    core.info(`  Issue #${existingIssue.number} already open — checking escalation`);
+                    if (isEscalate) {
+                      const hasEscLabel = existingIssue.labels.some(l => l.name === 'needs-human-review');
+                      if (!hasEscLabel) {
+                        try {
+                          await github.rest.issues.addLabels({
+                            ...ISSUE_REPO,
+                            issue_number: existingIssue.number,
+                            labels: ['needs-human-review'],
+                          });
+                          await github.rest.issues.createComment({
+                            ...ISSUE_REPO,
+                            issue_number: existingIssue.number,
+                            body: [
+                              `⚠️ **Escalation:** This workflow has been red for ~${hoursRed} hours.`,
+                              `@oviney please review urgently.`,
+                              ``,
+                              `_Updated by [CI Health Monitor](../../actions/workflows/ci-health-monitor.yml)_`,
+                            ].join('\n'),
+                          });
+                          core.info(`  ⬆️  Escalated issue #${existingIssue.number}`);
+                        } catch (err) {
+                          core.warning(`  Failed to escalate issue #${existingIssue.number}: ${err.message}`);
+                        }
+                      }
+                    }
+                  }
+
+                } else if (isSuccess && existingIssue) {
+                  // ── Workflow is green — close the issue ──────────────────────
+                  try {
+                    await github.rest.issues.createComment({
+                      ...ISSUE_REPO,
+                      issue_number: existingIssue.number,
+                      body: [
+                        `✅ **Resolved:** The \`${wf.name}\` workflow in \`${repoLabel}\` is now passing.`,
+                        ``,
+                        `- **Passing run:** ${latestRun.html_url}`,
+                        `- **Resolved at:** ${latestRun.updated_at}`,
+                        ``,
+                        `_Auto-closed by [CI Health Monitor](../../actions/workflows/ci-health-monitor.yml)_`,
+                      ].join('\n'),
+                    });
+                    await github.rest.issues.update({
+                      ...ISSUE_REPO,
+                      issue_number: existingIssue.number,
+                      state: 'closed',
+                      state_reason: 'completed',
+                    });
+                    core.info(`  ✅ Closed issue #${existingIssue.number} (resolved)`);
+                  } catch (err) {
+                    core.error(`  Failed to close issue #${existingIssue.number}: ${err.message}`);
+                  }
+                }
+              }
+            }
+
+            // ── Main ───────────────────────────────────────────────────────────
+
+            // Guarantee required labels exist before opening any issues.
+            await ensureLabel('ci',                 '0075ca', 'CI/CD pipeline failures and health');
+            await ensureLabel('needs-human-review', 'e11d48', 'Requires urgent human review');
+
+            // Process each repo in sequence.
+            for (const target of MONITOR_REPOS) {
+              if (target.token === 'cross') {
+                const crossToken = process.env.CROSS_REPO_TOKEN;
+                if (!crossToken) {
+                  core.info(`\nCROSS_REPO_TOKEN not set — skipping ${target.owner}/${target.repo}`);
+                  core.info('Add a fine-grained PAT with Actions:read on that repo to enable cross-repo monitoring.');
+                  continue;
+                }
+                const crossOctokit = github.getOctokit(crossToken);
+                await processRepo(crossOctokit, target.owner, target.repo);
+              } else {
+                await processRepo(github, target.owner, target.repo);
+              }
+            }
