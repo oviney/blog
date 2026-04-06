@@ -226,7 +226,7 @@ jobs:
               f"| Metric | Value |",
               f"|--------|-------|",
               f"| Total escapes logged | {total} |",
-              f"| Regression test coverage | {with_test}/{total} ({int(with_test/total*100) if total else 0}%) |",
+              f"| Regression test coverage | {with_test}/{total} ({int(with_test * 100 / total) if total else 0}%) |",
               "",
           ]
 

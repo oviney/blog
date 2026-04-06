@@ -22,8 +22,12 @@ import re
 import sys
 from datetime import date
 
+# String length limits for embedding in TypeScript literals
+MAX_TITLE_LENGTH    = 80
+MAX_EXPECTED_LENGTH = 120
+MAX_SLUG_LENGTH     = 50
 
-def slugify(text, max_len=50):
+def slugify(text, max_len=MAX_SLUG_LENGTH):
     """Convert text to a URL-safe slug."""
     slug = re.sub(r'[^a-z0-9]+', '-', text.lower())[:max_len].strip('-')
     return slug or "unknown"
@@ -117,8 +121,8 @@ def build_test_content(issue_number, title, parsed):
 
     repo = os.environ.get("GITHUB_REPOSITORY", "oviney/blog")
     # Use JSON string encoding for safe embedding in TypeScript string literals
-    title_safe = json.dumps(title[:80])[1:-1]   # strip outer quotes, keep inner escapes
-    expected_safe = json.dumps(expected[:120])[1:-1]
+    title_safe    = json.dumps(title[:MAX_TITLE_LENGTH])[1:-1]      # strip outer quotes, keep inner escapes
+    expected_safe = json.dumps(expected[:MAX_EXPECTED_LENGTH])[1:-1]
 
     lines = [
         "/**",

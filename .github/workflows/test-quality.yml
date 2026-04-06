@@ -166,9 +166,11 @@ jobs:
             GROUPS=$(echo "${PLAN}" | python3 -c "
           import json, sys
           d = json.load(sys.stdin)
-          tags = '|'.join('@' + g for g in d['groups'])
-          print(tags)
-          ")
+          grps = d.get('groups', [])
+          if not grps:
+              sys.exit(1)
+          print('|'.join('@' + g for g in grps))
+          " 2>/dev/null || echo "")
             echo "🔬 Running PARTIAL Playwright suite — groups: ${GROUPS}"
             if [[ -z "${GROUPS}" ]]; then
               echo "⚠️ No groups resolved — running full suite as safe fallback"

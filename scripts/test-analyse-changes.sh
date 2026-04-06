@@ -75,7 +75,7 @@ echo ""
 echo "Test 5: _posts/** → content + links groups"
 # We need git history with a post-only commit; use current HEAD if available
 # Find a commit that only touches _posts
-POST_COMMIT=$(git log --oneline --diff-filter=M -- '_posts/**' 2>/dev/null | head -1 | cut -d' ' -f1 || true)
+POST_COMMIT=$(git log --oneline --diff-filter=M -- _posts/** 2>/dev/null | head -1 | cut -d' ' -f1 || true)
 if [[ -n "${POST_COMMIT}" ]]; then
   POST_PARENT="${POST_COMMIT}^"
   OUT=$(bash "${SCRIPT_DIR}/analyse-changes.sh" "${POST_PARENT}" "${POST_COMMIT}" 2>/dev/null)
