@@ -68,3 +68,6 @@ healing-metrics/
 healing-reports/
 healing-success-report.md
 .bundle/
+
+# Ruby vendored bundles
+vendor/

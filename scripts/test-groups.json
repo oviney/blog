@@ -1,0 +1,27 @@
+{
+  "_comment": "Maps file path glob patterns to test groups. Evaluated top-to-bottom; first ALL match triggers a full suite.",
+  "groups": {
+    "_sass/**":             ["visual", "accessibility", "navigation"],
+    "assets/css/**":        ["visual", "accessibility"],
+    "_layouts/**":          ["ALL"],
+    "_includes/**":         ["ALL"],
+    "_config*.yml":         ["ALL"],
+    "package*.json":        ["security", "ALL"],
+    "_posts/**":            ["content", "links"],
+    "_drafts/**":           ["content", "links"],
+    "assets/js/**":         ["navigation", "search", "accessibility"],
+    "assets/images/**":     ["visual", "content"],
+    "assets/charts/**":     ["visual", "content"],
+    ".github/workflows/**": []
+  },
+  "group_to_req": {
+    "navigation":    ["REQ-NAV-01", "REQ-NAV-02"],
+    "content":       ["REQ-CONTENT-01", "REQ-CONTENT-02"],
+    "links":         ["REQ-LINKS-01"],
+    "search":        ["REQ-SEARCH-01"],
+    "accessibility": ["REQ-A11Y-01", "REQ-A11Y-02"],
+    "visual":        ["REQ-VISUAL-01"],
+    "performance":   ["REQ-PERF-01"],
+    "security":      ["REQ-SEC-01"]
+  }
+}

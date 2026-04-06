@@ -1,0 +1,110 @@
+name: Production Bug Report
+description: Report a bug that has escaped to production (viney.ca). Automatically labels the issue as `bug` and `production` and triggers the Defect Tracker workflow.
+title: "[PROD-BUG]: "
+labels: ["bug", "production"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Production Escape Report
+        Use this form to report a bug that is visible on the **live site** (https://www.viney.ca).
+        Filling in all fields enables automatic commit attribution and regression test generation.
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How severe is the impact on users?
+      options:
+        - P0 - Critical (site broken / unreadable)
+        - P1 - High (major feature broken)
+        - P2 - Medium (minor issue, workaround exists)
+        - P3 - Low (cosmetic, no functional impact)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: req_area
+    attributes:
+      label: Affected Requirement Area
+      description: Which functional area is impacted? This maps to REQ IDs for regression test generation.
+      options:
+        - navigation (REQ-NAV-01, REQ-NAV-02)
+        - content (REQ-CONTENT-01, REQ-CONTENT-02)
+        - links (REQ-LINKS-01)
+        - search (REQ-SEARCH-01)
+        - accessibility (REQ-A11Y-01, REQ-A11Y-02)
+        - visual (REQ-VISUAL-01)
+        - performance (REQ-PERF-01)
+        - security (REQ-SEC-01)
+        - other
+    validations:
+      required: true
+
+  - type: input
+    id: affected_url
+    attributes:
+      label: Affected Page URL
+      description: Full URL of the page where the bug appears.
+      placeholder: "https://www.viney.ca/blog/"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: What is broken? Be specific — this text is parsed to identify changed files for commit attribution.
+      placeholder: |
+        The site navigation collapses at 320px and the hamburger menu button is not visible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Exact steps — these are used to generate a Playwright regression test automatically.
+      placeholder: |
+        1. Open https://www.viney.ca/ on a 320px-wide viewport
+        2. Observe the header area
+        3. The hamburger menu icon is missing; nav links overlap
+      value: |
+        1. Navigate to [affected URL]
+        2. [Action]
+        3. [Observation]
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behaviour
+      placeholder: Navigation hamburger icon should be visible; tapping it should reveal the nav menu.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behaviour
+      placeholder: Hamburger icon is not rendered; nav links are stacked and overflow the viewport.
+    validations:
+      required: true
+
+  - type: input
+    id: affected_files
+    attributes:
+      label: Suspected Changed Files (optional)
+      description: If you know which files the regression might be in, list them (space-separated). Used for commit attribution.
+      placeholder: "_sass/economist-theme.scss assets/js/navigation.js"
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots / Video
+      description: Attach screenshots or a screen recording that shows the bug.
+    validations:
+      required: false

@@ -5,9 +5,12 @@ import { test, expect } from '@playwright/test';
  *
  * These tests validate handling of various content scenarios and edge cases
  * including AI disclosure, missing images, metadata variations, and content overflow.
+ *
+ * @requirements REQ-CONTENT-01, REQ-CONTENT-02, REQ-LINKS-01
+ * @group content links
  */
 
-test.describe('AI Disclosure and Content Badges', () => {
+test.describe('@content AI Disclosure and Content Badges', () => {
 
   test('AI disclosure badge appears on AI-assisted posts', async ({ page }) => {
     // Nuclear healing: Ultra-permissive AI disclosure testing
@@ -113,7 +116,7 @@ test.describe('AI Disclosure and Content Badges', () => {
 
 });
 
-test.describe('Image Handling Edge Cases', () => {
+test.describe('@content @visual Image Handling Edge Cases', () => {
 
   test('Posts with hero images load correctly', async ({ page }) => {
     await page.goto('/2025/12/31/testing-times/');
@@ -238,7 +241,7 @@ test.describe('Image Handling Edge Cases', () => {
 
 });
 
-test.describe('Content Metadata Variations', () => {
+test.describe('@content Content Metadata Variations', () => {
 
   test('Posts with complete metadata display correctly', async ({ page }) => {
     await page.goto('/2025/12/31/testing-times/');
@@ -348,7 +351,7 @@ test.describe('Content Metadata Variations', () => {
 
 });
 
-test.describe('Content Length and Overflow Edge Cases', () => {
+test.describe('@content Content Length and Overflow Edge Cases', () => {
 
   test('Very long article titles handle gracefully', async ({ page }) => {
     await page.goto('/blog/');
@@ -452,7 +455,7 @@ test.describe('Content Length and Overflow Edge Cases', () => {
 
 });
 
-test.describe('Related Posts and Content Discovery', () => {
+test.describe('@content @links Related Posts and Content Discovery', () => {
 
   test('Related posts display correctly', async ({ page }) => {
     // Nuclear healing: Ultra-permissive related posts testing

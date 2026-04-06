@@ -1,0 +1,327 @@
+name: Production Defect Tracker
+
+on:
+  issues:
+    types: [labeled]
+  schedule:
+    # Weekly escape-rate report — every Monday at 09:00 UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      weekly_report_only:
+        description: 'Run weekly escape-rate report only (skip intake)'
+        type: boolean
+        default: false
+
+jobs:
+  # ── Defect Intake ─────────────────────────────────────────────────────────
+  intake:
+    name: Log Production Escape
+    runs-on: ubuntu-latest
+    # Only trigger intake when both "bug" and "production" labels are present
+    if: >
+      github.event_name == 'issues' &&
+      github.event.action == 'labeled' &&
+      github.event.label.name == 'production' &&
+      contains(toJson(github.event.issue.labels), '"bug"')
+
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Parse issue body
+        id: parse
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          python3 - <<'PYEOF'
+          import os, re, json
+
+          body   = os.environ.get("ISSUE_BODY", "")
+          number = os.environ.get("ISSUE_NUMBER", "0")
+          title  = os.environ.get("ISSUE_TITLE", "")
+
+          # Extract affected URL
+          url_match = re.search(r'https?://[^\s\)]+', body)
+          affected_url = url_match.group(0).strip() if url_match else ""
+
+          # Extract req area from "Affected Requirement Area" field
+          area_match = re.search(r'(?:Affected Requirement Area|req_area)[^\n]*\n+([^\n]+)', body, re.IGNORECASE)
+          area = area_match.group(1).strip().split()[0] if area_match else "unknown"
+          area = re.sub(r'\s*\(.*\)', '', area).strip()
+
+          # Extract REQ IDs mentioned
+          req_ids = re.findall(r'REQ-[A-Z]+-\d+', body)
+
+          # Extract suspected files
+          files_match = re.search(r'Suspected Changed Files[^\n]*\n+([^\n]+)', body, re.IGNORECASE)
+          suspected_files = files_match.group(1).strip() if files_match else ""
+
+          result = {
+            "issue_number": int(number),
+            "affected_url": affected_url,
+            "area": area,
+            "req_ids": list(set(req_ids)),
+            "suspected_files": suspected_files.split() if suspected_files else []
+          }
+          print(json.dumps(result))
+          PYEOF > /tmp/parsed.json
+          echo "parsed=$(cat /tmp/parsed.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Attribute to commit
+        id: attribute
+        run: |
+          python3 - <<'PYEOF'
+          import os, json, subprocess
+
+          parsed = json.loads(os.environ.get("PARSED", "{}"))
+          suspected = parsed.get("suspected_files", [])
+
+          commit_sha = ""
+
+          # Try to find the last commit touching suspected files
+          if suspected:
+            for f in suspected:
+              try:
+                result = subprocess.run(
+                  ["git", "log", "-1", "--oneline", "--", f],
+                  capture_output=True, text=True
+                )
+                if result.stdout.strip():
+                  commit_sha = result.stdout.split()[0]
+                  break
+              except Exception:
+                pass
+
+          # Fall back to last merge commit on main
+          if not commit_sha:
+            try:
+              result = subprocess.run(
+                ["git", "log", "--merges", "-1", "--pretty=format:%h", "main"],
+                capture_output=True, text=True
+              )
+              commit_sha = result.stdout.strip() or "unknown"
+            except Exception:
+              commit_sha = "unknown"
+
+          print(commit_sha)
+          PYEOF
+          PARSED='${{ steps.parse.outputs.parsed }}'
+          COMMIT_SHA=$(python3 - <<PYEOF
+          import os, json, subprocess
+
+          parsed = json.loads('${{ steps.parse.outputs.parsed }}')
+          suspected = parsed.get("suspected_files", [])
+
+          commit_sha = ""
+          if suspected:
+              for f in suspected:
+                  try:
+                      result = subprocess.run(
+                          ["git", "log", "-1", "--oneline", "--", f],
+                          capture_output=True, text=True
+                      )
+                      if result.stdout.strip():
+                          commit_sha = result.stdout.split()[0]
+                          break
+                  except Exception:
+                      pass
+
+          if not commit_sha:
+              try:
+                  result = subprocess.run(
+                      ["git", "log", "--merges", "-1", "--pretty=format:%h", "main"],
+                      capture_output=True, text=True
+                  )
+                  commit_sha = result.stdout.strip() or "unknown"
+              except Exception:
+                  commit_sha = "unknown"
+
+          print(commit_sha)
+          PYEOF
+          )
+          echo "commit_sha=${COMMIT_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Append to defect-log.json
+        id: log_escape
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          COMMIT_SHA: ${{ steps.attribute.outputs.commit_sha }}
+          PARSED: ${{ steps.parse.outputs.parsed }}
+        run: |
+          python3 - <<'PYEOF'
+          import os, json
+          from datetime import date
+
+          log_path = "docs/defect-log.json"
+
+          try:
+              with open(log_path) as f:
+                  log = json.load(f)
+          except Exception:
+              log = []
+
+          parsed = json.loads(os.environ.get("PARSED", "{}"))
+
+          entry = {
+              "issue": int(os.environ.get("ISSUE_NUMBER", "0")),
+              "title": os.environ.get("ISSUE_TITLE", ""),
+              "detected": date.today().isoformat(),
+              "attributed_commit": os.environ.get("COMMIT_SHA", "unknown"),
+              "affected_area": parsed.get("area", "unknown"),
+              "affected_url": parsed.get("affected_url", ""),
+              "req_ids": parsed.get("req_ids", []),
+              "regression_test_created": False,
+              "regression_pr": None
+          }
+
+          # Avoid duplicate entries for the same issue
+          existing = [e for e in log if e.get("issue") != entry["issue"]]
+          existing.append(entry)
+
+          with open(log_path, "w") as f:
+              json.dump(existing, f, indent=2)
+              f.write("\n")
+
+          print(json.dumps(entry, indent=2))
+          PYEOF
+
+      - name: Commit defect-log.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/defect-log.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: log production escape for issue #${{ github.event.issue.number }}"
+            git push
+          fi
+
+      - name: Comment on issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commitSha = '${{ steps.attribute.outputs.commit_sha }}';
+            const issueNumber = context.issue.number;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: [
+                '🔍 **Production Escape Logged**',
+                '',
+                `**Issue:** #${issueNumber}`,
+                `**Attributed commit:** \`${commitSha}\` (best-effort attribution)`,
+                `**Logged to:** \`docs/defect-log.json\``,
+                '',
+                '⏳ **Next step:** Story C (Auto-Regression) will generate a Playwright regression test to prevent recurrence.',
+                '',
+                '_Escape rate metrics are published every Monday at 09:00 UTC in the [Actions step summary](https://github.com/${{ github.repository }}/actions)._'
+              ].join('\n')
+            });
+
+  # ── Weekly Escape Rate Report ─────────────────────────────────────────────
+  weekly-report:
+    name: Weekly Escape Rate Report
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.weekly_report_only == 'true')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate escape rate summary
+        run: |
+          python3 - <<'PYEOF'
+          import json, os
+          from datetime import date, timedelta
+
+          log_path = "docs/defect-log.json"
+
+          try:
+              with open(log_path) as f:
+                  log = json.load(f)
+          except Exception:
+              log = []
+
+          today = date.today()
+          thirty_days_ago = today - timedelta(days=30)
+
+          recent = [
+              e for e in log
+              if e.get("detected", "1970-01-01") >= thirty_days_ago.isoformat()
+          ]
+
+          total   = len(log)
+          recent_count = len(recent)
+          with_test = sum(1 for e in log if e.get("regression_test_created"))
+          without_test = total - with_test
+
+          # Area breakdown
+          areas = {}
+          for e in recent:
+              a = e.get("affected_area", "unknown")
+              areas[a] = areas.get(a, 0) + 1
+
+          lines = [
+              "## 📊 Production Defect Escape Rate — Weekly Report",
+              f"**Report date:** {today.isoformat()}",
+              "",
+              "### Last 30 days",
+              f"| Metric | Value |",
+              f"|--------|-------|",
+              f"| Production escapes | {recent_count} |",
+              f"| With regression test | {sum(1 for e in recent if e.get('regression_test_created'))} |",
+              f"| Without regression test | {sum(1 for e in recent if not e.get('regression_test_created'))} |",
+              "",
+              "### All-time",
+              f"| Metric | Value |",
+              f"|--------|-------|",
+              f"| Total escapes logged | {total} |",
+              f"| Regression test coverage | {with_test}/{total} ({int(with_test/total*100) if total else 0}%) |",
+              "",
+          ]
+
+          if areas:
+              lines += [
+                  "### Escapes by area (last 30 days)",
+                  "| Area | Count |",
+                  "|------|-------|",
+              ]
+              for area, count in sorted(areas.items(), key=lambda x: -x[1]):
+                  lines.append(f"| {area} | {count} |")
+              lines.append("")
+
+          if recent:
+              lines += [
+                  "### Recent escapes",
+                  "| Issue | Title | Date | Area | Commit | Regression |",
+                  "|-------|-------|------|------|--------|------------|",
+              ]
+              for e in sorted(recent, key=lambda x: x.get("detected",""), reverse=True):
+                  regression = "✅" if e.get("regression_test_created") else "❌ pending"
+                  pr_link = f" [PR #{e['regression_pr']}](https://github.com/{os.environ.get('GITHUB_REPOSITORY','')}/pull/{e['regression_pr']})" if e.get("regression_pr") else ""
+                  lines.append(
+                      f"| #{e['issue']} | {e['title'][:40]} | {e['detected']} | {e['affected_area']} | `{e['attributed_commit']}` | {regression}{pr_link} |"
+                  )
+          else:
+              lines.append("_No production escapes in the last 30 days. 🎉_")
+
+          report = "\n".join(lines)
+          print(report)
+
+          # Write to step summary
+          summary_path = os.environ.get("GITHUB_STEP_SUMMARY", "/dev/stdout")
+          with open(summary_path, "a") as f:
+              f.write(report + "\n")
+          PYEOF

@@ -5,6 +5,15 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  schedule:
+    # Nightly full suite — every day at 02:00 UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      full_suite:
+        description: 'Force full test suite regardless of changed files'
+        type: boolean
+        default: false
 
 jobs:
   test:
@@ -12,6 +21,8 @@ jobs:
     
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -30,6 +41,35 @@ jobs:
       
       - name: Build Jekyll site
         run: bundle exec jekyll build
+
+      # ── Smart Test Selector ──────────────────────────────────────────────
+      - name: Analyse changes → test plan
+        id: changes
+        run: |
+          # Determine BASE_SHA and HEAD_SHA depending on event type
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            # Nightly cron — always full suite
+            PLAN=$(bash scripts/analyse-changes.sh "" "nightly")
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.full_suite }}" == "true" ]]; then
+            PLAN=$(FORCE_FULL=true bash scripts/analyse-changes.sh "" "")
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.sha }}"
+            PLAN=$(bash scripts/analyse-changes.sh "${BASE}" "${HEAD}")
+          else
+            BASE="${{ github.event.before }}"
+            HEAD="${{ github.sha }}"
+            PLAN=$(bash scripts/analyse-changes.sh "${BASE}" "${HEAD}")
+          fi
+
+          echo "plan=${PLAN}" >> "$GITHUB_OUTPUT"
+          echo "### 🔬 Test Plan" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          echo "${PLAN}" | python3 -m json.tool >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo ""
+          echo "Test plan: ${PLAN}"
+      # ────────────────────────────────────────────────────────────────────
       
       - name: Start Jekyll server
         run: |
@@ -107,15 +147,36 @@ jobs:
           
           echo "✅ All Playwright browsers installed and verified successfully"
 
-      - name: Run Playwright E2E tests
+      - name: Run Playwright E2E tests (smart)
         id: playwright
         run: |
-          # Final verification before running tests
-          if ! npx playwright --version; then
-            echo "❌ ERROR: Playwright not properly installed"
-            exit 1
+          PLAN='${{ steps.changes.outputs.plan }}'
+          RUN_TYPE=$(echo "${PLAN}" | python3 -c "import json,sys; print(json.load(sys.stdin)['run_type'])")
+          FORCE_FULL=$(echo "${PLAN}" | python3 -c "import json,sys; print(json.load(sys.stdin)['force_full'])")
+
+          if [[ "${RUN_TYPE}" == "skip" ]]; then
+            echo "⏭️  Skipping Playwright — only CI workflow files changed"
+            exit 0
           fi
-          npm run test:playwright
+
+          if [[ "${RUN_TYPE}" == "full" || "${FORCE_FULL}" == "True" ]]; then
+            echo "🔬 Running FULL Playwright suite"
+            npm run test:playwright
+          else
+            GROUPS=$(echo "${PLAN}" | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)
+          tags = '|'.join('@' + g for g in d['groups'])
+          print(tags)
+          ")
+            echo "🔬 Running PARTIAL Playwright suite — groups: ${GROUPS}"
+            # Fallback to full suite if grep pattern is empty or test run fails
+            if [[ -z "${GROUPS}" ]]; then
+              npm run test:playwright
+            else
+              npx playwright test --grep "${GROUPS}" || npm run test:playwright
+            fi
+          fi
         continue-on-error: true
 
       - name: 📊 Monitor healing effectiveness
