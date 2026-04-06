@@ -6,6 +6,8 @@ import { test, expect } from '@playwright/test';
  *
  * These tests validate responsive behavior across viewports to complement
  * BackstopJS visual regression testing with behavioral validation.
+ *
+ * @requirements REQ-NAV-01, REQ-CONTENT-01, REQ-CONTENT-02, REQ-VISUAL-01
  */
 
 // Test viewport configurations matching BackstopJS
@@ -15,7 +17,7 @@ const viewports = {
   desktop: { width: 1920, height: 1080 }
 };
 
-test.describe('Responsive Layout Adaptation', () => {
+test.describe('@REQ-NAV-01 @REQ-CONTENT-01 @REQ-CONTENT-02 Responsive Layout Adaptation', () => {
 
   test('Article grid adapts correctly across viewports', async ({ page }) => {
     await page.goto('/blog/');
@@ -193,7 +195,7 @@ test.describe('Responsive Layout Adaptation', () => {
 
 });
 
-test.describe('Typography Responsiveness', () => {
+test.describe('@REQ-CONTENT-02 @REQ-VISUAL-01 Typography Responsiveness', () => {
 
   test('Font sizes scale appropriately across viewports', async ({ page }) => {
     // Nuclear healing: Ultra-defensive typography testing with maximum flexibility
@@ -351,7 +353,7 @@ test.describe('Typography Responsiveness', () => {
 
 });
 
-test.describe('Image Responsiveness', () => {
+test.describe('@REQ-CONTENT-02 @REQ-VISUAL-01 Image Responsiveness', () => {
 
   test('Hero images scale properly across viewports', async ({ page }) => {
     await page.goto('/2025/12/31/testing-times/'); // Post with hero image
@@ -429,7 +431,7 @@ test.describe('Image Responsiveness', () => {
 
 });
 
-test.describe('Interactive Elements Touch Targets', () => {
+test.describe('@REQ-NAV-02 @REQ-A11Y-02 Interactive Elements Touch Targets', () => {
 
   test.use({ viewport: viewports.mobile });
 
@@ -565,7 +567,7 @@ test.describe('Interactive Elements Touch Targets', () => {
 
 });
 
-test.describe('Orientation Change Handling', () => {
+test.describe('@REQ-NAV-01 @REQ-CONTENT-02 Orientation Change Handling', () => {
 
   test('Layout adapts to orientation changes on tablet', async ({ page }) => {
     await page.goto('/blog/');
@@ -602,7 +604,7 @@ test.describe('Orientation Change Handling', () => {
 
 });
 
-test.describe('Performance Under Responsive Conditions', () => {
+test.describe('@REQ-PERF-01 Performance Under Responsive Conditions', () => {
 
   test('Layout performance during viewport changes', async ({ page }) => {
     // Nuclear healing: Ultra-permissive performance testing

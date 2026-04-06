@@ -1,3 +1,6 @@
+# Ruby vendor bundle
+vendor/
+
 # Jekyll
 _site
 .sass-cache
@@ -26,6 +29,7 @@ playwright-report/
 **/screenshots/
 **/videos/
 playwright-healing-report.md
+quality-report.json
 
 # Python
 __pycache__/

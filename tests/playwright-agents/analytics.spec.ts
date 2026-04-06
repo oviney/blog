@@ -8,9 +8,11 @@ import { test, expect } from '@playwright/test';
  *  - Google Analytics 4 (GA4)
  *  - Plausible Analytics (privacy-friendly, cookie-free)
  *  - Google Search Console verification meta tag (when configured)
+ *
+ * @requirements REQ-CONTENT-01
  */
 
-test.describe('Analytics Integration', () => {
+test.describe('@REQ-CONTENT-01 Analytics Integration', () => {
 
   test('Google Analytics 4 script is present in <head>', async ({ page }) => {
     await page.goto('/');

@@ -4,7 +4,27 @@ import { defineConfig, devices } from '@playwright/test';
  * Playwright configuration for Economist Blog v5
  * Integrates with existing Jekyll server and testing infrastructure
  * Matches BackstopJS viewport configuration for consistency
+ *
+ * Sharding support:
+ *   Set PLAYWRIGHT_SHARD env var to "1/3", "2/3", "3/3" etc. to run a shard.
+ *   Set PLAYWRIGHT_GREP env var to a pipe-separated grep expression, e.g.
+ *     "@REQ-NAV-01|@REQ-NAV-02"
+ *   to run only tests matching those requirement tags.
  */
+
+// Shard configuration: "1/3" → { current: 1, total: 3 }
+const shardEnv = process.env.PLAYWRIGHT_SHARD;
+const shard = shardEnv
+  ? (() => {
+      const parts = shardEnv.split('/').map(Number);
+      return parts.length === 2 ? { current: parts[0], total: parts[1] } : undefined;
+    })()
+  : undefined;
+
+// Grep expression for change-based test selection
+const grepEnv = process.env.PLAYWRIGHT_GREP;
+const grep    = grepEnv ? new RegExp(grepEnv) : undefined;
+
 export default defineConfig({
   testDir: './tests/playwright-agents',
 
@@ -17,8 +37,8 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
 
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Allow parallelism on CI when sharding; use 2 workers per shard */
+  workers: process.env.CI ? (shard ? 2 : 1) : undefined,
 
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
@@ -42,6 +62,12 @@ export default defineConfig({
     /* Video recording for debugging */
     video: 'retain-on-failure',
   },
+
+  /* Change-based test selection: run only tests matching the grep expression */
+  ...(grep ? { grep } : {}),
+
+  /* Sharding: run a slice of the test suite */
+  ...(shard ? { shard } : {}),
 
   /* Configure projects for major browsers and viewports */
   projects: [
