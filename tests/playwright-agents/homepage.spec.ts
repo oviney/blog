@@ -9,11 +9,9 @@ import { test, expect } from '@playwright/test';
  * 4. Brief bio with headshot/avatar
  * 5. Newsletter signup
  * 6. Footer with social links + RSS
- *
- * @requirements REQ-CONTENT-01, REQ-CONTENT-02, REQ-LINKS-01
  */
 
-test.describe('@REQ-CONTENT-01 @REQ-CONTENT-02 Homepage Redesign', () => {
+test.describe('@content @navigation Homepage Redesign', () => {
 
   test('1. Hero section displays latest post', async ({ page }) => {
     await page.goto('/');
@@ -178,7 +176,7 @@ test.describe('@REQ-CONTENT-01 @REQ-CONTENT-02 Homepage Redesign', () => {
 
 });
 
-test.describe('@REQ-CONTENT-01 @REQ-NAV-01 Homepage Responsive Layout', () => {
+test.describe('@visual @navigation Homepage Responsive Layout', () => {
 
   test('Focus Area cards stack on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 568 });

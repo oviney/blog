@@ -4,14 +4,12 @@ import { test, expect } from '@playwright/test';
  * Interactive Elements Tests
  * Validates: reading progress bar, table of contents, copy code buttons,
  * back-to-top button, share buttons, and print stylesheet.
- *
- * @requirements REQ-NAV-02, REQ-A11Y-02
  */
 
 // Use a post that has multiple h2 headings to trigger the ToC
 const POST_URL = '/2026/01/02/self-healing-tests-myth-vs-reality/';
 
-test.describe('@REQ-A11Y-02 Reading Progress Bar', () => {
+test.describe('@navigation Reading Progress Bar', () => {
   test('progress bar is present on post pages', async ({ page }) => {
     await page.goto(POST_URL);
     await page.waitForLoadState('networkidle');
@@ -40,7 +38,7 @@ test.describe('@REQ-A11Y-02 Reading Progress Bar', () => {
   });
 });
 
-test.describe('@REQ-A11Y-02 @REQ-CONTENT-02 Table of Contents', () => {
+test.describe('@navigation @content Table of Contents', () => {
   test('ToC container is present on post pages', async ({ page }) => {
     await page.goto(POST_URL);
     await page.waitForLoadState('networkidle');
@@ -106,7 +104,7 @@ test.describe('@REQ-A11Y-02 @REQ-CONTENT-02 Table of Contents', () => {
   });
 });
 
-test.describe('@REQ-A11Y-02 Copy Code Buttons', () => {
+test.describe('@content Copy Code Buttons', () => {
   // Use a post that is known to have code blocks
   const CODE_POST = '/2023/08/08/practical-applications-of-ai-in-software-development/';
 
@@ -149,7 +147,7 @@ test.describe('@REQ-A11Y-02 Copy Code Buttons', () => {
   });
 });
 
-test.describe('@REQ-A11Y-02 Back to Top Button', () => {
+test.describe('@navigation Back to Top Button', () => {
   test('back-to-top button is present on post pages', async ({ page }) => {
     await page.goto(POST_URL);
     await page.waitForLoadState('networkidle');
@@ -199,7 +197,7 @@ test.describe('@REQ-A11Y-02 Back to Top Button', () => {
   });
 });
 
-test.describe('@REQ-CONTENT-02 Share Buttons', () => {
+test.describe('@navigation Share Buttons', () => {
   test('share section is present on post pages', async ({ page }) => {
     await page.goto(POST_URL);
     await page.waitForLoadState('networkidle');
@@ -256,7 +254,7 @@ test.describe('@REQ-CONTENT-02 Share Buttons', () => {
   });
 });
 
-test.describe('@REQ-CONTENT-02 Share Buttons (absent on non-post pages)', () => {
+test.describe('@navigation Share Buttons (absent on non-post pages)', () => {
   test('share section is not present on the blog listing page', async ({ page }) => {
     await page.goto('/blog/');
     await page.waitForLoadState('networkidle');
@@ -267,7 +265,7 @@ test.describe('@REQ-CONTENT-02 Share Buttons (absent on non-post pages)', () => 
   });
 });
 
-test.describe('@REQ-CONTENT-02 Print Styles', () => {
+test.describe('@visual Print Styles', () => {
   test('print-url span is present in article footer', async ({ page }) => {
     await page.goto(POST_URL);
     await page.waitForLoadState('networkidle');
@@ -308,7 +306,7 @@ test.describe('@REQ-CONTENT-02 Print Styles', () => {
   });
 });
 
-test.describe('@REQ-NAV-02 @REQ-A11Y-02 Interactive Elements - Mobile', () => {
+test.describe('@navigation @visual Interactive Elements - Mobile', () => {
   test.use({ viewport: { width: 320, height: 568 } });
 
   test('back-to-top button is accessible on mobile', async ({ page }) => {

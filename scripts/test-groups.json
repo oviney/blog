@@ -1,0 +1,12 @@
+{
+  "_sass/**":             ["visual", "accessibility", "navigation"],
+  "_layouts/**":          ["ALL"],
+  "_includes/**":         ["ALL"],
+  "_posts/**":            ["content", "links"],
+  "_drafts/**":           ["content", "links"],
+  "assets/js/**":         ["navigation", "search", "accessibility"],
+  "assets/css/**":        ["visual", "accessibility"],
+  "_config*.yml":         ["ALL"],
+  "package*.json":        ["security", "ALL"],
+  ".github/workflows/**": []
+}

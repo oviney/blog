@@ -6,11 +6,9 @@ import { test, expect } from '@playwright/test';
  *
  * These tests complement BackstopJS visual regression testing by validating
  * behavioral aspects of navigation and user interactions.
- *
- * @requirements REQ-NAV-01, REQ-NAV-02
  */
 
-test.describe('@REQ-NAV-01 @REQ-NAV-02 Navigation & User Journeys', () => {
+test.describe('@navigation @links Navigation & User Journeys', () => {
 
   test('Primary navigation journey: Homepage → Blog → Article → Back', async ({ page }) => {
     // Start from homepage
@@ -413,7 +411,7 @@ test.describe('@REQ-NAV-01 @REQ-NAV-02 Navigation & User Journeys', () => {
 
 });
 
-test.describe('@REQ-NAV-01 @REQ-NAV-02 Mobile Navigation Specific Tests', () => {
+test.describe('@navigation Mobile Navigation Specific Tests', () => {
 
   test.use({ viewport: { width: 320, height: 568 } }); // Mobile viewport
 
