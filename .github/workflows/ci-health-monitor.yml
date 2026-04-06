@@ -52,6 +52,9 @@ jobs:
             ]);
 
             // Conclusions that indicate a broken pipeline.
+            // `cancelled` and `skipped` are intentionally excluded — they are
+            // expected outcomes (e.g. concurrency cancellation, path filters)
+            // and do not indicate a broken workflow.
             const FAILING_CONCLUSIONS = new Set(['failure', 'action_required', 'timed_out']);
 
             const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
@@ -92,18 +95,27 @@ jobs:
             /**
              * Find the currently open CI-health issue for a given workflow.
              * Uses the "ci" label to narrow the search, then matches on title.
+             * Paginates until all open CI issues are checked so duplicates are
+             * not created even when more than 100 CI issues are open at once.
              */
             async function findOpenIssue(repoLabel, workflowName) {
               const expectedTitle = `ci: [${repoLabel}] ${workflowName} is failing on main`;
               try {
-                // Fetch open issues with the "ci" label (max 100).
-                const resp = await github.rest.issues.listForRepo({
-                  ...ISSUE_REPO,
-                  state: 'open',
-                  labels: 'ci',
-                  per_page: 100,
-                });
-                return resp.data.find(i => i.title === expectedTitle) ?? null;
+                let page = 1;
+                while (true) {
+                  const resp = await github.rest.issues.listForRepo({
+                    ...ISSUE_REPO,
+                    state: 'open',
+                    labels: 'ci',
+                    per_page: 100,
+                    page,
+                  });
+                  const found = resp.data.find(i => i.title === expectedTitle);
+                  if (found) return found;
+                  if (resp.data.length < 100) break;   // last page reached
+                  page++;
+                }
+                return null;
               } catch {
                 return null;
               }
@@ -139,7 +151,7 @@ jobs:
                 let latestRun;
                 try {
                   const resp = await octokit.rest.actions.listWorkflowRuns({
-                    owner, repo, workflow_id: wf.id, branch: 'main', per_page: 5,
+                    owner, repo, workflow_id: wf.id, branch: 'main', per_page: 20,
                   });
                   latestRun = resp.data.workflow_runs.find(r => r.conclusion !== null);
                 } catch (err) {
@@ -160,7 +172,11 @@ jobs:
 
                 if (isFailing) {
                   // ── How long has this run been failing? ─────────────────────
-                  const runAgeMs    = Date.now() - new Date(latestRun.created_at).getTime();
+                  // Use updated_at (when the run concluded) rather than
+                  // created_at (when it was triggered) so that long-running
+                  // workflows are not escalated before they even finish.
+                  const failedAt    = new Date(latestRun.updated_at);
+                  const runAgeMs    = Date.now() - failedAt.getTime();
                   const isEscalate  = runAgeMs >= TWO_HOURS_MS;
                   const hoursRed    = (runAgeMs / (1000 * 60 * 60)).toFixed(1);
 
@@ -181,6 +197,7 @@ jobs:
                     body += `### Failing Run\n\n`;
                     body += `- **URL:** ${latestRun.html_url}\n`;
                     body += `- **Started:** ${latestRun.created_at}\n`;
+                    body += `- **Failed at:** ${latestRun.updated_at}\n`;
                     body += `- **Duration red:** ~${hoursRed}h\n\n`;
 
                     if (lastGoodUrl) {
@@ -210,7 +227,19 @@ jobs:
                       });
                       core.info(`  ✅ Opened issue #${created.data.number}`);
                     } catch (err) {
-                      core.error(`  Failed to create issue for "${wf.name}": ${err.message}`);
+                      // Assignee may be rejected if 'copilot' is not a collaborator;
+                      // retry without assignee so the issue is still created.
+                      try {
+                        const created = await github.rest.issues.create({
+                          ...ISSUE_REPO,
+                          title: `ci: [${repoLabel}] ${wf.name} is failing on main`,
+                          body,
+                          labels,
+                        });
+                        core.warning(`  ⚠️ Opened issue #${created.data.number} without assignee: ${err.message}`);
+                      } catch (err2) {
+                        core.error(`  Failed to create issue for "${wf.name}": ${err2.message}`);
+                      }
                     }
 
                   } else {
