@@ -1,0 +1,88 @@
+name: Monthly Traffic Review
+description: Monthly checklist for reviewing GSC and GA4 data and feeding it back into content decisions
+title: "Monthly Traffic Review — [MONTH YYYY]"
+labels: ["analytics", "content-strategy"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Monthly Traffic Review
+
+        Complete this checklist on the **first Monday of each month**.
+        See [docs/seo-feedback-loop.md](https://github.com/oviney/blog/blob/main/docs/seo-feedback-loop.md) for full guidance.
+
+  - type: input
+    id: review_period
+    attributes:
+      label: Review period
+      description: Which 28-day window are you reviewing?
+      placeholder: "e.g. 2026-03-01 → 2026-03-28"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: gsc_checks
+    attributes:
+      label: Google Search Console
+      options:
+        - label: Opened Performance report (last 28 days)
+        - label: Noted top 5 queries by impressions
+        - label: Noted top 5 queries by CTR
+        - label: Checked for Index Coverage errors
+        - label: Checked sitemap status (no errors)
+
+  - type: textarea
+    id: top_queries
+    attributes:
+      label: Top queries (impressions)
+      description: Paste the top 5 queries from the Queries tab
+      placeholder: |
+        1. test automation roi
+        2. self-healing tests
+        3. cost of poor quality software
+        4. ai software testing
+        5. digital transformation failure
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: ga4_checks
+    attributes:
+      label: Google Analytics 4
+      options:
+        - label: Reviewed top 5 landing pages (organic)
+        - label: Noted avg. engagement time per page
+        - label: Identified pages with high bounce rate
+
+  - type: textarea
+    id: top_pages
+    attributes:
+      label: Top landing pages (organic)
+      description: Paste the top 5 pages from GA4 → Acquisition → Traffic acquisition
+      placeholder: |
+        1. /2026/01/19/the-surprising-economics-of-test-automation-roi/
+        2. /2026/01/02/self-healing-tests-myth-vs-reality/
+        ...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: content_actions
+    attributes:
+      label: Content actions
+      options:
+        - label: Identified at least one existing post to update
+        - label: Identified at least one new topic to write about
+        - label: Opened content issue(s) for next sprint
+
+  - type: textarea
+    id: findings
+    attributes:
+      label: Key findings and decisions
+      description: Summary of what you found and what content actions you're taking
+      placeholder: |
+        - "test automation roi" ranks page 2 → update the ROI post with fresher data
+        - High impressions, low CTR for "self-healing tests" → rewrite title/description
+        - New topic: "shift-left testing strategy" — no post yet, high volume
+    validations:
+      required: false
