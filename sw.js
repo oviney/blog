@@ -9,7 +9,7 @@ layout: null
  *   - Offline fallback page when both fail
  */
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const STATIC_CACHE  = 'static-' + CACHE_VERSION;
 const PAGES_CACHE   = 'pages-'  + CACHE_VERSION;
 
