@@ -35,6 +35,7 @@ PROTECTED_FILES=(
 # ---------------------------------------------------------------------------
 if ! git fetch origin main --quiet 2>/dev/null; then
   echo "WARN: Could not fetch origin/main; diff may be incomplete." >&2
+  echo "      Ensure you have network connectivity and push access to the remote." >&2
 fi
 
 # Build the list of files changed on this branch vs origin/main.
