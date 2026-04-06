@@ -975,10 +975,12 @@ blockquote {
   background: $text-primary;
   padding: $spacing-xs $spacing-sm;
   text-decoration: none;
+  border-bottom: none;
   transition: background 0.2s ease;
 
   &:hover {
     background: $economist-red;
+    color: $background-white;
   }
 }
 
@@ -2348,7 +2350,7 @@ article.topic-card h2 a,
     color: $text-primary;
   }
 
-  a {
+  a:not(.connect-link) {
     color: $economist-red;
     text-decoration: none;
     border-bottom: 1px solid currentColor;
