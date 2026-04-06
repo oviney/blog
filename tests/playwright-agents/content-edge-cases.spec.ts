@@ -255,7 +255,7 @@ test.describe('Content Metadata Variations', () => {
     }
 
     // Check for read time calculation (conditional)
-    const readTime = page.locator('.read-time, .reading-time, [class*="read"]').first();
+    const readTime = page.locator('.read-time, .reading-time, [class*="read-time"], [class*="reading-time"]').first();
     const readTimeCount = await readTime.count();
     if (readTimeCount > 0) {
       await expect(readTime).toBeVisible();
