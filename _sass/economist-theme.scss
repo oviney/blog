@@ -139,6 +139,31 @@ body {
   }
 }
 
+// Hamburger toggle button — hidden on desktop, shown on mobile
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  // Use padding so the clickable area meets the 44×44px touch-target minimum
+  // while keeping the visual bars at 28×22px.
+  // Content box: width = 44-(8+8) = 28px, height = 44-(11+11) = 22px → bars unchanged.
+  min-width: 44px;
+  min-height: 44px;
+  padding: 11px 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  .nav-toggle__bar {
+    display: block;
+    width: 100%; // 28px (min-width 44 − horizontal padding 8+8)
+    height: 2px;
+    background-color: $text-primary;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+}
+
 .main-content {
   max-width: 900px;
   margin: 0 auto;
@@ -1193,7 +1218,77 @@ table {
   body {
     font-size: 16px;
   }
-  
+
+  // Compact header row on mobile
+  .page-header {
+    padding: 0 $spacing-md;
+    min-height: 50px;
+    align-items: center;
+    justify-content: space-between;
+
+    .site-title {
+      padding-left: 0;
+
+      a {
+        font-size: 1.25rem;
+        padding: 4px 10px;
+      }
+    }
+  }
+
+  // Show hamburger button on mobile
+  .nav-toggle {
+    display: flex;
+  }
+
+  // Hide nav by default on mobile; shown when .nav-open is set on body.
+  // Only applies when JS is active (.js-nav-enabled) — progressive enhancement:
+  // without JS the nav remains visible so users can always reach navigation.
+  .js-nav-enabled .site-nav {
+    display: none;
+    border-bottom: 1px solid $border-color;
+
+    ul {
+      flex-direction: column;
+      padding: 0;
+
+      li a {
+        padding: $spacing-sm $spacing-md;
+        border-bottom: 1px solid $border-color;
+        border-left: none;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+
+        &:hover {
+          border-bottom-color: $border-color;
+          border-left: 3px solid $economist-red;
+          padding-left: calc(#{$spacing-md} - 3px);
+        }
+      }
+    }
+  }
+
+  // Open state: show nav and animate hamburger to X
+  .js-nav-enabled.nav-open .site-nav {
+    display: block;
+  }
+
+  .nav-open .nav-toggle {
+    // Button height is 22px; middle is at 10px — translate bars to centre before rotating
+    .nav-toggle__bar:nth-child(1) {
+      transform: translateY(10px) rotate(45deg);
+    }
+
+    .nav-toggle__bar:nth-child(2) {
+      opacity: 0;
+    }
+
+    .nav-toggle__bar:nth-child(3) {
+      transform: translateY(-10px) rotate(-45deg);
+    }
+  }
+
   .main-content {
     padding: $spacing-md;
   }
@@ -1201,20 +1296,7 @@ table {
   .posts-grid {
     grid-template-columns: 1fr;
   }
-  
-  .site-nav ul {
-    flex-direction: column;
-    
-    li a {
-      border-bottom: none;
-      border-left: 3px solid transparent;
-      
-      &:hover {
-        border-left-color: $economist-red;
-      }
-    }
-  }
-  
+
   article > p:first-of-type::first-letter {
     font-size: 3rem;
   }
@@ -1543,6 +1625,12 @@ table {
   .hero-post-image {
     aspect-ratio: 16 / 9;
   }
+
+  // Reduce hero section bottom gap so the next section starts closer to the fold
+  .hero-post {
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-md;
+  }
 }
 
 // ============================================
@@ -1684,7 +1772,14 @@ table {
   }
 
   .econ-topic-page {
-    padding: $spacing-lg $spacing-md;
+    // Reduce to 16px side padding so cards feel wider on small screens
+    padding: $spacing-md $spacing-sm;
+  }
+
+  .econ-topic-header {
+    // Tighten the gap below the title so first card is closer to the fold
+    margin-bottom: $spacing-sm;
+    padding-bottom: $spacing-sm;
   }
 
   .econ-topic-title {
@@ -1965,7 +2060,8 @@ article.topic-card h2 a,
   padding: $spacing-xl $spacing-lg;
 
   @media (max-width: 768px) {
-    padding: $spacing-lg $spacing-md;
+    // 16px side padding so cards read edge-to-edge on small screens
+    padding: $spacing-md $spacing-sm;
   }
 }
 
@@ -1981,6 +2077,13 @@ article.topic-card h2 a,
   padding-top: $spacing-xl;
   padding-bottom: $spacing-xl;
   border-bottom: 1px solid $border-color;
+
+  @media (max-width: 768px) {
+    // Reduce vertical whitespace so more content is visible on mobile
+    padding-top: $spacing-md;
+    padding-bottom: $spacing-md;
+    margin-bottom: $spacing-lg;
+  }
 }
 
 .home-focus-grid {

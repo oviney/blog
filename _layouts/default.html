@@ -24,9 +24,14 @@
     <h1 class="site-title">
       <a href="{{ '/' | relative_url }}">{{ site.title }}</a>
     </h1>
+    <button type="button" class="nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="site-navigation">
+      <span class="nav-toggle__bar"></span>
+      <span class="nav-toggle__bar"></span>
+      <span class="nav-toggle__bar"></span>
+    </button>
   </header>
 
-  <nav class="site-nav">
+  <nav class="site-nav" id="site-navigation">
     <ul>
       <li><a href="{{ '/' | relative_url }}">Home</a></li>
       <li><a href="{{ '/blog/' | relative_url }}">Blog</a></li>
@@ -72,6 +77,30 @@
       {% endif %}
     </div>
   </footer>
+  <!-- Hamburger navigation toggle -->
+  <script>
+    (function () {
+      // Progressive enhancement: mark body so nav is hidden behind hamburger only when JS is active
+      document.body.classList.add('js-nav-enabled');
+
+      var toggle = document.querySelector('.nav-toggle');
+      var nav = document.getElementById('site-navigation');
+      if (toggle && nav) {
+        toggle.addEventListener('click', function () {
+          var isOpen = document.body.classList.toggle('nav-open');
+          toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          toggle.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+        });
+        nav.querySelectorAll('a').forEach(function (link) {
+          link.addEventListener('click', function () {
+            document.body.classList.remove('nav-open');
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', 'Open navigation menu');
+          });
+        });
+      }
+    })();
+  </script>
   <!-- Service Worker registration -->
   <script>
     if ('serviceWorker' in navigator) {

@@ -14,6 +14,12 @@ test.describe('Navigation & User Journeys', () => {
     // Start from homepage
     await page.goto('/');
 
+    // On mobile, open the hamburger menu first so navigation becomes visible
+    const hamburger = page.locator('.nav-toggle');
+    if (await hamburger.isVisible()) {
+      await hamburger.click();
+    }
+
     // Verify main navigation is visible (improved selector)
     const mainNav = page.locator('nav, .site-nav, .main-nav, [role="navigation"]');
     await expect(mainNav.first()).toBeVisible();
@@ -409,8 +415,87 @@ test.describe('Mobile Navigation Specific Tests', () => {
 
   test.use({ viewport: { width: 320, height: 568 } }); // Mobile viewport
 
+  test('Hamburger button is visible and nav is hidden by default on mobile', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    // JS should have added js-nav-enabled class (progressive enhancement)
+    const hasJsClass = await page.evaluate(() => document.body.classList.contains('js-nav-enabled'));
+    expect(hasJsClass).toBe(true);
+
+    // Hamburger toggle button should be visible
+    const toggle = page.getByRole('button', { name: /open navigation menu/i });
+    await expect(toggle).toBeVisible();
+
+    // Navigation should be hidden behind hamburger when JS is active
+    const nav = page.locator('#site-navigation');
+    await expect(nav).toBeHidden();
+  });
+
+  test('Hamburger opens and closes the navigation menu', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    const toggle = page.locator('.nav-toggle');
+    const nav = page.locator('#site-navigation');
+
+    // Menu starts hidden
+    await expect(nav).toBeHidden();
+
+    // Open the menu
+    await toggle.click();
+    await expect(nav).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    // Close the menu
+    await toggle.click();
+    await expect(nav).toBeHidden();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('Nav link tap closes the hamburger menu', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    const toggle = page.locator('.nav-toggle');
+    const nav = page.locator('#site-navigation');
+
+    // Open the menu
+    await toggle.click();
+    await expect(nav).toBeVisible();
+
+    // Skip if the Blog link is not present; return stops further execution
+    const blogLink = nav.getByRole('link', { name: /blog/i }).first();
+    if (await blogLink.count() === 0) {
+      test.skip(true, 'Blog link is not present in the mobile navigation on this page.');
+      return;
+    }
+
+    const blogHref = await blogLink.getAttribute('href');
+    if (blogHref) {
+      const expectedUrl = new URL(blogHref, page.url()).toString();
+      await Promise.all([
+        page.waitForURL(expectedUrl),
+        blogLink.click(),
+      ]);
+    } else {
+      await blogLink.click();
+    }
+
+    await page.waitForLoadState('networkidle');
+    // After navigation the menu should be closed (nav-open class removed)
+    const isOpen = await page.evaluate(() => document.body.classList.contains('nav-open'));
+    expect(isOpen).toBe(false);
+  });
+
   test('Mobile navigation is touch-friendly', async ({ page }) => {
     await page.goto('/');
+
+    // Open the menu so links are visible before measuring
+    const toggle = page.locator('.nav-toggle');
+    if (await toggle.count() > 0) {
+      await toggle.click();
+    }
 
     // Verify navigation elements are large enough for touch
     const navLinks = page.getByRole('navigation').getByRole('link');
@@ -430,20 +515,33 @@ test.describe('Mobile Navigation Specific Tests', () => {
   test('Mobile navigation doesn\'t overlap content', async ({ page }) => {
     await page.goto('/');
 
-    // Check that navigation doesn't cover main content
-    const navigation = page.locator('nav, .site-nav, .main-nav, [role="navigation"]');
+    // Check that navigation (when closed) doesn't cover main content
     const mainContent = page.locator('main, .main-content, .content');
+    const header = page.locator('header.page-header, .page-header');
 
-    if (await navigation.count() > 0 && await mainContent.count() > 0) {
-      const navBox = await navigation.boundingBox();
+    if (await header.count() > 0 && await mainContent.count() > 0) {
+      const headerBox = await header.boundingBox();
       const contentBox = await mainContent.boundingBox();
 
-      if (navBox && contentBox) {
-        // Navigation should not overlap main content area
-        expect(navBox.y + navBox.height <= contentBox.y ||
-               navBox.y >= contentBox.y + contentBox.height).toBeTruthy();
+      if (headerBox && contentBox) {
+        // Header should be above main content; allow 1px sub-pixel rounding tolerance
+        expect(headerBox.y + headerBox.height).toBeLessThanOrEqual(contentBox.y + 1);
       }
     }
+  });
+
+  test('Desktop layout: hamburger hidden, nav visible at 1280px', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    // Hamburger button should not be visible on desktop
+    const toggle = page.locator('.nav-toggle');
+    await expect(toggle).toBeHidden();
+
+    // Navigation should be visible directly (no hamburger needed)
+    const nav = page.locator('#site-navigation');
+    await expect(nav).toBeVisible();
   });
 
 });
