@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "The invisible shield: how DNS became cybersecurity's first line of defence"
+title: "The invisible shield: DNS as cybersecurity's first line"
 date: 2023-12-28
-author: "The Economist"
-categories: ["Quality Engineering", "Software Engineering"]
+author: "Ouray Viney"
+categories: ["Security"]
 image: /assets/images/dns-invisible-shield.png
 description: "Cisco blocks 7 million malicious DNS requests every minute. How the Domain Name System became cybersecurity's most underrated first line of defence."
 ---
@@ -22,7 +22,7 @@ Yet DNS security is not impervious. Encrypted DNS protocols — DNS over HTTPS a
 
 Cisco's own 2023 Cybersecurity Readiness Index acknowledged this tension. Among 6,700 organisations surveyed across 27 countries, only 15% had adapted their DNS security architecture to handle encrypted queries. The remaining 85% faced a growing blind spot — precisely the kind of gap that attackers, who read the same reports, know how to exploit.
 
-Sophisticated adversaries are also learning to evade DNS filtering through domain generation algorithms that create thousands of disposable domains daily, staying ahead of blocklists. CrowdStrike's 2023 Threat Intelligence Report documented a 95% increase in algorithmically generated domains used by state-sponsored groups between 2021 and 2023.
+Sophisticated adversaries are also learning to evade DNS filtering through domain generation algorithms that create thousands of disposable domains daily, staying ahead of blocklists. CrowdStrike's 2023 Threat Intelligence Report documented a 95% increase in algorithmically generated domains used by state-sponsored groups between 2021 and 2023. The erosion of DNS visibility is one dimension of a broader pattern: security tools that were designed for one threat model age quickly in the face of adaptive attackers. The same dynamic affects software supply chains and development pipelines — as explored in [The coder's crutch: AI-assisted development's hidden costs](/2023/08/08/practical-applications-of-ai-in-software-development/).
 
 ## The integration imperative
 
@@ -33,6 +33,8 @@ Microsoft's own enterprise security division has taken a different approach, emb
 The choice between network-centric and endpoint-centric DNS security will define the next phase of this market. Organisations that treat DNS as a checkbox — install Umbrella, declare victory — will discover that the shield has gaps they never tested. Those that integrate DNS telemetry into their broader security operations, correlating query patterns with authentication anomalies and endpoint behaviour, will build something genuinely resilient.
 
 The invisible shield works. The question is whether organisations will invest enough to keep it from becoming invisible for the wrong reasons.
+
+DNS filtering is not a substitute for a complete security posture. It is one layer — albeit an unusually cost-effective one — in a broader architecture that must include endpoint detection, identity management, and user education. Organisations that deploy DNS security in isolation, without integrating it into a unified security operations centre, will find themselves chasing alerts from one layer while adversaries exploit gaps in another. The 2023 Cisco Cybersecurity Readiness Index found that organisations with integrated security platforms detected breaches 74 days faster than those with fragmented tools. Speed of detection, in cybersecurity, is often the difference between a recoverable incident and a catastrophic one. DNS visibility, feeding into that integrated platform, is a signal source that most organisations are still failing to use fully.
 
 ## References
 
