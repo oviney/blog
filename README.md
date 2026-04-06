@@ -144,3 +144,56 @@ bash scripts/check-pr-scope.sh
 - Exit `1` → one or more violations found; fix them before pushing.
 
 No dependencies beyond `git` and `bash`.
+## Agent Merge Unblocker
+
+Every Copilot-authored PR passes through the normal branch-protection rules on
+`main`.  Two settings were found (see [#586](https://github.com/oviney/blog/issues/586))
+that silently block agent PRs from ever merging:
+
+| # | Setting | Symptom | Fix |
+|---|---------|---------|-----|
+| 1 | `dismiss_stale_reviews = true` (branch protection, `main`) | Bot follow-up commits silently dismiss human approvals; PR drifts back to `REVIEW_REQUIRED`. | Set to `false` — approval survives subsequent bot commits. |
+| 2 | Actions → "Require approval for all outside collaborators" | Copilot bot is treated as a first-time contributor; every workflow ends in `action_required` (0 s); `build` context never passes. | Change policy to "first-time contributors who are new to GitHub". |
+
+**Setting 1** is patched automatically by the script.  
+**Setting 2** must be changed manually in the web UI (GitHub does not expose this toggle via REST API for user-owned repositories).
+
+### Running the fix script
+
+```bash
+# Requires: gh CLI (authenticated as a repo admin), jq
+bash scripts/fix-agent-merge-blockers.sh [owner/repo]
+```
+
+The script is **idempotent** — it reads current state before every write and
+exits 0 without making changes if a setting is already correct.
+
+**What the script does automatically (via REST API):**
+
+1. Reads the full branch-protection payload for `main`.
+2. Patches `dismiss_stale_reviews → false` while preserving every other
+   existing setting (required status checks, review count, admin enforcement,
+   restrictions, etc.).
+3. Confirms the write took effect.
+4. Reports `default_workflow_permissions` and `can_approve_pull_request_reviews`
+   for operator awareness — **no changes are made** to these values.
+   `can_approve_pull_request_reviews` must remain `false`; enabling it would
+   allow workflow tokens to self-approve PRs, removing the human-approval
+   requirement.
+
+**What must be done manually (web UI):**
+
+GitHub does not expose the fork-PR approval gate via REST API for
+user-owned repositories.  After running the script:
+
+1. Open **https://github.com/oviney/blog/settings/actions**
+2. Locate **"Fork pull request workflows from outside collaborators"**
+3. Select **"Require approval for first-time contributors who are new to GitHub"**
+   (or the least-restrictive option acceptable to the repository owner)
+4. Click **Save**
+
+### When to re-run
+
+Re-run the script any time branch-protection settings are reset by a GitHub
+UI change, a repository transfer, or a new admin modifying the settings.  The
+script is safe to run repeatedly.
