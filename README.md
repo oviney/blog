@@ -117,3 +117,30 @@ blog/
 ## Content Generation System
 
 For details on the AI content generation pipeline, see [oviney/economist-agents](https://github.com/oviney/economist-agents).
+
+## Agent PR Eval Harness
+
+Tools that agents run to self-validate their PRs before requesting review.
+
+### Scope Self-Check
+
+**Script:** `scripts/check-pr-scope.sh`
+
+A lightweight pre-push self-check that every agent should run before opening or updating a PR. It diffs the current branch against `origin/main` and enforces three scope rules:
+
+| Rule | What it flags |
+|------|--------------|
+| **Protected files** | Any change to `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`, `AGENTS.md`, or `ARCHITECTURE.md` |
+| **Scope explosion** | More than 15 files changed in a single PR |
+| **Governance surfaces** | Any change under `.github/skills/` or `.github/instructions/` — these require a dedicated issue |
+
+**When to run:** Before every `git push` on an agent branch.
+
+```bash
+bash scripts/check-pr-scope.sh
+```
+
+- Exit `0` → no violations; safe to push.
+- Exit `1` → one or more violations found; fix them before pushing.
+
+No dependencies beyond `git` and `bash`.

@@ -77,3 +77,15 @@ If the issue requires changes outside your scope, comment on the issue explainin
 - Follow existing code patterns — read surrounding code before editing
 - Maximum 30 files per PR — if more are needed, split into multiple PRs
 - Every PR must reference an issue (`Closes #N`)
+
+## Scope Discipline — NEVER do these things
+
+Out-of-scope changes have repeatedly caused PR review overhead and unexpected regressions. Enforce these rules on every PR without exception:
+
+- NEVER modify files outside the files/paths explicitly named in the assigned issue
+- NEVER "improve" adjacent code you happen to notice — open a separate issue instead
+- NEVER rename, move, or reorganize files unless the issue explicitly asks you to
+- NEVER add new scripts, workflows, or config files not requested by the issue
+- BEFORE pushing, run `scripts/check-pr-scope.sh` and fix any violations
+
+**Worked example:** If the issue says "fix mobile nav CSS", touching `AGENTS.md` is out of scope even if it has stale references to mobile nav. Open a new issue for that work instead.
