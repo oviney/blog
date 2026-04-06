@@ -7,11 +7,9 @@ import { test, expect } from '@playwright/test';
  *  - Article schema on post pages
  *  - BreadcrumbList schema on all pages
  *  - Meta description using page.description front matter
- *
- * @requirements REQ-CONTENT-01, REQ-CONTENT-02
  */
 
-test.describe('@REQ-CONTENT-01 @REQ-CONTENT-02 SEO JSON-LD Structured Data', () => {
+test.describe('@content @links SEO JSON-LD Structured Data', () => {
 
   test('BreadcrumbList JSON-LD is present on the homepage', async ({ page }) => {
     await page.goto('/');
