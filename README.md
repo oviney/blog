@@ -197,3 +197,42 @@ user-owned repositories.  After running the script:
 Re-run the script any time branch-protection settings are reset by a GitHub
 UI change, a repository transfer, or a new admin modifying the settings.  The
 script is safe to run repeatedly.
+`scripts/eval-agent-pr.sh` scores any PR against a five-dimension quality rubric
+and writes a JSON snapshot to `.agent-evals/<pr>.json`.
+
+**Dependencies:** `gh` CLI (authenticated) and `jq`.
+
+```bash
+# Score PR #578
+./scripts/eval-agent-pr.sh 578
+
+# Score a PR in a different repo
+./scripts/eval-agent-pr.sh 42 owner/other-repo
+```
+
+The script exits **0** when every dimension passes its hard threshold, **1** otherwise.
+
+### Rubric
+
+| Dimension | What is measured | Hard threshold |
+|-----------|-----------------|----------------|
+| **Scope adherence** | Changed files vs. protected files list (`_config.yml`, `Gemfile`, etc.) | Fail if any protected file is modified |
+| **Atomic commits** | Commit-message heuristic: subject containing two distinct action verbs | Fail if any commit bundles multiple concerns |
+| **Test coverage** | `test_loc / code_loc` for `.js/.ts/.sh/.rb/.py` files | Fail if `code_loc > 50` and `test_loc == 0` |
+| **CI status** | All completed check-runs conclude `success` or `skipped` | Fail if any check-run fails |
+| **Review churn** | Force-pushes after first non-pending review | Fail if > 2 force-pushes post-review |
+
+### Interpreting scores
+
+Each dimension in the output JSON contains:
+
+- **`pass`** (`true`/`false`) — whether the hard threshold was met
+- **`note`** — human-readable explanation
+- Dimension-specific counters (e.g. `commit_count`, `force_push_count`)
+
+**`all_pass: true`** means the PR passed every threshold — a signal of
+high-quality, reviewable agent work.  Individual dimensions can be inspected
+when `all_pass` is `false` to identify which governance rule was violated.
+
+Fixture evaluations for reference PRs live in `.agent-evals/`
+(e.g. `565.json`, `569.json`, `574.json`).
