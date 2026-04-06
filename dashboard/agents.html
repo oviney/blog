@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Observability Dashboard — The Economist Blog</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --red:        #E3120B;
+      --text:       #1a1a1a;
+      --muted:      #666;
+      --border:     #ddd;
+      --bg:         #f9f9f9;
+      --card-bg:    #fff;
+      --pass:       #2e7d32;
+      --warn:       #e65100;
+      --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-serif: 'Merriweather', Georgia, serif;
+      --radius:     6px;
+      --shadow:     0 2px 8px rgba(0,0,0,.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    /* ── Header ─────────────────────────────────────────────── */
+    .site-header {
+      background: var(--red);
+      color: #fff;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 48px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .4px;
+    }
+    .site-header a { color: #fff; text-decoration: none; opacity: .8; }
+    .site-header a:hover { opacity: 1; }
+    .site-header .sep { opacity: .4; }
+    .page-header {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 24px;
+    }
+    .page-header h1 {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 700;
+    }
+    .page-header .meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    /* ── Layout ─────────────────────────────────────────────── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+    }
+    .section { margin-bottom: 40px; }
+    /* ── KPI cards ──────────────────────────────────────────── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    .kpi-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      border-top: 3px solid var(--red);
+    }
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .kpi-value {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--text);
+    }
+    .kpi-value.green { color: var(--pass); }
+    .kpi-value.orange { color: var(--warn); }
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    /* ── Two-column chart grid ──────────────────────────────── */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 768px) { .chart-grid { grid-template-columns: 1fr; } }
+    .chart-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+    .chart-card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 16px;
+    }
+    .chart-wrap { position: relative; height: 220px; }
+    /* ── Tables ─────────────────────────────────────────────── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      font-size: 13px;
+    }
+    .data-table th {
+      background: var(--bg);
+      border-bottom: 2px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: var(--bg); }
+    /* ── Pills ──────────────────────────────────────────────── */
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .pill-pass  { background: #e8f5e9; color: var(--pass); }
+    .pill-fail  { background: #fbe9e7; color: var(--warn); }
+    .pill-skip  { background: #f5f5f5; color: #999; }
+    .pill-excellent { background: #e8f5e9; color: var(--pass); }
+    .pill-good      { background: #e3f2fd; color: #1565c0; }
+    .pill-needs     { background: #fff8e1; color: #f57f17; }
+    .pill-critical  { background: #fbe9e7; color: var(--warn); }
+    /* ── Dim grid in table ──────────────────────────────────── */
+    .dim-dots { display: flex; gap: 4px; }
+    .dim-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dim-dot.pass { background: var(--pass); }
+    .dim-dot.fail { background: var(--warn); }
+    .dim-dot.null { background: #ccc; }
+    /* ── Backlog ────────────────────────────────────────────── */
+    .backlog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .backlog-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .backlog-header {
+      background: var(--bg);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+    .backlog-item {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .backlog-item:last-child { border-bottom: none; }
+    .backlog-item a { color: var(--text); text-decoration: none; }
+    .backlog-item a:hover { color: var(--red); }
+    .backlog-age { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .empty-state { padding: 16px 14px; color: var(--muted); font-size: 13px; font-style: italic; }
+    /* ── Content score bar ──────────────────────────────────── */
+    .score-bar-wrap { display: flex; flex-direction: column; gap: 10px; }
+    .score-bar-row { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .score-bar-label { width: 170px; flex-shrink: 0; }
+    .score-bar-track {
+      flex: 1;
+      height: 10px;
+      background: var(--border);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      background: var(--pass);
+      transition: width .4s ease;
+    }
+    .score-bar-fill.amber { background: #f9a825; }
+    .score-bar-fill.red   { background: var(--warn); }
+    .score-bar-num { width: 40px; text-align: right; font-weight: 600; font-size: 13px; }
+    /* ── Cross flags ────────────────────────────────────────── */
+    .flag-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+    .flag-row:last-child { border-bottom: none; }
+    .flag-icon { font-size: 18px; flex-shrink: 0; }
+    /* ── Footer ─────────────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 12px;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+    .footer a { color: var(--muted); }
+    /* ── Loading ────────────────────────────────────────────── */
+    #loading { text-align: center; padding: 80px 24px; color: var(--muted); }
+    #error-msg { display: none; text-align: center; padding: 40px; color: var(--warn); }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/">The Economist Blog</a>
+  <span class="sep">›</span>
+  Agent Observability Dashboard
+</header>
+
+<div class="page-header">
+  <div class="container" style="padding-top:0;padding-bottom:0">
+    <h1>Agent Observability Dashboard</h1>
+    <p class="meta" id="generated-at">Loading…</p>
+  </div>
+</div>
+
+<div id="loading">Loading dashboard data…</div>
+<div id="error-msg">⚠️ Could not load <code>agents-data.json</code>. Run <code>node scripts/agent-dashboard-data.js</code> to generate it.</div>
+
+<div class="container" id="main-content" style="display:none">
+
+  <!-- ── KPI Row ──────────────────────────────────────── -->
+  <section class="section">
+    <h2 class="section-title">At a Glance</h2>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Agent PRs merged (30d)</div>
+        <div class="kpi-value" id="kpi-prs">—</div>
+        <div class="kpi-sub">Copilot-authored PRs</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Eval pass rate</div>
+        <div class="kpi-value" id="kpi-pass">—</div>
+        <div class="kpi-sub" id="kpi-pass-sub">of reviewed PRs</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Avg content score</div>
+        <div class="kpi-value" id="kpi-content">—</div>
+        <div class="kpi-sub" id="kpi-content-sub">across all posts</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Open backlog</div>
+        <div class="kpi-value" id="kpi-backlog">—</div>
+        <div class="kpi-sub">issues with agent labels</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Open PRs</div>
+        <div class="kpi-value" id="kpi-open-prs">—</div>
+        <div class="kpi-sub">awaiting review</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Charts Row ───────────────────────────────────── -->
+  <section class="section">
+    <h2 class="section-title">Quality Signals</h2>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>PR Eval Pass Rates by Dimension</h3>
+        <div class="chart-wrap"><canvas id="chart-dims"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Content Score Distribution</h3>
+        <div class="chart-wrap"><canvas id="chart-content-dist"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Content score by category ────────────────────── -->
+  <section class="section">
+    <h2 class="section-title">Content Health by Category</h2>
+    <div style="background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px">
+      <div class="score-bar-wrap" id="cat-scores"></div>
+    </div>
+  </section>
+
+  <!-- ── Recent agent PR evals ─────────────────────────── -->
+  <section class="section">
+    <h2 class="section-title">Recent PR Evaluations</h2>
+    <table class="data-table" id="evals-table">
+      <thead>
+        <tr>
+          <th>PR</th>
+          <th>Title</th>
+          <th>Result</th>
+          <th title="Scope · Commits · Tests · CI · Churn">Dimensions</th>
+          <th>Evaluated</th>
+        </tr>
+      </thead>
+      <tbody id="evals-tbody"></tbody>
+    </table>
+  </section>
+
+  <!-- ── Activity feed: recent merged PRs ─────────────── -->
+  <section class="section">
+    <h2 class="section-title">Recent Activity (30 days)</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>PR</th>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Type</th>
+          <th>Merged</th>
+        </tr>
+      </thead>
+      <tbody id="activity-tbody"></tbody>
+    </table>
+  </section>
+
+  <!-- ── Open backlog by agent ─────────────────────────── -->
+  <section class="section">
+    <h2 class="section-title">Open Backlog by Agent</h2>
+    <div class="backlog-grid" id="backlog-grid"></div>
+  </section>
+
+  <!-- ── Cross-article flags ──────────────────────────── -->
+  <section class="section" id="cross-flags-section">
+    <h2 class="section-title">Content Cross-Article Flags</h2>
+    <div style="background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow)" id="cross-flags-body"></div>
+  </section>
+
+</div><!-- /container -->
+
+<footer class="footer">
+  <p>Data refreshed weekly by <a href="https://github.com/oviney/blog/actions/workflows/agent-dashboard.yml">agent-dashboard.yml</a>.
+  Run <code>node scripts/agent-dashboard-data.js</code> locally to regenerate.</p>
+</footer>
+
+<script>
+// ── Utilities ─────────────────────────────────────────────────────────────
+
+function fmt(n, suffix = '') {
+  if (n === null || n === undefined) return '—';
+  return n + suffix;
+}
+
+function relDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const days = Math.round((Date.now() - d) / 86400000);
+  if (days === 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 30)  return `${days}d ago`;
+  if (days < 365) return `${Math.round(days / 30)}mo ago`;
+  return `${Math.round(days / 365)}y ago`;
+}
+
+function scoreColor(score) {
+  if (score >= 75) return 'green';
+  if (score >= 60) return 'orange';
+  return '';
+}
+
+function scorePill(score) {
+  if (score === null || score === undefined) return '<span class="pill pill-skip">N/A</span>';
+  if (score >= 90) return `<span class="pill pill-excellent">Excellent ${score}</span>`;
+  if (score >= 75) return `<span class="pill pill-good">Good ${score}</span>`;
+  if (score >= 60) return `<span class="pill pill-needs">Needs Work ${score}</span>`;
+  return `<span class="pill pill-critical">Critical ${score}</span>`;
+}
+
+// ── Render ────────────────────────────────────────────────────────────────
+
+function render(data) {
+  const { kpis, evalDimensions, recentEvals, content, recentPRs, openIssuesByLabel } = data;
+
+  // Generated at
+  document.getElementById('generated-at').textContent =
+    `Last updated: ${new Date(data.generatedAt).toLocaleString()} · ${kpis.evalCount} PRs evaluated · ${content?.postCount ?? 0} posts reviewed`;
+
+  // KPIs
+  const kpiPRs = document.getElementById('kpi-prs');
+  kpiPRs.textContent = fmt(kpis.agentPRsMerged30d);
+  kpiPRs.className = 'kpi-value';
+
+  const kpiPass = document.getElementById('kpi-pass');
+  kpiPass.textContent = fmt(kpis.evalPassRate, '%');
+  kpiPass.className = 'kpi-value ' + scoreColor(kpis.evalPassRate);
+  document.getElementById('kpi-pass-sub').textContent = `${kpis.evalCount} PRs evaluated`;
+
+  const kpiContent = document.getElementById('kpi-content');
+  kpiContent.textContent = fmt(kpis.contentAvgScore, '/100');
+  kpiContent.className = 'kpi-value ' + scoreColor(kpis.contentAvgScore);
+  document.getElementById('kpi-content-sub').textContent = `${content?.postCount ?? 0} posts`;
+
+  document.getElementById('kpi-backlog').textContent = fmt(kpis.openBacklog);
+  document.getElementById('kpi-open-prs').textContent = fmt(kpis.openPRCount);
+
+  // Chart: eval dimensions (horizontal bar)
+  new Chart(document.getElementById('chart-dims'), {
+    type: 'bar',
+    data: {
+      labels: evalDimensions.labels,
+      datasets: [{
+        label: 'Pass rate (%)',
+        data: evalDimensions.passRates,
+        backgroundColor: evalDimensions.passRates.map(v =>
+          v >= 75 ? 'rgba(46,125,50,.75)' : v >= 50 ? 'rgba(249,168,37,.75)' : 'rgba(230,81,0,.75)'
+        ),
+        borderRadius: 4,
+      }],
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { min: 0, max: 100, ticks: { callback: v => v + '%' } },
+        y: { ticks: { font: { size: 12 } } },
+      },
+    },
+  });
+
+  // Chart: content score distribution (doughnut)
+  if (content) {
+    const dist = content.distribution;
+    new Chart(document.getElementById('chart-content-dist'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Excellent (≥90)', 'Good (75–89)', 'Needs Work (60–74)', 'Critical (<60)'],
+        datasets: [{
+          data: [dist.excellent, dist.good, dist.needsWork, dist.critical],
+          backgroundColor: ['#2e7d32', '#1565c0', '#f9a825', '#e65100'],
+          borderWidth: 2,
+          borderColor: '#fff',
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 12 } },
+        },
+      },
+    });
+  }
+
+  // Content score bars by category
+  if (content?.catAvgs) {
+    const container = document.getElementById('cat-scores');
+    const cats = Object.entries(content.catAvgs);
+    if (cats.length === 0) {
+      container.innerHTML = '<p style="color:var(--muted);font-size:13px">No category data available.</p>';
+    } else {
+      container.innerHTML = cats.map(([cat, score]) => {
+        const pct    = score ?? 0;
+        const cls    = pct >= 75 ? '' : pct >= 60 ? 'amber' : 'red';
+        const label  = score !== null ? `${score}` : '—';
+        return `
+          <div class="score-bar-row">
+            <span class="score-bar-label">${cat}</span>
+            <div class="score-bar-track">
+              <div class="score-bar-fill ${cls}" style="width:${pct}%"></div>
+            </div>
+            <span class="score-bar-num">${label}</span>
+          </div>`;
+      }).join('');
+    }
+  }
+
+  // Eval table
+  const evalsTbody = document.getElementById('evals-tbody');
+  if (recentEvals.length === 0) {
+    evalsTbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:20px">No evaluations yet — run <code>scripts/eval-agent-pr.sh &lt;PR&gt;</code> to add one.</td></tr>';
+  } else {
+    const DIM_TIPS = ['Scope', 'Commits', 'Tests', 'CI', 'Churn'];
+    const DIM_KEYS = ['scope_adherence', 'atomic_commits', 'test_coverage', 'ci_status', 'review_churn'];
+    evalsTbody.innerHTML = recentEvals.map(e => {
+      const dots = DIM_KEYS.map((k, i) => {
+        const v = e.dims[k];
+        const cls = v === null ? 'null' : v ? 'pass' : 'fail';
+        return `<div class="dim-dot ${cls}" title="${DIM_TIPS[i]}: ${v === null ? 'N/A' : v ? '✓' : '✗'}"></div>`;
+      }).join('');
+      const badge = e.allPass
+        ? '<span class="pill pill-pass">All pass</span>'
+        : '<span class="pill pill-fail">Issues</span>';
+      return `<tr>
+        <td><a href="https://github.com/oviney/blog/pull/${e.pr}" target="_blank" rel="noopener">#${e.pr}</a></td>
+        <td>${e.title}</td>
+        <td>${badge}</td>
+        <td><div class="dim-dots">${dots}</div></td>
+        <td>${relDate(e.evaluatedAt)}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Activity feed
+  const actTbody = document.getElementById('activity-tbody');
+  if (!recentPRs || recentPRs.length === 0) {
+    actTbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:20px">No recent PR data available.</td></tr>';
+  } else {
+    actTbody.innerHTML = recentPRs.map(pr => {
+      const badge = pr.isAgent
+        ? '<span class="pill pill-pass">Agent</span>'
+        : '<span class="pill pill-skip">Human</span>';
+      return `<tr>
+        <td><a href="https://github.com/oviney/blog/pull/${pr.number}" target="_blank" rel="noopener">#${pr.number}</a></td>
+        <td>${pr.title}</td>
+        <td>${pr.author}</td>
+        <td>${badge}</td>
+        <td>${relDate(pr.mergedAt)}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Backlog
+  const backlogGrid = document.getElementById('backlog-grid');
+  const labelNames = {
+    'agent:creative-director':  'Creative Director',
+    'agent:qa-gatekeeper':      'QA Gatekeeper',
+    'agent:editorial-chief':    'Editorial Chief',
+    'agent:editorial-manager':  'Editorial Manager',
+  };
+  backlogGrid.innerHTML = Object.entries(openIssuesByLabel).map(([label, issues]) => {
+    const name  = labelNames[label] || label;
+    const items = issues.length === 0
+      ? '<div class="empty-state">No open issues 🎉</div>'
+      : issues.map(i =>
+          `<div class="backlog-item">
+            <a href="https://github.com/oviney/blog/issues/${i.number}" target="_blank" rel="noopener">#${i.number} ${i.title}</a>
+            <div class="backlog-age">${i.age}d old</div>
+          </div>`
+        ).join('');
+    return `<div class="backlog-card">
+      <div class="backlog-header">${name} (${issues.length})</div>
+      ${items}
+    </div>`;
+  }).join('');
+
+  // Cross-article flags
+  if (content?.crossFlags) {
+    const f = content.crossFlags;
+    const rows = [
+      { icon: '🔁', label: 'Duplicate topics',      count: f.duplicates, tip: 'Posts with >60% title-word similarity' },
+      { icon: '📊', label: 'Coverage imbalance',     count: f.coverage,   tip: 'One category >70% of posts' },
+      { icon: '🕐', label: 'Stale posts (>6 months)',count: f.freshness,  tip: 'Consider a refresh or follow-up' },
+    ];
+    document.getElementById('cross-flags-body').innerHTML = rows.map(r =>
+      `<div class="flag-row">
+        <span class="flag-icon">${r.icon}</span>
+        <span style="font-weight:600;width:210px;flex-shrink:0">${r.label}</span>
+        <span style="font-size:20px;font-weight:700;width:36px">${r.count}</span>
+        <span style="color:var(--muted);font-size:13px">${r.tip}</span>
+      </div>`
+    ).join('');
+  }
+}
+
+// ── Bootstrap ─────────────────────────────────────────────────────────────
+
+(async function () {
+  try {
+    const resp = await fetch('./agents-data.json?v=' + Date.now());
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    document.getElementById('loading').style.display   = 'none';
+    document.getElementById('main-content').style.display = '';
+    render(data);
+  } catch (err) {
+    document.getElementById('loading').style.display   = 'none';
+    document.getElementById('error-msg').style.display = '';
+    console.error('Dashboard load error:', err);
+  }
+})();
+</script>
+
+</body>
+</html>
