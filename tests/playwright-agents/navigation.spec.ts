@@ -464,10 +464,11 @@ test.describe('Mobile Navigation Specific Tests', () => {
     await toggle.click();
     await expect(nav).toBeVisible();
 
-    // Skip if the Blog link is not present
+    // Skip if the Blog link is not present; return stops further execution
     const blogLink = nav.getByRole('link', { name: /blog/i }).first();
     if (await blogLink.count() === 0) {
       test.skip(true, 'Blog link is not present in the mobile navigation on this page.');
+      return;
     }
 
     const blogHref = await blogLink.getAttribute('href');

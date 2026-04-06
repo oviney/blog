@@ -146,7 +146,7 @@ body {
   justify-content: space-between;
   // Use padding so the clickable area meets the 44×44px touch-target minimum
   // while keeping the visual bars at 28×22px.
-  // Content box: width = 44-16 = 28px, height = 44-22 = 22px → bars stay the same size.
+  // Content box: width = 44-(8+8) = 28px, height = 44-(11+11) = 22px → bars unchanged.
   min-width: 44px;
   min-height: 44px;
   padding: 11px 8px;
@@ -157,7 +157,7 @@ body {
 
   .nav-toggle__bar {
     display: block;
-    width: 100%; // 28px (min-width 44 − padding 8+8)
+    width: 100%; // 28px (min-width 44 − horizontal padding 8+8)
     height: 2px;
     background-color: $text-primary;
     transition: transform 0.2s ease, opacity 0.2s ease;
