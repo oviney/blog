@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "Test automation's hidden ledger: the costs nobody budgets for"
+title: "Test automation's hidden ledger: costs nobody budgets"
 date: 2026-04-04
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/automation-hidden-ledger.png
 description: "Test automation now consumes 42% of QA budgets—up from 31% in 2020. The rise isn't from expanded coverage; it's from the cost of keeping automation alive."
@@ -31,6 +31,8 @@ The response to flakiness is typically more automation — retry mechanisms, qua
 Netflix's test engineering team publishes its internal metrics with unusual candour. The company's approach inverts the conventional automation strategy: instead of maximising the number of automated tests, Netflix optimises for the signal-to-noise ratio of its test suite. Tests that fail intermittently are deleted, not quarantined. Tests that have not detected a genuine defect in six months are reviewed for retirement. The result is a smaller, faster, more reliable suite that costs less to maintain and catches more real defects per test hour.
 
 The lesson is counterintuitive but consistent across organisations that control automation costs effectively: the goal is not more tests. It is better tests — fewer scripts that each deliver higher confidence, maintained by engineers who understand both the test and the system it validates. The most expensive test in any suite is the one that passes every day and has never found a bug.
+
+Understanding these dynamics before committing to an automation programme makes the difference between a realistic business case and a promising-looking failure. The economics of test automation — when measured accurately — can still justify investment, as [detailed analysis of enterprise ROI trajectories](/2026/01/19/the-surprising-economics-of-test-automation-roi/) shows: median returns reach 143%, but only after 23 months, and only for programmes that correctly forecast the full cost base from the outset. The organisations that budget for infrastructure, maintenance, and the talent required to manage complexity are the ones that eventually reach those returns. Those that budget only for tooling discover the hidden ledger when it is too late to adjust.
 
 ## References
 
