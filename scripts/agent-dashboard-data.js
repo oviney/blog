@@ -79,8 +79,12 @@ function aggregateEvals() {
     .filter(Boolean)
     .sort((a, b) => new Date(b.evaluated_at) - new Date(a.evaluated_at));
 
-  const passRate = evals.length
-    ? Math.round((evals.filter(e => e.all_pass).length / evals.length) * 100)
+  const passed = evals.filter(e => e.all_pass === true).length;
+  const failed = evals.filter(e => e.all_pass === false).length;
+  // Bug fix: use passed+failed as denominator (runs with outcomes), not total evals.
+  // Evals where all_pass is undefined/null (e.g. not yet evaluated) should not dilute the rate.
+  const passRate = (passed + failed) > 0
+    ? Math.round((passed / (passed + failed)) * 100)
     : null;
 
   // Per-dimension pass rates
@@ -242,7 +246,7 @@ function main() {
       openBacklog:          totalBacklog,
       openPRCount:          liveData.openPRCount,
       evalCount:            evals.length,
-      remediationQueueDepth: remediationData?.postsInQueue ?? null,
+      remediationQueueDepth: remediationData?.postsInQueue ?? remediationData?.queue?.length ?? null,
       remediationThreshold:  remediationData?.threshold ?? 85,
     },
     evalDimensions: {
