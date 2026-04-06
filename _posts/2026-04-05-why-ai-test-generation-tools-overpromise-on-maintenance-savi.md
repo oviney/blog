@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "The maintenance myth: what AI test generation actually costs to keep running"
+title: "The maintenance myth: what AI test generation costs"
 date: 2026-04-05
-author: "The Economist"
-categories: ["Quality Engineering", "AI Testing"]
+author: "Ouray Viney"
+categories: ["Quality Engineering"]
 image: /assets/images/why-recent-ai-test-generation-tools-are-overpromising-on-mai.png
 description: "AI testing vendors promise 80% reductions in maintenance effort. IEEE research across 400 teams finds 62% see no meaningful savings."
 ---
@@ -26,7 +26,11 @@ The maintenance implications are severe. A test suite bloated with redundant and
 
 Stripe's testing infrastructure team published a candid assessment in early 2026. After 18 months of AI test generation adoption, the company measured a 22% net reduction in test maintenance hours — a figure that accounted for the new overhead of reviewing, curating, and debugging AI-generated tests. The key to achieving even this modest improvement was aggressive curation: Stripe's engineers accepted fewer than 40% of AI-generated tests into their suite, discarding the rest as redundant, trivial, or misaligned with business intent.
 
-The 22% figure is representative of what organisations can realistically achieve, according to Forrester's 2025 AI Testing Impact Study. It is a worthwhile improvement. It is not the transformation that $1.2 billion in venture funding was raised to deliver. The organisations that acknowledge this gap between expectation and reality will invest wisely in AI testing tools as productivity aids. Those still chasing the 80% promise will discover that the maintenance myth has a stubborn relationship with reality. The tools are worth buying. The claims are not worth believing.
+The 22% figure is representative of what organisations can realistically achieve, according to Forrester's 2025 AI Testing Impact Study. It is a worthwhile improvement. It is not the transformation that $1.2 billion in venture funding was raised to deliver.
+
+The curation overhead is itself a form of maintenance — one that vendors rarely acknowledge in their marketing. Every AI-generated test that passes initial review still requires a human to understand what it does, confirm that its assertions are meaningful, and own it when it fails in production. At scale, this ownership burden compounds. A team that accepts 500 AI-generated tests acquires 500 tests whose provenance, intent, and coverage value it may not fully understand — a qualitatively different liability from the 200 carefully authored tests the engineers wrote themselves.
+
+The organisations that acknowledge this gap between expectation and reality will invest wisely in AI testing tools as productivity aids, using them to eliminate tedium while retaining human judgement at the points where it matters most. Those still chasing the 80% promise will discover that the maintenance myth has a stubborn relationship with reality. The dynamics of [self-healing tests](/2026/01/02/self-healing-tests-myth-vs-reality/) follow the same pattern: vendor claims run ahead of independent evidence, and the gap persists long after adoption becomes mainstream. The tools are worth buying. The claims are not worth believing.
 
 ## References
 
