@@ -144,17 +144,20 @@ body {
   display: none;
   flex-direction: column;
   justify-content: space-between;
-  width: 28px;
-  height: 22px;
+  // Use padding so the clickable area meets the 44×44px touch-target minimum
+  // while keeping the visual bars at 28×22px.
+  // Content box: width = 44-16 = 28px, height = 44-22 = 22px → bars stay the same size.
+  min-width: 44px;
+  min-height: 44px;
+  padding: 11px 8px;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
   flex-shrink: 0;
 
   .nav-toggle__bar {
     display: block;
-    width: 100%;
+    width: 100%; // 28px (min-width 44 − padding 8+8)
     height: 2px;
     background-color: $text-primary;
     transition: transform 0.2s ease, opacity 0.2s ease;
@@ -1238,8 +1241,10 @@ table {
     display: flex;
   }
 
-  // Hide nav by default on mobile; shown when .nav-open is set on body
-  .site-nav {
+  // Hide nav by default on mobile; shown when .nav-open is set on body.
+  // Only applies when JS is active (.js-nav-enabled) — progressive enhancement:
+  // without JS the nav remains visible so users can always reach navigation.
+  .js-nav-enabled .site-nav {
     display: none;
     border-bottom: 1px solid $border-color;
 
@@ -1265,7 +1270,7 @@ table {
   }
 
   // Open state: show nav and animate hamburger to X
-  .nav-open .site-nav {
+  .js-nav-enabled.nav-open .site-nav {
     display: block;
   }
 
@@ -1620,6 +1625,12 @@ table {
   .hero-post-image {
     aspect-ratio: 16 / 9;
   }
+
+  // Reduce hero section bottom gap so the next section starts closer to the fold
+  .hero-post {
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-md;
+  }
 }
 
 // ============================================
@@ -1761,7 +1772,14 @@ table {
   }
 
   .econ-topic-page {
-    padding: $spacing-lg $spacing-md;
+    // Reduce to 16px side padding so cards feel wider on small screens
+    padding: $spacing-md $spacing-sm;
+  }
+
+  .econ-topic-header {
+    // Tighten the gap below the title so first card is closer to the fold
+    margin-bottom: $spacing-sm;
+    padding-bottom: $spacing-sm;
   }
 
   .econ-topic-title {
@@ -2042,7 +2060,8 @@ article.topic-card h2 a,
   padding: $spacing-xl $spacing-lg;
 
   @media (max-width: 768px) {
-    padding: $spacing-lg $spacing-md;
+    // 16px side padding so cards read edge-to-edge on small screens
+    padding: $spacing-md $spacing-sm;
   }
 }
 
@@ -2058,6 +2077,13 @@ article.topic-card h2 a,
   padding-top: $spacing-xl;
   padding-bottom: $spacing-xl;
   border-bottom: 1px solid $border-color;
+
+  @media (max-width: 768px) {
+    // Reduce vertical whitespace so more content is visible on mobile
+    padding-top: $spacing-md;
+    padding-bottom: $spacing-md;
+    margin-bottom: $spacing-lg;
+  }
 }
 
 .home-focus-grid {

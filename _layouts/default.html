@@ -24,7 +24,7 @@
     <h1 class="site-title">
       <a href="{{ '/' | relative_url }}">{{ site.title }}</a>
     </h1>
-    <button class="nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="site-navigation">
+    <button type="button" class="nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="site-navigation">
       <span class="nav-toggle__bar"></span>
       <span class="nav-toggle__bar"></span>
       <span class="nav-toggle__bar"></span>
@@ -80,6 +80,9 @@
   <!-- Hamburger navigation toggle -->
   <script>
     (function () {
+      // Progressive enhancement: mark body so nav is hidden behind hamburger only when JS is active
+      document.body.classList.add('js-nav-enabled');
+
       var toggle = document.querySelector('.nav-toggle');
       var nav = document.getElementById('site-navigation');
       if (toggle && nav) {

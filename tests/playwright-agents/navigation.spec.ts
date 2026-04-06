@@ -419,11 +419,15 @@ test.describe('Mobile Navigation Specific Tests', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    // JS should have added js-nav-enabled class (progressive enhancement)
+    const hasJsClass = await page.evaluate(() => document.body.classList.contains('js-nav-enabled'));
+    expect(hasJsClass).toBe(true);
+
     // Hamburger toggle button should be visible
     const toggle = page.getByRole('button', { name: /open navigation menu/i });
     await expect(toggle).toBeVisible();
 
-    // Navigation should be hidden by default (not visible in the viewport)
+    // Navigation should be hidden behind hamburger when JS is active
     const nav = page.locator('#site-navigation');
     await expect(nav).toBeHidden();
   });
@@ -453,26 +457,34 @@ test.describe('Mobile Navigation Specific Tests', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const toggle = page.getByRole('button', { name: /open navigation menu/i });
+    const toggle = page.locator('.nav-toggle');
     const nav = page.locator('#site-navigation');
 
     // Open the menu
     await toggle.click();
     await expect(nav).toBeVisible();
 
-    // Tap a nav link — menu should close (page may navigate away)
-    try {
-      const blogLink = nav.getByRole('link', { name: /blog/i }).first();
-      if (await blogLink.count() > 0) {
-        await blogLink.click();
-        await page.waitForLoadState('networkidle');
-        // After navigation the menu should be closed (no nav-open class)
-        const isOpen = await page.evaluate(() => document.body.classList.contains('nav-open'));
-        expect(isOpen).toBe(false);
-      }
-    } catch {
-      console.log('Nav link tap test skipped — navigation may have changed pages');
+    // Skip if the Blog link is not present
+    const blogLink = nav.getByRole('link', { name: /blog/i }).first();
+    if (await blogLink.count() === 0) {
+      test.skip(true, 'Blog link is not present in the mobile navigation on this page.');
     }
+
+    const blogHref = await blogLink.getAttribute('href');
+    if (blogHref) {
+      const expectedUrl = new URL(blogHref, page.url()).toString();
+      await Promise.all([
+        page.waitForURL(expectedUrl),
+        blogLink.click(),
+      ]);
+    } else {
+      await blogLink.click();
+    }
+
+    await page.waitForLoadState('networkidle');
+    // After navigation the menu should be closed (nav-open class removed)
+    const isOpen = await page.evaluate(() => document.body.classList.contains('nav-open'));
+    expect(isOpen).toBe(false);
   });
 
   test('Mobile navigation is touch-friendly', async ({ page }) => {
@@ -522,11 +534,11 @@ test.describe('Mobile Navigation Specific Tests', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // Hamburger should not be visible on desktop
-    const toggle = page.getByRole('button', { name: /open navigation menu/i });
+    // Hamburger button should not be visible on desktop
+    const toggle = page.locator('.nav-toggle');
     await expect(toggle).toBeHidden();
 
-    // Navigation should be visible directly
+    // Navigation should be visible directly (no hamburger needed)
     const nav = page.locator('#site-navigation');
     await expect(nav).toBeVisible();
   });
