@@ -90,11 +90,14 @@ COMMIT_COUNT=$(echo "$COMMITS_JSON" | jq 'length')
 MULTI_CONCERN_COUNT=0
 MULTI_CONCERN_SUBJECTS=()
 
+# Verbs that signal discrete work items; two of them in one subject = multi-concern
+VERB_PATTERN='(add|fix|update|remove|refactor|implement|create|delete)'
+
 while IFS= read -r msg; do
   subject=$(echo "$msg" | head -1)
-  # Two or more action verbs separated by "and" / "&" / "," → multi-concern
+  # Two or more action verbs separated by "and" or "," → multi-concern
   if echo "$subject" | grep -qiE \
-    '(add|fix|update|remove|refactor|implement|create|delete)[^,]+(and|,)[[:space:]]+(add|fix|update|remove|refactor|implement|create|delete)'; then
+    "${VERB_PATTERN}[^,]+(and|,)[[:space:]]+${VERB_PATTERN}"; then
     MULTI_CONCERN_COUNT=$((MULTI_CONCERN_COUNT + 1))
     MULTI_CONCERN_SUBJECTS+=("$subject")
   fi
@@ -135,23 +138,28 @@ CODE_LOC=$(echo "$FILES_JSON" | jq \
       (.filename | test("\\.(js|ts|sh|rb|py|go)$"))
     ) | .additions] | add // 0')
 
+# Hard threshold: PRs with >50 LOC of executable code changes should include tests.
+# 50 LOC is intentionally lenient to avoid false positives on small utility scripts.
+CODE_LOC_THRESHOLD=50
+
 if [[ "$CODE_LOC" -eq 0 ]]; then
   COVERAGE_PASS=true
   COVERAGE_RATIO="null"
   COVERAGE_NOTE="No executable code changes (config/docs only); coverage N/A"
 elif [[ "$TEST_LOC" -gt 0 ]]; then
+  # CODE_LOC > 0 is guaranteed here by the outer if; division is safe
   COVERAGE_RATIO_RAW=$(echo "scale=3; $TEST_LOC / $CODE_LOC" | bc)
   COVERAGE_RATIO="$COVERAGE_RATIO_RAW"
   COVERAGE_PASS=true
   COVERAGE_NOTE="test_loc=${TEST_LOC} / code_loc=${CODE_LOC} = ${COVERAGE_RATIO_RAW}"
 else
   COVERAGE_RATIO="0.000"
-  if [[ "$CODE_LOC" -gt 50 ]]; then
+  if [[ "$CODE_LOC" -gt "$CODE_LOC_THRESHOLD" ]]; then
     COVERAGE_PASS=false
-    COVERAGE_NOTE="No test changes alongside ${CODE_LOC} code LOC (hard threshold: code_loc > 50 requires tests)"
+    COVERAGE_NOTE="No test changes alongside ${CODE_LOC} code LOC (hard threshold: code_loc > ${CODE_LOC_THRESHOLD} requires tests)"
   else
     COVERAGE_PASS=true
-    COVERAGE_NOTE="No tests added; code_loc=${CODE_LOC} is below the 50-LOC threshold"
+    COVERAGE_NOTE="No tests added; code_loc=${CODE_LOC} is below the ${CODE_LOC_THRESHOLD}-LOC threshold"
   fi
 fi
 
@@ -211,6 +219,8 @@ else
     --arg after "$FIRST_REVIEW_AT" \
     '[.[] | select(.event == "force_pushed" and .created_at > $after)] | length')
 
+  # Hard threshold: more than 2 force-pushes after the first review indicates
+  # significant post-review rework; each rewrite burns reviewer attention.
   if [[ "$FORCE_PUSH_COUNT" -gt 2 ]]; then
     CHURN_PASS=false
     CHURN_NOTE="${FORCE_PUSH_COUNT} force-push(es) after first review (threshold: ≤ 2)"
