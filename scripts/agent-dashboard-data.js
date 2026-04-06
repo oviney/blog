@@ -26,9 +26,10 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const REPO_ROOT     = path.resolve(__dirname, '..');
-const EVALS_DIR     = path.join(REPO_ROOT, '.agent-evals');
-const CONTENT_FILE  = path.join(REPO_ROOT, 'content-review-results.json');
-const OUT_FILE      = path.join(REPO_ROOT, 'dashboard', 'agents-data.json');
+const EVALS_DIR        = path.join(REPO_ROOT, '.agent-evals');
+const CONTENT_FILE     = path.join(REPO_ROOT, 'content-review-results.json');
+const REMEDIATION_FILE = path.join(REPO_ROOT, 'content-remediation-queue.json');
+const OUT_FILE         = path.join(REPO_ROOT, 'dashboard', 'agents-data.json');
 const REPO_SLUG     = 'oviney/blog';
 
 const OFFLINE = process.argv.includes('--offline');
@@ -224,8 +225,9 @@ function main() {
   console.error('Building agent dashboard data…');
 
   const { evals, passRate, dimPassRates } = aggregateEvals();
-  const contentData = aggregateContent();
-  const liveData    = fetchLiveData();
+  const contentData     = aggregateContent();
+  const remediationData = safeReadJson(REMEDIATION_FILE);
+  const liveData        = fetchLiveData();
 
   const agentPRsMerged = liveData.recentPRs.filter(pr => pr.isAgent).length;
   const totalBacklog   = Object.values(liveData.openIssuesByLabel)
@@ -234,12 +236,14 @@ function main() {
   const output = {
     generatedAt: new Date().toISOString(),
     kpis: {
-      agentPRsMerged30d: agentPRsMerged,
-      evalPassRate:      passRate,
-      contentAvgScore:   contentData?.avgScore ?? null,
-      openBacklog:       totalBacklog,
-      openPRCount:       liveData.openPRCount,
-      evalCount:         evals.length,
+      agentPRsMerged30d:    agentPRsMerged,
+      evalPassRate:         passRate,
+      contentAvgScore:      contentData?.avgScore ?? null,
+      openBacklog:          totalBacklog,
+      openPRCount:          liveData.openPRCount,
+      evalCount:            evals.length,
+      remediationQueueDepth: remediationData?.postsInQueue ?? null,
+      remediationThreshold:  remediationData?.threshold ?? 85,
     },
     evalDimensions: {
       labels:    RUBRIC_DIMS.map(d => d.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())),
@@ -258,6 +262,7 @@ function main() {
     content: contentData,
     recentPRs:         liveData.recentPRs,
     openIssuesByLabel: liveData.openIssuesByLabel,
+    remediationQueue:  remediationData?.queue ?? [],
   };
 
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
