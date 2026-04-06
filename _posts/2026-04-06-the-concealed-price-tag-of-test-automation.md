@@ -4,7 +4,7 @@ title: "The Concealed Price Tag of Test Automation"
 date: 2026-04-06
 author: "The Economist"
 categories: ["Quality Engineering", "Test Automation"]
-image: /assets/images/the-concealed-price-tag-of-test-automation.png
+image: /assets/images/automation-hidden-ledger.png
 summary: "Delving into the overlooked financial and operational burdens that undermine test automation’s touted efficiencies."
 ---
 
