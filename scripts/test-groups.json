@@ -1,5 +1,6 @@
 {
   "_comment": "Maps file path glob patterns to test groups. Evaluated top-to-bottom; first ALL match triggers a full suite.",
+  "_all_groups": ["navigation","content","links","search","accessibility","visual","performance","security"],
   "groups": {
     "_sass/**":             ["visual", "accessibility", "navigation"],
     "assets/css/**":        ["visual", "accessibility"],

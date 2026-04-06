@@ -103,9 +103,9 @@ def build_test_content(issue_number, title, parsed):
     req_ids_str = ", ".join(req_ids)
     tag         = f"@{area}"
 
-    # Detect mobile from title or steps
     mobile_keywords = ["320", "mobile", "hamburger", "nav", "viewport"]
-    use_mobile = any(kw in (title + steps_text).lower() for kw in mobile_keywords)
+    combined_text   = (title + steps_text).lower()
+    use_mobile = any(kw in combined_text for kw in mobile_keywords)
 
     # Convert reproduction steps to comment lines
     step_lines = [f"    // {line.strip()}" for line in steps_text.split("\n") if line.strip()]
@@ -116,8 +116,9 @@ def build_test_content(issue_number, title, parsed):
         viewport_line = "\n    await page.setViewportSize({ width: 320, height: 568 });"
 
     repo = os.environ.get("GITHUB_REPOSITORY", "oviney/blog")
-    title_safe = title[:80].replace("'", "\\'")
-    expected_safe = expected[:120]
+    # Use JSON string encoding for safe embedding in TypeScript string literals
+    title_safe = json.dumps(title[:80])[1:-1]   # strip outer quotes, keep inner escapes
+    expected_safe = json.dumps(expected[:120])[1:-1]
 
     lines = [
         "/**",

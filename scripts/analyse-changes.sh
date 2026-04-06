@@ -26,6 +26,9 @@ GROUPS_FILE="${SCRIPT_DIR}/test-groups.json"
 BASE_SHA="${1:-}"
 HEAD_SHA="${2:-}"
 
+# All groups — single source of truth (kept in sync with test-groups.json keys)
+ALL_GROUPS_JSON='["navigation","content","links","search","accessibility","visual","performance","security"]'
+
 # ── forced full-suite conditions ─────────────────────────────────────────────
 
 emit_full() {
@@ -33,7 +36,7 @@ emit_full() {
   python3 -c "
 import json, sys
 reason = sys.argv[1]
-all_groups = ['navigation','content','links','search','accessibility','visual','performance','security']
+all_groups = json.loads('${ALL_GROUPS_JSON}')
 print(json.dumps({'run_type':'full','groups':all_groups,'skipped':[],'skip_reason':reason,'force_full':True}))
 " "${reason}"
   exit 0
@@ -78,7 +81,8 @@ with open(groups_file) as f:
     config = json.load(f)
 
 patterns = config["groups"]   # ordered dict: pattern → list of groups
-all_groups = ["navigation","content","links","search","accessibility","visual","performance","security"]
+all_groups = config.get("_all_groups",
+    ["navigation","content","links","search","accessibility","visual","performance","security"])
 
 # Read the changed-file list from stdin (passed via shell heredoc pipe)
 import subprocess

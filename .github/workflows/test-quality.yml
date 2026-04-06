@@ -170,11 +170,13 @@ jobs:
           print(tags)
           ")
             echo "🔬 Running PARTIAL Playwright suite — groups: ${GROUPS}"
-            # Fallback to full suite if grep pattern is empty or test run fails
             if [[ -z "${GROUPS}" ]]; then
+              echo "⚠️ No groups resolved — running full suite as safe fallback"
               npm run test:playwright
             else
-              npx playwright test --grep "${GROUPS}" || npm run test:playwright
+              # Run partial suite; only fall back if the grep pattern itself is invalid (exit 1 from playwright)
+              # Do NOT silently swallow actual test failures — keep continue-on-error on the step instead
+              npx playwright test --grep "${GROUPS}"
             fi
           fi
         continue-on-error: true

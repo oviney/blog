@@ -77,76 +77,11 @@ jobs:
 
       - name: Attribute to commit
         id: attribute
+        env:
+          PARSED: ${{ steps.parse.outputs.parsed }}
         run: |
-          python3 - <<'PYEOF'
-          import os, json, subprocess
-
-          parsed = json.loads(os.environ.get("PARSED", "{}"))
-          suspected = parsed.get("suspected_files", [])
-
-          commit_sha = ""
-
-          # Try to find the last commit touching suspected files
-          if suspected:
-            for f in suspected:
-              try:
-                result = subprocess.run(
-                  ["git", "log", "-1", "--oneline", "--", f],
-                  capture_output=True, text=True
-                )
-                if result.stdout.strip():
-                  commit_sha = result.stdout.split()[0]
-                  break
-              except Exception:
-                pass
-
-          # Fall back to last merge commit on main
-          if not commit_sha:
-            try:
-              result = subprocess.run(
-                ["git", "log", "--merges", "-1", "--pretty=format:%h", "main"],
-                capture_output=True, text=True
-              )
-              commit_sha = result.stdout.strip() or "unknown"
-            except Exception:
-              commit_sha = "unknown"
-
-          print(commit_sha)
-          PYEOF
-          PARSED='${{ steps.parse.outputs.parsed }}'
-          COMMIT_SHA=$(python3 - <<PYEOF
-          import os, json, subprocess
-
-          parsed = json.loads('${{ steps.parse.outputs.parsed }}')
-          suspected = parsed.get("suspected_files", [])
-
-          commit_sha = ""
-          if suspected:
-              for f in suspected:
-                  try:
-                      result = subprocess.run(
-                          ["git", "log", "-1", "--oneline", "--", f],
-                          capture_output=True, text=True
-                      )
-                      if result.stdout.strip():
-                          commit_sha = result.stdout.split()[0]
-                          break
-                  except Exception:
-                      pass
-
-          if not commit_sha:
-              try:
-                  result = subprocess.run(
-                      ["git", "log", "--merges", "-1", "--pretty=format:%h", "main"],
-                      capture_output=True, text=True
-                  )
-                  commit_sha = result.stdout.strip() or "unknown"
-              except Exception:
-                  commit_sha = "unknown"
-
-          print(commit_sha)
-          PYEOF
-          )
+          SUSPECTED=$(echo "${PARSED}" | python3 -c "import json,sys; print(' '.join(json.load(sys.stdin).get('suspected_files', [])))")
+          COMMIT_SHA=$(python3 scripts/attribute-commit.py --files "${SUSPECTED}")
           echo "commit_sha=${COMMIT_SHA}" >> "$GITHUB_OUTPUT"
 
       - name: Append to defect-log.json
@@ -236,6 +171,9 @@ jobs:
     if: >
       github.event_name == 'schedule' ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.weekly_report_only == 'true')
+
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
