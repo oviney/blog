@@ -43,6 +43,9 @@
     "url": "https://github.com/oviney/blog/issues"
   },
   "homepage": "https://github.com/oviney/blog#readme",
+  "overrides": {
+    "lodash": "^4.18.1"
+  },
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.59.1",
