@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "The automation accountant: what test ROI actually looks like at scale"
+title: "The automation accountant: what test ROI looks like"
 date: 2026-01-19
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/the-surprising-economics-of-test-automation-roi.png
 description: "Forrester tracked 15 enterprise test automation programmes. Median ROI reached 143%, but payback took 23 months—and 4 programmes never broke even."
@@ -33,6 +33,8 @@ The explanation is not mysterious. Experienced test engineers write fewer but mo
 ## The honest forecast
 
 Organisations initiating test automation programmes should budget for 18-24 months before breakeven, expect 15-25% efficiency improvement rather than the 50-70% that vendor presentations promise, and plan for automation maintenance to consume 40-60% of ongoing QA effort. These are realistic numbers that, if met, justify the investment. The programmes that fail are not the ones with modest returns. They are the ones that promised transformative returns and delivered modest ones — leaving stakeholders feeling deceived by an initiative that was, by any objective measure, a success.
+
+Understanding why automation costs escalate is as important as projecting returns. The [hidden costs of test automation](/2026/04/04/the-real-cost-of-test-automation--balancing-speed-and-sustai/) — infrastructure, maintenance overhead, and the opportunity cost of engineers maintaining brittle suites — routinely consume the efficiency gains that ROI models forecast. Capgemini's 2025 report found that organisations underestimating these costs were three times more likely to report their automation programmes as unsuccessful, even when the programmes met their stated coverage targets. ROI is real. So is the risk of measuring it incorrectly.
 
 ## References
 
