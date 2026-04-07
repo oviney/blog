@@ -13,6 +13,8 @@ name: 🤖 CI Orchestrator
 on:
   schedule:
     - cron: '*/15 * * * *'   # every 15 minutes
+  push:
+    branches: [main]          # run on every merge to main; idempotent if nothing to act on
   workflow_dispatch:
     inputs:
       dry_run:
