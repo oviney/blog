@@ -5,6 +5,7 @@ date: 2026-01-19
 author: "Ouray Viney"
 categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/the-surprising-economics-of-test-automation-roi.png
+image_alt: "Warm editorial illustration of an accountant examining an oversized ledger where automation costs spill off the page, muted amber and cream palette with fine pen hatching"
 description: "Forrester tracked 15 enterprise test automation programmes. Median ROI reached 143%, but payback took 23 months—and 4 programmes never broke even."
 ---
 

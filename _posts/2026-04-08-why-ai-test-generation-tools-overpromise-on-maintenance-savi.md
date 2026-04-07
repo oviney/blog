@@ -5,6 +5,7 @@ date: 2026-04-08
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
 image: /assets/images/why-recent-ai-test-generation-tools-are-overpromising-on-mai.png
+image_alt: "Stark black-and-white bar chart infographic placing vendor-promised savings alongside IEEE-measured actuals, data-journalism style with minimal colour"
 description: "AI testing vendors promise 80% reductions in maintenance effort. IEEE research across 400 teams finds 62% see no meaningful savings."
 ---
 

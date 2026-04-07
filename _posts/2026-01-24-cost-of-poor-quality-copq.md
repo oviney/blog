@@ -5,6 +5,7 @@ date: 2026-04-05
 author: "The Economist"
 categories: ["Quality Engineering"]
 image: /assets/images/copq-cross-industry.png
+image_alt: "Split-panel editorial illustration contrasting a precise factory assembly line on the left with a chaotic software deployment pipeline on the right, risograph print texture"
 summary: "Manufacturing spent decades learning that quality is cheaper than inspection — Boeing's $31 billion lesson and CrowdStrike's $500 million afternoon prove software hasn't learned yet."
 ---
 

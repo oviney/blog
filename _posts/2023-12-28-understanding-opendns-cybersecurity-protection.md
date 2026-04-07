@@ -5,6 +5,7 @@ date: 2023-12-28
 author: "Ouray Viney"
 categories: ["Security"]
 image: /assets/images/dns-invisible-shield.png
+image_alt: "Minimalist neon-on-black technical diagram of DNS request packets deflecting from an invisible force field, cyberpunk data-visualisation style"
 description: "Cisco blocks 7 million malicious DNS requests every minute. How the Domain Name System became cybersecurity's most underrated first line of defence."
 ---
 

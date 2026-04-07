@@ -5,6 +5,7 @@ date: 2026-04-05
 author: "The Economist"
 categories: ["Quality Engineering", "AI Testing"]
 image: /assets/images/the-end-of-manual-qa.png
+image_alt: "Dramatic duotone illustration of a lone human tester at a desk surrounded by advancing robotic assembly lines, film noir lighting in deep teal and amber"
 summary: "Manual testing is not declining gradually — it is being economically exterminated by AI tools that 89% of enterprises are piloting, even as only 15% have deployed them at scale."
 ---
 

@@ -5,6 +5,7 @@ date: 2026-04-05
 author: "The Economist"
 categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/test-coverage-paradox.png
+image_alt: "Cold infographic showing a coverage meter pegged at 100% while a cartoon bug slips through an unchecked gap, technical diagram style in slate grey and white"
 summary: "Test coverage has become the most gamed metric in software engineering — empirically uncorrelated with fault detection, yet mandated by managers who mistake activity for quality."
 ---
 

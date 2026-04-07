@@ -5,6 +5,7 @@ date: 2026-04-05
 author: "The Economist"
 categories: ["Quality Engineering", "Software Engineering"]
 image: /assets/images/copq-software-engineering.png
+image_alt: "Cool photorealistic newspaper front page displaying a trillion-dollar bill for software bugs, broadsheet layout with formal serif typography on aged newsprint"
 summary: "Poor software quality costs the US economy $2.41 trillion annually — and the CrowdStrike outage proved that a single untested deployment can destroy half a billion dollars in an afternoon."
 ---
 
