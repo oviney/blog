@@ -59,6 +59,12 @@ jobs:
 
             const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
 
+            // Only open or escalate issues for failures within this window.
+            // Older failures are considered stale and skipped to avoid noise
+            // from runs that finished months ago (e.g. a dormant workflow).
+            const MAX_STALE_DAYS = 7;
+            const MAX_STALE_MS   = MAX_STALE_DAYS * 24 * 60 * 60 * 1000;
+
             // ── Helpers ────────────────────────────────────────────────────────
 
             /**
@@ -179,6 +185,16 @@ jobs:
                   const runAgeMs    = Date.now() - failedAt.getTime();
                   const isEscalate  = runAgeMs >= TWO_HOURS_MS;
                   const hoursRed    = (runAgeMs / (1000 * 60 * 60)).toFixed(1);
+
+                  // ── Staleness guard ──────────────────────────────────────────
+                  // Skip workflows whose latest failure is older than
+                  // MAX_STALE_DAYS days — these are historical and not
+                  // actionable right now.  The close logic below is unaffected:
+                  // if the workflow goes green we still auto-close any open issue.
+                  if (runAgeMs > MAX_STALE_MS) {
+                    core.info(`  Skipping ${wf.name} — latest failure is ${hoursRed}h old (stale, >${MAX_STALE_DAYS}d)`);
+                    continue;
+                  }
 
                   if (!existingIssue) {
                     // ── Open a new issue ───────────────────────────────────────
