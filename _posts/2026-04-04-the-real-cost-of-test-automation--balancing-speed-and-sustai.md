@@ -15,6 +15,26 @@ Capgemini's World Quality Report surveyed 1,750 technology leaders in 2023 and f
 
 The visible cost of test automation — tool licences, initial script development, basic training — typically accounts for 30-40% of the total programme expense, according to Forrester's 2024 analysis of 200 enterprise test automation initiatives. The remaining 60-70% falls into three categories that rarely appear in the original business case.
 
+<figure aria-label="Stacked bar chart: test automation budget breakdown — tooling and scripts 35%, maintenance 40%, infrastructure 15%, other 10%. Visible costs 35%, hidden costs 65%." style="margin:2em 0;padding:1.25em 1.25em 0.75em;background:#f9f9f9;border-top:3px solid #E3120B;font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;">
+<figcaption style="font-size:0.9em;font-weight:700;color:#1a1a1a;margin:0 0 0.2em;">Where test automation budget actually goes</figcaption>
+<p style="font-size:0.75em;color:#666;margin:0 0 0.75em;">% of total programme cost · Forrester 2024</p>
+<!-- Proportions: tooling 35% + maintenance 40% + infrastructure 15% + other 10% = 100% -->
+<div style="display:flex;height:28px;width:100%;margin-bottom:0.5em;">
+<div style="flex:35;background:#E3120B;" title="Tooling and initial scripts: 35%"></div>
+<div style="flex:40;background:#555;" title="Ongoing maintenance: 40%"></div>
+<div style="flex:15;background:#888;" title="Infrastructure: 15%"></div>
+<div style="flex:10;background:#bbb;" title="Talent and opportunity costs: 10%"></div>
+</div>
+<div style="display:flex;font-size:0.7em;color:#666;margin-bottom:0.5em;">
+<div style="flex:35;color:#E3120B;font-weight:700;padding-right:4px;">Tooling &amp; scripts<br>35%</div>
+<div style="flex:40;color:#555;font-weight:700;padding-right:4px;">Maintenance<br>40%</div>
+<div style="flex:15;color:#888;font-weight:700;padding-right:4px;">Infrastructure<br>15%</div>
+<div style="flex:10;color:#bbb;font-weight:700;">Other<br>10%</div>
+</div>
+<p style="font-size:0.75em;color:#555;font-weight:600;margin:0.5em 0 0;padding:0.5em 0 0;border-top:1px solid #e0e0e0;">Visible costs: 35% &nbsp;·&nbsp; Hidden costs: 65%</p>
+<p style="font-size:0.7em;color:#999;margin:0.5em 0 0;padding-top:0.5em;border-top:1px solid #ddd;">Source: Forrester, <em>Enterprise Test Automation Cost Analysis</em>, 2024; Capgemini, <em>World Quality Report</em>, 2023</p>
+</figure>
+
 Infrastructure is the first. Automated tests require environments that mirror production with sufficient fidelity to produce meaningful results. At a major European retailer that Deloitte studied, the cost of maintaining six parallel test environments exceeded the annual licence fee for the automation platform by a factor of three. Each environment required dedicated infrastructure, synthetic data management, and integration stubs for third-party services — costs that the automation business case had classified as "existing infrastructure" and excluded.
 
 Maintenance is the second. The World Quality Report found that organisations spend 40-60% of their total automation effort on maintaining existing tests rather than creating new ones. Every UI redesign, API version change, and infrastructure migration triggers a cascade of test updates. At Walmart, the engineering team reported that a single major UI refresh in 2023 required updates to 12,000 automated test cases — a three-month effort that produced no new test coverage.

@@ -35,6 +35,22 @@ The explanation is not mysterious. Experienced test engineers write fewer but mo
 
 Organisations initiating test automation programmes should budget for 18-24 months before breakeven, expect 15-25% efficiency improvement rather than the 50-70% that vendor presentations promise, and plan for automation maintenance to consume 40-60% of ongoing QA effort. These are realistic numbers that, if met, justify the investment. The programmes that fail are not the ones with modest returns. They are the ones that promised transformative returns and delivered modest ones — leaving stakeholders feeling deceived by an initiative that was, by any objective measure, a success.
 
+<figure aria-label="Bar chart: vendor-claimed efficiency gain 50–70% versus realistic efficiency improvement 15–25% from Forrester tracking of 15 enterprise programmes" style="margin:2em 0;padding:1.25em 1.25em 0.75em;background:#f9f9f9;border-top:3px solid #E3120B;font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;">
+<figcaption style="font-size:0.9em;font-weight:700;color:#1a1a1a;margin:0 0 0.2em;">Test automation efficiency: what gets promised vs delivered</figcaption>
+<p style="font-size:0.75em;color:#666;margin:0 0 1em;">Typical efficiency improvement · %</p>
+<div style="margin-bottom:0.75em;">
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.3em;"><span style="font-size:0.8em;color:#1a1a1a;">Vendor-claimed efficiency gain</span><span style="font-size:0.8em;font-weight:700;color:#E3120B;">50–70%</span></div>
+<!-- 100% = 60% midpoint (reference / max value) -->
+<div style="background:#e0e0e0;height:18px;"><div style="background:#E3120B;height:100%;width:100%;"></div></div>
+</div>
+<div style="margin-bottom:0.5em;">
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.3em;"><span style="font-size:0.8em;color:#1a1a1a;">Realistic efficiency improvement (Forrester median)</span><span style="font-size:0.8em;font-weight:700;color:#555;">15–25%</span></div>
+<!-- 29% = 20% midpoint (15–25%) / 70% upper bound of vendor claims -->
+<div style="background:#e0e0e0;height:18px;"><div style="background:#555;height:100%;width:29%;"></div></div>
+</div>
+<p style="font-size:0.7em;color:#999;margin:0.75em 0 0;padding-top:0.6em;border-top:1px solid #ddd;">Sources: Forrester, <em>Total Economic Impact of Enterprise Test Automation</em>, 2025; Capgemini, <em>World Quality Report</em>, 2025</p>
+</figure>
+
 Understanding why automation costs escalate is as important as projecting returns. The [hidden costs of test automation](/2026/04/04/the-real-cost-of-test-automation-balancing-speed-and-sustai/) — infrastructure, maintenance overhead, and the opportunity cost of engineers maintaining brittle suites — routinely consume the efficiency gains that ROI models forecast. Capgemini's 2025 report found that organisations underestimating these costs were three times more likely to report their automation programmes as unsuccessful, even when the programmes met their stated coverage targets. ROI is real. So is the risk of measuring it incorrectly.
 
 ## References

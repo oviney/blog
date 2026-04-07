@@ -13,6 +13,27 @@ On 19 July 2024, a faulty content update pushed by CrowdStrike's Falcon sensor c
 
 The CrowdStrike incident was spectacular, but it was not unusual. The Consortium for Information and Software Quality (CISQ) estimated in its 2022 report — still the most comprehensive macroeconomic analysis available — that poor software quality cost the United States economy $2.41 trillion annually. That figure comprises operational failures ($1.56 trillion), legacy system maintenance ($520 billion), and unsuccessful IT projects ($260 billion). The number has grown every year since CISQ began tracking in 2018, rising 24% in real terms over six years. Software quality is not improving. The cost of its absence is compounding.
 
+<figure aria-label="Horizontal bar chart: annual cost of poor software quality in the US — operational failures $1,560B, legacy system maintenance $520B, unsuccessful IT projects $260B" style="margin:2em 0;padding:1.25em 1.25em 0.75em;background:#f9f9f9;border-top:3px solid #E3120B;font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;">
+<figcaption style="font-size:0.9em;font-weight:700;color:#1a1a1a;margin:0 0 0.2em;">Annual cost of poor software quality in the US</figcaption>
+<p style="font-size:0.75em;color:#666;margin:0 0 1em;">$ billions · CISQ 2022 estimate</p>
+<div style="margin-bottom:0.75em;">
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.3em;"><span style="font-size:0.8em;color:#1a1a1a;">Operational failures</span><span style="font-size:0.8em;font-weight:700;color:#E3120B;">$1,560B</span></div>
+<!-- 100% = $1,560B (reference / max value) -->
+<div style="background:#e0e0e0;height:18px;"><div style="background:#E3120B;height:100%;width:100%;"></div></div>
+</div>
+<div style="margin-bottom:0.75em;">
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.3em;"><span style="font-size:0.8em;color:#1a1a1a;">Legacy system maintenance</span><span style="font-size:0.8em;font-weight:700;color:#555;">$520B</span></div>
+<!-- 33% = $520B / $1,560B -->
+<div style="background:#e0e0e0;height:18px;"><div style="background:#555;height:100%;width:33%;"></div></div>
+</div>
+<div style="margin-bottom:0.5em;">
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.3em;"><span style="font-size:0.8em;color:#1a1a1a;">Unsuccessful IT projects</span><span style="font-size:0.8em;font-weight:700;color:#888;">$260B</span></div>
+<!-- 17% = $260B / $1,560B -->
+<div style="background:#e0e0e0;height:18px;"><div style="background:#888;height:100%;width:17%;"></div></div>
+</div>
+<p style="font-size:0.7em;color:#999;margin:0.75em 0 0;padding-top:0.6em;border-top:1px solid #ddd;">Source: CISQ, <em>The Cost of Poor Software Quality in the US</em>, 2022</p>
+</figure>
+
 ## The invisible tax
 
 Most companies have no idea what poor quality costs them because the expenses hide in plain sight. Rework hours are logged against feature sprints. Incident response is charged to operations. Customer churn caused by buggy releases appears in the retention budget. Nobody totals the bill because nobody owns the line item.
