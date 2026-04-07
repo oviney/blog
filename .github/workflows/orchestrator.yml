@@ -46,7 +46,6 @@ jobs:
         # June 2 2026 forced migration and silences the deprecation warning.
         env:
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-        env:
           DRY_RUN: ${{ env.DRY_RUN }}
           ORCHESTRATOR_TOKEN: ${{ env.ORCHESTRATOR_TOKEN }}
         with:
