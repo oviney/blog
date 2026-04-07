@@ -5,6 +5,7 @@ date: 2026-04-05
 author: "The Economist"
 categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/test-automation-technical-debt.png
+image_alt: "Stark data-visualisation style chart showing compounding technical debt curves in crimson on white, inspired by financial charting with annotated inflection points"
 summary: "Test suites have become the fastest-growing source of technical debt, with flaky tests consuming up to 8% of enterprise development time and maintenance devouring 40% of QA capacity."
 ---
 

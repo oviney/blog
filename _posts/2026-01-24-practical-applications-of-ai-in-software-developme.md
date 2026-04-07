@@ -5,6 +5,7 @@ date: 2026-04-05
 author: "The Economist"
 categories: ["Quality Engineering", "AI Testing", "Software Engineering"]
 image: /assets/images/ai-software-development-reality.png
+image_alt: "Two-panel illustration: left panel shows a dazzling neon-lit stage demo of AI coding; right panel reveals a dimly lit office with confused developers and error messages"
 summary: "AI coding tools make experienced developers 19% slower according to METR, while Cursor's $29 billion valuation suggests the market has priced in a revolution that the evidence hasn't delivered."
 ---
 
