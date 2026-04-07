@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The Concealed Price Tag of Test Automation"
-date: 2026-04-06
+date: 2026-04-12
 author: "The Economist"
 categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/automation-hidden-ledger.png

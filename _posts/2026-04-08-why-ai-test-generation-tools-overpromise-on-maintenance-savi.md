@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The maintenance myth: what AI test generation costs"
-date: 2026-04-05
+date: 2026-04-08
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
 image: /assets/images/why-recent-ai-test-generation-tools-are-overpromising-on-mai.png
