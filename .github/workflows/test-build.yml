@@ -75,6 +75,20 @@ jobs:
           path: _site/
           retention-days: 7
 
+  validate-editorial:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Validate post front matter and image paths
+        run: bash scripts/validate-posts.sh --all
+
   check-agent-scope:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
