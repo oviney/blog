@@ -1,0 +1,41 @@
+name: 💡 Idea Triage
+
+# Scans the repository for improvement signals and files a GitHub issue per
+# finding. Runs weekly on Mondays at 09:00 UTC and on demand. The workflow is
+# read-only with respect to repository files — it only opens issues.
+#
+# Signals detected:
+#   1. Missing images    — image: front-matter value not found in assets/images/
+#   2. Stale skill files — .github/skills/*/SKILL.md not updated in 90+ days
+#   3. Test coverage gap — fewer spec files than layout files
+#   4. Stale post links  — posts >365 days old with dead external URLs (404/410)
+#
+# Issues are labelled "triage" and "P3:low". Deduplication prevents re-filing
+# an issue that is already open with the same title.
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'   # Mondays 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  triage:
+    name: Scan and file improvement issues
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository (full history for git dates)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run idea triage
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: bash scripts/idea-triage.sh
