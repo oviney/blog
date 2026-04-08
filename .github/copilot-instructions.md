@@ -14,7 +14,7 @@ Read the corresponding skill file BEFORE doing any work.
 | `agent:qa-gatekeeper` | QA Gatekeeper | `.github/skills/jekyll-qa/SKILL.md` | Testing, CI, bugs, accessibility, performance |
 | `agent:editorial-chief` | Editorial Chief | `.github/skills/editorial/SKILL.md` | Content, blog posts, SEO, writing |
 | `agent:editorial-manager` | Editorial Chief | `.github/skills/editorial/SKILL.md` | Same as above (alias) |
-| No agent label | General | Read issue description and use best judgment | Documentation, refactoring, misc |
+| No agent label | General | `.github/skills/general/SKILL.md` | Documentation, refactoring, misc |
 
 ## Workflow
 
