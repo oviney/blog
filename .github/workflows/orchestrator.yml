@@ -148,12 +148,20 @@ jobs:
                 if (!isInitialPlanCommit(lastMsg) && idleMin >= 15) {
                   await exec(
                     `Promoted blog#${pr.number} to ready (idle ${Math.round(idleMin)}min, feature commit present)`,
-                    () => github.rest.pulls.update({
-                      owner:       context.repo.owner,
-                      repo:        context.repo.repo,
-                      pull_number: pr.number,
-                      draft:       false,
-                    })
+                    async () => {
+                      const result = await github.graphql(`
+                        mutation markReady($prId: ID!) {
+                          markPullRequestReadyForReview(input: { pullRequestId: $prId }) {
+                            pullRequest { isDraft }
+                          }
+                        }
+                      `, { prId: pr.node_id });
+                      const isDraft = result?.markPullRequestReadyForReview?.pullRequest?.isDraft;
+                      console.log(`blog#${pr.number} post-mutation isDraft=${isDraft}`);
+                      if (isDraft !== false) {
+                        throw new Error(`markPullRequestReadyForReview returned isDraft=${isDraft} — PR is still in draft`);
+                      }
+                    }
                   );
                 } else if (isInitialPlanCommit(lastMsg)) {
                   // ── 2. STALL DETECTION ─────────────────────────────────────
