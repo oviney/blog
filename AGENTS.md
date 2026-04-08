@@ -94,7 +94,7 @@ bash scripts/validate-posts.sh --all
 | Property | Value |
 |----------|-------|
 | **Label** | *(none)* |
-| **Skill file** | Read issue description and use best judgment |
+| **Skill file** | `.github/skills/general/SKILL.md` |
 | **Domain** | Documentation, refactoring, miscellaneous |
 | **May touch** | Any file except the protected list below |
 | **Must not touch** | `_config.yml`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`, `Gemfile`, `Gemfile.lock` |
