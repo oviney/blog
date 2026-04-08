@@ -7,6 +7,16 @@
 #   1. Changes to any protected file
 #   2. More than 15 files changed (scope explosion heuristic)
 #   3. Changes to .github/skills/ or .github/instructions/ governance surfaces
+#   4. Changes to files forbidden for the active agent label (reads PR_LABELS env)
+#
+# Agent-scope pass/fail examples:
+#   PASS: agent:creative-director PR changes only _sass/ and _layouts/
+#   FAIL: agent:creative-director PR changes .github/workflows/test-build.yml
+#   PASS: agent:qa-gatekeeper PR changes tests/ and scripts/
+#   FAIL: agent:qa-gatekeeper PR changes _posts/ or _sass/
+#   PASS: agent:editorial-chief PR changes _posts/ and docs/
+#   FAIL: agent:editorial-chief PR changes _sass/ or .github/workflows/
+#   PASS: PR with no agent label (human PR) — agent-scope check is always skipped
 #
 # Dependencies: git and bash only. No other tools required.
 # Exit codes: 0 = clean, 1 = one or more violations found.
@@ -76,6 +86,45 @@ if [ -n "$GOVERNANCE_CHANGES" ]; then
   echo "VIOLATION [governance-surface]: The following governance files were modified — these require a dedicated issue:"
   echo "$GOVERNANCE_CHANGES" | sed 's/^/  - /'
   VIOLATIONS=$((VIOLATIONS + 1))
+fi
+
+# ---------------------------------------------------------------------------
+# Rule 4: Agent-specific scope rules (only when PR_LABELS env var is set)
+#
+# When running in CI the caller sets:
+#   PR_LABELS=${{ join(github.event.pull_request.labels.*.name, ',') }}
+# When running as a pre-push hook PR_LABELS is unset; this rule is skipped.
+# ---------------------------------------------------------------------------
+if [ -z "${PR_LABELS:-}" ]; then
+  echo "check-pr-scope: PR_LABELS not set — skipping agent-scope check."
+else
+  AGENT_LABEL=""
+  FORBIDDEN_PATTERN=""
+
+  if echo "$PR_LABELS" | grep -q "agent:creative-director"; then
+    AGENT_LABEL="agent:creative-director"
+    FORBIDDEN_PATTERN="^\.github/workflows/|^tests/|^scripts/|^_posts/|^_config\.yml$"
+  elif echo "$PR_LABELS" | grep -q "agent:qa-gatekeeper"; then
+    AGENT_LABEL="agent:qa-gatekeeper"
+    FORBIDDEN_PATTERN="^_sass/|^_layouts/|^_posts/|^_config\.yml$"
+  elif echo "$PR_LABELS" | grep -qE "agent:editorial-chief|agent:editorial-manager"; then
+    AGENT_LABEL="agent:editorial-chief"
+    FORBIDDEN_PATTERN="^_sass/|^_layouts/|^\.github/workflows/|^tests/|^scripts/|^_config\.yml$"
+  fi
+
+  if [ -z "$AGENT_LABEL" ]; then
+    echo "check-pr-scope: no agent label found in PR_LABELS — skipping agent-scope check (human PR)."
+  else
+    echo "check-pr-scope: applying MUST-NOT-TOUCH rules for '$AGENT_LABEL'..."
+    SCOPE_VIOLATIONS=$(echo "$CHANGED_FILES" | grep -E "$FORBIDDEN_PATTERN" || true)
+    if [ -n "$SCOPE_VIOLATIONS" ]; then
+      echo "VIOLATION [agent-scope/$AGENT_LABEL]: The following files are in a forbidden zone for this label:"
+      echo "$SCOPE_VIOLATIONS" | sed 's/^/  - /'
+      VIOLATIONS=$((VIOLATIONS + 1))
+    else
+      echo "  ✓ No agent-scope violations for '$AGENT_LABEL'."
+    fi
+  fi
 fi
 
 # ---------------------------------------------------------------------------

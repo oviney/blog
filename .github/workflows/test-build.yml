@@ -74,3 +74,19 @@ jobs:
           name: site-build
           path: _site/
           retention-days: 7
+
+  check-agent-scope:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check agent scope compliance
+        run: bash scripts/check-pr-scope.sh
+        env:
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
