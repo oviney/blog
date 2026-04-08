@@ -215,12 +215,19 @@ jobs:
                   repo:  context.repo.repo,
                   ref:   pr.head.sha,
                 });
+                const REQUIRED_CHECKS = ['Copilot code review'];
                 const allRunsPass = checkRuns.check_runs.length > 0 &&
                   checkRuns.check_runs.every(r => r.status === 'completed' && r.conclusion === 'success');
                 // total_count === 0 means no legacy status checks configured; rely on allRunsPass
                 const statusPass = checkStatus.state === 'success' || checkStatus.total_count === 0;
 
-                if (allRunsPass && statusPass) {
+                const missingCheck = REQUIRED_CHECKS.find(name =>
+                  !checkRuns.check_runs.some(r => r.name === name && r.conclusion === 'success')
+                );
+
+                if (missingCheck) {
+                  skipped.push(`blog#${pr.number} — required check '${missingCheck}' not yet passing`);
+                } else if (allRunsPass && statusPass) {
                   await exec(
                     `Merged blog#${pr.number} (all checks passed)`,
                     () => github.rest.pulls.merge({
