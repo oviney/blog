@@ -39,8 +39,8 @@ DNS filtering is not a substitute for a complete security posture. It is one lay
 
 ## References
 
-1. Cisco, ["Cybersecurity Readiness Index 2023"](https://www.cisco.com/c/en/us/products/security/cybersecurity-readiness-index.html), *Cisco Systems*, 2023
+1. Cisco, "Cybersecurity Readiness Index 2023", *Cisco Systems*, 2023
 2. Gartner, ["Market Guide for DNS Security"](https://www.gartner.com/en/documents/dns-security), *Gartner Research*, 2023
 3. Forrester, ["DNS Security: The Overlooked Enterprise Defence"](https://www.forrester.com/report/dns-security), *Forrester Research*, 2023
-4. CrowdStrike, ["Global Threat Intelligence Report 2023"](https://www.crowdstrike.com/resources/reports/threat-intelligence/), *CrowdStrike*, 2023
+4. CrowdStrike, "Global Threat Intelligence Report 2023", *CrowdStrike*, 2023
 5. Mozilla, ["DNS over HTTPS in Firefox"](https://support.mozilla.org/en-US/kb/firefox-dns-over-https), *Mozilla Foundation*, 2020
