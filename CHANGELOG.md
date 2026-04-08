@@ -6,6 +6,43 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Top Five Improvements — April 8, 2026 (last 12 hours)
+
+1. **Editorial quality gate added to CI** (PR #668) — A new `validate-posts.sh`
+   script and a `validate-editorial` CI job now run on every pull request.
+   The gate rejects posts with missing required front-matter fields (`layout`,
+   `title`, `date`, `author`, `categories`, `image`), broken image paths, or
+   future-dated content — preventing downstream HTML-Proofer failures before
+   they can reach `main`.
+
+2. **Copilot code review required before orchestrator merges** (PR #671) — The
+   CI orchestrator merge gate now refuses to merge any agent PR unless the
+   `Copilot code review` check has concluded with `success`. Previously a
+   `neutral`, `skipped`, or absent run would still pass the `allRunsPass`
+   guard. Adding a new required check in future is a one-line change to the
+   `REQUIRED_CHECKS` constant.
+
+3. **Agent scope rules enforced as a required CI status check** (PR #663) — A
+   new `check-agent-scope` job in `test-build.yml` runs `check-pr-scope.sh`
+   with the PR's labels on every pull request. Agent-labelled PRs that touch
+   files outside their permitted paths now fail CI with an explicit
+   `VIOLATION [agent-scope/]` message instead of relying solely on a
+   bypassable pre-commit hook.
+
+4. **General Agent skill file created, completing the agent roster** (PR #669)
+   — The General Agent was the only agent without a formal skill file. The new
+   `.github/skills/general/SKILL.md` documents scope, protected files,
+   handoff triggers, quality standards, and common pitfalls. Routing tables in
+   `AGENTS.md` and `.github/copilot-instructions.md` now reference the skill
+   file instead of the placeholder "use best judgment."
+
+5. **Hotfix: 43 HTML-Proofer CI failures resolved** (PR #664) — The
+   concealed-price-tag post referenced an image file
+   (`concealed-price-tag-test-automation.png`) that was never created, causing
+   43 image-check failures across the site on every CI run. The broken path was
+   replaced with an existing, thematically appropriate asset
+   (`testing-tax-shifted-costs.png`).
+
 ### Fixed - January 5, 2026
 - **Issue #33**: Blog layout now matches Economist design system
   - Single-column layout with 1040px max-width (centered)
