@@ -15,7 +15,7 @@ Cisco processes 620 billion DNS requests daily through its Umbrella platform, fo
 
 The logic is disarmingly simple. Every internet connection begins with a DNS lookup — a device asking "where is this website?" By intercepting that question, a security provider can refuse to answer when the destination is known to harbour malware, phishing pages, or botnet command infrastructure. No software agent is required on the device. No signature database needs updating on every laptop. The protection blankets everything on the network, from an engineer's workstation to a neglected IoT thermostat that will never receive a security patch.
 
-This architectural elegance explains why Gartner's 2023 Market Guide for DNS Security placed DNS-layer filtering among the fastest-growing segments of enterprise security, projecting 25% compound annual growth through 2027. Forrester's corresponding analysis found that organisations deploying DNS-based security reduced successful phishing incidents by 85% compared with those relying solely on email filtering and endpoint detection.
+This architectural elegance explains why Gartner's 2023 Market Guide for DNS Security placed DNS-layer filtering among the fastest-growing segments of enterprise security, projecting 25% compound annual growth over the forecast period. Forrester's corresponding analysis found that organisations deploying DNS-based security reduced successful phishing incidents by 85% compared with those relying solely on email filtering and endpoint detection.
 
 ## Where the shield cracks
 
@@ -23,7 +23,7 @@ Yet DNS security is not impervious. Encrypted DNS protocols — DNS over HTTPS a
 
 Cisco's own 2023 Cybersecurity Readiness Index acknowledged this tension. Among 6,700 organisations surveyed across 27 countries, only 15% had adapted their DNS security architecture to handle encrypted queries. The remaining 85% faced a growing blind spot — precisely the kind of gap that attackers, who read the same reports, know how to exploit.
 
-Sophisticated adversaries are also learning to evade DNS filtering through domain generation algorithms that create thousands of disposable domains daily, staying ahead of blocklists. CrowdStrike's 2023 Threat Intelligence Report documented a 95% increase in algorithmically generated domains used by state-sponsored groups between 2021 and 2023. The erosion of DNS visibility is one dimension of a broader pattern: security tools that were designed for one threat model age quickly in the face of adaptive attackers. The same dynamic affects software supply chains and development pipelines — as explored in [The coder's crutch: AI-assisted development's hidden costs](/2023/08/08/practical-applications-of-ai-in-software-development/).
+Sophisticated adversaries are also learning to evade DNS filtering through domain generation algorithms that create thousands of disposable domains daily, staying ahead of blocklists. CrowdStrike's 2023 Threat Intelligence Report documented a 95% increase in algorithmically generated domains used by state-sponsored groups between 2021 and 2023. The erosion of DNS visibility is one dimension of a broader pattern: security tools that were designed for one threat model age quickly in the face of adaptive attackers.
 
 ## The integration imperative
 
