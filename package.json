@@ -48,7 +48,9 @@
   },
   "homepage": "https://github.com/oviney/blog#readme",
   "overrides": {
-    "lodash": "^4.18.1"
+    "lodash": "^4.18.1",
+    "tmp": ">=0.2.3",
+    "basic-ftp": ">=5.2.1"
   },
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
