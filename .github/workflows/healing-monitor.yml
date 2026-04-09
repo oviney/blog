@@ -39,7 +39,7 @@ jobs:
   monitor-healing:
     name: 🔍 Healing Effectiveness Monitor
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
 
     outputs:
       success-rate: ${{ steps.monitor.outputs.success-rate }}
