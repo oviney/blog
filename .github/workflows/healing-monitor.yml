@@ -160,7 +160,8 @@ jobs:
 
         # Run Playwright using config file reporters (json, html, github, list)
         # playwright.config.ts defines JSON output at test-results/results.json
-        npx playwright test || true
+        # Restrict to Chromium-only projects — only Chromium is installed in this workflow
+        npx playwright test --project='Mobile Chrome' --project='Tablet Chrome' --project='Desktop Chrome' || true
 
         # Verify results file was created
         if [ -f "test-results/results.json" ]; then
