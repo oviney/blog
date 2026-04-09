@@ -123,11 +123,17 @@ jobs:
             // Track issues referenced by open PRs (for duplicate detection)
             const issueRefMap = {};   // issueNumber → [pr, ...]
 
+            // Known login formats for the Copilot coding agent
+            // (e.g. 'copilot[bot]', 'Copilot', 'app/copilot-swe-agent')
+            const COPILOT_LOGINS = new Set(['copilot[bot]', 'copilot', 'app/copilot-swe-agent']);
+
             for (const pr of allPRs) {
               const idleMin = minutesAgo(pr.updated_at);
 
               // Count @copilot draft PRs for capacity
-              if (pr.draft && pr.user?.login === 'copilot[bot]') {
+              const prLogin = pr.user?.login ?? '';
+              const isCopilotAuthor = COPILOT_LOGINS.has(prLogin.toLowerCase());
+              if (pr.draft && isCopilotAuthor) {
                 activeCopilotDraftPRs++;
               }
 
@@ -145,6 +151,9 @@ jobs:
               if (pr.draft) {
                 const commit = await getLatestCommit(pr);
                 const lastMsg = commit?.commit?.message ?? '';
+                const firstLine = lastMsg.split('\n')[0];
+                const shortMsg  = firstLine.length > 80 ? firstLine.slice(0, 80) + '…' : firstLine;
+                console.log(`draft check blog#${pr.number} — author=${prLogin}, idle=${Math.round(idleMin)}min, initialPlan=${isInitialPlanCommit(lastMsg)}, lastCommit="${shortMsg}"`);
                 if (!isInitialPlanCommit(lastMsg) && idleMin >= 15) {
                   await exec(
                     `Promoted blog#${pr.number} to ready (idle ${Math.round(idleMin)}min, feature commit present)`,
@@ -199,6 +208,8 @@ jobs:
                   } else {
                     skipped.push(`blog#${pr.number} — still in initial plan phase (${Math.round(idleMin)} min), watching`);
                   }
+                } else {
+                  skipped.push(`blog#${pr.number} — draft, idle ${Math.round(idleMin)}min (< 15min threshold), author=${prLogin}, last commit: "${shortMsg}"`);
                 }
                 continue;  // rest of lifecycle only applies to ready PRs
               }
