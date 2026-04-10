@@ -787,8 +787,448 @@ fi
 - [ ] Production testing documented
 - [ ] Issue closed with reference to PR
 
+---
+
+## 6. Production Test Strategy
+
+The QA Gatekeeper must proactively find bugs in production — not only review PRs. Run the following checks automatically after every merge to `main`.
+
+### 6.1 Smoke Test Suite (post-deploy)
+
+Verify that all core pages load and return HTTP 200 after every deployment:
+
+```bash
+PROD_URL="https://www.viney.ca"
+
+for path in "/" "/blog/"; do
+  STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${PROD_URL}${path}")
+  echo "${path}: HTTP ${STATUS}"
+  [ "$STATUS" = "200" ] || echo "❌ FAIL: ${path} returned ${STATUS}"
+done
+
+# Custom 404 page should return HTTP 404, not 200
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${PROD_URL}/this-page-does-not-exist/")
+[ "$STATUS" = "404" ] || echo "❌ FAIL: 404 handler returned ${STATUS} (expected 404)"
+
+# Also check the most recent post — derive URL from sitemap
+LATEST=$(curl -s "${PROD_URL}/sitemap.xml" \
+  | grep -oP '(?<=<loc>)[^<]+' \
+  | grep '/20' | tail -1)
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$LATEST")
+echo "Latest post (${LATEST}): HTTP ${STATUS}"
+```
+
+**Required pages (must all return 200):**
+- Homepage `/`
+- Blog listing `/blog/`
+- Any recent post page
+- Search page `/search/` (if enabled)
+- Sitemap `/sitemap.xml`
+
+**Failure action:** File a `type:functional` / `severity:S2:major` bug immediately.
+
+### 6.2 Synthetic Link Check
+
+Crawl `sitemap.xml` and verify every listed URL resolves:
+
+```bash
+PROD_URL="https://www.viney.ca"
+ERRORS=0
+
+while IFS= read -r url; do
+  STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+  if [ "$STATUS" != "200" ]; then
+    echo "❌ BROKEN: ${url} → HTTP ${STATUS}"
+    ERRORS=$((ERRORS + 1))
+  fi
+done < <(curl -s "${PROD_URL}/sitemap.xml" | grep -oP '(?<=<loc>)[^<]+')
+
+echo "Link check complete. Errors: ${ERRORS}"
+```
+
+**Target:** Zero broken links. Any broken URL → `type:functional` / `severity:S2:major` bug.
+
+### 6.3 Content Integrity Check
+
+Detect posts whose `date:` front-matter year differs from the body content year:
+
+```bash
+cd "$(git rev-parse --show-toplevel)"
+ERRORS=0
+
+for post in _posts/*.md; do
+  FM_YEAR=$(grep -m1 '^date:' "$post" | grep -oP '\d{4}')
+  # Look for 4-digit years referenced in the body (skip front matter block)
+  BODY_YEARS=$(awk '/^---/{f++} f==2{print}' "$post" \
+    | grep -oP '\b(202[0-9])\b' | sort -u)
+  for year in $BODY_YEARS; do
+    if [ "$year" != "$FM_YEAR" ]; then
+      echo "⚠️  Year mismatch in ${post}: front-matter=${FM_YEAR}, body references ${year}"
+      ERRORS=$((ERRORS + 1))
+    fi
+  done
+done
+
+[ "$ERRORS" -eq 0 ] && echo "✅ Content integrity OK"
+```
+
+**Failure action:** File a `type:content` / `severity:S3:minor` bug for each mismatch.
+
+### 6.4 Image Integrity Check
+
+Detect duplicate image hashes and broken `<img>` src references:
+
+```bash
+# Check for duplicate image files (by MD5 hash)
+find assets/images -type f | while read -r f; do
+  md5sum "$f"
+done | sort | awk 'seen[$1]++{print "❌ DUPLICATE HASH:", $2}'
+
+# Check for broken image references in built site
+bundle exec jekyll build --quiet
+grep -r '<img' _site --include="*.html" \
+  | grep -oP 'src="[^"]+"' \
+  | grep -oP '"[^"]+"' \
+  | tr -d '"' \
+  | sort -u \
+  | while read -r src; do
+      # Resolve absolute paths
+      [[ "$src" == http* ]] && continue
+      local_path="_site${src}"
+      [ -f "$local_path" ] || echo "❌ MISSING IMAGE: ${src}"
+    done
+```
+
+**Failure action:** Duplicate hashes → `type:data-integrity` / `severity:S4:cosmetic`. Broken references → `type:functional` / `severity:S2:major`.
+
+### 6.5 Performance Baseline
+
+Lighthouse scores must not drop more than 5 points from the previous run:
+
+```bash
+# Requires: npm install -g lighthouse
+PROD_URL="https://www.viney.ca"
+BASELINE_FILE=".lighthouse-baseline.json"
+
+# Run current
+lighthouse "${PROD_URL}" \
+  --output json --output-path /tmp/lh-current.json \
+  --chrome-flags="--headless" --quiet
+
+PERF=$(jq '.categories.performance.score * 100' /tmp/lh-current.json)
+A11Y=$(jq '.categories.accessibility.score * 100' /tmp/lh-current.json)
+
+echo "Performance: ${PERF}"
+echo "Accessibility: ${A11Y}"
+
+# Compare to baseline if it exists
+if [ -f "$BASELINE_FILE" ]; then
+  PREV_PERF=$(jq '.performance' "$BASELINE_FILE")
+  # Validate both values are numeric before comparing
+  if [[ "$PERF" =~ ^[0-9]+(\.[0-9]+)?$ ]] && [[ "$PREV_PERF" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+    DELTA=$(echo "$PERF - $PREV_PERF" | bc)
+    if (( $(echo "$DELTA < -5" | bc -l) )); then
+      echo "❌ PERFORMANCE REGRESSION: dropped ${DELTA} points"
+    fi
+  else
+    echo "⚠️  Skipping baseline comparison: non-numeric score (PERF=${PERF}, PREV=${PREV_PERF})"
+  fi
+fi
+
+# Update baseline
+echo "{\"performance\": ${PERF}, \"accessibility\": ${A11Y}}" > "$BASELINE_FILE"
+```
+
+**Target:** Performance ≥ 90, Accessibility ≥ 95. Drop > 5 points → `type:performance` / `severity:S2:major` bug.
+
+### 6.6 Accessibility Baseline
+
+Pa11y must report zero errors on the homepage, blog listing, and most recent post:
+
+```bash
+PROD_URL="https://www.viney.ca"
+
+for path in "/" "/blog/"; do
+  ERRORS=$(npx pa11y "${PROD_URL}${path}" \
+    --reporter json 2>/dev/null \
+    | jq '[.[] | select(.type=="error")] | length')
+  echo "${path}: ${ERRORS} Pa11y errors"
+  [ "$ERRORS" -eq 0 ] || echo "❌ ACCESSIBILITY FAILURES on ${path}"
+done
+```
+
+**Target:** Zero errors. Any violations → `type:accessibility` / `severity:S2:major` bug.
+
+### 6.7 Trigger
+
+All six checks above must run automatically in CI after every merge to `main` (not just on PRs). Add a GitHub Actions job step that runs the smoke suite as a post-deploy verification stage.
+
+---
+
+## 7. Industry-Standard Defect Classification
+
+Every bug filed or triaged by the QA Gatekeeper must include both a **defect type** and a **severity level**.
+
+### 7.1 Defect Type
+
+| Type | Definition |
+|------|-----------|
+| `functional` | Feature does not behave as specified |
+| `visual` | Rendering, layout, or styling error |
+| `performance` | Response time, Lighthouse score, or CI duration regression |
+| `accessibility` | WCAG AA violation |
+| `content` | Incorrect text, date, citation, or image |
+| `security` | Vulnerability, exposed secret, or unsafe dependency |
+| `data-integrity` | Duplicate, missing, or inconsistent data (e.g., image files) |
+| `ci-cd` | Workflow, pipeline, or deployment failure |
+
+Apply to the GitHub issue via label: `type:functional`, `type:visual`, etc.
+
+> **Note:** This taxonomy is inspired by IEEE 1044 principles (the standard was withdrawn in 2017; current practitioners align with ISO/IEC/IEEE 29119 test documentation standards).
+
+### 7.2 Severity
+
+| Level | Definition |
+|-------|-----------|
+| `S1: critical` | Site down, data loss, security breach |
+| `S2: major` | Core feature broken, escaped to production |
+| `S3: minor` | Degraded experience, workaround exists |
+| `S4: cosmetic` | Visual imperfection, no functional impact |
+
+Apply to the GitHub issue via label: `severity:S1:critical`, `severity:S2:major`, etc.
+
+### 7.3 Severity → Priority Mapping
+
+| Severity | Priority Label | SLA |
+|----------|---------------|-----|
+| S1: critical | `P0` | Immediate |
+| S2: major | `P1:high` | < 24 h |
+| S3: minor | `P2:medium` | < 72 h |
+| S4: cosmetic | `P3:low` | Next sprint |
+
+### 7.4 Required Fields for New Bug Issues
+
+All new bug issues **must** include:
+- `type:` label (one of the 8 types above)
+- `severity:` label (S1–S4)
+- `Priority` dropdown set (P0–P3)
+- `Component` dropdown set
+- Description, steps to reproduce, and affected URL
+
+**Non-compliant bug issues will be sent back to the reporter for classification.**
+
+---
+
+## 8. Root Cause Analysis (RCA) Process
+
+For every **S1** or **S2** defect that reaches `status:verified`, the QA Gatekeeper must complete an RCA before closing the issue. Use the **5-Whys** format (see `.github/RCA_TEMPLATE.md`).
+
+### 8.1 RCA Template (5-Whys)
+
+```markdown
+## Root Cause Analysis
+
+**Defect:** [one-line description]
+**Escaped to:** [PR review / staging / production]
+**Detected by:** [CI / human / monitoring / user report]
+
+**5-Whys:**
+1. Why did the bug occur? [immediate cause]
+2. Why did that happen? [process gap]
+3. Why did that process fail? [system gap]
+4. Why does that system gap exist? [root cause]
+5. Why has it not been fixed? [systemic issue]
+
+**Root cause category:**
+- [ ] Missing test coverage
+- [ ] Inadequate acceptance criteria
+- [ ] Agent scope violation
+- [ ] Skill file gap
+- [ ] CI gate not enforcing the rule
+
+**Corrective action:** [specific fix to prevent recurrence]
+```
+
+### 8.2 RCA Procedure
+
+1. **Gather facts** — pull CI logs, git blame, issue timeline.
+2. **Complete the 5-Whys** in the RCA template above.
+3. **Select the root cause category** (check all that apply).
+4. **Define corrective action** — specific, measurable, assigned.
+5. **Post the RCA as a comment** on the issue before closing.
+6. **Track category trends** — if the same category appears ≥ 3 times, file a systemic improvement issue.
+
+### 8.3 Systemic Improvement Trigger
+
+When the same root cause category is identified 3 or more times, automatically create a new issue with:
+- Title: `[SYSTEMIC]: Recurring <category> root cause (N occurrences)`
+- Labels: `type:ci-cd`, `P2:medium`, `systemic`
+- Body: List the issue numbers that share the root cause.
+
+---
+
+## 9. Defect Lifecycle (State Machine)
+
+Every bug issue must follow the lifecycle below, enforced via GitHub labels.
+
+### 9.1 State Transitions
+
+```
+OPEN → status:triaged → status:in-progress → status:fixed → status:verified → CLOSED
+                                                           ↘ status:wont-fix  → CLOSED
+                                                           ↘ status:duplicate → CLOSED
+```
+
+### 9.2 Transition Rules
+
+| From | To | Condition |
+|------|----|-----------|
+| `OPEN` | `status:triaged` | QA Gatekeeper has classified `type:`, `severity:`, and assigned owner |
+| `status:triaged` | `status:in-progress` | Assigned agent has opened a PR |
+| `status:in-progress` | `status:fixed` | PR merged to `main` |
+| `status:fixed` | `status:verified` | QA Gatekeeper confirmed fix on production (viney.ca) |
+| `status:fixed` | `status:wont-fix` | Decision made not to fix (document reason in comment) |
+| `status:fixed` | `status:duplicate` | Confirmed duplicate of another issue |
+| `status:verified` | `CLOSED` | RCA documented (S1/S2 only); issue closed |
+
+**Never close a bug without first transitioning to `status:verified`.**
+
+### 9.3 Required Labels
+
+The following labels must exist in the repository:
+
+| Label | Colour | Description |
+|-------|--------|-------------|
+| `status:triaged` | `#e4e669` | Classified and assigned; ready for dev |
+| `status:in-progress` | `#0075ca` | PR open; being worked on |
+| `status:fixed` | `#a2eeef` | PR merged; awaiting production verification |
+| `status:verified` | `#0e8a16` | Fix confirmed on production |
+| `status:wont-fix` | `#ffffff` | Decision: will not fix |
+| `status:duplicate` | `#cfd3d7` | Duplicate of another issue |
+| `type:functional` | `#d93f0b` | Feature does not behave as specified |
+| `type:visual` | `#e99695` | Rendering, layout, or styling error |
+| `type:performance` | `#f9d0c4` | Performance regression |
+| `type:accessibility` | `#fef2c0` | WCAG AA violation |
+| `type:content` | `#c2e0c6` | Incorrect text, date, citation, or image |
+| `type:security` | `#b60205` | Vulnerability or unsafe dependency |
+| `type:data-integrity` | `#bfdadc` | Duplicate, missing, or inconsistent data |
+| `type:ci-cd` | `#d4c5f9` | Workflow, pipeline, or deployment failure |
+| `severity:S1:critical` | `#b60205` | Site down, data loss, security breach |
+| `severity:S2:major` | `#e11d48` | Core feature broken or escaped to prod |
+| `severity:S3:minor` | `#f97316` | Degraded experience, workaround exists |
+| `severity:S4:cosmetic` | `#fbbf24` | Visual imperfection, no functional impact |
+
+See `.github/labels.yml` for the canonical label definitions used by the label-sync workflow.
+
+---
+
+## 10. COPQ Metrics Dashboard
+
+The QA Gatekeeper must track and report Cost of Poor Quality (COPQ) metrics weekly as a comment on the repo's CI health issue (or a pinned COPQ issue).
+
+### 10.1 Metric Definitions
+
+| Metric | Definition | Target |
+|--------|-----------|--------|
+| **Escaped defect rate** | Bugs found in production ÷ total bugs found | < 10% |
+| **Mean time to detect (MTTD)** | Time from deploy to bug detection | < 24 h |
+| **Mean time to resolve (MTTR)** | Time from bug open to `status:verified` | < 72 h |
+| **Defect re-open rate** | Bugs reopened after `status:verified` | < 5% |
+| **Rework ratio** | PRs requiring > 1 review cycle ÷ total PRs | < 20% |
+| **Flaky test rate** | Tests failing intermittently ÷ total tests | < 2% |
+| **Defect density** | Bugs per post published (content defects) | < 0.5 |
+
+### 10.2 Weekly Report Format
+
+Post the following as a comment on the COPQ tracking issue every Monday:
+
+```markdown
+## COPQ Weekly Report — [YYYY-MM-DD]
+
+| Metric | This Week | Target | Trend |
+|--------|-----------|--------|-------|
+| Escaped defect rate | X% | <10% | ✅ / ⬆️ WORSE |
+| MTTD | Xh | <24h | ✅ / ⬆️ WORSE |
+| MTTR | Xh | <72h | ✅ / ⬆️ WORSE |
+| Defect re-open rate | X% | <5% | ✅ / ⬆️ WORSE |
+| Rework ratio | X% | <20% | ✅ / ⬆️ WORSE |
+| Flaky test rate | X% | <2% | ✅ / ⬆️ WORSE |
+| Defect density | X | <0.5 | ✅ / ⬆️ WORSE |
+
+**Notes:** [Any context, incidents, or corrective actions this week]
+```
+
+### 10.3 Escalation Rule
+
+When any metric is WORSE for 2 consecutive weeks, automatically file a systemic improvement issue:
+
+```
+Title: [SYSTEMIC]: <Metric> exceeding target for 2+ consecutive weeks
+Labels: systemic, P2:medium, type:ci-cd
+Body: Include the last 4 weeks of data and a proposed corrective action.
+```
+
+---
+
+## 11. Observability — What the QA Gatekeeper Must Monitor
+
+Beyond CI green/red, the QA Gatekeeper maintains explicit monitoring across three signal categories.
+
+### 11.1 Production Signals
+
+| Signal | How to Check | Alert Threshold |
+|--------|-------------|-----------------|
+| HTTP response codes | Sitemap crawl (see § 6.2) | Any non-200 |
+| Lighthouse score trend | Weekly Lighthouse run | Drop > 5 pts |
+| Pa11y violation count trend | Post-deploy check (see § 6.6) | Any new error |
+| Image load success rate | Image integrity check (see § 6.4) | Any broken `src` |
+
+**Monitoring cadence:** Run automatically after every merge to `main`; additionally, run the smoke suite (§ 6.1) at least once per week against production even when there are no deploys.
+
+### 11.2 Process Signals
+
+| Signal | Target | Alert Condition |
+|--------|--------|-----------------|
+| PR cycle time (open → merge) | < 4 h for P1 / < 48 h for P2 | Exceeded target |
+| Draft PR age | < 24 h | Any draft > 24 h unmerged |
+| Open S1/S2 bug count | 0 at end of each day | Any S1 or S2 open at EOD |
+
+**How to check:**
+
+```bash
+# List open S1/S2 bugs
+gh issue list --repo oviney/blog \
+  --label "severity:S1:critical" \
+  --label "severity:S2:major" \
+  --state open
+
+# List draft PRs older than 24h
+gh pr list --repo oviney/blog --state open \
+  --json isDraft,createdAt,number,title \
+  | jq '.[] | select(.isDraft == true)'
+```
+
+### 11.3 Agent Quality Signals
+
+| Signal | What it Measures | Target |
+|--------|-----------------|--------|
+| PRs requiring QA change requests | Rework indicator | < 20% of PRs |
+| Bugs filed by users vs. caught by QA | Escaped defect indicator | < 10% user-reported |
+| Root cause categories trending | Systemic gap indicator | No single category > 3× |
+
+**Monthly review:** Summarise agent quality signals in the COPQ report (§ 10.2). If rework ratio or escaped defect rate exceed targets, review the relevant agent skill file and update acceptance criteria.
+
+---
+
 ## Version History
 
+- **2.0.0** (2026-04-10): Major upgrade — production quality engineering disciplines:
+  - Added § 6: Production Test Strategy (smoke tests, link check, content integrity, image integrity, performance baseline, Pa11y baseline)
+  - Added § 7: Industry-Standard Defect Classification (type + severity taxonomy, IEEE 1044 aligned)
+  - Added § 8: Root Cause Analysis Process (5-Whys, systemic improvement trigger)
+  - Added § 9: Defect Lifecycle State Machine (status labels, transition rules)
+  - Added § 10: COPQ Metrics Dashboard (7 metrics with targets and escalation rule)
+  - Added § 11: Observability (production, process, and agent quality signals)
 - **1.2.0** (2026-01-05): Major enhancements based on PR #35 learnings:
   - Added Section 0e: Distinguish Expected vs Unexpected Failures
   - Added external verification workflow for Pa11y false positives (WebAIM Contrast Checker)

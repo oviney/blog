@@ -1,0 +1,83 @@
+# GitHub label definitions
+# Used by label-sync tooling (e.g. github-action-label-sync)
+# Managed by the QA Gatekeeper — do not edit manually
+
+# ── Defect lifecycle status ─────────────────────────────────────────────────
+- name: "status:triaged"
+  color: "e4e669"
+  description: "Classified and assigned; ready for development"
+
+- name: "status:in-progress"
+  color: "0075ca"
+  description: "PR open; actively being worked on"
+
+- name: "status:fixed"
+  color: "a2eeef"
+  description: "PR merged; awaiting production verification"
+
+- name: "status:verified"
+  color: "0e8a16"
+  description: "Fix confirmed on production (viney.ca)"
+
+- name: "status:wont-fix"
+  color: "ffffff"
+  description: "Decision: will not fix — reason documented in issue"
+
+- name: "status:duplicate"
+  color: "cfd3d7"
+  description: "Duplicate of another issue"
+
+# ── Defect type (based on IEEE 1044 principles; note: IEEE 1044 was withdrawn in 2017) ──
+- name: "type:functional"
+  color: "d93f0b"
+  description: "Feature does not behave as specified"
+
+- name: "type:visual"
+  color: "e99695"
+  description: "Rendering, layout, or styling error"
+
+- name: "type:performance"
+  color: "f9d0c4"
+  description: "Response time, Lighthouse score, or CI duration regression"
+
+- name: "type:accessibility"
+  color: "fef2c0"
+  description: "WCAG AA violation"
+
+- name: "type:content"
+  color: "c2e0c6"
+  description: "Incorrect text, date, citation, or image"
+
+- name: "type:security"
+  color: "b60205"
+  description: "Vulnerability, exposed secret, or unsafe dependency"
+
+- name: "type:data-integrity"
+  color: "bfdadc"
+  description: "Duplicate, missing, or inconsistent data"
+
+- name: "type:ci-cd"
+  color: "d4c5f9"
+  description: "Workflow, pipeline, or deployment failure"
+
+# ── Severity ─────────────────────────────────────────────────────────────────
+- name: "severity:S1:critical"
+  color: "b60205"
+  description: "S1: Site down, data loss, or security breach — fix immediately"
+
+- name: "severity:S2:major"
+  color: "e11d48"
+  description: "S2: Core feature broken or escaped to production — P1 priority"
+
+- name: "severity:S3:minor"
+  color: "f97316"
+  description: "S3: Degraded experience, workaround exists — P2 priority"
+
+- name: "severity:S4:cosmetic"
+  color: "fbbf24"
+  description: "S4: Visual imperfection, no functional impact — P3 priority"
+
+# ── Systemic improvement ─────────────────────────────────────────────────────
+- name: "systemic"
+  color: "5319e7"
+  description: "Recurring root cause — requires systemic fix"
