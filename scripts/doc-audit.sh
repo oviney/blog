@@ -102,8 +102,18 @@ while IFS= read -r md_file; do
     else
       resolved="${dir}/${link}"
     fi
-    # Normalise (remove ./)
-    resolved=$(python3 -c "import os, sys; print(os.path.normpath(sys.argv[1]))" "$resolved" 2>/dev/null || echo "$resolved")
+    # Normalize path components (resolve ../ and ./ segments) using bash string ops
+    # We avoid relying on Python so the check is robust across environments.
+    local_resolved=""
+    IFS='/' read -ra parts <<< "$resolved"
+    for part in "${parts[@]}"; do
+      case "$part" in
+        ""|.) ;;
+        ..) local_resolved="${local_resolved%/*}" ;;
+        *)  local_resolved="${local_resolved}/${part}" ;;
+      esac
+    done
+    resolved="${local_resolved#/}"  # strip leading /
     if [[ ! -e "$resolved" ]]; then
       broken_links+=("${md_file}: broken link → ${raw_link}")
       echo "  [broken] ${md_file}: ${raw_link} → ${resolved}"
@@ -207,8 +217,8 @@ if [[ ${#unknown_cmds[@]} -gt 0 ]]; then
     "doc-audit: unrecognised commands in skill-file code blocks" \
     "## Unrecognised Commands in Skill-File Code Blocks
 
-The following commands appear as the first token in \`bash\`/\`sh\` code blocks in skill files
-but are not in the list of known-good commands:
+The following commands appear as the first token in \`bash\`/\`sh\` code blocks in
+\`.github/skills/*/SKILL.md\` files but are not in the list of known-good commands:
 
 ${list}
 
@@ -292,8 +302,8 @@ while IFS= read -r md_file; do
       missing_workflows+=("${md_file}: references missing workflow → ${wf_ref}")
       echo "  [missing] ${md_file}: ${wf_ref}"
     fi
-  done < <(grep -oE '[a-zA-Z0-9_-]+\.yml' "$md_file" 2>/dev/null \
-           | grep -v '^[0-9]' \
+  done < <(grep -oE 'workflows/[a-zA-Z0-9_-]+\.yml' "$md_file" 2>/dev/null \
+           | grep -oE '[a-zA-Z0-9_-]+\.yml' \
            | sort -u || true)
 done < <(find . \
   -not -path './.git/*' \
@@ -329,13 +339,21 @@ echo ""
 echo "=== Check 5: Stale skill files ==="
 
 stale_skills=()
-CUTOFF=$(date -d "90 days ago" +%Y-%m-%d 2>/dev/null \
-         || python3 -c "from datetime import date, timedelta; print(date.today()-timedelta(90))")
+CUTOFF=$(date -d "90 days ago" +%Y-%m-%d 2>/dev/null || true)
+if [[ -z "${CUTOFF:-}" ]]; then
+  # macOS / BSD date fallback
+  CUTOFF=$(date -v-90d +%Y-%m-%d 2>/dev/null || true)
+fi
+if [[ -z "${CUTOFF:-}" ]]; then
+  echo "  [warn] cannot determine CUTOFF date; skipping stale-skill check" >&2
+  CUTOFF=""
+fi
 
 while IFS= read -r skill_file; do
+  [[ -z "${CUTOFF:-}" ]] && break  # skip if CUTOFF could not be determined
   # Last commit date for this file
   last_commit=$(git log -1 --format="%cs" -- "$skill_file" 2>/dev/null || echo "")
-  [[ -z "$last_commit" ]] && last_commit="1970-01-01"
+  [[ -z "$last_commit" ]] && last_commit="1970-01-01"  # Unix epoch ensures untracked files are flagged
   if [[ "$last_commit" < "$CUTOFF" ]]; then
     stale_skills+=("${skill_file} (last updated: ${last_commit})")
     echo "  [stale] ${skill_file}: last commit ${last_commit}"
@@ -376,8 +394,8 @@ done < <(grep -oE 'agent:[a-z-]+' AGENTS.md 2>/dev/null | sort -u || true)
 
 missing_gh_labels=()
 for label in "${roster_labels[@]}"; do
-  exists=$(gh label list --repo "$REPO" --json name --jq \
-    --arg l "$label" '[.[] | select(.name == $l)] | length' 2>/dev/null || echo "0")
+  exists=$(gh label list --repo "$REPO" --json name \
+    --jq "[.[] | select(.name == \"${label}\")] | length" 2>/dev/null || echo "0")
   if [[ "${exists:-0}" -eq 0 ]]; then
     missing_gh_labels+=("$label")
     echo "  [missing label] ${label}"

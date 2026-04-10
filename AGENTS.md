@@ -159,11 +159,11 @@ docs and assigns issues to the appropriate owner.
 
 ### Doc-Audit Automation
 
-The `.github/workflows/doc-audit.yml` workflow runs every Monday at 08:00 UTC and performs:
+The `.github/workflows/doc-audit.yml` workflow runs every Monday at 08:00 UTC (and on manual dispatch) and performs:
 
 **Structural checks:**
 - All internal Markdown links in `*.md` files resolve to existing files
-- All `bash` / `sh` code blocks in skill files reference known commands (`gh`, `bundle`, `npx`, `npm`, `git`, `bash`, `node`, `ruby`, `python3`, `jq`, `curl`)
+- All `bash` / `sh` code blocks in skill files reference known commands (see `scripts/doc-audit.sh` for the full allow-list)
 - All file paths explicitly referenced in docs (`` `path/to/file` `` patterns) exist in the repo
 - All workflow files referenced in docs exist in `.github/workflows/`
 
