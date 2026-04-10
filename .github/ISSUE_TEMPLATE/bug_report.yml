@@ -9,6 +9,36 @@ body:
         Thanks for taking the time to fill out this bug report!
   
   - type: dropdown
+    id: defect_type
+    attributes:
+      label: Defect Type
+      description: "What category of defect is this? (IEEE 1044)"
+      options:
+        - functional
+        - visual
+        - performance
+        - accessibility
+        - content
+        - security
+        - data-integrity
+        - ci-cd
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: "How severe is the impact?"
+      options:
+        - "S1: critical — site down, data loss, security breach"
+        - "S2: major — core feature broken, escaped to production"
+        - "S3: minor — degraded experience, workaround exists"
+        - "S4: cosmetic — visual imperfection, no functional impact"
+    validations:
+      required: true
+
+  - type: dropdown
     id: priority
     attributes:
       label: Priority
@@ -31,7 +61,10 @@ body:
         - Blog Posts
         - Navigation
         - Performance
+        - Accessibility
         - SEO
+        - Security
+        - CI/CD
         - Other
     validations:
       required: true
