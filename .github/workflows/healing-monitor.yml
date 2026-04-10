@@ -36,15 +36,20 @@ env:
   HEALING_WEBHOOK_URL: ${{ secrets.HEALING_WEBHOOK_URL }}
 
 jobs:
-  monitor-healing:
-    name: 🔍 Healing Effectiveness Monitor
+  playwright-tests:
+    name: 🎭 Playwright Tests (${{ matrix.browser }})
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    outputs:
-      success-rate: ${{ steps.monitor.outputs.success-rate }}
-      trend: ${{ steps.monitor.outputs.trend }}
-      status: ${{ steps.monitor.outputs.status }}
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        include:
+          - browser: chromium
+            projects: --project "Mobile Chrome" --project "Tablet Chrome" --project "Desktop Chrome"
+          - browser: firefox
+            projects: --project "Desktop Firefox"
+          - browser: webkit
+            projects: --project "Desktop Safari"
+      fail-fast: false
 
     steps:
     - name: 📥 Checkout repository
@@ -70,12 +75,7 @@ jobs:
         PUPPETEER_SKIP_DOWNLOAD: 'true'
       run: |
         npm ci --include=dev
-        npx playwright install --with-deps chromium
-
-    - name: ✅ Verify Playwright installation
-      run: |
-        npx playwright --version
-        npx playwright install-deps
+        npx playwright install --with-deps ${{ matrix.browser }}
 
     - name: 🏗️ Build Jekyll site
       run: bundle exec jekyll build
@@ -153,26 +153,87 @@ jobs:
         # Save Jekyll PID for cleanup
         echo "$JEKYLL_PID" > /tmp/jekyll.pid
 
-    - name: 🧪 Run Playwright tests
+    - name: 🧪 Run Playwright tests (${{ matrix.browser }})
       run: |
-        echo "🎭 Running Playwright test suite..."
+        echo "🎭 Running Playwright tests for ${{ matrix.browser }}..."
         mkdir -p test-results
 
-        # Run Playwright using config file reporters (json, html, github, list)
-        # playwright.config.ts defines JSON output at test-results/results.json
-        # Restrict to Chromium-only projects — only Chromium is installed in this workflow
-        npx playwright test --project='Mobile Chrome' --project='Tablet Chrome' --project='Desktop Chrome' || true
+        npx playwright test ${{ matrix.projects }} || true
 
-        # Verify results file was created
         if [ -f "test-results/results.json" ]; then
           echo "✅ Playwright results saved to test-results/results.json"
           echo "📊 Results summary:"
           node -e "const r=require('./test-results/results.json'); console.log('Passed:', r.stats?.expected || 0, 'Failed:', r.stats?.unexpected || 0)"
         else
-          echo "❌ Results file not created — check playwright.config.ts reporter settings"
+          echo "⚠️ Results file not created"
         fi
 
-        echo "✅ Playwright tests completed"
+        echo "✅ Playwright tests completed for ${{ matrix.browser }}"
+
+    - name: 📤 Upload test results (${{ matrix.browser }})
+      uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: playwright-results-${{ matrix.browser }}
+        path: |
+          test-results/
+          playwright-report/
+        retention-days: 30
+
+    - name: 🛑 Stop Jekyll server
+      if: always()
+      run: |
+        if [ -f /tmp/jekyll.pid ]; then
+          JEKYLL_PID=$(cat /tmp/jekyll.pid)
+          if kill -0 $JEKYLL_PID 2>/dev/null; then
+            echo "Stopping Jekyll server (PID: $JEKYLL_PID)"
+            kill $JEKYLL_PID || true
+            sleep 2
+            if kill -0 $JEKYLL_PID 2>/dev/null; then
+              echo "Process still running, forcing termination..."
+              kill -9 $JEKYLL_PID 2>/dev/null || true
+            else
+              echo "Process terminated gracefully"
+            fi
+          fi
+        fi
+        pkill -f "jekyll serve" || true
+        echo "✅ Jekyll server cleanup complete"
+
+  monitor-healing:
+    name: 🔍 Healing Effectiveness Monitor
+    needs: playwright-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    outputs:
+      success-rate: ${{ steps.monitor.outputs.success-rate }}
+      trend: ${{ steps.monitor.outputs.trend }}
+      status: ${{ steps.monitor.outputs.status }}
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - name: 🚀 Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: 📦 Install Node.js dependencies
+      env:
+        PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
+        PUPPETEER_SKIP_DOWNLOAD: 'true'
+      run: npm ci --include=dev
+
+    - name: 📥 Download Playwright results (chromium)
+      uses: actions/download-artifact@v4
+      with:
+        name: playwright-results-chromium
+        path: test-results/
 
     - name: 🎯 Run comprehensive healing monitoring
       id: monitor
@@ -255,30 +316,6 @@ jobs:
           playwright-report/
           test-results/
         retention-days: 90
-
-    - name: 🛑 Stop Jekyll server
-      if: always()
-      run: |
-        if [ -f /tmp/jekyll.pid ]; then
-          JEKYLL_PID=$(cat /tmp/jekyll.pid)
-          if kill -0 $JEKYLL_PID 2>/dev/null; then
-            echo "Stopping Jekyll server (PID: $JEKYLL_PID)"
-            kill $JEKYLL_PID || true  # Send SIGTERM for graceful shutdown
-            sleep 2
-            # Force kill if still running after graceful shutdown attempt
-            if kill -0 $JEKYLL_PID 2>/dev/null; then
-              echo "Process still running, forcing termination..."
-              kill -9 $JEKYLL_PID 2>/dev/null || true  # Send SIGKILL
-            else
-              echo "Process terminated gracefully"
-            fi
-          fi
-        fi
-        
-        # Clean up any orphaned Jekyll processes
-        pkill -f "jekyll serve" || true
-        
-        echo "✅ Jekyll server cleanup complete"
 
     - name: 📊 Create healing status badge
       run: |
