@@ -40,6 +40,8 @@ jobs:
     name: 🎭 Playwright Tests (${{ matrix.browser }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
     strategy:
       matrix:
         include:
@@ -205,6 +207,8 @@ jobs:
     needs: playwright-tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: write
 
     outputs:
       success-rate: ${{ steps.monitor.outputs.success-rate }}
