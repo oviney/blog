@@ -311,6 +311,15 @@
     </div>
   </section>
 
+  <!-- ── AI Spend panel ──────────────────────────────── -->
+  <section class="section" id="ai-spend-section">
+    <h2 class="section-title">AI Spend — GitHub Copilot</h2>
+    <div id="ai-spend-content">
+      <div class="kpi-grid" id="ai-spend-kpis"></div>
+      <div id="ai-spend-note" style="margin-top:12px;font-size:13px;color:var(--muted)"></div>
+    </div>
+  </section>
+
   <!-- ── Charts Row ───────────────────────────────────── -->
   <section class="section">
     <h2 class="section-title">Quality Signals</h2>
@@ -654,6 +663,44 @@ function render(data) {
         <span style="color:var(--muted);font-size:13px">${r.tip}</span>
       </div>`
     ).join('');
+  }
+
+  // AI Spend — GitHub Copilot
+  const cu = data.copilotUsage;
+  if (cu) {
+    const agentPRs   = kpis.agentPRsMerged30d ?? 0;
+    const totalCost  = cu.seatsActive !== null ? cu.seatsActive * cu.seatCostPerMonth : null;
+    const costPerPR  = totalCost !== null && agentPRs > 0
+      ? (totalCost / agentPRs).toFixed(2)
+      : null;
+
+    document.getElementById('ai-spend-kpis').innerHTML = `
+      <div class="kpi-card">
+        <div class="kpi-label">Copilot seats active</div>
+        <div class="kpi-value">${cu.seatsActive !== null ? cu.seatsActive : '—'}</div>
+        <div class="kpi-sub">${cu.billingCycleStart} → ${cu.billingCycleEnd}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Seat cost this cycle</div>
+        <div class="kpi-value">${totalCost !== null ? '$' + totalCost : '—'}</div>
+        <div class="kpi-sub">$${cu.seatCostPerMonth}/seat/month</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Agent PRs this cycle</div>
+        <div class="kpi-value">${agentPRs}</div>
+        <div class="kpi-sub">Copilot-authored (30d)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Cost per PR</div>
+        <div class="kpi-value">${costPerPR !== null ? '$' + costPerPR : '—'}</div>
+        <div class="kpi-sub">${costPerPR !== null ? 'seat cost ÷ agent PRs' : 'enable billing API'}</div>
+      </div>
+    `;
+
+    if (!cu.apiAvailable && cu.note) {
+      document.getElementById('ai-spend-note').innerHTML =
+        `ℹ️ ${cu.note}`;
+    }
   }
 }
 
