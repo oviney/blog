@@ -130,3 +130,46 @@ The following files require human review and must **never** be modified by any a
 ## Architectural Decisions
 
 See [`decisions.md`](decisions.md) for a log of architectural decisions that span agent sessions.
+
+---
+
+## Documentation Ownership Map
+
+Every documentation file has an explicit owner and a review cadence.
+Ownership means the agent is responsible for keeping the file accurate and up to date.
+The automated doc-audit workflow (`.github/workflows/doc-audit.yml`) flags stale or broken
+docs and assigns issues to the appropriate owner.
+
+| File / Path | Owner | Review cadence |
+|---|---|---|
+| `AGENTS.md` | General Agent | On any agent/workflow change |
+| `CLAUDE.md` | General Agent | On any skill file or routing change |
+| `decisions.md` | General Agent | On any architectural decision |
+| `.github/skills/economist-theme/SKILL.md` | Creative Director | On any design-system change |
+| `.github/skills/jekyll-qa/SKILL.md` | QA Gatekeeper | On any CI/testing change |
+| `.github/skills/editorial/SKILL.md` | Editorial Chief | On any content-workflow change |
+| `.github/skills/general/SKILL.md` | General Agent | On any scope/workflow change |
+| `.github/skills/git-operations/SKILL.md` | General Agent | On any git-workflow change |
+| `.github/skills/github-issues-workflow/SKILL.md` | General Agent | On any issue-workflow change |
+| `.github/skills/jekyll-development/SKILL.md` | QA Gatekeeper | On any dev-server change |
+| `docs/` | Editorial Chief | Monthly |
+| `README.md`, `GETTING_STARTED.md` | General Agent | On any setup change |
+| `CHANGELOG.md` | General Agent | On every sprint |
+| `ARCHITECTURE.md` | General Agent | On any structural change |
+
+### Doc-Audit Automation
+
+The `.github/workflows/doc-audit.yml` workflow runs every Monday at 08:00 UTC and performs:
+
+**Structural checks:**
+- All internal Markdown links in `*.md` files resolve to existing files
+- All `bash` / `sh` code blocks in skill files reference known commands (`gh`, `bundle`, `npx`, `npm`, `git`, `bash`, `node`, `ruby`, `python3`, `jq`, `curl`)
+- All file paths explicitly referenced in docs (`` `path/to/file` `` patterns) exist in the repo
+- All workflow files referenced in docs exist in `.github/workflows/`
+
+**Staleness checks:**
+- Skill files not updated in > 90 days → flag for human review
+- `AGENTS.md` agent roster labels match actual GitHub labels in the repo
+
+When a check fails, the workflow files a GitHub issue with label `doc-debt` and `P2:medium`
+so the correct owner can address it promptly.
