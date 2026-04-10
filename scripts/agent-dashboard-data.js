@@ -31,6 +31,10 @@ const CONTENT_FILE     = path.join(REPO_ROOT, 'content-review-results.json');
 const REMEDIATION_FILE = path.join(REPO_ROOT, 'content-remediation-queue.json');
 const OUT_FILE         = path.join(REPO_ROOT, 'dashboard', 'agents-data.json');
 const REPO_SLUG     = 'oviney/blog';
+const REPO_OWNER    = REPO_SLUG.split('/')[0];
+
+// GitHub Copilot Business seat price (USD/seat/month). Update if pricing changes.
+const COPILOT_SEAT_COST_USD = 19;
 
 const OFFLINE = process.argv.includes('--offline');
 
@@ -168,6 +172,55 @@ function aggregateContent() {
   };
 }
 
+// ── Copilot usage ─────────────────────────────────────────────────────────────
+
+function fetchCopilotUsage() {
+  const now = new Date();
+  const year  = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const lastDay = new Date(year, now.getMonth() + 1, 0).getDate();
+  const billingCycleStart = `${year}-${month}-01`;
+  const billingCycleEnd   = `${year}-${month}-${lastDay}`;
+
+  if (OFFLINE) {
+    return {
+      seatsActive: null,
+      billingCycleStart,
+      billingCycleEnd,
+      seatCostPerMonth: COPILOT_SEAT_COST_USD,
+      apiAvailable: false,
+      note: 'Offline mode — skipping Copilot API calls.',
+    };
+  }
+
+  // Try user-level endpoint first (applies to personal repos like oviney/blog)
+  let data = ghApi(`/users/${REPO_OWNER}/copilot`);
+  let seatsActive = null;
+
+  if (data) {
+    seatsActive = data.seat_breakdown?.active_this_cycle ?? null;
+  } else {
+    // Fall back to org-level endpoint
+    data = ghApi(`/orgs/${REPO_OWNER}/copilot/billing`);
+    if (data) {
+      seatsActive = data.seat_breakdown?.active_this_cycle ?? data.total_seats ?? null;
+    }
+  }
+
+  const apiAvailable = seatsActive !== null;
+
+  return {
+    seatsActive,
+    billingCycleStart,
+    billingCycleEnd,
+    seatCostPerMonth: COPILOT_SEAT_COST_USD,
+    apiAvailable,
+    ...(!apiAvailable && {
+      note: 'Copilot billing API unavailable. Add a PAT with manage_billing:copilot or read:org scope as secret COPILOT_BILLING_PAT to enable live seat data.',
+    }),
+  };
+}
+
 // ── Live GitHub data ──────────────────────────────────────────────────────────
 
 function fetchLiveData() {
@@ -232,6 +285,7 @@ function main() {
   const contentData     = aggregateContent();
   const remediationData = safeReadJson(REMEDIATION_FILE);
   const liveData        = fetchLiveData();
+  const copilotUsage    = fetchCopilotUsage();
 
   const agentPRsMerged = liveData.recentPRs.filter(pr => pr.isAgent).length;
   const totalBacklog   = Object.values(liveData.openIssuesByLabel)
@@ -267,6 +321,7 @@ function main() {
     recentPRs:         liveData.recentPRs,
     openIssuesByLabel: liveData.openIssuesByLabel,
     remediationQueue:  remediationData?.queue ?? [],
+    copilotUsage,
   };
 
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
