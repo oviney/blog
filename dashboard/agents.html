@@ -686,14 +686,14 @@ function render(data) {
         <div class="kpi-sub">$${cu.seatCostPerMonth}/seat/month</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Agent PRs this cycle</div>
+        <div class="kpi-label">Agent PRs (rolling 30d)</div>
         <div class="kpi-value">${agentPRs}</div>
-        <div class="kpi-sub">Copilot-authored (30d)</div>
+        <div class="kpi-sub">Copilot-authored merged PRs</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Cost per PR</div>
+        <div class="kpi-label">Cost per PR (estimate)</div>
         <div class="kpi-value">${costPerPR !== null ? '$' + costPerPR : '—'}</div>
-        <div class="kpi-sub">${costPerPR !== null ? 'seat cost ÷ agent PRs' : 'enable billing API'}</div>
+        <div class="kpi-sub">${costPerPR !== null ? 'seat cost ÷ agent PRs (30d)' : 'enable billing API'}</div>
       </div>
     `;
 

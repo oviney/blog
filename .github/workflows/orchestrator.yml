@@ -450,7 +450,12 @@ jobs:
 
           # Current billing cycle (1st of this month → last day of this month)
           BILLING_START=$(date +%Y-%m-01)
-          BILLING_END=$(date -d "$(date +%Y-%m-01) +1 month -1 day" +%Y-%m-%d)
+          BILLING_END=$(python3 -c "import datetime,calendar; d=datetime.date.today(); print('{}-{:02d}-{:02d}'.format(d.year,d.month,calendar.monthrange(d.year,d.month)[1]))")
+
+          # Use ephemeral temp files to avoid leaving billing data on the runner
+          TMPUSER=$(mktemp)
+          TMPORG=$(mktemp)
+          trap 'rm -f "$TMPUSER" "$TMPORG"' EXIT
 
           {
             echo ""
@@ -458,7 +463,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
           # Try user-level Copilot endpoint first (user repo)
-          HTTP_USER=$(curl -s -o /tmp/copilot_user.json -w "%{http_code}" \
+          HTTP_USER=$(curl -s -o "$TMPUSER" -w "%{http_code}" \
             -H "Authorization: Bearer ${TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
@@ -467,14 +472,14 @@ jobs:
           if [ "$HTTP_USER" = "200" ]; then
             SEATS=$(jq -r '
               (.seat_breakdown.active_this_cycle // "N/A") | tostring
-            ' /tmp/copilot_user.json 2>/dev/null || echo "N/A")
+            ' "$TMPUSER" 2>/dev/null || echo "N/A")
             {
               echo "- Seats active: ${SEATS}"
               echo "- Billing cycle: ${BILLING_START} → ${BILLING_END}"
             } >> "$GITHUB_STEP_SUMMARY"
           else
             # Fall back to org-level endpoint
-            HTTP_ORG=$(curl -s -o /tmp/copilot_org.json -w "%{http_code}" \
+            HTTP_ORG=$(curl -s -o "$TMPORG" -w "%{http_code}" \
               -H "Authorization: Bearer ${TOKEN}" \
               -H "Accept: application/vnd.github+json" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
@@ -483,7 +488,7 @@ jobs:
             if [ "$HTTP_ORG" = "200" ]; then
               SEATS=$(jq -r '
                 (.seat_breakdown.active_this_cycle // .total_seats // "N/A") | tostring
-              ' /tmp/copilot_org.json 2>/dev/null || echo "N/A")
+              ' "$TMPORG" 2>/dev/null || echo "N/A")
               {
                 echo "- Seats active: ${SEATS}"
                 echo "- Billing cycle: ${BILLING_START} → ${BILLING_END}"
