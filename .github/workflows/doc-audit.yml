@@ -1,0 +1,44 @@
+name: 📚 Doc Audit
+
+# Scans documentation for structural and staleness issues, then files a GitHub
+# issue per finding. Runs weekly on Mondays at 08:00 UTC (before idea-triage
+# at 09:00) and on demand.
+#
+# Checks performed:
+#   1. Internal Markdown links     — linked file paths must exist in the repo
+#   2. Known commands in code blocks — bash/sh blocks in skill files must use
+#                                      recognised commands as first token
+#   3. File paths in back-ticks    — `path/to/file` patterns must exist
+#   4. Workflow file references    — workflow .yml names cited in docs must exist
+#   5. Stale skill files           — SKILL.md not updated in > 90 days
+#   6. AGENTS.md label roster      — agent: labels in AGENTS.md must exist in GitHub
+#
+# Issues are labelled "doc-debt" and "P2:medium". Deduplication prevents
+# re-filing an issue that is already open with the same title.
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'   # Mondays 08:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    name: Run documentation audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository (full history for git dates)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run doc audit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: bash scripts/doc-audit.sh
