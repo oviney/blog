@@ -96,6 +96,7 @@ test.describe('@visual Responsive Layout Adaptation', () => {
 
   test('Navigation menu adapts to viewport size', async ({ page }) => {
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
 
     const navigation = page.locator('nav, .site-nav, .main-nav, [role="navigation"]');
     await expect(navigation.first()).toBeVisible();
