@@ -7,7 +7,8 @@ name: 🤖 CI Orchestrator
 #   1. PR lifecycle  — promote drafts, merge passing PRs, rebase conflicts,
 #                      close duplicate PRs
 #   2. Stall detection — initial-plan PRs idle >45 min → close + reassign
-#   3. Backlog dispatch — assign oldest unassigned P1/P2 to @copilot (max 6)
+#   3. Backlog dispatch — assign oldest unassigned P1:high/P2:medium to @copilot (max 6)
+#   3b. Stuck re-dispatch — re-trigger @copilot on assigned issues with no open PR
 #   4. Escalation  — idle >2h with unresolved state → needs-human-review
 
 on:
@@ -372,8 +373,8 @@ jobs:
                 continue;
               }
 
-              // Fetch unassigned P1/P2 issues (oldest first)
-              for (const priority of ['P1', 'P2']) {
+              // Fetch unassigned P1:high/P2:medium issues (oldest first)
+              for (const priority of ['P1:high', 'P2:medium']) {
                 let issues = [];
                 try {
                   // github client already uses ORCHESTRATOR_TOKEN (set as github-token above)
@@ -399,6 +400,67 @@ jobs:
                   await exec(
                     `Dispatched ${repoLabel}#${issue.number} to @copilot (${priority}, capacity available)`,
                     async () => {
+                      await github.rest.issues.addAssignees({
+                        owner:        target.owner,
+                        repo:         target.repo,
+                        issue_number: issue.number,
+                        assignees:    ['copilot[bot]'],
+                      });
+                    }
+                  );
+                  activeCopilotDraftPRs++;
+                }
+              }
+
+              // ── 3b. STUCK RE-DISPATCH ────────────────────────────────────
+              // Issues already assigned to @copilot but with no open PR after
+              // 30 minutes — remove + re-add the assignee to re-trigger the
+              // Copilot coding-agent webhook.
+              // Note: uses updated_at as a proxy for assignment time because
+              // the REST issues list does not include the assignment timestamp.
+              const issuesWithPRs = new Set(Object.keys(issueRefMap).map(Number));
+
+              // Single-entry array — structured for extensibility if GitHub
+              // changes the Copilot bot login format in the future.
+              for (const copilotLogin of ['copilot[bot]']) {
+                let assignedIssues = [];
+                try {
+                  const resp = await github.rest.issues.listForRepo({
+                    owner:     target.owner,
+                    repo:      target.repo,
+                    state:     'open',
+                    assignee:  copilotLogin,
+                    sort:      'created',
+                    direction: 'asc',
+                    per_page:  30,
+                  });
+                  assignedIssues = resp.data.filter(i => !i.pull_request);
+                } catch (err) {
+                  skipped.push(`${repoLabel} stuck-check fetch failed — ${err.message}`);
+                  continue;
+                }
+
+                for (const issue of assignedIssues) {
+                  if (issuesWithPRs.has(issue.number)) continue;
+
+                  const ageMin = minutesAgo(issue.updated_at);
+                  if (ageMin < 30) {
+                    skipped.push(`${repoLabel}#${issue.number} — assigned to @copilot ${Math.round(ageMin)} min ago (< 30 min), waiting`);
+                    continue;
+                  }
+
+                  const cap = MAX_COPILOT_CAPACITY - activeCopilotDraftPRs;
+                  if (cap <= 0) break;
+
+                  await exec(
+                    `Re-dispatched ${repoLabel}#${issue.number} to @copilot (assigned ${Math.round(ageMin)} min ago, no open PR found)`,
+                    async () => {
+                      await github.rest.issues.removeAssignees({
+                        owner:        target.owner,
+                        repo:         target.repo,
+                        issue_number: issue.number,
+                        assignees:    [copilotLogin],
+                      });
                       await github.rest.issues.addAssignees({
                         owner:        target.owner,
                         repo:         target.repo,
