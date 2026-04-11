@@ -21,7 +21,7 @@ on:
       dry_run:
         description: 'Preview actions without executing them'
         type: boolean
-        default: true
+        default: false
 
 permissions:
   contents: write
