@@ -416,8 +416,12 @@ jobs:
               // Issues already assigned to @copilot but with no open PR after
               // 30 minutes — remove + re-add the assignee to re-trigger the
               // Copilot coding-agent webhook.
+              // Note: uses updated_at as a proxy for assignment time because
+              // the REST issues list does not include the assignment timestamp.
               const issuesWithPRs = new Set(Object.keys(issueRefMap).map(Number));
 
+              // Single-entry array — structured for extensibility if GitHub
+              // changes the Copilot bot login format in the future.
               for (const copilotLogin of ['copilot[bot]']) {
                 let assignedIssues = [];
                 try {
@@ -439,7 +443,7 @@ jobs:
                 for (const issue of assignedIssues) {
                   if (issuesWithPRs.has(issue.number)) continue;
 
-                  const ageMin = minutesAgo(issue.created_at);
+                  const ageMin = minutesAgo(issue.updated_at);
                   if (ageMin < 30) {
                     skipped.push(`${repoLabel}#${issue.number} — assigned to @copilot ${Math.round(ageMin)} min ago (< 30 min), waiting`);
                     continue;
