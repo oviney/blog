@@ -237,7 +237,8 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: playwright-results-chromium
-        path: test-results/
+        path: .
+      continue-on-error: true
 
     - name: 🎯 Run comprehensive healing monitoring
       id: monitor
