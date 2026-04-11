@@ -1,0 +1,25 @@
+name: "Editorial: AI review bug"
+description: "Report a problem with AI-generated editorial review output"
+labels: ["bug", "P1:high", "agent:editorial-chief", "needs-human-review"]
+body:
+  - type: input
+    id: article_url
+    attributes:
+      label: Article URL
+      placeholder: "https://www.viney.ca/..."
+    validations:
+      required: true
+  - type: textarea
+    id: ai_review
+    attributes:
+      label: AI review text
+      description: "Paste the full AI review output"
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional notes
+      description: "Any context about what looks wrong"
+    validations:
+      required: false
