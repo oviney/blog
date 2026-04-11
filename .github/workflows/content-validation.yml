@@ -1,0 +1,21 @@
+name: Content Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '_posts/**'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-posts:
+    name: Validate post front matter
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Validate posts
+        run: bash scripts/validate-posts.sh --all
