@@ -234,10 +234,22 @@ jobs:
       run: npm ci --include=dev
 
     - name: 📥 Download Playwright results (chromium)
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: playwright-results-chromium
-        path: test-results/
+        path: .
+
+    - name: ✅ Verify Playwright results
+      run: |
+        if [ -f "test-results/results.json" ]; then
+          echo "✅ Found test-results/results.json"
+          node -e "const r=require('./test-results/results.json'); console.log('Passed:', r.stats?.expected || 0, 'Failed:', r.stats?.unexpected || 0)"
+        else
+          echo "❌ test-results/results.json not found"
+          echo "📁 Workspace contents:"
+          find . -name 'results.json' -o -name '*.json' -path '*/test-results/*' 2>/dev/null | head -20
+          exit 1
+        fi
 
     - name: 🎯 Run comprehensive healing monitoring
       id: monitor
