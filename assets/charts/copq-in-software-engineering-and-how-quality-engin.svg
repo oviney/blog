@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">Defect cost multiplier by detection stage</text>
+  <text x="40" y="56" font-size="12" fill="#666">Relative cost to fix a defect · index (design phase = 1×)</text>
+
+  <!-- Y axis -->
+  <line x1="100" y1="80" x2="100" y2="310" stroke="#1a1a1a" stroke-width="1"/>
+  <!-- X axis -->
+  <line x1="100" y1="310" x2="760" y2="310" stroke="#1a1a1a" stroke-width="1"/>
+
+  <!-- Y axis labels -->
+  <text x="90" y="310" font-size="11" fill="#999" text-anchor="end">0×</text>
+  <text x="90" y="264" font-size="11" fill="#999" text-anchor="end">20×</text>
+  <line x1="98" y1="264" x2="760" y2="264" stroke="#f0f0f0" stroke-width="1"/>
+  <text x="90" y="218" font-size="11" fill="#999" text-anchor="end">40×</text>
+  <line x1="98" y1="218" x2="760" y2="218" stroke="#f0f0f0" stroke-width="1"/>
+  <text x="90" y="172" font-size="11" fill="#999" text-anchor="end">60×</text>
+  <line x1="98" y1="172" x2="760" y2="172" stroke="#f0f0f0" stroke-width="1"/>
+  <text x="90" y="126" font-size="11" fill="#999" text-anchor="end">80×</text>
+  <line x1="98" y1="126" x2="760" y2="126" stroke="#f0f0f0" stroke-width="1"/>
+  <text x="90" y="84" font-size="11" fill="#999" text-anchor="end">100×</text>
+  <line x1="98" y1="84" x2="760" y2="84" stroke="#f0f0f0" stroke-width="1"/>
+
+  <!-- Bar 1: Design — 1× -->
+  <rect x="130" y="307.7" width="80" height="2.3" fill="#888" rx="1"/>
+  <text x="170" y="300" font-size="11" font-weight="700" fill="#888" text-anchor="middle">1×</text>
+  <text x="170" y="335" font-size="11" fill="#1a1a1a" text-anchor="middle">Design</text>
+
+  <!-- Bar 2: Unit test — 5× -->
+  <rect x="250" y="298.5" width="80" height="11.5" fill="#888" rx="1"/>
+  <text x="290" y="293" font-size="11" font-weight="700" fill="#888" text-anchor="middle">5×</text>
+  <text x="290" y="335" font-size="11" fill="#1a1a1a" text-anchor="middle">Unit test</text>
+
+  <!-- Bar 3: Integration — 10× -->
+  <rect x="370" y="287" width="80" height="23" fill="#555" rx="1"/>
+  <text x="410" y="282" font-size="11" font-weight="700" fill="#555" text-anchor="middle">10×</text>
+  <text x="410" y="335" font-size="11" fill="#1a1a1a" text-anchor="middle">Integration</text>
+
+  <!-- Bar 4: System test — 15× -->
+  <rect x="490" y="275.5" width="80" height="34.5" fill="#555" rx="1"/>
+  <text x="530" y="270" font-size="11" font-weight="700" fill="#555" text-anchor="middle">15×</text>
+  <text x="530" y="335" font-size="11" fill="#1a1a1a" text-anchor="middle">System test</text>
+
+  <!-- Bar 5: Production — 30-100× (show at 65× midpoint with range indicator) -->
+  <rect x="610" y="160.5" width="80" height="149.5" fill="#E3120B" rx="1"/>
+  <text x="650" y="153" font-size="12" font-weight="700" fill="#E3120B" text-anchor="middle">30–100×</text>
+  <text x="650" y="335" font-size="11" fill="#1a1a1a" text-anchor="middle">Production</text>
+
+  <!-- Annotation arrow -->
+  <text x="540" y="150" font-size="11" fill="#E3120B" font-style="italic">Cost explodes</text>
+  <text x="540" y="164" font-size="11" fill="#E3120B" font-style="italic">in production</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: CloudQA, Cost of Software Bugs Report, 2025; CISQ, The Cost of Poor Software Quality in the US, 2022</text>
+</svg>

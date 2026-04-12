@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">AI coding tools: the real productivity picture</text>
+  <text x="40" y="56" font-size="12" fill="#666">Impact on key software metrics · %</text>
+
+  <!-- Axis line -->
+  <line x1="300" y1="75" x2="300" y2="310" stroke="#ccc" stroke-width="1"/>
+
+  <!-- Zero label -->
+  <text x="300" y="325" font-size="11" fill="#999" text-anchor="middle">0</text>
+
+  <!-- Grid lines and labels (positive) -->
+  <line x1="450" y1="75" x2="450" y2="310" stroke="#eee" stroke-width="1"/>
+  <text x="450" y="325" font-size="11" fill="#999" text-anchor="middle">+25</text>
+  <line x1="600" y1="75" x2="600" y2="310" stroke="#eee" stroke-width="1"/>
+  <text x="600" y="325" font-size="11" fill="#999" text-anchor="middle">+50</text>
+
+  <!-- Grid lines and labels (negative) -->
+  <line x1="180" y1="75" x2="180" y2="310" stroke="#eee" stroke-width="1"/>
+  <text x="180" y="325" font-size="11" fill="#999" text-anchor="middle">−20</text>
+
+  <!-- Bar 1: Code throughput +25% (positive, red accent) -->
+  <text x="290" y="107" font-size="13" fill="#1a1a1a" text-anchor="end">Code throughput (DORA)</text>
+  <rect x="300" y="90" width="150" height="28" fill="#E3120B" rx="2"/>
+  <text x="458" y="109" font-size="12" font-weight="700" fill="#E3120B">+25%</text>
+
+  <!-- Bar 2: Task completion -19% (negative, dark grey) -->
+  <text x="290" y="162" font-size="13" fill="#1a1a1a" text-anchor="end">Task completion time (METR)</text>
+  <rect x="186" y="145" width="114" height="28" fill="#555" rx="2"/>
+  <text x="178" y="164" font-size="12" font-weight="700" fill="#555" text-anchor="end">−19%</text>
+
+  <!-- Bar 3: Code churn +43% (negative outcome, dark grey) -->
+  <text x="290" y="217" font-size="13" fill="#1a1a1a" text-anchor="end">Code churn increase (GitClear)</text>
+  <rect x="300" y="200" width="258" height="28" fill="#555" rx="2"/>
+  <text x="566" y="219" font-size="12" font-weight="700" fill="#555">+43%</text>
+
+  <!-- Bar 4: Failed deployments +14% (negative outcome, dark grey) -->
+  <text x="290" y="272" font-size="13" fill="#1a1a1a" text-anchor="end">Failed deployments (DORA)</text>
+  <rect x="300" y="255" width="84" height="28" fill="#555" rx="2"/>
+  <text x="392" y="274" font-size="12" font-weight="700" fill="#555">+14%</text>
+
+  <!-- Legend -->
+  <rect x="40" y="345" width="12" height="12" fill="#E3120B" rx="1"/>
+  <text x="58" y="356" font-size="11" fill="#666">Positive outcome</text>
+  <rect x="160" y="345" width="12" height="12" fill="#555" rx="1"/>
+  <text x="178" y="356" font-size="11" fill="#666">Negative outcome</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: DORA, State of AI-Assisted Software Development, 2025; METR, 2025; GitClear, AI Code Generation Impact Report, 2025</text>
+</svg>

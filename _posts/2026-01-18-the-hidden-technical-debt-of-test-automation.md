@@ -14,6 +14,9 @@ Slack's engineering team discovered that flaky tests — tests that pass and fai
 
 Test automation has become one of the fastest-growing sources of technical debt in modern software development, yet it rarely appears on any team's debt register. The suites that promised to reduce maintenance burden have themselves become the maintenance burden — demanding constant care, consuming compute resources, and delivering diminishing returns as they bloat beyond comprehension. The TestDino Flaky Test Benchmark Report 2026 found that the proportion of teams experiencing significant test flakiness grew from 10% in 2022 to 26% in 2025, a trajectory showing no signs of reversal.
 
+![The hidden cost of test automation debt — chart showing 40% of QA time on maintenance, 20–30% on flaky test triage, and flakiness growth from 10% in 2022 to 26% in 2025](/assets/charts/the-hidden-technical-debt-of-test-automation.svg)
+*Source: TestDino, 2026; Capgemini & Sogeti, 2025-26*
+
 ## The compounding cost
 
 The financial damage is quantifiable. Developers spend up to 1.28% of their time repairing flaky tests, translating to approximately $2,250 per month per organisation in direct costs. For enterprise teams, more than 8% of total development time is consumed by fixing unreliable tests — time logged against feature tickets rather than quality budgets, making the true cost invisible to leadership. QA engineers spend an average of 20-30% of their work week simply triaging failures to distinguish between genuine regressions and flaky phantoms.

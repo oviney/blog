@@ -43,6 +43,9 @@ Stripe's developer coefficient survey found that engineers at the average compan
 
 The CloudQA 2025 cost of software bugs report confirmed that defect economics follow a brutal exponential curve. A defect found in production costs 30 to 100 times more to fix than one caught during design or unit testing. Yet most teams still allocate the bulk of their quality spend to the end of the pipeline, where the cost multiplier is highest. The economics are perverse: the industry systematically over-invests in the most expensive place to find bugs and under-invests in the cheapest.
 
+![Defect cost multiplier by detection stage — chart showing costs rising from 1× at design to 30–100× in production](/assets/charts/copq-in-software-engineering-and-how-quality-engin.svg)
+*Source: CloudQA, 2025; CISQ, 2022*
+
 ## The shift-left arithmetic
 
 The DORA State of DevOps 2025 report found that elite-performing teams deploy 182 times more frequently than low performers while maintaining change failure rates below 5%. Speed and quality are not trade-offs — they are the same discipline viewed from different angles. The primary barrier to shift-left testing is not technical but organisational: testing is still treated as a phase rather than a practice, owned by a separate QA function rather than embedded in development workflows.
