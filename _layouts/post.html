@@ -10,7 +10,7 @@ layout: default
     {% if page.categories %}
     <!-- Section + Rubric (Economist Style) -->
     <div class="article-section-line">
-      <a href="{{ '/blog/' | relative_url }}" class="section-link">{{ page.categories | first | capitalize }}</a>
+      <a href="{{ '/blog/' | relative_url }}" class="section-link">{{ page.categories | first }}</a>
       <span class="section-separator">|</span>
       <span class="article-rubric">{{ page.rubric | default: page.title | truncatewords: 4 }}</span>
     </div>
@@ -75,7 +75,7 @@ layout: default
     <nav class="topic-tags-nav">
       {% if page.categories %}
       {% for category in page.categories %}
-      <a href="{{ '/blog/' | relative_url }}" class="topic-tag-link">{{ category | capitalize }}</a>
+      <a href="{{ '/blog/' | relative_url }}" class="topic-tag-link">{{ category }}</a>
       {% endfor %}
       {% endif %}
       {% if page.tags %}
@@ -162,7 +162,7 @@ layout: default
 <!-- More from Section -->
 <section class="more-from-section">
   <div class="more-from-header">
-    <h2>More from {{ page.categories | first | capitalize | default: "Quality Engineering" }} →</h2>
+    <h2>More from {{ page.categories | first | default: "Quality Engineering" }} →</h2>
   </div>
 
   <div class="more-from-grid">
