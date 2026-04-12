@@ -3,7 +3,7 @@ layout: post
 title: "The Financial Toll of Security Debt: A Growing Concern"
 date: 2026-04-12
 author: "Ouray Viney"
-categories: ["quality-engineering", "security"]
+categories: ["Security"]
 description: "Exploring the financial implications and challenges of managing security debt within organizations."
 image: /assets/images/the-hidden-economics-of-security-debt.png
 ---
