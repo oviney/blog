@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">Coverage targets: high numbers, low signal</text>
+  <text x="40" y="56" font-size="12" fill="#666">How organisations set and achieve coverage thresholds · % of teams</text>
+
+  <line x1="40" y1="310" x2="760" y2="310" stroke="#ddd" stroke-width="1"/>
+  <line x1="192" y1="80" x2="192" y2="310" stroke="#eee" stroke-width="1"/>
+  <text x="192" y="326" font-size="11" fill="#999" text-anchor="middle">25%</text>
+  <line x1="344" y1="80" x2="344" y2="310" stroke="#eee" stroke-width="1"/>
+  <text x="344" y="326" font-size="11" fill="#999" text-anchor="middle">50%</text>
+  <line x1="496" y1="80" x2="496" y2="310" stroke="#eee" stroke-width="1"/>
+  <text x="496" y="326" font-size="11" fill="#999" text-anchor="middle">75%</text>
+  <text x="40" y="326" font-size="11" fill="#999" text-anchor="middle">0</text>
+  <text x="700" y="326" font-size="11" fill="#999" text-anchor="middle">≥80% target</text>
+
+  <!-- Teams mandating ≥80% coverage -->
+  <text x="36" y="108" font-size="13" fill="#1a1a1a" text-anchor="end">Teams mandating ≥80% coverage</text>
+  <rect x="40" y="90" width="461" height="28" fill="#555" rx="2"/>
+  <text x="509" y="109" font-size="13" font-weight="700" fill="#555">60%</text>
+
+  <!-- Teams where high coverage correlated with fewer bugs -->
+  <text x="36" y="163" font-size="13" fill="#1a1a1a" text-anchor="end">High coverage correlated with fewer defects</text>
+  <rect x="40" y="145" width="115" height="28" fill="#E3120B" rx="2"/>
+  <text x="163" y="164" font-size="13" font-weight="700" fill="#E3120B">15%</text>
+
+  <!-- Teams gaming coverage with trivial tests -->
+  <text x="36" y="218" font-size="13" fill="#1a1a1a" text-anchor="end">Coverage inflated by trivial / auto-generated tests</text>
+  <rect x="40" y="200" width="345" height="28" fill="#555" rx="2"/>
+  <text x="393" y="219" font-size="13" font-weight="700" fill="#555">45%</text>
+
+  <!-- Google: no universal target -->
+  <rect x="40" y="248" width="720" height="36" fill="#f9f9f9" rx="2"/>
+  <text x="52" y="267" font-size="13" fill="#1a1a1a">Google enforces no universal coverage target across a 2-billion-line codebase</text>
+  <text x="52" y="282" font-size="12" fill="#666">— and explicitly warns against treating coverage percentages as quality proxies</text>
+
+  <text x="40" y="388" font-size="10" fill="#999">Sources: Codecov State of Software Quality, 2025; Google Engineering Productivity Research; Trail of Bits Engineering Blog, September 2025</text>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">Manual QA's displacement: the non-adoption gap closes</text>
+  <text x="40" y="56" font-size="12" fill="#666">AI adoption in quality engineering · % of organisations</text>
+
+  <!-- Non-adoption trend: 31% → 11% -->
+  <text x="40" y="90" font-size="13" font-weight="600" fill="#1a1a1a">Non-adopters of generative AI in QE (Capgemini)</text>
+  <text x="200" y="155" font-family="Merriweather, Georgia, serif" font-size="52" font-weight="700" fill="#888" text-anchor="middle">31%</text>
+  <text x="200" y="175" font-size="12" fill="#999" text-anchor="middle">2023</text>
+  <line x1="260" y1="148" x2="360" y2="148" stroke="#ddd" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="312" y="140" font-size="24" fill="#E3120B" text-anchor="middle">↘</text>
+  <text x="430" y="155" font-family="Merriweather, Georgia, serif" font-size="52" font-weight="700" fill="#E3120B" text-anchor="middle">11%</text>
+  <text x="430" y="175" font-size="12" fill="#999" text-anchor="middle">2025</text>
+
+  <line x1="40" y1="198" x2="760" y2="198" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Current adoption breakdown -->
+  <text x="40" y="222" font-size="13" font-weight="600" fill="#1a1a1a">Current AI QE adoption (World Quality Report 2025-26)</text>
+
+  <text x="36" y="256" font-size="13" fill="#1a1a1a" text-anchor="end">Piloting or deploying AI-augmented QE</text>
+  <rect x="40" y="242" width="641" height="26" fill="#888" rx="2"/>
+  <text x="689" y="260" font-size="13" font-weight="700" fill="#888">89%</text>
+
+  <text x="36" y="296" font-size="13" fill="#1a1a1a" text-anchor="end">In production</text>
+  <rect x="40" y="282" width="266" height="26" fill="#E3120B" rx="2"/>
+  <text x="314" y="300" font-size="13" font-weight="700" fill="#E3120B">37%</text>
+
+  <text x="40" y="346" font-size="12" fill="#888" font-style="italic">Test-cycle time reductions of 30–40% commonplace among adopters; self-healing locators survive 89% of UI changes</text>
+
+  <text x="40" y="388" font-size="10" fill="#999">Sources: Capgemini/Sogeti World Quality Report 2025-26; Perforce State of Continuous Testing, 2025; Katalon Benchmark, 2025</text>
+</svg>

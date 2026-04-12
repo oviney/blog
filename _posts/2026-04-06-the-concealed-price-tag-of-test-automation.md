@@ -10,6 +10,9 @@ description: "Only 25% of test automation programmes hit their projected ROI. Li
 summary: "Delving into the overlooked financial and operational burdens that undermine test automation’s touted efficiencies."
 ---
 
+![Test automation cost iceberg: licensing and scripts are 35%; maintenance, infrastructure, and talent account for 65%](/assets/charts/the-concealed-price-tag-of-test-automation.svg)
+*Source: Gartner Market Guide for Test Automation Tools, 2022; Forrester Enterprise Automation Study, 2023*
+
 The promise of test automation promises to whisk software releases along at breakneck speed with minimal errors. Yet, beneath this gleaming veneer lies a tangle of hidden costs that organisations seldom reckon with until budgets balloon and deadlines slip. A sober reckoning reveals that test automation is often a far more expensive and complicated beast than conventional wisdom admits.
 
 If you find yourself nodding politely while sipping your morning brew, consider the sobering statistic from the *World Quality Report 2023-24*: only a quarter of test automation initiatives hit their promised return on investment, while over half stagger under the weight of maintenance woes or entirely capitulate. This is not a footnote for enthusiasts to ignore—it is a clarion call to anyone contemplating automation as a shortcut to software quality and speed.

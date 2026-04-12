@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">AI test generation: what it fixes and what it ignores</text>
+  <text x="40" y="56" font-size="12" fill="#666">Decomposition of test maintenance effort · % of total (Capgemini, 2025)</text>
+
+  <!-- Horizontal stacked bar showing the 5 categories -->
+  <!-- Total bar width = 720 -->
+  <!-- Locator 35% = 252px (red - AI handles) -->
+  <!-- Functional 25% = 180px (dark - AI doesn't handle) -->
+  <!-- Data 20% = 144px -->
+  <!-- Timing 12% = 86px -->
+  <!-- Environment 8% = 58px -->
+
+  <text x="40" y="95" font-size="13" fill="#666">All test maintenance effort</text>
+  <rect x="40" y="105" width="252" height="44" fill="#E3120B" rx="0"/>
+  <rect x="292" y="105" width="180" height="44" fill="#555" rx="0"/>
+  <rect x="472" y="105" width="144" height="44" fill="#777" rx="0"/>
+  <rect x="616" y="105" width="87" height="44" fill="#999" rx="0"/>
+  <rect x="703" y="105" width="57" height="44" fill="#bbb" rx="0"/>
+
+  <text x="166" y="132" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">35%</text>
+  <text x="382" y="132" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">25%</text>
+  <text x="544" y="132" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">20%</text>
+  <text x="659" y="132" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">12%</text>
+  <text x="731" y="132" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">8%</text>
+
+  <!-- Labels below -->
+  <text x="166" y="168" font-size="11" fill="#E3120B" text-anchor="middle">Locator /</text>
+  <text x="166" y="181" font-size="11" fill="#E3120B" text-anchor="middle">selector changes</text>
+  <text x="382" y="168" font-size="11" fill="#555" text-anchor="middle">Functional</text>
+  <text x="382" y="181" font-size="11" fill="#555" text-anchor="middle">logic changes</text>
+  <text x="544" y="168" font-size="11" fill="#777" text-anchor="middle">Data</text>
+  <text x="544" y="181" font-size="11" fill="#777" text-anchor="middle">dependencies</text>
+  <text x="659" y="168" font-size="11" fill="#999" text-anchor="middle">Timing /</text>
+  <text x="659" y="181" font-size="11" fill="#999" text-anchor="middle">synchronisation</text>
+  <text x="731" y="168" font-size="11" fill="#bbb" text-anchor="middle">Environment</text>
+
+  <!-- Annotation -->
+  <line x1="166" y1="190" x2="166" y2="215" stroke="#E3120B" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="166" y="230" font-size="12" fill="#E3120B" text-anchor="middle">AI addresses this</text>
+
+  <line x1="540" y1="190" x2="540" y2="215" stroke="#555" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="580" y="230" font-size="12" fill="#555">AI cannot address these four (65%)</text>
+
+  <!-- Outcome callout -->
+  <rect x="40" y="260" width="720" height="50" fill="#f9f9f9" rx="2"/>
+  <text x="52" y="281" font-size="13" fill="#1a1a1a">IEEE study of 400 teams across 15 countries:</text>
+  <text x="52" y="298" font-size="13" fill="#555">62% reported <tspan font-weight="700" fill="#1a1a1a">no meaningful reduction</tspan> in maintenance effort after adopting AI test generation</text>
+
+  <text x="40" y="388" font-size="10" fill="#999">Sources: Capgemini World Quality Report, 2025; IEEE Empirical Study on AI Test Generation, 2025 (n=400 teams, 15 countries); CB Insights, 2025</text>
+</svg>

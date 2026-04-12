@@ -9,6 +9,9 @@ image_alt: "Minimalist neon-on-black technical diagram of DNS request packets de
 description: "Cisco blocks 7 million malicious DNS requests every minute. How the Domain Name System became cybersecurity's most underrated first line of defence."
 ---
 
+![DNS security impact: phishing reduction and the encrypted DNS blind spot](/assets/charts/understanding-opendns-cybersecurity-protection.svg)
+*Source: Forrester Research, 2023; Gartner Market Guide for DNS Security, 2023*
+
 Cisco processes 620 billion DNS requests daily through its Umbrella platform, formerly OpenDNS. Each query is a chance to stop an attack before it starts — and the company claims to block 7 million malicious requests every minute. In an era when sophisticated threats slip past firewalls and endpoint agents with depressing regularity, the humble Domain Name System has become an unlikely sentinel.
 
 ## The DNS advantage

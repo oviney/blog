@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">AI threat detection: the case for machine-speed security</text>
+  <text x="40" y="56" font-size="12" fill="#666">Operational impact of AI-driven vs. traditional security tools</text>
+
+  <line x1="40" y1="310" x2="760" y2="310" stroke="#ddd" stroke-width="1"/>
+  <line x1="40" y1="80" x2="40" y2="310" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Scale labels -->
+  <text x="40" y="326" font-size="11" fill="#999" text-anchor="middle">0</text>
+  <line x1="220" y1="80" x2="220" y2="310" stroke="#eee" stroke-width="1"/>
+  <text x="220" y="326" font-size="11" fill="#999" text-anchor="middle">25%</text>
+  <line x1="400" y1="80" x2="400" y2="310" stroke="#eee" stroke-width="1"/>
+  <text x="400" y="326" font-size="11" fill="#999" text-anchor="middle">50%</text>
+  <line x1="580" y1="80" x2="580" y2="310" stroke="#eee" stroke-width="1"/>
+  <text x="580" y="326" font-size="11" fill="#999" text-anchor="middle">75%</text>
+  <text x="760" y="326" font-size="11" fill="#999" text-anchor="middle">100%</text>
+
+  <!-- Breach detection speed improvement 108 days / normalise to 92% -->
+  <text x="36" y="108" font-size="13" fill="#1a1a1a" text-anchor="end">Faster breach detection (IBM, AI vs traditional)</text>
+  <rect x="40" y="90" width="230" height="28" fill="#888" rx="2"/>
+  <text x="278" y="109" font-size="12" fill="#888">108 days faster</text>
+
+  <!-- CrowdStrike investigation time reduction 92% -->
+  <text x="36" y="158" font-size="13" fill="#1a1a1a" text-anchor="end">Investigation time reduction (CrowdStrike Charlotte AI)</text>
+  <rect x="40" y="140" width="662" height="28" fill="#E3120B" rx="2"/>
+  <text x="710" y="159" font-size="13" font-weight="700" fill="#E3120B">92%</text>
+  <text x="52" y="159" font-size="12" fill="#fff">60 min → under 5 min</text>
+
+  <!-- Cost savings per incident $2.22M (relative to industry avg) -->
+  <text x="36" y="208" font-size="13" fill="#1a1a1a" text-anchor="end">Average cost saving per breach (IBM)</text>
+  <rect x="40" y="190" width="310" height="28" fill="#555" rx="2"/>
+  <text x="358" y="209" font-size="12" fill="#555">$2.22M per incident</text>
+
+  <!-- Evading signature detection 40% -->
+  <text x="36" y="258" font-size="13" fill="#1a1a1a" text-anchor="end">2024 incidents evading signature-based detection (Palo Alto)</text>
+  <rect x="40" y="240" width="288" height="28" fill="#555" rx="2"/>
+  <text x="336" y="259" font-size="13" font-weight="700" fill="#555">40%</text>
+
+  <text x="40" y="388" font-size="10" fill="#999">Sources: IBM Cost of a Data Breach Report, 2025; CrowdStrike Charlotte AI, 2024; Palo Alto Networks Unit 42 Threat Report, 2024; AV-TEST (450k new samples/day)</text>
+</svg>

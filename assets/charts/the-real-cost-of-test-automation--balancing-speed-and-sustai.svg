@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">Test automation budget: what companies plan vs. what they spend</text>
+  <text x="40" y="56" font-size="12" fill="#666">Share of total QA budget consumed by automation · % (Capgemini, n=1,750)</text>
+
+  <!-- Trend line: 31% → 42% -->
+  <text x="200" y="110" font-size="42" font-weight="700" fill="#888" font-family="Merriweather, Georgia, serif" text-anchor="middle">31%</text>
+  <text x="200" y="130" font-size="12" fill="#999" text-anchor="middle">2020</text>
+  <line x1="240" y1="115" x2="340" y2="115" stroke="#ddd" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="292" y="108" font-size="18" fill="#E3120B">↗</text>
+  <text x="420" y="110" font-size="42" font-weight="700" fill="#E3120B" font-family="Merriweather, Georgia, serif" text-anchor="middle">42%</text>
+  <text x="420" y="130" font-size="12" fill="#999" text-anchor="middle">2023</text>
+
+  <line x1="40" y1="155" x2="760" y2="155" stroke="#ddd" stroke-width="1"/>
+  <text x="40" y="178" font-size="13" font-weight="600" fill="#1a1a1a">Where the budget actually goes (Forrester, n=200 enterprise programmes)</text>
+
+  <!-- Visible costs 30-40% -->
+  <text x="36" y="214" font-size="13" fill="#1a1a1a" text-anchor="end">Visible: tooling, scripts, initial training</text>
+  <rect x="40" y="200" width="252" height="28" fill="#888" rx="2"/>
+  <text x="300" y="219" font-size="13" font-weight="700" fill="#888">35%</text>
+
+  <!-- Hidden costs 60-70% -->
+  <text x="36" y="259" font-size="13" fill="#1a1a1a" text-anchor="end">Hidden: maintenance, infra, talent, rework</text>
+  <rect x="40" y="245" width="468" height="28" fill="#E3120B" rx="2"/>
+  <text x="516" y="264" font-size="13" font-weight="700" fill="#fff">65%</text>
+
+  <text x="40" y="318" font-size="12" fill="#888" font-style="italic">Only 25% of automation programmes deliver projected ROI — those that correctly budgeted for the hidden 65%</text>
+
+  <text x="40" y="388" font-size="10" fill="#999">Sources: Capgemini World Quality Report, 2023 (n=1,750 technology leaders); Forrester Enterprise Test Automation Study, 2024 (n=200 initiatives)</text>
+</svg>
