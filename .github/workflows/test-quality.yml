@@ -84,6 +84,8 @@ jobs:
     name: 📝 Content Validation
     runs-on: ubuntu-latest
     needs: select-tests
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -101,7 +103,7 @@ jobs:
           exit $rc
 
   # ---------------------------------------------------------------------------
-  # Step 2a: Non-Playwright quality checks (always run unless CI-only change)
+  # Step 3: Non-Playwright quality checks (always run unless CI-only change)
   # ---------------------------------------------------------------------------
   quality-checks:
     name: 🎯 Accessibility, Visual & Lighthouse

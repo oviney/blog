@@ -223,12 +223,10 @@ for post in $POSTS; do
   # ------------------------------------------------------------------
   alt_val=$(fm_value "$post" "image_alt")
   alt_lower=$(echo "$alt_val" | tr '[:upper:]' '[:lower:]')
-  for term in watercolour pastel whimsical; do
-    if echo "$alt_lower" | grep -qi "$term"; then
-      echo "⚠️   $rel — image_alt contains prohibited style term: '$term'"
-      WARNINGS=$((WARNINGS + 1))
-      post_warnings=$((post_warnings + 1))
-    fi
+  for term in $(echo "$alt_lower" | grep -oiE 'watercolour|pastel|whimsical' || true); do
+    echo "⚠️   $rel — image_alt contains prohibited style term: '$term'"
+    WARNINGS=$((WARNINGS + 1))
+    post_warnings=$((post_warnings + 1))
   done
 
   # ------------------------------------------------------------------
