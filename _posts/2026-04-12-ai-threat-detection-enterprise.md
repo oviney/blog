@@ -51,3 +51,11 @@ The arms race is far from settled. Attackers are already using generative AI to 
 The implications extend well beyond network perimeters. As organisations instrument more of their operations — from software supply chains to cloud-native microservices — the attack surface grows faster than human teams can monitor. This is the same scaling challenge that confronts [quality engineering in software development](/2026/04/05/ai-quality-testing-automation/): the volume and velocity of signals have outstripped manual inspection capacity, making AI augmentation not a luxury but an operational necessity.
 
 The enterprises that will fare best are those treating AI-driven threat detection not as a product purchase but as a capability investment — retraining analysts, building feedback loops, and accepting that the models will be imperfect but improvable. In cybersecurity, as in most domains where AI is transforming operations, the competitive advantage belongs not to those with the best algorithms but to those with the best data, the fastest learning cycles, and the institutional willingness to trust — and verify — machine judgement.
+
+## References
+
+1. IBM Security, ["Cost of a Data Breach Report 2025"](https://www.ibm.com/reports/data-breach), *IBM*, 2025
+2. AV-TEST Institute, ["Malware Statistics & Trends Report"](https://www.av-test.org/en/statistics/malware/), *AV-TEST*, 2025
+3. Palo Alto Networks, ["Unit 42 Incident Response Report 2024"](https://www.paloaltonetworks.com/unit42/incident-response-report), *Palo Alto Networks*, 2024
+4. ISC2, ["Cybersecurity Workforce Study 2024"](https://www.isc2.org/Research/Workforce-Study), *ISC2*, 2024
+5. Gartner, ["Top Strategic Technology Trends 2026"](https://www.gartner.com/en/articles/gartner-top-10-strategic-technology-trends-for-2026), *Gartner*, 2025
