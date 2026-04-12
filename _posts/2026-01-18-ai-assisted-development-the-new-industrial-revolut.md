@@ -6,7 +6,7 @@ author: "Ouray Viney"
 categories: ["Software Engineering"]
 image: /assets/images/ai-assisted-code-generation.png
 image_alt: "Whimsical watercolour scene of unsupervised intern robots typing furiously at keyboards in an empty open-plan office, pastel tones with loose brushwork"
-description: "AI code generators boost typing speed but degrade code quality at scale — METR found they make experienced developers 19% slower, while GitClear shows 41% higher code churn."
+description: "AI code generators boost typing speed but degrade code quality — METR found developers are 19% slower on tasks, while GitClear shows 41% higher code churn."
 ---
 
 METR, a non-profit AI safety research lab, tracked 16 experienced open-source developers as they completed 246 real-world coding tasks on mature repositories averaging over one million lines of code. The developers using AI tools took 19% longer than those working without them. Before the study, participants had predicted AI would make them 24% faster. Even after experiencing the slowdown, they estimated AI had improved their productivity by 20%. The gap between perception and measurement is the defining feature of the AI coding revolution: developers believe the tools help, the data says otherwise, and nobody wants to hear it.
