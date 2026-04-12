@@ -139,7 +139,7 @@ layout: default
   {% endif %}
 {% endfor %}
 
-{% if related_posts.size > 0 %}
+{% if related_posts.size >= 2 %}
 <section class="related-reading" aria-labelledby="related-reading-heading">
   <h2 class="related-reading__heading" id="related-reading-heading">Related reading</h2>
   <div class="related-list">
@@ -149,6 +149,7 @@ layout: default
       <h3 class="related-title">
         <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
       </h3>
+      <p class="related-excerpt">{{ post.excerpt | strip_html | truncate: 100, "…" }}</p>
       <time class="related-meta" datetime="{{ post.date | date_to_xmlschema }}">
         {{ post.date | date: "%b %-d, %Y" }}
       </time>
