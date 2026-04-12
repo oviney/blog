@@ -1154,6 +1154,20 @@ blockquote {
       color: rgba(255, 255, 255, 0.9); // Ensure all paragraph text is visible on dark background
     }
   }
+
+  .footer-rss-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    .rss-icon {
+      transition: color 0.2s ease;
+    }
+
+    &:hover .rss-icon {
+      color: $economist-red;
+    }
+  }
 }
 
 // ============================================
