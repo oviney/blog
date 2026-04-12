@@ -6,6 +6,7 @@ author: "Ouray Viney"
 categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/testing-tax-shifted-costs.png
 image_alt: "Cold technical blueprint of automation machinery with price-tag labels attached to every component and subsystem, engineering schematic style in white lines on deep navy"
+description: "Only 25% of test automation programmes hit their projected ROI. Licensing, maintenance, and hidden integration costs inflate budgets by 20-30%."
 summary: "Delving into the overlooked financial and operational burdens that undermine test automation’s touted efficiencies."
 ---
 

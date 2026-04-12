@@ -6,6 +6,7 @@ author: "Ouray Viney"
 categories: ["Quality Engineering"]
 image: /assets/images/copq-cross-industry.png
 image_alt: "Split-panel editorial illustration contrasting a precise factory assembly line on the left with a chaotic software deployment pipeline on the right, risograph print texture"
+description: "Boeing's $31 billion quality failure mirrors software's inverted cost structure. US firms spend 3.4× more fixing defects than preventing them."
 summary: "Manufacturing spent decades learning that quality is cheaper than inspection — Boeing's $31 billion lesson and CrowdStrike's $500 million afternoon prove software hasn't learned yet."
 ---
 
