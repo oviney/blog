@@ -11,7 +11,7 @@ import { test, expect } from '@playwright/test';
  * 6. Footer with social links + RSS
  */
 
-test.describe('@content @navigation Homepage Redesign', () => {
+test.describe('@content @navigation Homepage Redesign @REQ-CONTENT-01 @REQ-VISUAL-01', () => {
 
   test('1. Hero section displays latest post', async ({ page }) => {
     await page.goto('/');
@@ -176,7 +176,7 @@ test.describe('@content @navigation Homepage Redesign', () => {
 
 });
 
-test.describe('@visual @navigation Homepage Responsive Layout', () => {
+test.describe('@visual @navigation Homepage Responsive Layout @REQ-VISUAL-01 @REQ-CONTENT-01', () => {
 
   test('Focus Area cards stack on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 568 });
