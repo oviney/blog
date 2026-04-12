@@ -2486,6 +2486,14 @@ article.topic-card h2 a,
   }
 }
 
+.related-excerpt {
+  font-family: $font-serif;
+  font-size: 0.875rem;
+  line-height: $line-height-normal;
+  color: $text-secondary;
+  margin: 0;
+}
+
 .related-meta {
   font-family: $font-sans;
   font-size: 0.75rem;
