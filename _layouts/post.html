@@ -124,6 +124,40 @@ layout: default
 <!-- Back to top button -->
 <button class="back-to-top" id="back-to-top" aria-label="Back to top" title="Back to top">&#8679;</button>
 
+{% assign related_posts = "" | split: "" %}
+{% for post in site.posts %}
+  {% if post.url != page.url %}
+    {% for cat in post.categories %}
+      {% if page.categories contains cat %}
+        {% assign related_posts = related_posts | push: post %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  {% if related_posts.size >= 3 %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% if related_posts.size > 0 %}
+<section class="related-reading" aria-labelledby="related-reading-heading">
+  <h2 class="related-reading__heading" id="related-reading-heading">Related reading</h2>
+  <div class="related-list">
+    {% for post in related_posts limit: 3 %}
+    <article class="related-item">
+      <span class="related-category">{{ post.categories | first }}</span>
+      <h3 class="related-title">
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      </h3>
+      <time class="related-meta" datetime="{{ post.date | date_to_xmlschema }}">
+        {{ post.date | date: "%b %-d, %Y" }}
+      </time>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
 {% if site.posts.size > 1 %}
 <!-- More from Section -->
 <section class="more-from-section">
