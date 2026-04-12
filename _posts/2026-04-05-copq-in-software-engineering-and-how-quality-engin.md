@@ -2,7 +2,7 @@
 layout: post
 title: "Software's Trillion-Dollar Tax: The Cost Nobody Itemises"
 date: 2026-04-05
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering", "Software Engineering"]
 image: /assets/images/copq-software-engineering.png
 image_alt: "Cool photorealistic newspaper front page displaying a trillion-dollar bill for software bugs, broadsheet layout with formal serif typography on aged newsprint"

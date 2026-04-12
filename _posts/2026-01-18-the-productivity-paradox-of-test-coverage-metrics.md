@@ -2,7 +2,7 @@
 layout: post
 title: "Coverage Obsession: The Metric That Ate Quality Engineering"
 date: 2026-04-05
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/test-coverage-paradox.png
 image_alt: "Cold infographic showing a coverage meter pegged at 100% while a cartoon bug slips through an unchecked gap, technical diagram style in slate grey and white"

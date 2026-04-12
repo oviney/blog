@@ -2,8 +2,8 @@
 layout: post
 title: "AI Testing Tools: The Adoption Chasm Nobody Discusses"
 date: 2026-04-05
-author: "The Economist"
-categories: ["Quality Engineering", "AI Testing"]
+author: "Ouray Viney"
+categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/ai-quality-testing-adoption.png
 image_alt: "Bold infographic showing a yawning chasm separating 'pilot' enterprises from 'deployed at scale', rendered in vivid burnt-orange and electric-blue block-print style"
 description: "89% of enterprises are piloting AI in QA, but only 15% have deployed it at scale — the gap is organisational inertia, not technology readiness."

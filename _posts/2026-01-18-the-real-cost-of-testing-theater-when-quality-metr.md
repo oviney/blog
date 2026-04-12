@@ -2,7 +2,7 @@
 layout: post
 title: "Testing Theatre: The QA Metrics That Fool Everyone"
 date: 2026-04-05
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering"]
 image: /assets/images/testing-theatre-vanity-metrics.png
 image_alt: "Theatrical stage-set editorial illustration with green-light QA dashboards as painted scenery props while actors perform quality rituals for an unseen audience"

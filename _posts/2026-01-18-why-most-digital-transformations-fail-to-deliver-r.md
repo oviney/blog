@@ -2,7 +2,7 @@
 layout: post
 title: "Digital transformation's dirty secret: the 70% that never deliver"
 date: 2026-01-18
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering", "Software Engineering"]
 image: /assets/images/digital-transformation-secret.png
 image_alt: "Monochrome architectural rendering of a half-built digital bridge crumbling on the far side, rendered with precise pencil-sketch crosshatching in pewter and ivory"

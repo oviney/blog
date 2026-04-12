@@ -2,7 +2,7 @@
 layout: post
 title: "Quality's Second Act: What Software Can Steal from Factories"
 date: 2026-04-05
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering"]
 image: /assets/images/copq-cross-industry.png
 image_alt: "Split-panel editorial illustration contrasting a precise factory assembly line on the left with a chaotic software deployment pipeline on the right, risograph print texture"

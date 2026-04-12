@@ -2,7 +2,7 @@
 layout: post
 title: "Test Automation's Dirty Secret: The Debt Nobody Budgets For"
 date: 2026-04-05
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/test-automation-technical-debt.png
 image_alt: "Stark data-visualisation style chart showing compounding technical debt curves in crimson on white, inspired by financial charting with annotated inflection points"
