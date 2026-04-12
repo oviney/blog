@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Run orchestrator
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         # TODO: upgrade to @v8 when released; FORCE flag below opts into Node 24 ahead of the
         # June 2 2026 forced migration and silences the deprecation warning.
         env:
