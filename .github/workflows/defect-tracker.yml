@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Verify issue has both bug and production labels
         id: verify
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { data: issue } = await github.rest.issues.get({
@@ -197,7 +197,7 @@ jobs:
 
       - name: Comment on issue
         if: steps.verify.outputs.skip != 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           COMMIT_SHA: ${{ steps.attr.outputs.attributed_commit }}
         with:

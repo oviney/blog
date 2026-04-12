@@ -156,7 +156,7 @@ jobs:
         fi
 
     - name: Ensure risk labels exist
-      uses: actions/github-script@v8
+      uses: actions/github-script@v9
       with:
         script: |
           const labels = [
@@ -173,7 +173,7 @@ jobs:
           }
 
     - name: Apply risk label
-      uses: actions/github-script@v8
+      uses: actions/github-script@v9
       with:
         script: |
           const tier = '${{ steps.risk.outputs.tier }}';
@@ -201,7 +201,7 @@ jobs:
           });
 
     - name: Post eval report
-      uses: actions/github-script@v8
+      uses: actions/github-script@v9
       with:
         script: |
           const build = '${{ steps.build.outputs.status }}';
@@ -267,7 +267,7 @@ jobs:
       # "Allow auto-merge" to be enabled and branch protection rules with
       # required status checks configured.
       if: steps.risk.outputs.tier == 'low' && steps.build.outputs.status == 'pass' && steps.scope.outputs.status == 'pass'
-      uses: actions/github-script@v8
+      uses: actions/github-script@v9
       with:
         script: |
           try {
@@ -291,7 +291,7 @@ jobs:
       # High-risk PRs must have explicit human sign-off before merge.
       # We request a review from the repository owner and add a blocking comment.
       if: steps.risk.outputs.tier == 'high'
-      uses: actions/github-script@v8
+      uses: actions/github-script@v9
       with:
         script: |
           // Request a review from the repository owner

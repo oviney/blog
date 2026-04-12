@@ -32,7 +32,7 @@ jobs:
     steps:
     - name: Collect metrics
       id: metrics
-      uses: actions/github-script@v8
+      uses: actions/github-script@v9
       with:
         script: |
           const rawLookback = parseInt(context.payload.inputs?.lookback_days ?? '7', 10);
@@ -154,7 +154,7 @@ jobs:
           core.setOutput('build_pct',      buildPct);
 
     - name: Ensure monitoring label exists
-      uses: actions/github-script@v8
+      uses: actions/github-script@v9
       with:
         script: |
           try {
@@ -174,7 +174,7 @@ jobs:
           }
 
     - name: Create weekly report issue
-      uses: actions/github-script@v8
+      uses: actions/github-script@v9
       with:
         script: |
           const reportDate   = '${{ steps.metrics.outputs.report_date }}';

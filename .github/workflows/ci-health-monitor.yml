@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Monitor CI health and manage issues
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           CROSS_REPO_TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
         with:
