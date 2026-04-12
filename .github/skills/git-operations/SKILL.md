@@ -261,7 +261,7 @@ git fetch --prune
 
 ```bash
 git checkout main
-git branch --merged main | grep -v '^\*\|main' | xargs -r git branch -d
+git branch --merged main | grep -v '^\*\|main' | xargs git branch -d
 ```
 
 **Rules**:
@@ -275,7 +275,7 @@ When a PR shows **0 CI checks** (no status checks triggered), push an empty
 commit to re-trigger the pipeline:
 
 ```bash
-git commit --allow-empty -m "ci: trigger pipeline re-run"
+git commit --allow-empty -m "ci: trigger pipeline rerun"
 git push
 ```
 
