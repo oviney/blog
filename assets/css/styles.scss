@@ -1,8 +1,8 @@
 ---
 ---
 
-// Google Fonts - The Economist uses serif for body
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
-
 // The Economist Theme
-@import 'economist-theme';
+@use 'economist-theme';
+
+// Google Fonts - The Economist uses serif for body (CSS @import, not Sass @import)
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
