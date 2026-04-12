@@ -5,7 +5,7 @@ date: 2026-04-12
 author: "Ouray Viney"
 categories: ["Software Engineering"]
 tags: [platform-engineering, developer-portals, backstage, developer-experience, internal-developer-platform]
-image: /assets/images/blog-default.svg
+image: /assets/images/platform-engineering-developer-portals.png
 image_alt: "Abstract illustration of interconnected developer tools forming a unified platform"
 description: "Platform engineering is reshaping how organisations deliver software. Internal developer portals are cutting onboarding times and cognitive load."
 ---
