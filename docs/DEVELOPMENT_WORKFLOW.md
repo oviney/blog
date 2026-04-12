@@ -26,13 +26,6 @@ When starting the server, you'll see these warnings that don't affect functional
    ```
    - **Fix (optional)**: Run `bundle add faraday-retry`
 
-3. **Sass Deprecation Warning**:
-   ```
-   Deprecation Warning [import]: Sass @import rules are deprecated
-   ```
-   - **Future task**: Migrate from @import to @use/@forward syntax
-   - **Impact**: None until Dart Sass 3.0.0
-
 ### Successful Server Output
 ```
 Configuration file: /Users/ouray.viney/code/economist-blog-v5/_config.yml
