@@ -99,11 +99,22 @@ test.describe('@visual Responsive Layout Adaptation @REQ-NAV-01 @REQ-VISUAL-01',
     await page.waitForLoadState('networkidle');
 
     const navigation = page.locator('nav, .site-nav, .main-nav, [role="navigation"]');
+    const hamburger = page.locator('.nav-toggle');
+
+    // On mobile/tablet viewports the nav is hidden behind the hamburger; open it first
+    if (!(await navigation.first().isVisible()) && await hamburger.isVisible()) {
+      await hamburger.click();
+    }
     await expect(navigation.first()).toBeVisible();
 
     // Test mobile navigation
     await page.setViewportSize(viewports.mobile);
     await page.waitForLoadState('networkidle');
+
+    // Open hamburger on mobile so nav is visible for measurement
+    if (!(await navigation.first().isVisible()) && await hamburger.isVisible()) {
+      await hamburger.click();
+    }
 
     const mobileNavBox = await navigation.boundingBox();
     expect(mobileNavBox).not.toBeNull();
@@ -111,6 +122,11 @@ test.describe('@visual Responsive Layout Adaptation @REQ-NAV-01 @REQ-VISUAL-01',
     // Test tablet navigation
     await page.setViewportSize(viewports.tablet);
     await page.waitForLoadState('networkidle');
+
+    // Open hamburger on tablet if nav is still hidden
+    if (!(await navigation.first().isVisible()) && await hamburger.isVisible()) {
+      await hamburger.click();
+    }
 
     const tabletNavBox = await navigation.boundingBox();
     expect(tabletNavBox).not.toBeNull();
