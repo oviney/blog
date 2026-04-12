@@ -29,6 +29,8 @@ At a North American financial services company studied by Forrester in its 2023 
 
 Self-healing tests are a genuine incremental improvement in test automation, not a transformative technology. They belong in the same category as auto-formatting tools and linting — features that eliminate a specific category of tedium without changing the fundamental nature of the work. The organisations extracting the most value from self-healing are those that deploy it with modest expectations, measuring the actual maintenance hours saved rather than the percentage the vendor promised.
 
+TestGuild's State of Testing 2024 survey reinforced this point: organisations that tracked maintenance hours before and after self-healing adoption reported a median reduction of 18% — useful, but well below vendor projections. Crucially, the teams that achieved the highest reductions were those that had already invested in stable test architectures, including page object models and data isolation patterns, before introducing self-healing. The tool amplified existing discipline; it did not substitute for it.
+
 Gartner predicted that 70% of enterprises would incorporate self-healing tests into DevOps by 2025. That adoption target will likely be met in numerical terms, if not in outcome terms. The tools will be widely installed. The maintenance burdens they were supposed to eliminate will persist, in modified form, alongside them.
 
 The test suites that truly heal themselves remain a research aspiration. Today's self-healing tools are, more accurately, self-adjusting — and the distinction between healing and adjusting is precisely the gap between the marketing and the reality.

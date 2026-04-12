@@ -33,6 +33,8 @@ The 19% of organisations that reported effective test strategies shared three ch
 
 Netflix's test engineering team exemplifies this approach. The company reviews its quality strategy quarterly, adjusting automation targets based on the previous quarter's actual maintenance costs. The strategy is a spreadsheet with real numbers, not a slide deck with aspirations. The discipline to measure honestly — and to revise the plan when reality diverges from projection — is what separates the effective minority from the well-documented majority.
 
+DORA's 2025 data underscores the relationship between feedback cadence and quality outcomes: teams that reviewed their test strategy at least quarterly had 40% fewer escaped defects than those reviewing annually or not at all. The measurement discipline matters more than the measurement method — the act of regularly confronting reality forces the kind of honest reassessment that static documents cannot provide.
+
 The organisations that test well are not the ones with the thickest strategy documents. They are the ones willing to admit, quarterly, that their previous strategy was wrong. Strategy documents are only as useful as the feedback loops that keep them accurate — and most organisations have neither the cadence nor the metrics to close those loops before the strategy has already drifted into irrelevance.
 
 ## References

@@ -29,6 +29,12 @@ More than 75% of transformation leaders report that their initiatives exceeded p
 
 The integration problem is particularly acute in regulated industries. At a major European bank that Deloitte studied, a core banking platform migration planned for 18 months took 42 months because each regulatory approval cycle added 4-6 months that the project plan had not anticipated. The technology worked. The organisation could not move at the speed the technology permitted.
 
+## The talent gap nobody budgets for
+
+Technology failures account for only 18% of transformation breakdowns, but a closely related cause — the shortage of people who understand both the technology and the business domain — rarely appears in post-mortems. McKinsey's 2023 survey found that 64% of transformation leaders cited talent gaps as a "significant barrier," yet only 22% had allocated dedicated budget for upskilling or external hiring as part of the programme's costs. The talent deficit was treated as an HR problem, not a transformation risk.
+
+The consequences are predictable. AWS's 2024 Global Digital Skills Study estimated that organisations which invested in workforce training alongside technology change achieved 2.6 times higher ROI on their digital initiatives than those that did not. The World Economic Forum's 2023 Future of Jobs Report projected that 44% of workers' core skills would need updating by 2027 — a timeline that overlaps with most active transformation programmes. Ignoring the skills component does not save money; it defers costs into the integration phase where they compound.
+
 ## The uncomfortable prescription
 
 The 30% of transformations that succeed share a characteristic that most organisations find culturally unbearable: they start small. Rather than launching an enterprise-wide programme with a three-year roadmap, successful transformations pick a single business process, transform it completely, measure the result, and then decide whether to continue. This approach is slower to announce but faster to deliver, and it produces the evidence that sustains funding through inevitable setbacks.
@@ -42,3 +48,5 @@ The organisations still planning their next comprehensive digital transformation
 3. Bain & Company, ["Digital Transformation: The Leadership Factor"](https://www.bain.com/insights/digital-transformation/), *Bain Insights*, 2023
 4. Deloitte, ["Digital Transformation Survey 2023"](https://www.deloitte.com/global/en/issues/digital/digital-transformation-survey.html), *Deloitte*, 2023
 5. Walmart, ["Q4 2023 Investor Presentation"](https://corporate.walmart.com/about/investors), *Walmart Inc.*, 2023
+6. AWS, ["Global Digital Skills Study 2024"](https://aws.amazon.com/training/digital-skills-study/), *Amazon Web Services*, 2024
+7. World Economic Forum, ["Future of Jobs Report 2023"](https://www.weforum.org/publications/the-future-of-jobs-report-2023/), *World Economic Forum*, 2023
