@@ -1,15 +1,13 @@
 ---
-published: false
 layout: post
 title: "Code Generators: The Brilliant Interns Nobody Supervises"
 date: 2026-04-05
-author: "The Economist"
-categories: ["Software Engineering", "AI Testing"]
+author: "Ouray Viney"
+categories: ["Software Engineering"]
 image: /assets/images/ai-assisted-code-generation.png
 image_alt: "Whimsical watercolour scene of unsupervised intern robots typing furiously at keyboards in an empty open-plan office, pastel tones with loose brushwork"
 description: "AI code generators boost typing speed but degrade code quality at scale — METR found they make experienced developers 19% slower, while GitClear shows 41% higher code churn."
 ---
-published: false
 
 METR, a non-profit AI safety research lab, tracked 16 experienced open-source developers as they completed 246 real-world coding tasks on mature repositories averaging over one million lines of code. The developers using AI tools took 19% longer than those working without them. Before the study, participants had predicted AI would make them 24% faster. Even after experiencing the slowdown, they estimated AI had improved their productivity by 20%. The gap between perception and measurement is the defining feature of the AI coding revolution: developers believe the tools help, the data says otherwise, and nobody wants to hear it.
 
@@ -40,7 +38,6 @@ AI code generation is not useless. It excels at boilerplate, scaffolding, test s
 The mistake is treating these results as evidence of general-purpose productivity transformation. Kent Beck, the creator of extreme programming, summarised the dynamic in a widely shared 2025 essay: "AI makes me mass-produce rough drafts. But programming was never bottlenecked on rough drafts." The companies extracting real value are those that deploy AI where it works, measure its actual impact, and resist the temptation to mistake faster typing for faster shipping. The demo reel will always outperform the daily reality — and the engineers who understand that distinction are the ones whose productivity is genuinely improving.
 
 ---
-published: false
 
 ## References
 

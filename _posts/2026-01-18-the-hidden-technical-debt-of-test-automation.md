@@ -1,15 +1,13 @@
 ---
-published: false
 layout: post
 title: "Test Automation's Dirty Secret: The Debt Nobody Budgets For"
 date: 2026-04-05
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/test-automation-technical-debt.png
 image_alt: "Stark data-visualisation style chart showing compounding technical debt curves in crimson on white, inspired by financial charting with annotated inflection points"
 summary: "Test suites have become the fastest-growing source of technical debt, with flaky tests consuming up to 8% of enterprise development time and maintenance devouring 40% of QA capacity."
 ---
-published: false
 
 Slack's engineering team discovered that flaky tests — tests that pass and fail on identical code — accounted for 56.76% of their CI failures. More than half of every build failure was a phantom, sending engineers chasing ghosts instead of shipping software. After investing in a dedicated remediation effort, Slack drove flakiness down to 3.85%, but the journey consumed months of engineering capacity that could have built features. The lesson was expensive and universal: the machinery built to catch bugs had itself become the bug.
 
@@ -40,7 +38,6 @@ AI-assisted test generation — now offered by tools from Codium, Diffblue, and 
 The organisations that thrive will be those that treat their test suite not as an ever-growing archive but as a garden requiring constant, deliberate pruning. A lean suite that runs fast, fails meaningfully, and costs little to maintain will catch more real bugs than a sprawling one that drowns its signals in noise. The test suite is not a safety net — it is a tool, and like any tool, it works best when kept sharp.
 
 ---
-published: false
 
 ## References
 

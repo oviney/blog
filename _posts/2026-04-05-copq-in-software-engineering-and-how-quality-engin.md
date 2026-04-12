@@ -1,15 +1,13 @@
 ---
-published: false
 layout: post
 title: "Software's Trillion-Dollar Tax: The Cost Nobody Itemises"
 date: 2026-04-05
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering", "Software Engineering"]
 image: /assets/images/copq-software-engineering.png
 image_alt: "Cool photorealistic newspaper front page displaying a trillion-dollar bill for software bugs, broadsheet layout with formal serif typography on aged newsprint"
 summary: "Poor software quality costs the US economy $2.41 trillion annually — and the CrowdStrike outage proved that a single untested deployment can destroy half a billion dollars in an afternoon."
 ---
-published: false
 
 On 19 July 2024, a faulty content update pushed by CrowdStrike's Falcon sensor crashed 8.5 million Windows machines worldwide. Delta Air Lines cancelled 7,000 flights over five days, disrupting 1.3 million customers. Delta's CEO Ed Bastian put the cost at $500 million, encompassing lost revenue, tens of millions per day in customer compensation, and hotel costs. Delta has since sued CrowdStrike, seeking damages exceeding that figure. The root cause was not a sophisticated cyberattack. It was a defective configuration file that bypassed validation — a quality engineering lapse so elementary that it would fail a university exam.
 
@@ -59,7 +57,6 @@ The irony is that the data to close this gap already exists. Every company track
 Until companies appoint a quality economics function with visibility across the entire software lifecycle, the trillion-dollar tax will continue to compound. CrowdStrike's $500 million day was the bill arriving all at once. For most companies, the same amount leaks out slowly — in engineer hours wasted on rework, in customers lost to buggy releases, in features delayed by fragile infrastructure. The difference is only visibility. The cost is identical.
 
 ---
-published: false
 
 ## References
 

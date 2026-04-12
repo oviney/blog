@@ -1,15 +1,13 @@
 ---
-published: false
 layout: post
 title: "Testing Theatre: The QA Metrics That Fool Everyone"
 date: 2026-04-05
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering"]
 image: /assets/images/testing-theatre-vanity-metrics.png
 image_alt: "Theatrical stage-set editorial illustration with green-light QA dashboards as painted scenery props while actors perform quality rituals for an unseen audience"
 summary: "Most QA dashboards measure activity, not outcomes — and the 2025 DORA report confirms that AI adoption improves throughput while increasing delivery instability."
 ---
-published: false
 
 Volkswagen's software division, CARIAD, reported in 2024 that its automated test suites achieved 94% pass rates across all vehicle software modules. Six months later, the company delayed the launch of the Trinity electric sedan by two years, citing software quality failures so severe that board members described the codebase as "not production-ready." The test suites had been passing. The software had been failing. Nobody noticed because the dashboard was green.
 
@@ -44,7 +42,6 @@ The companies abandoning theatrical metrics share a common approach: they replac
 Within three years, AI-generated test suites will push code coverage toward 95% as a default across most commercial codebases. Every dashboard will glow green. And the gap between measured quality and experienced quality will grow wider than ever — because generating tests that execute code is trivially easy, while generating tests that encode meaningful expectations about behaviour is genuinely hard. The teams that thrive will be those that had the nerve to stop counting tests and start counting the defects their customers find. The rest will be performing to an empty theatre, applauding their own metrics while the audience has already left.
 
 ---
-published: false
 
 ## References
 

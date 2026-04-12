@@ -1,15 +1,13 @@
 ---
-published: false
 layout: post
 title: "Quality's Second Act: What Software Can Steal from Factories"
 date: 2026-04-05
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["Quality Engineering"]
 image: /assets/images/copq-cross-industry.png
 image_alt: "Split-panel editorial illustration contrasting a precise factory assembly line on the left with a chaotic software deployment pipeline on the right, risograph print texture"
 summary: "Manufacturing spent decades learning that quality is cheaper than inspection — Boeing's $31 billion lesson and CrowdStrike's $500 million afternoon prove software hasn't learned yet."
 ---
-published: false
 
 Boeing has accumulated more than $22 billion in deferred production costs on the 737 programme alone, according to Leeham News analysis of Boeing's SEC filings through December 2024. Total financial impact from the MAX crisis — spanning compensation payments, production halts, regulatory fines, and a January 2024 door-plug blowout that grounded fleets again — exceeds $31 billion since the original 2019 grounding. The company reported an $11.83 billion net loss for 2024, its worst since the pandemic. That sum represents the most expensive proof in industrial history of a principle that W. Edwards Deming articulated in the 1950s: quality cannot be inspected into a product. It must be built into the process.
 
@@ -44,7 +42,6 @@ The technical tools are available. What most software companies lack is the cult
 Boeing's $31 billion lesson, Toyota's decades of compounding advantage, and CrowdStrike's $500 million afternoon all point to the same conclusion: the cost of quality is always paid. The only choice is whether to pay it in prevention, which compounds into competitive advantage, or in failure, which compounds into existential risk.
 
 ---
-published: false
 
 ## References
 
