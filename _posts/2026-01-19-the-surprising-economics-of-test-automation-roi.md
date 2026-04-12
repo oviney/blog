@@ -17,6 +17,9 @@ Most organisations calculate test automation ROI using a formula inherited from 
 
 The organisations with accurate ROI measurements — the ones whose numbers hold up to CFO scrutiny — measure differently. They track total cost of quality: the sum of prevention costs (test development), appraisal costs (test execution), internal failure costs (bugs found before release), and external failure costs (production incidents). Automation shifts spending from appraisal to prevention. Whether that shift produces positive ROI depends on whether the prevented defects would have been more expensive to fix in production than the automation was to build.
 
+![Test automation ROI: the long road to payback — chart showing median ROI of 143% after 23 months, with wide variance across programmes](/assets/charts/the-surprising-economics-of-test-automation-roi.png)
+*Source: Forrester, Total Economic Impact of Enterprise Test Automation, 2025*
+
 ## The scale threshold
 
 Automation ROI is not linear. Small-scale automation programmes — fewer than 500 automated tests — consistently produce negative or marginal returns, according to McKinsey's 2025 analysis of 200 QA organisations. The fixed costs of tooling, infrastructure, and expertise required to maintain an automation programme create a breakeven threshold that small programmes cannot reach.

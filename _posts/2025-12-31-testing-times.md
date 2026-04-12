@@ -11,6 +11,9 @@ description: "80% of software teams will use AI testing tools by 2025. Vendors r
 
 Tricentis research projects that 80% of software teams will use AI-assisted testing tools by the end of 2025 — a fourfold increase from 2021. Vendors have raised $2.3 billion in venture capital since 2022, according to CB Insights, promising self-healing scripts, autonomous test generation, and the obsolescence of manual testers. Yet by the measures that matter to engineering leaders, remarkably little has changed. The artificial intelligence revolution in software testing is real. The productivity revolution is not.
 
+![AI in QA: the gap between vendor promises and measured reality — chart comparing claimed productivity gains against independent evidence](/assets/charts/testing-times-ai-gap.png)
+*Source: Tricentis, 2025; Forrester, 2024; TestGuild, 2024*
+
 ## The adoption paradox
 
 The adoption curves look like hockey sticks. DevOps testing practices jumped from 17% of teams in 2022 to 52% in 2024, per TestGuild's annual survey. Generative AI is now used by 61% of organisations for code generation and test scripting, according to GitLab's 2024 DevSecOps Report. These are not experimental programmes — they represent mainstream adoption at enterprise scale.
