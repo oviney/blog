@@ -512,21 +512,21 @@ jobs:
         run: npm ci
 
       - name: Download shard 1 results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: playwright-results-shard1
           path: test-results-shard1/
         continue-on-error: true
 
       - name: Download shard 2 results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: playwright-results-shard2
           path: test-results-shard2/
         continue-on-error: true
 
       - name: Download shard 3 results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: playwright-results-shard3
           path: test-results-shard3/
