@@ -78,6 +78,29 @@ jobs:
           echo "| Reason | ${SELECTION_REASON} |" >> "$GITHUB_STEP_SUMMARY"
 
   # ---------------------------------------------------------------------------
+  # Step 2: Content Validation (post quality checks)
+  # ---------------------------------------------------------------------------
+  content-validation:
+    name: 📝 Content Validation
+    runs-on: ubuntu-latest
+    needs: select-tests
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate post quality
+        run: |
+          set +e
+          bash scripts/validate-post-quality.sh
+          rc=$?
+          set -e
+          if [ $rc -eq 2 ]; then
+            echo "⚠️ Post quality warnings found (non-blocking)"
+            exit 0
+          fi
+          exit $rc
+
+  # ---------------------------------------------------------------------------
   # Step 2a: Non-Playwright quality checks (always run unless CI-only change)
   # ---------------------------------------------------------------------------
   quality-checks:
