@@ -1,11 +1,12 @@
 ---
 layout: post
+title: "Quality Assurance, Control and Engineering: A Comprehensive Guide"
 date: 2024-01-03
-categories: quality-management
-description: "Explore the distinct yet interconnected roles of Quality Assurance, Quality Control, and Quality Engineering in our comprehensive guide. Understand their importance in maintaining high standards in products and services across various industries."
+author: "Ouray Viney"
+categories: ["Quality Engineering"]
+tags: [quality-assurance, quality-control, quality-engineering, quality-management]
+image: /assets/images/blog-default.svg
 ---
-
-## {{ page.title }}
 In every industry, the pursuit of excellence hinges on three pivotal roles: Quality Assurance (QA), Quality Control (QC), and Quality Engineering (QE). While often entwined in confusion, these roles are distinct and interconnected, forming the backbone of superior product and service delivery. This post aims to demystify these roles, making them easily graspable for everyone.
 
 ### The Proactive Champion: Quality Assurance
