@@ -39,7 +39,7 @@ jobs:
         run: node scripts/content-remediation.js
 
       - name: Upload queue as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: remediation-queue
           path: content-remediation-queue.json

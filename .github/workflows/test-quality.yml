@@ -159,7 +159,7 @@ jobs:
 
       - name: Upload visual regression report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: visual-regression-report
           path: backstop_data/html_report/
@@ -167,7 +167,7 @@ jobs:
 
       - name: Upload Lighthouse reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lighthouse-reports
           path: .lighthouseci/
@@ -262,7 +262,7 @@ jobs:
 
       - name: Upload quality report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: quality-report
           path: quality-report.json
@@ -270,7 +270,7 @@ jobs:
 
       - name: Upload Playwright results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-results-partial
           path: |
@@ -345,7 +345,7 @@ jobs:
 
       - name: Upload Playwright results (shard 1)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-results-shard1
           path: |
@@ -410,7 +410,7 @@ jobs:
 
       - name: Upload Playwright results (shard 2)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-results-shard2
           path: |
@@ -475,7 +475,7 @@ jobs:
 
       - name: Upload Playwright results (shard 3)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-results-shard3
           path: |
@@ -560,7 +560,7 @@ jobs:
 
       - name: Upload quality report artefact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: quality-report
           path: quality-report.json
@@ -578,7 +578,7 @@ jobs:
 
       - name: Upload healing monitoring data
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: healing-monitoring-data
           path: |
