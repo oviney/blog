@@ -14,6 +14,9 @@
   <link rel="manifest" href="{{ '/manifest.webmanifest' | relative_url }}">
   <meta name="theme-color" content="#E3120B">
 
+  <!-- RSS feed discovery -->
+  <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | relative_url }}">
+
   {% include analytics.html %}
   {% include seo-jsonld.html %}
   {% feed_meta %}
@@ -59,11 +62,17 @@
           <li><a href="https://linkedin.com/in/ourayviney">LinkedIn</a></li>
           <li><a href="https://github.com/{{ site.github_username }}">GitHub</a></li>
           <li><a href="https://twitter.com/{{ site.twitter_username }}">Twitter</a></li>
-          <li><a href="{{ '/feed.xml' | relative_url }}">RSS Feed</a></li>
+          <li>
+            <a href="{{ '/feed.xml' | relative_url }}" class="footer-rss-link">
+              <svg class="rss-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="6.18" cy="17.82" r="2.18"/><path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56z"/><path d="M4 10.1v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/></svg>
+              Subscribe via RSS
+            </a>
+          </li>
         </ul>
       </div>
       <div>
         <h4>About</h4>
+
         <ul>
           <li><a href="{{ '/about/' | relative_url }}">About</a></li>
           <li><a href="mailto:{{ site.email }}">Contact</a></li>
