@@ -10,6 +10,9 @@ description: "Research shows coverage has low correlation with fault detection a
 summary: "Test coverage has become the most gamed metric in software engineering — empirically uncorrelated with fault detection, yet mandated by managers who mistake activity for quality."
 ---
 
+![Coverage targets: 60% of teams mandate high thresholds, yet only 15% find coverage correlates with fewer defects](/assets/charts/the-productivity-paradox-of-test-coverage-metrics.svg)
+*Source: Codecov State of Software Quality, 2025; Google Engineering Productivity Research*
+
 Google's testing infrastructure processes over four billion test executions per day across a codebase exceeding two billion lines. The company enforces no universal coverage target. Not 80%, not 90%, and certainly not 100%. Instead, Google's engineering productivity team recommends that teams pursue "useful coverage" — tests that have historically detected real defects — and explicitly warns against treating coverage percentages as quality proxies. When the company with the most sophisticated testing infrastructure on Earth declines to mandate a coverage floor, it is worth asking what everyone else thinks they know that Google does not.
 
 The thesis is blunt: test coverage, measured as a percentage of lines or branches exercised, has become the most widely gamed metric in software engineering. Teams chase coverage numbers not because high coverage reliably prevents defects but because the number is easy to measure, easy to mandate, and easy to present to executives who want a simple quality score. The result is a perverse incentive structure that rewards writing trivial tests and penalises thoughtful engineering judgement.

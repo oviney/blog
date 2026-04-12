@@ -10,6 +10,9 @@ image_alt: "Abstract illustration of interconnected developer tools forming a un
 description: "Platform engineering is reshaping how organisations deliver software. Internal developer portals are cutting onboarding times and cognitive load."
 ---
 
+![Platform engineering adoption: from 15% of large software orgs in 2022 to a projected 80% by 2027](/assets/charts/platform-engineering-developer-portals.svg)
+*Source: Gartner, 2024; CNCF Annual Survey, 2024; Spotify Engineering Blog, 2025*
+
 Platform engineering — the discipline of building internal toolchains and self-service infrastructure for development teams — has moved from conference buzzword to organisational imperative. Gartner predicts that by 2027, 80% of large software engineering organisations will have established platform engineering teams, up from fewer than 15% in 2022. The shift reflects a hard-won lesson: giving every team unfettered access to raw cloud primitives does not scale.
 
 ## The problem with infinite choice

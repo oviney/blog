@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">The cost of poor quality: prevention vs. failure</text>
+  <text x="40" y="56" font-size="12" fill="#666">Where quality spending goes vs. where it should go · % of revenue / operations spend</text>
+
+  <!-- COPQ in manufacturing -->
+  <text x="40" y="90" font-size="13" font-weight="600" fill="#1a1a1a">Manufacturing (ASQ benchmark)</text>
+  <text x="36" y="122" font-size="12" fill="#666" text-anchor="end">COPQ as % of sales revenue</text>
+  <rect x="40" y="108" width="576" height="26" fill="#555" rx="2"/>
+  <text x="624" y="126" font-size="13" font-weight="700" fill="#555">15–20%</text>
+
+  <line x1="40" y1="152" x2="760" y2="152" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Software spend distribution -->
+  <text x="40" y="175" font-size="13" font-weight="600" fill="#1a1a1a">Software engineering (CISQ / US industry)</text>
+
+  <text x="36" y="210" font-size="12" fill="#666" text-anchor="end">Fixing defects (detection + failure costs)</text>
+  <rect x="40" y="196" width="576" height="26" fill="#555" rx="2"/>
+  <text x="624" y="214" font-size="12" font-weight="700" fill="#555">3.4× prevention spend</text>
+
+  <text x="36" y="255" font-size="12" fill="#666" text-anchor="end">Prevention: design, standards, training</text>
+  <rect x="40" y="241" width="170" height="26" fill="#E3120B" rx="2"/>
+  <text x="218" y="259" font-size="13" font-weight="700" fill="#E3120B">1×</text>
+
+  <!-- Case study callout -->
+  <rect x="40" y="290" width="720" height="50" fill="#fff5f5" rx="2"/>
+  <text x="52" y="311" font-size="13" fill="#1a1a1a" font-weight="600">Boeing 737 MAX: $31 billion — the most expensive quality failure in industrial history</text>
+  <text x="52" y="328" font-size="12" fill="#666">CrowdStrike July 2024: $500 million in customer losses from a single untested configuration update</text>
+
+  <text x="40" y="388" font-size="10" fill="#999">Sources: American Society for Quality (ASQ); CISQ Cost of Poor Software Quality in the US, 2022 ($2.41T); Boeing SEC filings, Leeham News analysis, 2024</text>
+</svg>

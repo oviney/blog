@@ -9,6 +9,9 @@ image_alt: "Monochrome architectural rendering of a half-built digital bridge cr
 description: "McKinsey's data shows 70% of digital transformations fail their stated objectives. Why the failure rate persists despite a decade of accumulated wisdom."
 ---
 
+![Digital transformation failures: 82% stem from organisational and governance problems, not technology](/assets/charts/why-most-digital-transformations-fail-to-deliver-r.svg)
+*Source: McKinsey Digital Transformation Survey, 2023; BCG Transformation Analysis, 2023*
+
 McKinsey has been tracking digital transformation success rates since 2018, and the headline number has barely moved: 70% of initiatives fail to meet their stated objectives. In its 2023 update, the consultancy surveyed 1,500 executives across 20 industries and found that the average transformation consumed 10% of annual revenue over three years while delivering less than half the projected value. The persistence of this failure rate, despite a decade of accumulated wisdom, suggests the problem is structural, not informational.
 
 ## The technology alibi

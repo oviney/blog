@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">Testing theatre: the metrics industry tracks vs. the ones that matter</text>
+  <text x="40" y="56" font-size="12" fill="#666">Primary quality metrics used by QA practitioners · % of teams (PractiTest, n=2,700)</text>
+
+  <line x1="40" y1="220" x2="760" y2="220" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Bar chart: metrics in use -->
+  <!-- Pass rate / test count 61% -->
+  <rect x="60" y="100" width="183" height="120" fill="#555" rx="2"/>
+  <text x="152" y="240" font-size="12" fill="#555" text-anchor="middle">Pass rate /</text>
+  <text x="152" y="254" font-size="12" fill="#555" text-anchor="middle">test count</text>
+  <text x="152" y="92" font-size="18" font-weight="700" fill="#555" text-anchor="middle">61%</text>
+
+  <!-- Defect density 19% -->
+  <rect x="290" y="163" width="183" height="57" fill="#888" rx="2"/>
+  <text x="382" y="240" font-size="12" fill="#888" text-anchor="middle">Escaped defects</text>
+  <text x="382" y="155" font-size="18" font-weight="700" fill="#888" text-anchor="middle">19%</text>
+
+  <!-- Mutation testing 12% -->
+  <rect x="520" y="184" width="183" height="36" fill="#E3120B" rx="2"/>
+  <text x="612" y="240" font-size="12" fill="#E3120B" text-anchor="middle">Mutation testing</text>
+  <text x="612" y="176" font-size="18" font-weight="700" fill="#E3120B" text-anchor="middle">12%</text>
+
+  <!-- Context box -->
+  <rect x="40" y="278" width="720" height="42" fill="#fff5f5" rx="2"/>
+  <text x="52" y="297" font-size="13" fill="#1a1a1a">Volkswagen CARIAD: 94% automated test pass rate — then a two-year Trinity launch delay</text>
+  <text x="52" y="312" font-size="12" fill="#666">The dashboard was green. The software was failing. No one noticed.</text>
+
+  <text x="40" y="388" font-size="10" fill="#999">Sources: PractiTest State of Testing Survey, 2025 (n=2,700 practitioners, 76 countries); Volkswagen CARIAD annual report, 2024</text>
+</svg>

@@ -9,6 +9,9 @@ image_alt: "Stark black-and-white bar chart infographic placing vendor-promised 
 description: "AI testing vendors promise 80% reductions in maintenance effort. IEEE research across 400 teams finds 62% see no meaningful savings."
 ---
 
+![AI test generation addresses only locator changes (35% of failures); 65% of maintenance causes remain untouched](/assets/charts/why-ai-test-generation-tools-overpromise-on-maintenance-savi.svg)
+*Source: Capgemini World Quality Report, 2025; IEEE Empirical Study on AI Test Generation, 2025 (n=400 teams)*
+
 Functionize, an AI testing platform, claims its tools reduce test maintenance effort by 80%. Applitools advertises "visual AI" that eliminates manual test updates. Mabl promises tests that "adapt automatically" to application changes. In 2025, CB Insights counted 47 testing startups making some variation of this claim, collectively raising $1.2 billion in venture funding. Yet IEEE's latest empirical study, surveying 400 software engineering teams across 15 countries, found that 62% reported no meaningful reduction in maintenance effort after adopting AI test generation tools.
 
 ## The 35% ceiling

@@ -9,6 +9,9 @@ image_alt: "Cold technical blueprint of a test pyramid collapsing under its own 
 description: "88% of organisations have a documented test strategy. Only 23% believe it works. An examination of why quality plans fail before the first test runs."
 ---
 
+![Test strategy effectiveness gap: 91% of organisations have one, only 19% believe it works](/assets/charts/building-a-test-strategy-that-works.svg)
+*Source: OpenText/Capgemini World Quality Report 2025-26 (n=1,800, 33 countries)*
+
 The World Quality Report 2025-2026, published by OpenText and Capgemini in July 2025, surveyed 1,800 technology leaders across 33 countries and found that 91% of organisations had a documented test strategy. Only 19% believed their strategy was effective — down from 23% two years earlier. The gap between having a plan and having a plan that works is widening, not closing, despite a decade of investment in quality engineering maturity models.
 
 ## The document problem

@@ -9,6 +9,9 @@ image_alt: "Bold infographic showing a yawning chasm separating 'pilot' enterpri
 description: "89% of enterprises are piloting AI in QA, but only 15% have deployed it at scale — the gap is organisational inertia, not technology readiness."
 ---
 
+![AI in QA adoption funnel: 75% cite it as a priority, 89% are piloting, only 15% have reached enterprise scale](/assets/charts/ai-quality-testing-automation.svg)
+*Source: Perforce State of Continuous Testing, 2025; Capgemini World Quality Report 2025-26*
+
 In a Perforce industry survey, 75% of respondents identified AI-driven testing as a pivotal component of their 2025 strategy. Only 16% had actually adopted it. That 59-point gap between intention and execution defines the AI testing market in 2026 — a chasm so wide that it has spawned its own academic literature. An arXiv secondary study published in April 2025, titled "Expectations vs Reality," systematically catalogued the disconnect between AI testing aspirations and deployment reality across dozens of industry surveys. The conclusion was damning: 5-8 times more teams plan to use AI in testing than have successfully implemented it.
 
 The tools are not the problem. The World Quality Report 2025-26, published by Capgemini and Sogeti, found that 89% of organisations are piloting or deploying generative-AI-augmented QE workflows. Among that 89%, a full 37% are in production. But only 15% have achieved enterprise-scale deployment — the point at which AI testing stops being a novelty and starts changing economics. The bottleneck is not technology. It is procurement, governance, skills, and the stubborn organisational reality that QA has never had the budget authority to make its own tooling decisions.

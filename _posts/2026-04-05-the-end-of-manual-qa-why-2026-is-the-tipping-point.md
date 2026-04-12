@@ -10,6 +10,9 @@ description: "89% of enterprises are piloting AI in QA, yet only 16% have adopte
 summary: "Manual testing is not declining gradually — it is being economically exterminated by AI tools that 89% of enterprises are piloting, even as only 15% have deployed them at scale."
 ---
 
+![AI non-adoption in quality engineering fell from 31% in 2023 to 11% in 2025; 89% now piloting or deploying](/assets/charts/the-end-of-manual-qa-why-2026-is-the-tipping-point.svg)
+*Source: Capgemini/Sogeti World Quality Report 2025-26; Perforce State of Continuous Testing, 2025*
+
 In a Perforce industry survey published in 2025, 75% of respondents identified AI-driven testing as a pivotal component of their strategy. Only 16% had actually adopted it. That 59-point chasm between intention and execution is the defining feature of quality engineering in 2026 — and it is closing fast, in one direction only. The World Quality Report 2025-26, published by Capgemini and Sogeti, found that 89% of organisations are now piloting or deploying generative-AI-augmented QE workflows, with 37% already in production. Manual QA, as a standalone profession, is being squeezed between a technology that works and an industry that has finally decided to use it.
 
 The thesis is not that manual testing will vanish overnight, but that its economic rationale has collapsed. When AI tools can generate exploratory scenarios, self-heal broken locators, and adapt to UI changes autonomously, the case for staffing large manual QA teams evaporates. Companies clinging to headcount-heavy manual processes are not exercising caution — they are burning capital.

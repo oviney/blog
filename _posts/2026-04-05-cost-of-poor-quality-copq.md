@@ -10,6 +10,9 @@ description: "Boeing's $31 billion quality failure mirrors software's inverted c
 summary: "Manufacturing spent decades learning that quality is cheaper than inspection — Boeing's $31 billion lesson and CrowdStrike's $500 million afternoon prove software hasn't learned yet."
 ---
 
+![Cost of poor quality: software organisations spend 3.4 times more fixing defects than preventing them](/assets/charts/cost-of-poor-quality-copq.svg)
+*Source: ASQ; CISQ Cost of Poor Software Quality in the US, 2022; Boeing SEC filings, 2024*
+
 Boeing has accumulated more than $22 billion in deferred production costs on the 737 programme alone, according to Leeham News analysis of Boeing's SEC filings through December 2024. Total financial impact from the MAX crisis — spanning compensation payments, production halts, regulatory fines, and a January 2024 door-plug blowout that grounded fleets again — exceeds $31 billion since the original 2019 grounding. The company reported an $11.83 billion net loss for 2024, its worst since the pandemic. That sum represents the most expensive proof in industrial history of a principle that W. Edwards Deming articulated in the 1950s: quality cannot be inspected into a product. It must be built into the process.
 
 Software engineering inherited its quality models from manufacturing but implemented them backwards. The American Society for Quality estimates that the cost of poor quality (COPQ) consumes 15-20% of sales revenue in American manufacturing, with some organisations reaching 40% of total operations. The CISQ pegged the software equivalent at $2.41 trillion in the United States alone. Whether the defect is a misaligned fuselage panel or a race condition in a payments API, the arithmetic of prevention versus failure follows identical curves.

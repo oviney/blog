@@ -10,6 +10,9 @@ description: "Volkswagen's tests hit 94% pass rates — then a two-year launch d
 summary: "Most QA dashboards measure activity, not outcomes — and the 2025 DORA report confirms that AI adoption improves throughput while increasing delivery instability."
 ---
 
+![Testing theatre: 61% of QA teams still use pass rate as their primary metric; only 12% measure mutation testing](/assets/charts/the-real-cost-of-testing-theater-when-quality-metr.svg)
+*Source: PractiTest State of Testing Survey, 2025 (n=2,700 practitioners)*
+
 Volkswagen's software division, CARIAD, reported in 2024 that its automated test suites achieved 94% pass rates across all vehicle software modules. Six months later, the company delayed the launch of the Trinity electric sedan by two years, citing software quality failures so severe that board members described the codebase as "not production-ready." The test suites had been passing. The software had been failing. Nobody noticed because the dashboard was green.
 
 This is testing theatre — the elaborate performance of quality assurance activity that creates the illusion of rigour while leaving actual software quality unmeasured. It is not a fringe problem. It is the default state of QA measurement in most large enterprises, and it persists because the metrics teams report are designed to reassure rather than inform.

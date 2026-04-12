@@ -11,6 +11,10 @@ description: "Test automation now consumes 42% of QA budgets—up from 31% in 20
 
 Capgemini's World Quality Report surveyed 1,750 technology leaders in 2023 and found that test automation consumed 42% of their total QA budgets — up from 31% in 2020. The increase was not driven by expanding test suites. It was driven by the maintenance, infrastructure, and specialist labour required to keep existing automation running. Organisations are spending more on automation each year and, by their own assessment, getting proportionally less in return.
 
+
+![Test automation budget allocation: visible licensing costs are 35%; hidden maintenance and talent costs are 65%](/assets/charts/the-real-cost-of-test-automation--balancing-speed-and-sustai.svg)
+*Source: Capgemini World Quality Report, 2023; Forrester Enterprise Test Automation Study, 2024*
+
 ## The three costs nobody forecasts
 
 The visible cost of test automation — tool licences, initial script development, basic training — typically accounts for 30-40% of the total programme expense, according to Forrester's 2024 analysis of 200 enterprise test automation initiatives. The remaining 60-70% falls into three categories that rarely appear in the original business case.

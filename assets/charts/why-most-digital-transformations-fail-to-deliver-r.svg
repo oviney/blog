@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">Why digital transformations fail: it is not the technology</text>
+  <text x="40" y="56" font-size="12" fill="#666">Root causes of transformation failure · % of failed programmes (BCG, n=900)</text>
+
+  <!-- Big number -->
+  <text x="40" y="130" font-family="Merriweather, Georgia, serif" font-size="72" font-weight="700" fill="#E3120B">70%</text>
+  <text x="40" y="155" font-size="14" fill="#666">of digital transformations fail their stated objectives (McKinsey, n=1,500)</text>
+
+  <line x1="40" y1="175" x2="760" y2="175" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Root cause breakdown -->
+  <text x="40" y="200" font-size="13" font-weight="600" fill="#1a1a1a">What actually causes failure</text>
+
+  <!-- Org resistance + unclear accountability 82% -->
+  <text x="36" y="232" font-size="13" fill="#1a1a1a" text-anchor="end">Organisational and governance failures</text>
+  <rect x="40" y="218" width="590" height="28" fill="#555" rx="2"/>
+  <text x="638" y="237" font-size="13" font-weight="700" fill="#555">82%</text>
+
+  <!-- Tech issues 18% -->
+  <text x="36" y="277" font-size="13" fill="#1a1a1a" text-anchor="end">Technology-related issues</text>
+  <rect x="40" y="263" width="130" height="28" fill="#E3120B" rx="2"/>
+  <text x="178" y="282" font-size="13" font-weight="700" fill="#E3120B">18%</text>
+
+  <text x="40" y="330" font-size="12" fill="#888" font-style="italic">Average transformation: 10% of annual revenue over 3 years → less than half projected value delivered</text>
+
+  <text x="40" y="388" font-size="10" fill="#999">Sources: McKinsey Digital Transformation Survey, 2023 (n=1,500 executives, 20 industries); BCG Transformation Analysis, 2023 (n=900 programmes)</text>
+</svg>

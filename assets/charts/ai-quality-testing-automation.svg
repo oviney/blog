@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">AI in QA: the adoption funnel</text>
+  <text x="40" y="56" font-size="12" fill="#666">From intention to enterprise-scale deployment · % of organisations (2026)</text>
+
+  <!-- Funnel bars descending -->
+  <!-- Cite AI as strategic priority 75% -->
+  <text x="36" y="106" font-size="13" fill="#1a1a1a" text-anchor="end">Cite AI testing as strategic priority</text>
+  <rect x="40" y="88" width="540" height="28" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="88" width="540" height="28" fill="#888" rx="2"/>
+  <text x="588" y="107" font-size="13" font-weight="700" fill="#888">75%</text>
+
+  <!-- Piloting or deploying 89% -->
+  <text x="36" y="146" font-size="13" fill="#1a1a1a" text-anchor="end">Piloting or deploying AI-augmented QE</text>
+  <rect x="40" y="128" width="641" height="28" fill="#888" rx="2"/>
+  <text x="689" y="147" font-size="13" font-weight="700" fill="#888">89%</text>
+
+  <!-- In production 37% -->
+  <text x="36" y="186" font-size="13" fill="#1a1a1a" text-anchor="end">AI testing in production</text>
+  <rect x="40" y="168" width="266" height="28" fill="#555" rx="2"/>
+  <text x="314" y="187" font-size="13" font-weight="700" fill="#555">37%</text>
+
+  <!-- Adopted at scale 15-16% -->
+  <text x="36" y="226" font-size="13" fill="#1a1a1a" text-anchor="end">Enterprise-scale deployment</text>
+  <rect x="40" y="208" width="108" height="28" fill="#E3120B" rx="2"/>
+  <text x="156" y="227" font-size="13" font-weight="700" fill="#E3120B">15%</text>
+
+  <!-- Actually adopted 16% (Perforce) -->
+  <text x="36" y="266" font-size="13" fill="#1a1a1a" text-anchor="end">Have fully adopted AI testing (Perforce)</text>
+  <rect x="40" y="248" width="115" height="28" fill="#E3120B" rx="2"/>
+  <text x="163" y="267" font-size="13" font-weight="700" fill="#E3120B">16%</text>
+
+  <text x="40" y="330" font-size="12" fill="#888" font-style="italic">5–8× more teams plan to use AI in testing than have successfully implemented it (arXiv, April 2025)</text>
+
+  <text x="40" y="388" font-size="10" fill="#999">Sources: Perforce State of Continuous Testing, 2025; Capgemini World Quality Report 2025-26; arXiv "Expectations vs Reality" systematic study, April 2025</text>
+</svg>

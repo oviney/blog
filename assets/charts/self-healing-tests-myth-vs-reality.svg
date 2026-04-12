@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">Self-healing tests: vendor promise vs. independent reality</text>
+  <text x="40" y="56" font-size="12" fill="#666">What AI-based self-healing actually fixes · % of test failures</text>
+
+  <!-- Left panel: promise vs reality -->
+  <text x="40" y="90" font-size="13" font-weight="600" fill="#1a1a1a">Maintenance reduction claimed vs. achieved</text>
+
+  <!-- Vendor claim 80% -->
+  <text x="36" y="122" font-size="12" fill="#666" text-anchor="end">Vendor claim</text>
+  <rect x="40" y="108" width="576" height="26" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="108" width="576" height="26" fill="#555" rx="2"/>
+  <text x="624" y="126" font-size="13" font-weight="700" fill="#555">80%</text>
+
+  <!-- Reality 30% -->
+  <text x="36" y="157" font-size="12" fill="#666" text-anchor="end">Teams achieving autonomy (ISTQB)</text>
+  <rect x="40" y="143" width="576" height="26" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="143" width="216" height="26" fill="#E3120B" rx="2"/>
+  <text x="264" y="161" font-size="13" font-weight="700" fill="#E3120B">30%</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="192" x2="760" y2="192" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Right panel: what self-healing covers -->
+  <text x="40" y="216" font-size="13" font-weight="600" fill="#1a1a1a">Root causes of test failures (Capgemini, 2023)</text>
+  <text x="460" y="216" font-size="12" fill="#E3120B">← Self-healing addresses only this</text>
+
+  <!-- Locator changes 35% - what it fixes -->
+  <text x="36" y="248" font-size="12" fill="#666" text-anchor="end">Locator / selector changes</text>
+  <rect x="40" y="234" width="576" height="26" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="234" width="252" height="26" fill="#E3120B" rx="2"/>
+  <text x="300" y="252" font-size="13" font-weight="700" fill="#E3120B">35%</text>
+
+  <!-- Other causes 65% - what it doesn't -->
+  <text x="36" y="283" font-size="12" fill="#666" text-anchor="end">Functional, data, timing, environment</text>
+  <rect x="40" y="269" width="576" height="26" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="269" width="468" height="26" fill="#555" rx="2"/>
+  <text x="516" y="287" font-size="13" font-weight="700" fill="#555">65%</text>
+
+  <!-- Legend -->
+  <rect x="40" y="345" width="12" height="12" fill="#E3120B" rx="1"/>
+  <text x="58" y="356" font-size="11" fill="#666">Addressed by self-healing</text>
+  <rect x="220" y="345" width="12" height="12" fill="#555" rx="1"/>
+  <text x="238" y="356" font-size="11" fill="#666">Outside self-healing scope</text>
+
+  <text x="40" y="388" font-size="10" fill="#999">Sources: ISTQB Global Testing Survey, 2023; Capgemini World Quality Report, 2023; Tricentis vendor claims, 2024</text>
+</svg>
