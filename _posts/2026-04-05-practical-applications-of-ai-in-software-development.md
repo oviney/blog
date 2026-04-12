@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The coder's crutch: AI-assisted development's hidden costs"
-date: 2023-08-08
+date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Software Engineering"]
 image: /assets/images/ai-coders-crutch.png

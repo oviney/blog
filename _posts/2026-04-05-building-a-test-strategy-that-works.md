@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The test strategy trap: why quality plans fail"
-date: 2023-08-09
+date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
 image: /assets/images/test-strategy-trap.png
