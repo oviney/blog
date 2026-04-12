@@ -38,7 +38,7 @@ Microsoft's Security Copilot, launched in 2024 and integrated across its Defende
 
 ## Enterprise adoption patterns
 
-Adoption is accelerating but uneven. Gartner projected that by 2026, 40% of enterprises will have deployed AI-augmented security operations, up from fewer than 5% in 2021. The largest deployments cluster in financial services, healthcare, and critical infrastructure — sectors where regulatory pressure and breach costs create strong economic incentives.
+Adoption is accelerating but uneven. Gartner projected that by the end of 2026, 40% of enterprises will have deployed AI-augmented security operations, up from fewer than 5% in 2021. The largest deployments cluster in financial services, healthcare, and critical infrastructure — sectors where regulatory pressure and breach costs create strong economic incentives.
 
 The deployment models vary. Some organisations embed AI detection within existing security information and event management (SIEM) platforms — Splunk, now owned by Cisco, and Microsoft Sentinel both offer native machine-learning modules. Others deploy dedicated network detection and response (NDR) solutions from specialists like Darktrace, Vectra AI, or ExtraHop. A third cohort builds bespoke models on internal data, an approach favoured by large banks with in-house data-science teams and proprietary threat-intelligence feeds.
 
