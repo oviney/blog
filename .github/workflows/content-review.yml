@@ -41,7 +41,7 @@ jobs:
           echo "Review complete. JSON results saved to content-review-results.json"
 
       - name: Upload results as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: content-review-results
           path: content-review-results.json
