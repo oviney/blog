@@ -13,7 +13,7 @@ triggers:
 
 Every agent — Copilot, Codex, Gemini, Claude — must apply this 5-axis framework when reviewing code changes. The framework ensures consistent, thorough reviews regardless of which agent performs the review or which domain the change belongs to.
 
-Adapted from the [addyosmani/agent-skills](https://github.com/nicepkg/agent-skills) code-review pattern.
+Adapted from the addyosmani/agent-skills code-review pattern.
 
 **Applies to**: All agents (Creative Director, QA Gatekeeper, Editorial Chief, General Agent)
 
@@ -71,7 +71,7 @@ Does the change fit the system's structure?
 Does the change avoid introducing vulnerabilities?
 
 - [ ] No secrets or credentials committed
-- [ ] External links use `rel="noopener noreferrer"` when opening in new tabs
+- [ ] External links use `rel="noopener"` or `rel="noreferrer"` when opening in new tabs
 - [ ] User-supplied data is escaped or sanitized
 - [ ] Dependencies are free of known vulnerabilities
 - [ ] No `eval()` or dynamic code execution from untrusted input
