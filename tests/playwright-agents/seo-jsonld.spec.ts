@@ -9,7 +9,7 @@ import { test, expect } from '@playwright/test';
  *  - Meta description using page.description front matter
  */
 
-test.describe('@content @links SEO JSON-LD Structured Data', () => {
+test.describe('@content @links SEO JSON-LD Structured Data @REQ-CONTENT-01', () => {
 
   test('BreadcrumbList JSON-LD is present on the homepage', async ({ page }) => {
     await page.goto('/');

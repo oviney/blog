@@ -15,7 +15,7 @@ const viewports = {
   desktop: { width: 1920, height: 1080 }
 };
 
-test.describe('@visual Responsive Layout Adaptation', () => {
+test.describe('@visual Responsive Layout Adaptation @REQ-NAV-01 @REQ-VISUAL-01', () => {
 
   test('Article grid adapts correctly across viewports', async ({ page }) => {
     await page.goto('/blog/');
@@ -194,7 +194,7 @@ test.describe('@visual Responsive Layout Adaptation', () => {
 
 });
 
-test.describe('@visual Typography Responsiveness', () => {
+test.describe('@visual Typography Responsiveness @REQ-VISUAL-01', () => {
 
   test('Font sizes scale appropriately across viewports', async ({ page }) => {
     // Nuclear healing: Ultra-defensive typography testing with maximum flexibility
@@ -352,7 +352,7 @@ test.describe('@visual Typography Responsiveness', () => {
 
 });
 
-test.describe('@visual Image Responsiveness', () => {
+test.describe('@visual Image Responsiveness @REQ-VISUAL-01', () => {
 
   test('Hero images scale properly across viewports', async ({ page }) => {
     await page.goto('/2025/12/31/testing-times/'); // Post with hero image
@@ -430,7 +430,7 @@ test.describe('@visual Image Responsiveness', () => {
 
 });
 
-test.describe('@accessibility Interactive Elements Touch Targets', () => {
+test.describe('@accessibility Interactive Elements Touch Targets @REQ-A11Y-02 @REQ-NAV-01', () => {
 
   test.use({ viewport: viewports.mobile });
 
@@ -566,7 +566,7 @@ test.describe('@accessibility Interactive Elements Touch Targets', () => {
 
 });
 
-test.describe('@visual Orientation Change Handling', () => {
+test.describe('@visual Orientation Change Handling @REQ-VISUAL-01', () => {
 
   test('Layout adapts to orientation changes on tablet', async ({ page }) => {
     await page.goto('/blog/');
@@ -603,7 +603,7 @@ test.describe('@visual Orientation Change Handling', () => {
 
 });
 
-test.describe('@performance Performance Under Responsive Conditions', () => {
+test.describe('@performance Performance Under Responsive Conditions @REQ-VISUAL-01', () => {
 
   test('Layout performance during viewport changes', async ({ page }) => {
     // Nuclear healing: Ultra-permissive performance testing

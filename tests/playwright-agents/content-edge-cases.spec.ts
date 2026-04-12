@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test';
  * including AI disclosure, missing images, metadata variations, and content overflow.
  */
 
-test.describe('@content AI Disclosure and Content Badges', () => {
+test.describe('@content AI Disclosure and Content Badges @REQ-CONTENT-01 @REQ-CONTENT-02', () => {
 
   test('AI disclosure badge appears on AI-assisted posts', async ({ page }) => {
     // Nuclear healing: Ultra-permissive AI disclosure testing
@@ -113,7 +113,7 @@ test.describe('@content AI Disclosure and Content Badges', () => {
 
 });
 
-test.describe('@content @visual Image Handling Edge Cases', () => {
+test.describe('@content @visual Image Handling Edge Cases @REQ-CONTENT-01 @REQ-CONTENT-02', () => {
 
   test('Posts with hero images load correctly', async ({ page }) => {
     await page.goto('/2025/12/31/testing-times/');
@@ -238,7 +238,7 @@ test.describe('@content @visual Image Handling Edge Cases', () => {
 
 });
 
-test.describe('@content Content Metadata Variations', () => {
+test.describe('@content Content Metadata Variations @REQ-CONTENT-01 @REQ-CONTENT-02', () => {
 
   test('Posts with complete metadata display correctly', async ({ page }) => {
     await page.goto('/2025/12/31/testing-times/');
@@ -348,7 +348,7 @@ test.describe('@content Content Metadata Variations', () => {
 
 });
 
-test.describe('@content Content Length and Overflow Edge Cases', () => {
+test.describe('@content Content Length and Overflow Edge Cases @REQ-CONTENT-01 @REQ-CONTENT-02', () => {
 
   test('Very long article titles handle gracefully', async ({ page }) => {
     await page.goto('/blog/');
@@ -452,7 +452,7 @@ test.describe('@content Content Length and Overflow Edge Cases', () => {
 
 });
 
-test.describe('@content @navigation Related Posts and Content Discovery', () => {
+test.describe('@content @navigation Related Posts and Content Discovery @REQ-CONTENT-01 @REQ-LINKS-01', () => {
 
   test('Related posts display correctly', async ({ page }) => {
     // Nuclear healing: Ultra-permissive related posts testing

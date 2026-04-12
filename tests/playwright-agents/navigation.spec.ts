@@ -8,7 +8,7 @@ import { test, expect } from '@playwright/test';
  * behavioral aspects of navigation and user interactions.
  */
 
-test.describe('@navigation @links Navigation & User Journeys', () => {
+test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NAV-02', () => {
 
   test('Primary navigation journey: Homepage → Blog → Article → Back', async ({ page }) => {
     // Start from homepage
@@ -411,7 +411,7 @@ test.describe('@navigation @links Navigation & User Journeys', () => {
 
 });
 
-test.describe('@navigation Mobile Navigation Specific Tests', () => {
+test.describe('@navigation Mobile Navigation Specific Tests @REQ-NAV-01 @REQ-NAV-02', () => {
 
   test.use({ viewport: { width: 320, height: 568 } }); // Mobile viewport
 

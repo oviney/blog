@@ -10,7 +10,7 @@ import { test, expect } from '@playwright/test';
  *  - Google Search Console verification meta tag (when configured)
  */
 
-test.describe('@content Analytics Integration', () => {
+test.describe('@content Analytics Integration @REQ-SEC-01', () => {
 
   test('Google Analytics 4 script is present in <head>', async ({ page }) => {
     await page.goto('/');
