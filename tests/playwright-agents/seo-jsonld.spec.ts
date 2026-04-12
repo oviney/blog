@@ -133,7 +133,7 @@ test.describe('@content @links SEO JSON-LD Structured Data', () => {
 
   test('Article JSON-LD description matches the post description front matter', async ({ page }) => {
     // Navigate to the test strategy post which has a known description
-    await page.goto('/2023/08/09/building-a-test-strategy-that-works/');
+    await page.goto('/2026/04/05/building-a-test-strategy-that-works/');
     await page.waitForLoadState('networkidle');
 
     const jsonLdScripts = page.locator('script[type="application/ld+json"]');
@@ -159,7 +159,7 @@ test.describe('@content @links SEO JSON-LD Structured Data', () => {
   });
 
   test('Meta description tag is present on post pages', async ({ page }) => {
-    await page.goto('/2023/08/09/building-a-test-strategy-that-works/');
+    await page.goto('/2026/04/05/building-a-test-strategy-that-works/');
     await page.waitForLoadState('networkidle');
 
     const metaDescription = page.locator('meta[name="description"]').first();
