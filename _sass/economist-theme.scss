@@ -137,6 +137,20 @@ body {
       }
     }
   }
+
+  .nav-rss-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    .rss-icon {
+      transition: color 0.2s ease;
+    }
+
+    &:hover .rss-icon {
+      color: $economist-red;
+    }
+  }
 }
 
 // Hamburger toggle button — hidden on desktop, shown on mobile
