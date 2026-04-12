@@ -6,6 +6,7 @@ Agent skill files provide structured, step-by-step guidance for common tasks. Co
 
 | Skill | File | When to Use |
 |---|---|---|
+| **Code Review** | [`code-review/SKILL.md`](code-review/SKILL.md) | Reviewing PRs, evaluating code quality, providing structured 5-axis review feedback |
 | **Economist Theme** | [`economist-theme/SKILL.md`](economist-theme/SKILL.md) | Adding styles, modifying SCSS, creating layouts, ensuring design consistency, visual regression testing |
 | **Jekyll Development** | [`jekyll-development/SKILL.md`](jekyll-development/SKILL.md) | Starting the Jekyll server, making content changes, modifying layouts or styles, debugging server failures |
 | **QA Gatekeeper** | [`jekyll-qa/SKILL.md`](jekyll-qa/SKILL.md) | PR reviews, monitoring the CI pipeline, verifying deployments, diagnosing test failures, closing issues |
