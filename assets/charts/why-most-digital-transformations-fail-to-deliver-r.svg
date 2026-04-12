@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">Why digital transformations fail</text>
+  <text x="40" y="56" font-size="12" fill="#666">Failure drivers and success factors · McKinsey &amp; BCG, 2023</text>
+
+  <!-- Bar 1: Overall failure rate -->
+  <text x="40" y="100" font-size="13" fill="#1a1a1a">Initiatives that fail to meet stated objectives</text>
+  <rect x="40" y="110" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="110" width="420" height="32" fill="#E3120B" rx="2"/>
+  <text x="468" y="132" font-size="13" font-weight="700" fill="#1a1a1a">70%</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="165" x2="760" y2="165" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Section: Root causes -->
+  <text x="40" y="190" font-size="14" font-weight="600" fill="#1a1a1a">Root causes of failure (BCG, 900 programmes)</text>
+
+  <!-- Bar 2: Organisational issues -->
+  <text x="40" y="220" font-size="13" fill="#666">Organisational resistance &amp; unclear accountability</text>
+  <rect x="340" y="206" width="380" height="24" fill="#e0e0e0" rx="2"/>
+  <rect x="340" y="206" width="312" height="24" fill="#E3120B" rx="2"/>
+  <text x="660" y="224" font-size="12" font-weight="700" fill="#E3120B">82%</text>
+
+  <!-- Bar 3: Technology issues -->
+  <text x="40" y="254" font-size="13" fill="#666">Technology-related issues</text>
+  <rect x="340" y="240" width="380" height="24" fill="#e0e0e0" rx="2"/>
+  <rect x="340" y="240" width="68" height="24" fill="#555" rx="2"/>
+  <text x="416" y="258" font-size="12" font-weight="700" fill="#555">18%</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="280" x2="760" y2="280" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Section: Timeline -->
+  <text x="40" y="305" font-size="14" font-weight="600" fill="#1a1a1a">Additional budget and timeline overruns</text>
+
+  <!-- Bar 4: Exceeded timelines -->
+  <text x="40" y="335" font-size="13" fill="#666">Exceeded planned timelines (Deloitte)</text>
+  <rect x="340" y="321" width="380" height="22" fill="#e0e0e0" rx="2"/>
+  <rect x="340" y="321" width="285" height="22" fill="#555" rx="2"/>
+  <text x="633" y="337" font-size="12" font-weight="700" fill="#555">75%</text>
+
+  <!-- Annotation -->
+  <text x="400" y="267" font-size="11" fill="#E3120B" font-style="italic">People, not technology</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: McKinsey, Digital Transformation: Improving the Odds of Success, 2023; BCG, Flipping the Odds, 2023; Deloitte, Digital Transformation Survey, 2023</text>
+</svg>

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">Test automation's hidden ledger</text>
+  <text x="40" y="56" font-size="12" fill="#666">Budget share consumed by automation · % of total QA budget</text>
+
+  <!-- Bar 1: 2020 baseline -->
+  <text x="40" y="100" font-size="13" fill="#666">2020</text>
+  <rect x="100" y="86" width="560" height="28" fill="#e0e0e0" rx="2"/>
+  <rect x="100" y="86" width="174" height="28" fill="#555" rx="2"/>
+  <text x="282" y="106" font-size="13" font-weight="700" fill="#555">31%</text>
+
+  <!-- Bar 2: 2023 -->
+  <text x="40" y="140" font-size="13" fill="#666">2023</text>
+  <rect x="100" y="126" width="560" height="28" fill="#e0e0e0" rx="2"/>
+  <rect x="100" y="126" width="235" height="28" fill="#E3120B" rx="2"/>
+  <text x="343" y="146" font-size="13" font-weight="700" fill="#E3120B">42%</text>
+  <text x="400" y="146" font-size="11" fill="#999">↑ driven by maintenance, not new tests</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="175" x2="760" y2="175" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Section: Where budget goes -->
+  <text x="40" y="200" font-size="14" font-weight="600" fill="#1a1a1a">Where the automation budget actually goes</text>
+
+  <!-- Stacked breakdown -->
+  <text x="40" y="232" font-size="13" fill="#1a1a1a">Visible costs (tooling &amp; initial scripts)</text>
+  <rect x="40" y="240" width="560" height="26" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="240" width="196" height="26" fill="#555" rx="2"/>
+  <text x="244" y="259" font-size="12" font-weight="700" fill="#555">30–40%</text>
+
+  <text x="40" y="286" font-size="13" fill="#1a1a1a">Hidden costs (maintenance, infrastructure, talent)</text>
+  <rect x="40" y="294" width="560" height="26" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="294" width="364" height="26" fill="#E3120B" rx="2"/>
+  <text x="412" y="313" font-size="12" font-weight="700" fill="#E3120B">60–70%</text>
+
+  <!-- Key stat: Flaky test cost -->
+  <line x1="40" y1="335" x2="760" y2="335" stroke="#ddd" stroke-width="1"/>
+  <text x="40" y="358" font-size="13" fill="#1a1a1a">Maintenance share of total automation effort: </text>
+  <text x="380" y="358" font-size="13" font-weight="700" fill="#E3120B">40–60%</text>
+  <text x="455" y="358" font-size="12" fill="#999">(World Quality Report)</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: Capgemini, World Quality Report, 2023; Forrester, Enterprise Test Automation Cost Analysis, 2024</text>
+</svg>

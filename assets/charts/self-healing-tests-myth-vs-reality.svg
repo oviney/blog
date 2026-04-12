@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">Self-healing tests: vendor promise vs. independent reality</text>
+  <text x="40" y="56" font-size="12" fill="#666">Test maintenance reduction claims · %</text>
+
+  <!-- Bar 1: Vendor claim -->
+  <text x="40" y="100" font-size="13" fill="#1a1a1a">Vendor-claimed maintenance reduction</text>
+  <rect x="40" y="110" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="110" width="480" height="32" fill="#555" rx="2"/>
+  <text x="528" y="132" font-size="13" font-weight="700" fill="#1a1a1a">80%</text>
+
+  <!-- Bar 2: What self-healing actually fixes -->
+  <text x="40" y="175" font-size="13" fill="#1a1a1a">Failures addressed by self-healing (locator changes only)</text>
+  <rect x="40" y="185" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="185" width="210" height="32" fill="#E3120B" rx="2"/>
+  <text x="258" y="207" font-size="13" font-weight="700" fill="#E3120B">35%</text>
+  <text x="310" y="207" font-size="12" fill="#999">Capgemini, 2023</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="240" x2="760" y2="240" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Section: Actual measured outcomes -->
+  <text x="40" y="268" font-size="14" font-weight="600" fill="#1a1a1a">What independent studies measured</text>
+
+  <!-- Bar 3: Median reduction (TestGuild) -->
+  <text x="40" y="298" font-size="13" fill="#666">Median actual reduction (TestGuild)</text>
+  <rect x="310" y="284" width="300" height="22" fill="#e0e0e0" rx="2"/>
+  <rect x="310" y="284" width="54" height="22" fill="#E3120B" rx="2"/>
+  <text x="372" y="300" font-size="12" font-weight="700" fill="#E3120B">18%</text>
+
+  <!-- Bar 4: Net reduction after review overhead (Forrester) -->
+  <text x="40" y="332" font-size="13" fill="#666">Net reduction after review overhead (Forrester)</text>
+  <rect x="310" y="318" width="300" height="22" fill="#e0e0e0" rx="2"/>
+  <rect x="310" y="318" width="45" height="22" fill="#555" rx="2"/>
+  <text x="363" y="334" font-size="12" font-weight="700" fill="#555">15%</text>
+
+  <!-- Annotation -->
+  <text x="500" y="300" font-size="11" fill="#E3120B" font-style="italic">65% of failures require</text>
+  <text x="500" y="314" font-size="11" fill="#E3120B" font-style="italic">human diagnosis</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: Capgemini, World Quality Report, 2023; TestGuild, State of Testing, 2024; Forrester, Total Economic Impact of AI-Powered Testing, 2023</text>
+</svg>

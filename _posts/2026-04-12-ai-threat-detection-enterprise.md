@@ -12,6 +12,9 @@ description: "Signature-based intrusion detection misses 60% of novel attacks. A
 
 Signature-based intrusion detection systems were built for a world of known threats. That world no longer exists. IBM's 2025 Cost of a Data Breach Report found that organisations using AI-driven security tools detected breaches 108 days faster than those relying on traditional methods — and saved an average of $2.22 million per incident. As adversaries weaponise generative AI to craft polymorphic malware and zero-day exploits at industrial scale, the enterprise security industry is undergoing its most significant architectural shift in two decades: the migration from pattern-matching to machine-learning-based threat detection.
 
+![AI-driven threat detection: the enterprise shift — chart showing 450,000+ new malware samples daily, 92% investigation time reduction with AI, and $2.22M average savings per incident](/assets/charts/ai-threat-detection-enterprise.svg)
+*Source: IBM, Cost of a Data Breach Report, 2025; AV-TEST, 2025; CrowdStrike, 2024*
+
 ## The signature problem
 
 Traditional intrusion detection and prevention systems — IDS and IPS — operate on a conceptually simple model. Security researchers identify a malicious payload, extract a unique byte pattern, and distribute that signature to every sensor on the network. When traffic matches the pattern, the system fires an alert. The approach works reliably against known threats. It fails catastrophically against unknown ones.

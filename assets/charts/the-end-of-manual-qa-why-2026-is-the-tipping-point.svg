@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">Manual QA's last stand: the adoption avalanche</text>
+  <text x="40" y="56" font-size="12" fill="#666">AI adoption in quality engineering · % of organisations</text>
+
+  <!-- Bar 1: Piloting AI in QE -->
+  <text x="40" y="100" font-size="13" fill="#1a1a1a">Piloting or deploying AI in QE (Capgemini)</text>
+  <rect x="40" y="110" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="110" width="534" height="32" fill="#E3120B" rx="2"/>
+  <text x="582" y="132" font-size="13" font-weight="700" fill="#1a1a1a">89%</text>
+
+  <!-- Bar 2: Identify AI as pivotal -->
+  <text x="40" y="172" font-size="13" fill="#1a1a1a">Cited AI as pivotal to strategy (Perforce)</text>
+  <rect x="40" y="182" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="182" width="450" height="32" fill="#555" rx="2"/>
+  <text x="498" y="204" font-size="13" font-weight="700" fill="#1a1a1a">75%</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="235" x2="760" y2="235" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Section: Non-adopter decline -->
+  <text x="40" y="263" font-size="14" font-weight="600" fill="#1a1a1a">Non-adopters of generative AI in QE</text>
+
+  <!-- 2023 bar -->
+  <text x="40" y="296" font-size="13" fill="#666">2023</text>
+  <rect x="100" y="282" width="500" height="24" fill="#e0e0e0" rx="2"/>
+  <rect x="100" y="282" width="155" height="24" fill="#555" rx="2"/>
+  <text x="263" y="299" font-size="12" font-weight="700" fill="#555">31%</text>
+
+  <!-- 2025 bar -->
+  <text x="40" y="330" font-size="13" fill="#666">2025</text>
+  <rect x="100" y="316" width="500" height="24" fill="#e0e0e0" rx="2"/>
+  <rect x="100" y="316" width="55" height="24" fill="#E3120B" rx="2"/>
+  <text x="163" y="333" font-size="12" font-weight="700" fill="#E3120B">11%</text>
+  <text x="210" y="333" font-size="11" fill="#999">↓ 20-point drop in two years</text>
+
+  <!-- AI-first stat -->
+  <text x="490" y="296" font-size="11" fill="#999">AI-first QA approaches:</text>
+  <text x="630" y="296" font-size="12" font-weight="700" fill="#E3120B">77.7%</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: Capgemini &amp; Sogeti, World Quality Report, 2025-26; Perforce, State of Continuous Testing, 2025; ThinkSys, QA Trends, 2026</text>
+</svg>

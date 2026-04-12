@@ -11,6 +11,9 @@ description: "AI testing vendors promise 80% reductions in maintenance effort. I
 
 Functionize, an AI testing platform, claims its tools reduce test maintenance effort by 80%. Applitools advertises "visual AI" that eliminates manual test updates. Mabl promises tests that "adapt automatically" to application changes. In 2025, CB Insights counted 47 testing startups making some variation of this claim, collectively raising $1.2 billion in venture funding. Yet IEEE's latest empirical study, surveying 400 software engineering teams across 15 countries, found that 62% reported no meaningful reduction in maintenance effort after adopting AI test generation tools.
 
+![The maintenance myth: vendor claims vs. evidence — chart showing 80% vendor claim vs. 35% theoretical ceiling, with Stripe achieving 22% net reduction and 62% of teams seeing no meaningful savings](/assets/charts/why-ai-test-generation-tools-overpromise-on-maintenance-savi.svg)
+*Source: Capgemini, 2025; IEEE, 2025; Stripe Engineering Blog, 2026*
+
 ## The 35% ceiling
 
 The disconnect has a structural explanation. Capgemini's 2025 Quality Engineering Report decomposed test maintenance into five categories: locator updates (35%), functional logic changes (25%), data dependencies (20%), timing and synchronisation issues (12%), and environmental instability (8%). AI test generation tools address the first category well — automatically adjusting CSS selectors, XPath expressions, and element identifiers when the UI changes. They address the remaining four poorly or not at all.

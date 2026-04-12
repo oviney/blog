@@ -12,6 +12,9 @@ summary: "Test coverage has become the most gamed metric in software engineering
 
 Google's testing infrastructure processes over four billion test executions per day across a codebase exceeding two billion lines. The company enforces no universal coverage target. Not 80%, not 90%, and certainly not 100%. Instead, Google's engineering productivity team recommends that teams pursue "useful coverage" — tests that have historically detected real defects — and explicitly warns against treating coverage percentages as quality proxies. When the company with the most sophisticated testing infrastructure on Earth declines to mandate a coverage floor, it is worth asking what everyone else thinks they know that Google does not.
 
+![The coverage-quality gap — paired bar chart showing that 95% line coverage detects only 60% of seeded mutations, exposing a 35-point gap between coverage and fault detection](/assets/charts/the-productivity-paradox-of-test-coverage-metrics.svg)
+*Source: Petrovic & Ivankovic, State of Mutation Testing at Google, IEEE, 2018; Inozemtseva & Holmes, ICSE, 2014*
+
 The thesis is blunt: test coverage, measured as a percentage of lines or branches exercised, has become the most widely gamed metric in software engineering. Teams chase coverage numbers not because high coverage reliably prevents defects but because the number is easy to measure, easy to mandate, and easy to present to executives who want a simple quality score. The result is a perverse incentive structure that rewards writing trivial tests and penalises thoughtful engineering judgement.
 
 ## The correlation that isn't

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">The maintenance myth: vendor claims vs. evidence</text>
+  <text x="40" y="56" font-size="12" fill="#666">AI test generation maintenance reduction · %</text>
+
+  <!-- Bar 1: Vendor claim -->
+  <text x="40" y="100" font-size="13" fill="#1a1a1a">Vendor-claimed reduction (Functionize, Applitools, Mabl)</text>
+  <rect x="40" y="110" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="110" width="480" height="32" fill="#555" rx="2"/>
+  <text x="528" y="132" font-size="13" font-weight="700" fill="#1a1a1a">80%</text>
+
+  <!-- Bar 2: Theoretical ceiling (locator-only) -->
+  <text x="40" y="172" font-size="13" fill="#1a1a1a">Theoretical ceiling — locator updates only (Capgemini)</text>
+  <rect x="40" y="182" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="182" width="210" height="32" fill="#E3120B" rx="2"/>
+  <text x="258" y="204" font-size="13" font-weight="700" fill="#E3120B">35%</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="236" x2="760" y2="236" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Section: What studies found -->
+  <text x="40" y="264" font-size="14" font-weight="600" fill="#1a1a1a">What independent studies found</text>
+
+  <!-- Bar 3: Stripe net reduction -->
+  <text x="40" y="296" font-size="13" fill="#666">Stripe — net reduction after 18 months</text>
+  <rect x="340" y="282" width="320" height="22" fill="#e0e0e0" rx="2"/>
+  <rect x="340" y="282" width="70" height="22" fill="#E3120B" rx="2"/>
+  <text x="418" y="298" font-size="12" font-weight="700" fill="#E3120B">22%</text>
+
+  <!-- Bar 4: IEEE — no meaningful reduction -->
+  <text x="40" y="330" font-size="13" fill="#666">IEEE — no meaningful savings reported</text>
+  <rect x="340" y="316" width="320" height="22" fill="#e0e0e0" rx="2"/>
+  <rect x="340" y="316" width="198" height="22" fill="#555" rx="2"/>
+  <text x="546" y="332" font-size="12" font-weight="700" fill="#555">62%</text>
+  <text x="580" y="332" font-size="11" fill="#999">of 400 teams</text>
+
+  <!-- Annotation -->
+  <text x="540" y="298" font-size="11" fill="#E3120B" font-style="italic">accepted &lt;40%</text>
+  <text x="540" y="312" font-size="11" fill="#E3120B" font-style="italic">of AI-generated tests</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: Capgemini, Quality Engineering Report, 2025; IEEE, AI Test Generation Maintenance Impact, 2025; Stripe Engineering Blog, 2026</text>
+</svg>

@@ -11,6 +11,9 @@ description: "88% of organisations have a documented test strategy. Only 23% bel
 
 The World Quality Report 2025-2026, published by OpenText and Capgemini in July 2025, surveyed 1,800 technology leaders across 33 countries and found that 91% of organisations had a documented test strategy. Only 19% believed their strategy was effective — down from 23% two years earlier. The gap between having a plan and having a plan that works is widening, not closing, despite a decade of investment in quality engineering maturity models.
 
+![The test strategy trap: plans vs. reality — chart showing 91% have a strategy but only 19% believe it works, down from 23% two years earlier](/assets/charts/building-a-test-strategy-that-works.svg)
+*Source: OpenText & Capgemini, World Quality Report, 2025-26; DORA, 2025*
+
 ## The document problem
 
 The typical test strategy remains a 40-page Confluence artifact written during a project's optimistic early weeks, reviewed once by stakeholders who lack the technical context to challenge it, and never updated. The World Quality Report found that 67% of test strategies were more than six months out of date. In an industry where deployment frequency has increased 35% year-over-year according to DORA's 2025 report, a strategy written six months ago describes a system that no longer exists.

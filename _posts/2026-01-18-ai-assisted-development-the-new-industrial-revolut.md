@@ -11,6 +11,9 @@ description: "AI code generators boost typing speed but degrade code quality —
 
 METR, a non-profit AI safety research lab, tracked 16 experienced open-source developers as they completed 246 real-world coding tasks on mature repositories averaging over one million lines of code. The developers using AI tools took 19% longer than those working without them. Before the study, participants had predicted AI would make them 24% faster. Even after experiencing the slowdown, they estimated AI had improved their productivity by 20%. The gap between perception and measurement is the defining feature of the AI coding revolution: developers believe the tools help, the data says otherwise, and nobody wants to hear it.
 
+![AI code generation: perception vs. measurement — chart showing developers predicted +24% improvement but METR measured −19% actual speed, with a 43-point perception gap](/assets/charts/ai-assisted-development-the-new-industrial-revolut.svg)
+*Source: METR, 2025; GitClear, AI Code Generation Impact Report, 2025*
+
 The core problem is that AI code generators optimise for plausibility, not correctness. They produce code that looks right, compiles cleanly, and passes superficial review. But the evidence — from controlled studies, production telemetry, and security research — shows that the code they generate carries higher defect density, weaker security, and more churn than human-written equivalents. The productivity gains are real but narrow, and the costs are systematically undermeasured.
 
 ## The churn problem

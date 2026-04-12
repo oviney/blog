@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">Platform engineering: adoption and impact</text>
+  <text x="40" y="56" font-size="12" fill="#666">Key metrics from the internal developer platform revolution</text>
+
+  <!-- Bar 1: Platform teams by 2027 (Gartner) -->
+  <text x="40" y="100" font-size="13" fill="#1a1a1a">Large orgs with platform teams by 2027 (Gartner)</text>
+  <rect x="40" y="110" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="110" width="480" height="32" fill="#E3120B" rx="2"/>
+  <text x="528" y="132" font-size="13" font-weight="700" fill="#1a1a1a">80%</text>
+  <text x="570" y="132" font-size="11" fill="#999">↑ from 15% in 2022</text>
+
+  <!-- Bar 2: Developer time on infrastructure tasks -->
+  <text x="40" y="172" font-size="13" fill="#1a1a1a">Developers spending 30%+ time on infrastructure (CNCF)</text>
+  <rect x="40" y="182" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="182" width="360" height="32" fill="#555" rx="2"/>
+  <text x="408" y="204" font-size="13" font-weight="700" fill="#555">60%</text>
+  <text x="450" y="204" font-size="11" fill="#999">of orgs surveyed</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="235" x2="760" y2="235" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Section: Measured outcomes -->
+  <text x="40" y="263" font-size="14" font-weight="600" fill="#1a1a1a">Measured outcomes</text>
+
+  <!-- Stat: Onboarding reduction -->
+  <text x="40" y="296" font-size="13" fill="#666">Onboarding time reduction (Spotify/Backstage)</text>
+  <rect x="380" y="282" width="300" height="22" fill="#e0e0e0" rx="2"/>
+  <rect x="380" y="282" width="201" height="22" fill="#E3120B" rx="2"/>
+  <text x="589" y="298" font-size="12" font-weight="700" fill="#E3120B">67%</text>
+  <text x="630" y="298" font-size="11" fill="#999">60 → 20 days</text>
+
+  <!-- Stat: DORA elite performance -->
+  <text x="40" y="330" font-size="13" fill="#666">More likely to be DORA elite performers</text>
+  <rect x="380" y="316" width="300" height="22" fill="#e0e0e0" rx="2"/>
+  <rect x="380" y="316" width="240" height="22" fill="#555" rx="2"/>
+  <text x="628" y="332" font-size="12" font-weight="700" fill="#555">2.4×</text>
+
+  <!-- Stat: Developer toil recovered -->
+  <text x="40" y="360" font-size="13" fill="#666">Developer toil that platforms can automate (McKinsey): </text>
+  <text x="470" y="360" font-size="13" font-weight="700" fill="#E3120B">20–30%</text>
+  <text x="555" y="360" font-size="12" fill="#999">of working time</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: Gartner, Top Strategic Technology Trends, 2024; CNCF Annual Survey, 2024; DORA, Accelerate State of DevOps, 2024</text>
+</svg>

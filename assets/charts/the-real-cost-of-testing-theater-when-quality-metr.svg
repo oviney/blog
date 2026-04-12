@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">Testing theatre: the metrics teams actually track</text>
+  <text x="40" y="56" font-size="12" fill="#666">QA measurement priorities · PractiTest survey of 2,700 practitioners, 2025</text>
+
+  <!-- Bar 1: Test execution count / pass rate -->
+  <text x="40" y="100" font-size="13" fill="#1a1a1a">Rely on test execution count &amp; pass rate</text>
+  <rect x="40" y="110" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="110" width="366" height="32" fill="#555" rx="2"/>
+  <text x="414" y="132" font-size="13" font-weight="700" fill="#1a1a1a">61%</text>
+  <text x="460" y="132" font-size="11" fill="#999">activity metric</text>
+
+  <!-- Bar 2: Track escaped defects -->
+  <text x="40" y="175" font-size="13" fill="#1a1a1a">Track escaped defects (bugs found by customers)</text>
+  <rect x="40" y="185" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="185" width="114" height="32" fill="#E3120B" rx="2"/>
+  <text x="162" y="207" font-size="13" font-weight="700" fill="#E3120B">19%</text>
+  <text x="210" y="207" font-size="11" fill="#999">outcome metric</text>
+
+  <!-- Bar 3: Measure mutation testing -->
+  <text x="40" y="250" font-size="13" fill="#1a1a1a">Use mutation testing</text>
+  <rect x="40" y="260" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="260" width="72" height="32" fill="#E3120B" rx="2"/>
+  <text x="120" y="282" font-size="13" font-weight="700" fill="#E3120B">12%</text>
+  <text x="168" y="282" font-size="11" fill="#999">effectiveness metric</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="310" x2="760" y2="310" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Case study callout -->
+  <text x="40" y="336" font-size="13" fill="#1a1a1a">VW CARIAD: </text>
+  <text x="130" y="336" font-size="13" font-weight="700" fill="#E3120B">94% test pass rate</text>
+  <text x="310" y="336" font-size="13" fill="#1a1a1a"> → </text>
+  <text x="330" y="336" font-size="13" font-weight="700" fill="#555">2-year launch delay</text>
+  <text x="40" y="354" font-size="12" fill="#999">Dashboard was green. Software was failing. Nobody noticed.</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: PractiTest, State of Testing Report, 2025; DORA, State of DevOps Report, 2025; Volkswagen AG, CARIAD disclosures, 2024</text>
+</svg>

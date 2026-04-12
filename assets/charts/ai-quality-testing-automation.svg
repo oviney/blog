@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">AI testing tools: the adoption chasm</text>
+  <text x="40" y="56" font-size="12" fill="#666">From intention to enterprise-scale deployment · %</text>
+
+  <!-- Funnel bars -->
+
+  <!-- Bar 1: Piloting or deploying -->
+  <text x="40" y="100" font-size="13" fill="#1a1a1a">Piloting or deploying AI in QE (Capgemini)</text>
+  <rect x="40" y="110" width="660" height="34" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="110" width="587" height="34" fill="#E3120B" rx="2"/>
+  <text x="635" y="133" font-size="14" font-weight="700" fill="#1a1a1a">89%</text>
+
+  <!-- Bar 2: Identify AI as pivotal -->
+  <text x="40" y="172" font-size="13" fill="#1a1a1a">Identify AI testing as pivotal to strategy (Perforce)</text>
+  <rect x="40" y="182" width="660" height="34" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="182" width="495" height="34" fill="#555" rx="2"/>
+  <text x="543" y="205" font-size="14" font-weight="700" fill="#1a1a1a">75%</text>
+
+  <!-- Bar 3: In production -->
+  <text x="40" y="244" font-size="13" fill="#1a1a1a">AI testing in production</text>
+  <rect x="40" y="254" width="660" height="34" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="254" width="244" height="34" fill="#555" rx="2"/>
+  <text x="292" y="277" font-size="14" font-weight="700" fill="#1a1a1a">37%</text>
+
+  <!-- Bar 4: Actually adopted / at scale -->
+  <text x="40" y="316" font-size="13" fill="#1a1a1a">Actually adopted at enterprise scale</text>
+  <rect x="40" y="326" width="660" height="34" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="326" width="106" height="34" fill="#E3120B" rx="2"/>
+  <text x="154" y="349" font-size="14" font-weight="700" fill="#E3120B">16%</text>
+
+  <!-- Gap annotation -->
+  <line x1="710" y1="127" x2="710" y2="343" stroke="#E3120B" stroke-width="1.5" stroke-dasharray="4"/>
+  <text x="720" y="230" font-size="11" fill="#E3120B" font-style="italic">73-point</text>
+  <text x="720" y="244" font-size="11" fill="#E3120B" font-style="italic">chasm</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: Capgemini &amp; Sogeti, World Quality Report, 2025-26; Perforce, State of Continuous Testing, 2025</text>
+</svg>

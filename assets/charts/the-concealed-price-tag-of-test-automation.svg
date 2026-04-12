@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">The concealed price tag of test automation</text>
+  <text x="40" y="56" font-size="12" fill="#666">Hidden costs that inflate budgets · industry survey data</text>
+
+  <!-- Bar 1: Hit projected ROI -->
+  <text x="40" y="100" font-size="13" fill="#1a1a1a">Automation initiatives that hit projected ROI</text>
+  <rect x="40" y="110" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="110" width="150" height="32" fill="#E3120B" rx="2"/>
+  <text x="198" y="132" font-size="13" font-weight="700" fill="#E3120B">25%</text>
+  <text x="250" y="132" font-size="11" fill="#999">World Quality Report</text>
+
+  <!-- Bar 2: Maintenance share of lifecycle -->
+  <text x="40" y="175" font-size="13" fill="#1a1a1a">Maintenance share of the automation lifecycle</text>
+  <rect x="40" y="185" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="185" width="360" height="32" fill="#555" rx="2"/>
+  <text x="408" y="207" font-size="13" font-weight="700" fill="#555">60%</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="240" x2="760" y2="240" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Section: Cost inflation -->
+  <text x="40" y="268" font-size="14" font-weight="600" fill="#1a1a1a">Budget overruns and hidden costs</text>
+
+  <!-- Bar 3: Integration cost inflation -->
+  <text x="40" y="300" font-size="13" fill="#666">Integration inflates upfront costs (Forrester)</text>
+  <rect x="340" y="286" width="320" height="22" fill="#e0e0e0" rx="2"/>
+  <rect x="340" y="286" width="96" height="22" fill="#E3120B" rx="2"/>
+  <text x="444" y="302" font-size="12" font-weight="700" fill="#E3120B">+20–30%</text>
+
+  <!-- Bar 4: Infrastructure cost hikes -->
+  <text x="40" y="334" font-size="13" fill="#666">Annual infrastructure cost hikes (Puppet)</text>
+  <rect x="340" y="320" width="320" height="22" fill="#e0e0e0" rx="2"/>
+  <rect x="340" y="320" width="80" height="22" fill="#555" rx="2"/>
+  <text x="428" y="336" font-size="12" font-weight="700" fill="#555">+15–25%</text>
+
+  <!-- Bar 5: Talent demand surge -->
+  <text x="40" y="363" font-size="13" fill="#666">Talent demand surge 2020–2023 (LinkedIn)</text>
+  <text x="444" y="363" font-size="12" font-weight="700" fill="#555">+75%</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: Capgemini, World Quality Report, 2023; Forrester, Total Economic Impact of Automated Testing, 2023; Puppet, State of DevOps, 2023</text>
+</svg>

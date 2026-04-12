@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">AI code generation: perception vs. measurement</text>
+  <text x="40" y="56" font-size="12" fill="#666">Developer productivity impact · METR study of 246 real-world tasks</text>
+
+  <!-- Centre axis -->
+  <line x1="400" y1="80" x2="400" y2="280" stroke="#ccc" stroke-width="1"/>
+  <text x="400" y="295" font-size="11" fill="#999" text-anchor="middle">0%</text>
+
+  <!-- Grid lines -->
+  <line x1="250" y1="80" x2="250" y2="280" stroke="#eee" stroke-width="1"/>
+  <text x="250" y="295" font-size="11" fill="#999" text-anchor="middle">−25</text>
+  <line x1="550" y1="80" x2="550" y2="280" stroke="#eee" stroke-width="1"/>
+  <text x="550" y="295" font-size="11" fill="#999" text-anchor="middle">+25</text>
+  <line x1="700" y1="80" x2="700" y2="280" stroke="#eee" stroke-width="1"/>
+  <text x="700" y="295" font-size="11" fill="#999" text-anchor="middle">+50</text>
+
+  <!-- Bar 1: Predicted improvement -->
+  <text x="390" y="107" font-size="13" fill="#1a1a1a" text-anchor="end">Predicted improvement</text>
+  <rect x="400" y="92" width="144" height="26" fill="#888" rx="2"/>
+  <text x="552" y="110" font-size="12" font-weight="700" fill="#888">+24%</text>
+
+  <!-- Bar 2: Actual measurement (negative) -->
+  <text x="390" y="152" font-size="13" fill="#1a1a1a" text-anchor="end">Actual task completion (METR)</text>
+  <rect x="286" y="137" width="114" height="26" fill="#E3120B" rx="2"/>
+  <text x="278" y="155" font-size="12" font-weight="700" fill="#E3120B" text-anchor="end">−19%</text>
+
+  <!-- Bar 3: Post-study perception -->
+  <text x="390" y="197" font-size="13" fill="#1a1a1a" text-anchor="end">Post-study perception</text>
+  <rect x="400" y="182" width="120" height="26" fill="#888" rx="2"/>
+  <text x="528" y="200" font-size="12" font-weight="700" fill="#888">+20%</text>
+
+  <!-- Bar 4: Code churn increase (GitClear) -->
+  <text x="390" y="242" font-size="13" fill="#1a1a1a" text-anchor="end">Code churn increase (GitClear)</text>
+  <rect x="400" y="227" width="246" height="26" fill="#555" rx="2"/>
+  <text x="654" y="245" font-size="12" font-weight="700" fill="#555">+41%</text>
+
+  <!-- Legend -->
+  <rect x="40" y="320" width="12" height="12" fill="#E3120B" rx="1"/>
+  <text x="58" y="331" font-size="11" fill="#666">Measured (slower)</text>
+  <rect x="175" y="320" width="12" height="12" fill="#888" rx="1"/>
+  <text x="193" y="331" font-size="11" fill="#666">Developer perception</text>
+  <rect x="320" y="320" width="12" height="12" fill="#555" rx="1"/>
+  <text x="338" y="331" font-size="11" fill="#666">Quality degradation</text>
+
+  <!-- Annotation -->
+  <text x="440" y="170" font-size="11" fill="#E3120B" font-style="italic">43-point perception gap</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: METR, Measuring AI Impact on Experienced Developers, 2025; GitClear, AI Code Generation Impact Report, 2025</text>
+</svg>

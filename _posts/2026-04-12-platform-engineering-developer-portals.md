@@ -12,6 +12,9 @@ description: "Platform engineering is reshaping how organisations deliver softwa
 
 Platform engineering — the discipline of building internal toolchains and self-service infrastructure for development teams — has moved from conference buzzword to organisational imperative. Gartner predicts that by 2027, 80% of large software engineering organisations will have established platform engineering teams, up from fewer than 15% in 2022. The shift reflects a hard-won lesson: giving every team unfettered access to raw cloud primitives does not scale.
 
+![Platform engineering: adoption and impact — chart showing 80% of orgs expected to have platform teams by 2027, with Backstage cutting onboarding by 67% and 2.4× DORA elite performance](/assets/charts/platform-engineering-developer-portals.svg)
+*Source: Gartner, 2024; CNCF Annual Survey, 2024; DORA, 2024*
+
 ## The problem with infinite choice
 
 The promise of cloud-native development was liberation. Containers, Kubernetes, serverless functions, and infrastructure-as-code tools handed developers unprecedented power to provision and deploy. What followed was not the productivity revolution that vendor slide decks forecast but a proliferation of bespoke configurations, inconsistent security postures, and what Humanitec's 2024 State of Platform Engineering report termed "the paradox of choice paralysis."

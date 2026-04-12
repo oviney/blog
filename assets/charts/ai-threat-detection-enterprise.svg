@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">AI-driven threat detection: the enterprise shift</text>
+  <text x="40" y="56" font-size="12" fill="#666">Key metrics in the migration from signatures to machine learning</text>
+
+  <!-- Bar 1: New malware samples per day -->
+  <text x="40" y="100" font-size="13" fill="#1a1a1a">New malware samples registered daily (AV-TEST)</text>
+  <rect x="40" y="110" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="110" width="540" height="32" fill="#E3120B" rx="2"/>
+  <text x="588" y="132" font-size="13" font-weight="700" fill="#1a1a1a">450,000+</text>
+
+  <!-- Bar 2: Investigation time reduction (CrowdStrike) -->
+  <text x="40" y="172" font-size="13" fill="#1a1a1a">Investigation time reduction — Charlotte AI (CrowdStrike)</text>
+  <rect x="40" y="182" width="600" height="32" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="182" width="552" height="32" fill="#555" rx="2"/>
+  <text x="600" y="204" font-size="13" font-weight="700" fill="#1a1a1a">92%</text>
+  <text x="640" y="204" font-size="11" fill="#999">60 → 5 min</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="235" x2="760" y2="235" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Section: Business impact -->
+  <text x="40" y="263" font-size="14" font-weight="600" fill="#1a1a1a">Business impact of AI-driven security (IBM, 2025)</text>
+
+  <!-- Stat: Detection speed -->
+  <text x="40" y="296" font-size="13" fill="#666">Faster breach detection with AI tools</text>
+  <rect x="370" y="282" width="300" height="22" fill="#e0e0e0" rx="2"/>
+  <rect x="370" y="282" width="216" height="22" fill="#E3120B" rx="2"/>
+  <text x="594" y="298" font-size="12" font-weight="700" fill="#E3120B">108 days</text>
+
+  <!-- Stat: Cost savings -->
+  <text x="40" y="330" font-size="13" fill="#666">Average savings per incident</text>
+  <rect x="370" y="316" width="300" height="22" fill="#e0e0e0" rx="2"/>
+  <rect x="370" y="316" width="222" height="22" fill="#555" rx="2"/>
+  <text x="600" y="332" font-size="12" font-weight="700" fill="#555">$2.22M</text>
+
+  <!-- Junior analyst improvement -->
+  <text x="40" y="360" font-size="13" fill="#666">Junior analyst accuracy improvement (Microsoft Security Copilot): </text>
+  <text x="520" y="360" font-size="13" font-weight="700" fill="#E3120B">+44%</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: IBM, Cost of a Data Breach Report, 2025; AV-TEST, Malware Statistics, 2025; CrowdStrike, Charlotte AI, 2024</text>
+</svg>

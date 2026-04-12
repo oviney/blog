@@ -11,6 +11,9 @@ description: "Vendors promise 80% reductions in test maintenance. Independent da
 
 Tricentis, the testing platform company, claims its self-healing technology reduces test maintenance by 80%. Mabl advertises "zero-maintenance testing." Functionize promises tests that "fix themselves." These are extraordinary claims — and the data, when it arrives from independent sources rather than vendor marketing, tells a more complicated story. ISTQB's 2023 global survey found that 85% of organisations using self-healing tests reported some decrease in maintenance time. But only 30% achieved what they had been promised: meaningful autonomy from manual test updates.
 
+![Self-healing tests: vendor promise vs. independent reality — chart showing 80% vendor claim but only 35% of failures addressable by self-healing, with 18% median actual reduction](/assets/charts/self-healing-tests-myth-vs-reality.svg)
+*Source: Capgemini, 2023; TestGuild, 2024; Forrester, 2023*
+
 ## The healing that isn't
 
 Self-healing tests work by detecting when a user interface element has changed — a button moved, a class name updated, an ID attribute renamed — and automatically adjusting the test selector to match the new state. The concept is sound, and for simple locator changes it works reliably. The problem is that simple locator changes account for a minority of real-world test failures.

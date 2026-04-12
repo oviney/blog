@@ -14,6 +14,9 @@ Boeing has accumulated more than $22 billion in deferred production costs on the
 
 Software engineering inherited its quality models from manufacturing but implemented them backwards. The American Society for Quality estimates that the cost of poor quality (COPQ) consumes 15-20% of sales revenue in American manufacturing, with some organisations reaching 40% of total operations. The CISQ pegged the software equivalent at $2.41 trillion in the United States alone. Whether the defect is a misaligned fuselage panel or a race condition in a payments API, the arithmetic of prevention versus failure follows identical curves.
 
+![The cost of poor quality: prevention vs. failure — chart showing software spends 3.4× more fixing defects than preventing them, with total US software COPQ at $2.41 trillion](/assets/charts/cost-of-poor-quality-copq.svg)
+*Source: CISQ, 2022; ASQ, Cost of Poor Quality; Boeing SEC filings, 2024*
+
 ## The manufacturing precedent
 
 Toyota's production system, the archetype of modern quality management, is built on a deceptively simple insight: stopping the line to fix a defect costs less than shipping it to the customer. Toyota's andon cord — which any worker can pull to halt production — embodies the principle that prevention is cheaper than detection. Toyota's COPQ runs at approximately 2-3% of revenue. Companies without mature quality systems operate at 15-25%.

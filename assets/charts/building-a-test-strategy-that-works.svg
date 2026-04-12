@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <rect width="800" height="400" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-family="Merriweather, Georgia, serif" font-size="18" font-weight="700" fill="#1a1a1a">The test strategy trap: plans vs. reality</text>
+  <text x="40" y="56" font-size="12" fill="#666">Test strategy effectiveness · World Quality Report, 2025-26</text>
+
+  <!-- Bar 1: Have a documented strategy -->
+  <text x="40" y="100" font-size="13" fill="#1a1a1a">Have a documented test strategy</text>
+  <rect x="40" y="110" width="600" height="34" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="110" width="546" height="34" fill="#555" rx="2"/>
+  <text x="594" y="133" font-size="14" font-weight="700" fill="#1a1a1a">91%</text>
+
+  <!-- Bar 2: Believe strategy is effective -->
+  <text x="40" y="175" font-size="13" fill="#1a1a1a">Believe their strategy is effective</text>
+  <rect x="40" y="185" width="600" height="34" fill="#e0e0e0" rx="2"/>
+  <rect x="40" y="185" width="114" height="34" fill="#E3120B" rx="2"/>
+  <text x="162" y="208" font-size="14" font-weight="700" fill="#E3120B">19%</text>
+
+  <!-- Gap annotation -->
+  <text x="220" y="208" font-size="12" fill="#E3120B" font-style="italic">↓ down from 23% two years earlier</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="245" x2="760" y2="245" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Section: Contributing factors -->
+  <text x="40" y="273" font-size="14" font-weight="600" fill="#1a1a1a">Why strategies fail</text>
+
+  <!-- Bar 3: Strategy out of date -->
+  <text x="40" y="303" font-size="13" fill="#666">Strategy more than 6 months out of date</text>
+  <rect x="350" y="289" width="310" height="22" fill="#e0e0e0" rx="2"/>
+  <rect x="350" y="289" width="208" height="22" fill="#555" rx="2"/>
+  <text x="566" y="305" font-size="12" font-weight="700" fill="#555">67%</text>
+
+  <!-- Bar 4: Fewer escaped defects with quarterly review -->
+  <text x="40" y="337" font-size="13" fill="#666">Fewer escaped defects with quarterly review (DORA)</text>
+  <rect x="350" y="323" width="310" height="22" fill="#e0e0e0" rx="2"/>
+  <rect x="350" y="323" width="124" height="22" fill="#E3120B" rx="2"/>
+  <text x="482" y="339" font-size="12" font-weight="700" fill="#E3120B">40%</text>
+
+  <!-- Source -->
+  <text x="40" y="388" font-size="10" fill="#999">Sources: OpenText &amp; Capgemini, World Quality Report, 2025-26; DORA, State of DevOps Report, 2025</text>
+</svg>
