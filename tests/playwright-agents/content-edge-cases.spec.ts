@@ -283,8 +283,8 @@ test.describe('@content Content Metadata Variations @REQ-CONTENT-01 @REQ-CONTENT
   test('Posts with missing optional metadata handle gracefully', async ({ page }) => {
     // Test older posts that might have incomplete metadata
     const testPosts = [
-      '/2023/08/09/building-a-test-strategy-that-works/',
-      '/2023/08/08/practical-applications-of-ai-in-software-development/'
+      '/2026/04/05/building-a-test-strategy-that-works/',
+      '/2026/04/05/practical-applications-of-ai-in-software-development/'
     ];
 
     for (const postUrl of testPosts) {
