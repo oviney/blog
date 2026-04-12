@@ -64,8 +64,9 @@ Count the total number of files in your plan.
 | **11–15** | Review critically — can any changes be deferred to a follow-up issue? |
 | **> 15** | **Stop.** Split into multiple issues/PRs before writing any code |
 
-The CI scope-explosion check (`scripts/check-pr-scope.sh`) hard-fails at 15 files.
-Plan for a maximum of 10 files per PR to leave margin for unexpected additions.
+The CI scope-explosion check (`scripts/check-pr-scope.sh`) hard-fails above 15 files
+(16+ triggers a violation). Plan for a maximum of 10 files per PR to leave margin for
+unexpected additions.
 
 ### 4. Check scope rules
 
