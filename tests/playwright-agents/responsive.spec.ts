@@ -102,7 +102,7 @@ test.describe('@visual Responsive Layout Adaptation', () => {
     const hamburger = page.locator('.nav-toggle');
 
     // On mobile/tablet viewports the nav is hidden behind the hamburger; open it first
-    if (await hamburger.isVisible()) {
+    if (!(await navigation.first().isVisible()) && await hamburger.isVisible()) {
       await hamburger.click();
     }
     await expect(navigation.first()).toBeVisible();
