@@ -1,13 +1,16 @@
 ---
 name: git-operations
 description: 'Git workflow conventions for this repo. Use when committing, branching, creating PRs, resolving merge conflicts, or pushing changes.'
-version: 1.0.0
+version: 1.1.0
 triggers:
   - Committing code changes
   - Creating feature branches
   - Pushing to remote repository
   - Checking git status
   - Reviewing uncommitted changes
+  - Opening or updating pull requests
+  - Resolving merge conflicts
+  - Cleaning up stale branches
 ---
 
 ## Context
@@ -169,6 +172,122 @@ git push -u origin feature/new-feature
 
 **When to use**: Large features that need review before merging
 
+### PR Body Template
+
+Every pull request must include a structured description. Use this template:
+
+```markdown
+## Summary
+
+One-sentence description of what this PR does.
+
+## Changes
+
+- Bullet list of each meaningful change
+
+## Testing
+
+- [ ] `bundle exec jekyll build` passes
+- [ ] Playwright tests pass (if applicable)
+- [ ] Manually verified at target viewports (320 px, 768 px, 1024 px)
+
+## Screenshots
+
+(Attach before/after screenshots for any visual change)
+
+Closes #<issue-number>
+```
+
+**Rules**:
+- Always reference the issue with `Closes #N` so GitHub auto-closes it on merge
+- Keep the summary line under 100 characters
+- List every file category touched (posts, styles, tests, scripts)
+
+### Rebase vs Merge
+
+Use **rebase** to keep a clean, linear history. Use **merge** only when explicitly
+required (e.g., combining long-lived branches with independent history).
+
+```bash
+# Preferred: rebase your branch onto the latest main
+git fetch origin main
+git rebase origin/main
+
+# If conflicts arise during rebase
+# 1. Fix the conflicting files
+# 2. Stage the resolved files
+git add path/to/resolved-file
+# 3. Continue the rebase
+git rebase --continue
+
+# Abort a rebase if things go wrong
+git rebase --abort
+```
+
+**When to use merge instead**:
+- The branch has been shared with other contributors who have based work on it
+- You need to preserve the full branch history for audit purposes
+
+```bash
+# Merge (only when rebase is inappropriate)
+git fetch origin main
+git merge origin/main
+```
+
+**Conflict resolution checklist**:
+1. Run `git status` to see which files have conflicts
+2. Open each file and look for `<<<<<<<`, `=======`, `>>>>>>>` markers
+3. Resolve to the correct content and remove all markers
+4. Stage resolved files with `git add`
+5. Complete with `git rebase --continue` (rebase) or `git commit` (merge)
+6. Run `bundle exec jekyll build` to verify the resolved code builds
+
+### Branch Cleanup
+
+Delete merged branches promptly to keep the repository tidy.
+
+```bash
+# Delete a local branch after merge
+git branch -d feature/old-branch
+
+# Delete the corresponding remote branch
+git push origin --delete feature/old-branch
+
+# Prune remote-tracking references that no longer exist
+git fetch --prune
+```
+
+**Bulk cleanup** (remove all local branches already merged into main):
+
+```bash
+git checkout main
+git branch --merged main | grep -v '^\*\|main' | xargs -r git branch -d
+```
+
+**Rules**:
+- Never delete `main`
+- Delete feature branches within 24 hours of merge
+- Use `git branch -d` (safe delete) not `git branch -D` (force delete) unless intentional
+
+### Zero CI Checks Recovery
+
+When a PR shows **0 CI checks** (no status checks triggered), push an empty
+commit to re-trigger the pipeline:
+
+```bash
+git commit --allow-empty -m "ci: trigger pipeline re-run"
+git push
+```
+
+**Common causes of zero checks**:
+- PR opened from a shallow clone that GitHub Actions cannot diff
+- Branch protection rules updated after the PR was opened
+- Workflow file syntax error preventing the workflow from loading
+- Race condition when the PR was created immediately after a force-push
+
+**When to use**: The PR page shows "0 checks" or "Waiting for status to be reported"
+and no workflow run appears under the Actions tab for the head SHA.
+
 ### Undo Last Commit (Before Push)
 
 ```bash
@@ -230,4 +349,5 @@ git stash list
 
 ## Version History
 
+- **1.1.0** (2026-04-12): Add PR body template, rebase vs merge guidance, branch cleanup, zero CI checks recovery
 - **1.0.0** (2026-01-05): Initial git operations skill creation
