@@ -3,7 +3,7 @@ layout: post
 title: "Test Automation's Dirty Secret: The Debt Nobody Budgets For"
 date: 2026-04-05
 author: "Ouray Viney"
-categories: ["Quality Engineering", "Test Automation"]
+categories: ["Test Automation"]
 image: /assets/images/test-automation-technical-debt.png
 image_alt: "Stark data-visualisation style chart showing compounding technical debt curves in crimson on white, inspired by financial charting with annotated inflection points"
 description: "Flaky tests caused 57% of Slack's CI failures. Test suites now consume 40% of QA capacity in maintenance — becoming the debt they were built to prevent."
