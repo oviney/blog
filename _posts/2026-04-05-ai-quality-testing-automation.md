@@ -1,4 +1,5 @@
 ---
+published: false
 layout: post
 title: "AI Testing Tools: The Adoption Chasm Nobody Discusses"
 date: 2026-04-05
@@ -8,6 +9,7 @@ image: /assets/images/ai-quality-testing-adoption.png
 image_alt: "Bold infographic showing a yawning chasm separating 'pilot' enterprises from 'deployed at scale', rendered in vivid burnt-orange and electric-blue block-print style"
 description: "89% of enterprises are piloting AI in QA, but only 15% have deployed it at scale — the gap is organisational inertia, not technology readiness."
 ---
+published: false
 
 In a Perforce industry survey, 75% of respondents identified AI-driven testing as a pivotal component of their 2025 strategy. Only 16% had actually adopted it. That 59-point gap between intention and execution defines the AI testing market in 2026 — a chasm so wide that it has spawned its own academic literature. An arXiv secondary study published in April 2025, titled "Expectations vs Reality," systematically catalogued the disconnect between AI testing aspirations and deployment reality across dozens of industry surveys. The conclusion was damning: 5-8 times more teams plan to use AI in testing than have successfully implemented it.
 
@@ -32,6 +34,7 @@ The companies that push through these barriers are pulling ahead measurably. Del
 The economics are becoming inescapable. As AI tool capabilities improve and traditional automation maintenance costs climb, the calculus will tip — not because CIOs are convinced by demonstrations but because the cost of standing still exceeds the cost of moving. The companies shipping AI-tested software today are building institutional muscle that late adopters will struggle to replicate. The chasm is real, but it has an expiry date — and the companies still standing on the wrong side when it closes will discover that catching up costs far more than keeping pace.
 
 ---
+published: false
 
 ## References
 
