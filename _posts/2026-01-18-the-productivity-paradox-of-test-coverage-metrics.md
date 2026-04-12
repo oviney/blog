@@ -1,4 +1,5 @@
 ---
+published: false
 layout: post
 title: "Coverage Obsession: The Metric That Ate Quality Engineering"
 date: 2026-04-05
@@ -8,6 +9,7 @@ image: /assets/images/test-coverage-paradox.png
 image_alt: "Cold infographic showing a coverage meter pegged at 100% while a cartoon bug slips through an unchecked gap, technical diagram style in slate grey and white"
 summary: "Test coverage has become the most gamed metric in software engineering — empirically uncorrelated with fault detection, yet mandated by managers who mistake activity for quality."
 ---
+published: false
 
 Google's testing infrastructure processes over four billion test executions per day across a codebase exceeding two billion lines. The company enforces no universal coverage target. Not 80%, not 90%, and certainly not 100%. Instead, Google's engineering productivity team recommends that teams pursue "useful coverage" — tests that have historically detected real defects — and explicitly warns against treating coverage percentages as quality proxies. When the company with the most sophisticated testing infrastructure on Earth declines to mandate a coverage floor, it is worth asking what everyone else thinks they know that Google does not.
 
@@ -40,6 +42,7 @@ Coverage persists as a target because it fills a communication vacuum. Executive
 The engineering leaders who successfully retire coverage mandates reframe quality in business terms: defects reaching customers, revenue lost to incidents, engineering hours burned on rework. These metrics are harder to game precisely because they measure outcomes rather than activity. The coverage number will continue to appear on dashboards for years. But its authority is eroding, test by meaningless test, as the companies that take quality seriously learn to measure what matters instead of what is easy.
 
 ---
+published: false
 
 ## References
 

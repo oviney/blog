@@ -1,4 +1,5 @@
 ---
+published: false
 layout: post
 title: "Manual QA's Last Stand: The Machines Have Already Won"
 date: 2026-04-05
@@ -8,6 +9,7 @@ image: /assets/images/the-end-of-manual-qa.png
 image_alt: "Dramatic duotone illustration of a lone human tester at a desk surrounded by advancing robotic assembly lines, film noir lighting in deep teal and amber"
 summary: "Manual testing is not declining gradually — it is being economically exterminated by AI tools that 89% of enterprises are piloting, even as only 15% have deployed them at scale."
 ---
+published: false
 
 In a Perforce industry survey published in 2025, 75% of respondents identified AI-driven testing as a pivotal component of their strategy. Only 16% had actually adopted it. That 59-point chasm between intention and execution is the defining feature of quality engineering in 2026 — and it is closing fast, in one direction only. The World Quality Report 2025-26, published by Capgemini and Sogeti, found that 89% of organisations are now piloting or deploying generative-AI-augmented QE workflows, with 37% already in production. Manual QA, as a standalone profession, is being squeezed between a technology that works and an industry that has finally decided to use it.
 
@@ -38,6 +40,7 @@ Manual QA is not dying because it was bad. For decades it was the only reliable 
 The remaining holdouts face a compounding disadvantage. Every quarter that a competitor runs AI-assisted regression suites while a rival's manual testers click through the same screens, the gap in release velocity and defect economics widens. The companies that thrive will be those that redeploy human intelligence where it genuinely outperforms machines: understanding user intent, questioning ambiguous requirements, designing quality into architecture rather than inspecting it after the fact, and — critically — supervising the AI tools that are doing the inspecting. The rest will discover that nostalgia for manual processes is an expensive indulgence in a market that stopped subsidising it the moment the machines learned to explore.
 
 ---
+published: false
 
 ## References
 

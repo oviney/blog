@@ -1,4 +1,5 @@
 ---
+published: false
 layout: post
 title: "The Concealed Price Tag of Test Automation"
 date: 2026-04-06
@@ -8,6 +9,7 @@ image: /assets/images/testing-tax-shifted-costs.png
 image_alt: "Cold technical blueprint of automation machinery with price-tag labels attached to every component and subsystem, engineering schematic style in white lines on deep navy"
 summary: "Delving into the overlooked financial and operational burdens that undermine test automation’s touted efficiencies."
 ---
+published: false
 
 The promise of test automation promises to whisk software releases along at breakneck speed with minimal errors. Yet, beneath this gleaming veneer lies a tangle of hidden costs that organisations seldom reckon with until budgets balloon and deadlines slip. A sober reckoning reveals that test automation is often a far more expensive and complicated beast than conventional wisdom admits.
 

@@ -1,4 +1,5 @@
 ---
+published: false
 layout: post
 title: "AI's Coding Demo: Dazzling on Stage, Mediocre at the Desk"
 date: 2026-04-05
@@ -8,6 +9,7 @@ image: /assets/images/ai-software-development-reality.png
 image_alt: "Two-panel illustration: left panel shows a dazzling neon-lit stage demo of AI coding; right panel reveals a dimly lit office with confused developers and error messages"
 summary: "AI coding tools make experienced developers 19% slower according to METR, while Cursor's $29 billion valuation suggests the market has priced in a revolution that the evidence hasn't delivered."
 ---
+published: false
 
 METR, a non-profit AI safety research lab, tracked 16 experienced open-source developers completing 246 real-world coding tasks on mature repositories averaging over one million lines of code. Developers using AI tools took 19% longer than those working without them. Before the study, participants predicted AI would make them 24% faster. Even after experiencing the actual slowdown, they estimated AI had improved their productivity by 20%. The perception gap is so wide that METR noted a significant increase in developers declining to participate because they refused to work without AI — a tool they measurably cannot use productively on complex codebases, but believe they cannot work without.
 
@@ -38,6 +40,7 @@ The most honest assessment came from Satya Nadella in a January 2025 earnings ca
 The companies extracting genuine value are those that deploy AI where it works, measure its actual impact with the same rigour they apply to any engineering investment, and resist the temptation to mistake faster typing for faster shipping. By 2027, the most productive engineering teams will not be those with the most AI tooling. They will be those that learned, earliest, which suggestions to refuse.
 
 ---
+published: false
 
 ## References
 
