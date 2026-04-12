@@ -80,12 +80,17 @@ fi
 
 # ---------------------------------------------------------------------------
 # Rule 3: .github/skills/ or .github/instructions/ governance surfaces
+# Skip if PR is a deliberate governance update (label: governance-update)
 # ---------------------------------------------------------------------------
-GOVERNANCE_CHANGES=$(echo "$CHANGED_FILES" | grep -E '^\.github/(skills|instructions)/' || true)
-if [ -n "$GOVERNANCE_CHANGES" ]; then
-  echo "VIOLATION [governance-surface]: The following governance files were modified — these require a dedicated issue:"
-  echo "$GOVERNANCE_CHANGES" | sed 's/^/  - /'
-  VIOLATIONS=$((VIOLATIONS + 1))
+if echo "${PR_LABELS:-}" | grep -q 'governance-update'; then
+  echo "check-pr-scope: governance-update label present — skipping rule 3."
+else
+  GOVERNANCE_CHANGES=$(echo "$CHANGED_FILES" | grep -E '^\.github/(skills|instructions)/' || true)
+  if [ -n "$GOVERNANCE_CHANGES" ]; then
+    echo "VIOLATION [governance-surface]: The following governance files were modified — these require a dedicated issue:"
+    echo "$GOVERNANCE_CHANGES" | sed 's/^/  - /'
+    VIOLATIONS=$((VIOLATIONS + 1))
+  fi
 fi
 
 # ---------------------------------------------------------------------------
