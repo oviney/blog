@@ -101,6 +101,29 @@ for post in $POSTS; do
       echo "❌  $rel — image path does not exist: '$image_val'"
       ERRORS=$((ERRORS + 1))
       post_errors=$((post_errors + 1))
+    else
+      # Check image is not a stub (must be at least 100×100 px)
+      if command -v python3 &>/dev/null; then
+        dim_check=$(python3 - "$image_abs" <<'PYEOF'
+import sys
+try:
+    from PIL import Image
+    with Image.open(sys.argv[1]) as img:
+        w, h = img.size
+        if w < 100 or h < 100:
+            print(f"STUB:{w}x{h}")
+except ImportError:
+    pass  # Pillow not available — skip dimension check
+except Exception:
+    pass
+PYEOF
+)
+        if [[ "$dim_check" == STUB:* ]]; then
+          echo "❌  $rel — featured image is a stub (${dim_check#STUB:}): '$image_val'"
+          ERRORS=$((ERRORS + 1))
+          post_errors=$((post_errors + 1))
+        fi
+      fi
     fi
   fi
 
