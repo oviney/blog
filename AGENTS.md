@@ -127,6 +127,37 @@ The following files require human review and must **never** be modified by any a
 
 ---
 
+## Skill Invocation — Lifecycle Mapping
+
+Each task maps to a development phase. Find your phase, invoke the corresponding skill.
+
+```
+Task arrives
+    │
+    ├── Bug / incident / production issue? ────→ github-issues-workflow
+    ├── Content / post / SEO? ─────────────────→ editorial
+    ├── Design / CSS / layout? ────────────────→ economist-theme
+    ├── Tests / CI / QA? ──────────────────────→ jekyll-qa
+    ├── Jekyll build / Liquid templates? ──────→ jekyll-development
+    ├── Git / branch / PR / commit? ───────────→ git-operations
+    ├── Sprint planning / backlog? ────────────→ planning
+    └── Code review? ──────────────────────────→ code-review
+```
+
+| Phase | What you're doing | Skill |
+|-------|------------------|-------|
+| **REPORT** | Bug, incident, feature request | `github-issues-workflow` |
+| **PLAN** | Sprint planning, task breakdown | `planning` |
+| **BUILD** | Jekyll, SCSS, Liquid, layouts | `jekyll-development` + `economist-theme` |
+| **WRITE** | Blog posts, drafts, SEO | `editorial` |
+| **TEST** | Playwright, pa11y, Lighthouse, CI | `jekyll-qa` |
+| **REVIEW** | PR review, code quality check | `code-review` |
+| **SHIP** | Commit, push, open PR, deploy | `git-operations` |
+
+**Meta-skill:** `.github/skills/using-agent-skills/SKILL.md` — read this when unsure which skill applies.
+
+---
+
 ## Architectural Decisions
 
 See [`decisions.md`](decisions.md) for a log of architectural decisions that span agent sessions.
