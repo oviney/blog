@@ -3,7 +3,7 @@ layout: post
 title: "Manual QA's Last Stand: The Machines Have Already Won"
 date: 2026-04-05
 author: "Ouray Viney"
-categories: ["Quality Engineering"]
+categories: ["quality-engineering"]
 image: /assets/images/the-end-of-manual-qa.png
 image_alt: "Dramatic duotone illustration of a lone human tester at a desk surrounded by advancing robotic assembly lines, film noir lighting in deep teal and amber"
 description: "89% of enterprises are piloting AI in QA, yet only 16% have adopted it. The 59-point gap is closing fast — and manual QA's economics have collapsed."

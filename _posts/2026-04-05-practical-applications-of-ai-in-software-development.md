@@ -3,7 +3,7 @@ layout: post
 title: "The coder's crutch: AI-assisted development's hidden costs"
 date: 2026-04-05
 author: "Ouray Viney"
-categories: ["Software Engineering"]
+categories: ["software-engineering"]
 image: /assets/images/ai-coders-crutch.png
 image_alt: "Stark black-and-white editorial cartoon of a developer leaning on a giant crutch shaped like a glowing microchip, symbolising AI dependency"
 description: "AI tools like Copilot now write 46% of code on GitHub. Developers ship faster—but understand less, creating compounding technical debt."

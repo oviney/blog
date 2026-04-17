@@ -3,7 +3,7 @@ layout: post
 title: "Platform Engineering's Adoption Crisis: Why Potential Goes Unrealised"
 date: 2026-04-12
 author: "Ouray Viney"
-categories: ["Software Engineering"]
+categories: ["software-engineering"]
 description: "Most platform engineering initiatives stall before delivering value. Here is why cultural inertia, poor tooling, and misaligned expectations derail the promise."
 tags: [platform-engineering, developer-experience, devops, adoption]
 image: /assets/images/platform-engineering-adoption-crisis.png

@@ -3,7 +3,7 @@ layout: post
 title: "Test automation's hidden ledger: costs nobody budgets"
 date: 2026-04-04
 author: "Ouray Viney"
-categories: ["Test Automation"]
+categories: ["test-automation"]
 image: /assets/images/automation-hidden-ledger.png
 image_alt: "Close-up editorial photomontage of an oversized accountant's ledger where red-ink automation costs sprawl beyond the margins onto the surrounding desk"
 description: "Test automation now consumes 42% of QA budgets—up from 31% in 2020. The rise isn't from expanded coverage; it's from the cost of keeping automation alive."

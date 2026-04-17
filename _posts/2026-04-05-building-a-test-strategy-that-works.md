@@ -3,7 +3,7 @@ layout: post
 title: "The test strategy trap: why quality plans fail"
 date: 2026-04-05
 author: "Ouray Viney"
-categories: ["Quality Engineering"]
+categories: ["quality-engineering"]
 image: /assets/images/test-strategy-trap.png
 image_alt: "Cold technical blueprint of a test pyramid collapsing under its own weight, rendered in blueprint drafting style with crisp white lines on navy blue"
 description: "88% of organisations have a documented test strategy. Only 23% believe it works. An examination of why quality plans fail before the first test runs."

@@ -3,7 +3,7 @@ layout: post
 title: "Self-healing tests: the promise that keeps breaking"
 date: 2026-01-02
 author: "Ouray Viney"
-categories: ["Test Automation"]
+categories: ["test-automation"]
 image: /assets/images/self-healing-broken-promise.png
 image_alt: "High-contrast photorealistic close-up of a cracked mechanical arm attempting to reassemble itself mid-fracture, industrial photography with stark studio lighting"
 description: "Vendors promise 80% reductions in test maintenance. Independent data tells a different story: only 30% of teams achieve meaningful autonomy."
