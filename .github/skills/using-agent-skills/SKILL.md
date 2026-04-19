@@ -7,27 +7,40 @@ description: Discovers and invokes agent skills for viney.ca blog. Use when star
 
 ## Overview
 
-This blog uses a skill-driven execution model. Each skill encodes the workflow a senior engineer follows for a specific type of task. This meta-skill helps you discover and apply the right skill for your current task.
+For direct/local agent work in this repo, use the upstream `agent-skills`
+lifecycle as the execution backbone. Blog-specific skills still matter, but they
+are augmentations layered onto the lifecycle rather than replacements for it.
+This meta-skill helps you choose the callable local lifecycle skill first, then
+add any repo-specific skill that sharpens execution for viney.ca.
+
+The upstream-aligned guides live in `.github/skills/spec-driven-development/`,
+`.github/skills/incremental-implementation/`, and similar folders. Treat those as
+reference docs backing the callable local skills such as `spec`, `build`, `test`,
+`review`, and `ship`.
+
+Issue-assigned cloud agents still follow `.github/copilot-instructions.md`.
 
 ## Skill Discovery Flowchart
 
-When a task arrives, identify the phase and apply the corresponding skill:
+When a task arrives, identify the lifecycle phase first, then add any blog-specific augmentation:
 
 ```
 Task arrives
     │
-    ├── Reporting a bug or incident? ──────────→ github-issues-workflow
-    ├── Writing or editing content? ───────────→ editorial
-    │   └── New post, draft, SEO fix, etc.
-    ├── Design / CSS / layout change? ─────────→ economist-theme
-    │   └── SCSS, responsive, typography, UI
-    ├── Test / CI / QA work? ──────────────────→ jekyll-qa
-    │   └── Playwright, pa11y, Lighthouse, CI
-    ├── Jekyll build / dev server / Liquid? ───→ jekyll-development
-    ├── Git workflow / branching / PR? ────────→ git-operations
-    ├── Planning a sprint or backlog? ─────────→ planning
-    ├── Code review? ──────────────────────────→ code-review
-    └── Cross-cutting / infra / general? ──────→ github-issues-workflow + best judgement
+    ├── Need to define what to build? ─────────→ spec
+    │   └── If it should be tracked in GitHub → github-issues-workflow
+    ├── Have a spec and need tasks? ───────────→ planning-and-task-breakdown
+    ├── Ready to implement? ───────────────────→ build
+    │   ├── Jekyll/Liquid/content work? ──────→ jekyll-development
+    │   ├── Design / CSS / layout change? ───→ economist-theme
+    │   └── Writing / SEO / editorial work? ─→ editorial
+    ├── Need proof or regression coverage? ───→ test
+    │   └── Repo QA / Playwright / CI? ───────→ jekyll-qa
+    ├── Reviewing a change? ──────────────────→ review
+    │   └── Repo review conventions? ─────────→ code-review
+    ├── Branching / committing / PR flow? ────→ ship
+    │   └── Repo PR/ship conventions? ───────→ git-operations
+    └── Issue triage / bug lifecycle? ────────→ github-issues-workflow
 ```
 
 ## Agent Personas
@@ -58,7 +71,7 @@ ASSUMPTIONS I'M MAKING:
 
 ### 2. Skill Before Code
 
-Never implement directly if a skill applies. Invoke the skill first, follow its process, then implement.
+Never implement directly if a skill applies. Invoke the lifecycle skill first, follow its process, then add any repo-specific skill needed for this blog.
 
 ### 3. Protected Files — Never Touch
 
@@ -74,21 +87,21 @@ bundle exec jekyll build   # must pass
 
 | Phase | What you're doing | Skill |
 |-------|------------------|-------|
-| **REPORT** | Bug found, incident, production issue | `github-issues-workflow` |
-| **PLAN** | Sprint planning, backlog grooming | `planning` |
-| **BUILD** | Jekyll templates, SCSS, Liquid | `jekyll-development` + `economist-theme` |
-| **WRITE** | Blog posts, drafts, SEO | `editorial` |
-| **TEST** | Playwright, CI, a11y, performance | `jekyll-qa` |
-| **REVIEW** | PR review, code quality | `code-review` |
-| **SHIP** | Branch, commit, PR, deploy | `git-operations` |
+| **DEFINE** | Clarify what to build | `spec` |
+| **PLAN** | Break approved work into tasks | `planning-and-task-breakdown` |
+| **BUILD** | Implement in slices | `build` + relevant blog skill |
+| **VERIFY** | Prove it works | `test` + `jekyll-qa` when repo validation is needed |
+| **REVIEW** | Review code quality | `review` + `code-review` |
+| **SHIP** | Branch, commit, PR, deploy | `ship` + `git-operations` |
+| **REPORT** | File or triage repo issues | `github-issues-workflow` |
 
 ## Slash Commands
 
 | Command | Activates |
 |---------|-----------|
-| `/spec` | `github-issues-workflow` — file a well-formed issue |
-| `/plan` | `planning` — break work into tasks |
-| `/build` | `jekyll-development` — start dev server and build |
-| `/test` | `jekyll-qa` — run test suite |
-| `/review` | `code-review` — review a PR or diff |
-| `/ship` | `git-operations` — commit, push, open PR |
+| `/spec` | `spec` first, then `github-issues-workflow` when the outcome should be a tracked GitHub issue |
+| `/plan` | `planning-and-task-breakdown` |
+| `/build` | `build` + the relevant blog domain skill |
+| `/test` | `test` + `jekyll-qa` |
+| `/review` | `review` + `code-review` |
+| `/ship` | `ship` + `git-operations` |

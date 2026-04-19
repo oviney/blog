@@ -5,22 +5,46 @@ directly in this repository. Read this first, then follow the references below.
 
 ---
 
-## Agent Dispatch (the right way to work)
+## Lifecycle Backbone
 
-**Do not do the work yourself.** Route it:
+For direct/local agent sessions in this repo, use the upstream `agent-skills`
+lifecycle as the working backbone. In this runtime, agents should invoke the
+callable local lifecycle skills first, then use the upstream-aligned reference
+guides in `.github/skills/` plus any viney.ca blog skill needed for repo-specific
+constraints and conventions.
 
-1. File or identify a GitHub issue
-2. Apply the correct agent label (see table below)
-3. Assign to `@copilot`: `gh issue edit <N> --repo oviney/blog --add-assignee "@copilot"`
-4. The cloud agent picks it up, reads the skill file, opens a PR
-5. Admin-merge the PR: `gh pr merge <N> --repo oviney/blog --admin --squash --delete-branch`
+Issue-assigned cloud agents still follow the label-first routing in
+`.github/copilot-instructions.md`; this file describes the lifecycle backbone for
+local/direct execution and command-driven workflows in the repo.
 
-**Reserve direct work for:** triage, orchestration, admin-merges, pipeline debugging,
-and tasks that cannot be expressed as a GitHub issue.
+| Phase | Default backbone | Add local augmentation when needed |
+|-------|------------------|------------------------------------|
+| **DEFINE** | `spec` | `github-issues-workflow` if the work should become a tracked GitHub issue |
+| **PLAN** | `planning-and-task-breakdown` | Add repo planning context only when issue-specific ordering or decomposition needs local guidance |
+| **BUILD** | `build` | `jekyll-development`, `economist-theme`, or `editorial` depending on domain |
+| **VERIFY** | `test` | `jekyll-qa` for Playwright/CI/a11y/perf validation |
+| **REVIEW** | `review` | `code-review` for repo-specific review standards |
+| **SHIP** | `ship` | `git-operations` for repo PR and deployment workflow |
 
 ---
 
-## Agent Label → Skill File
+## GitHub Issue Routing
+
+For non-trivial work on oviney/blog, prefer tracked GitHub Issues:
+
+1. Define the work with `/spec`
+2. Create or identify the GitHub issue
+3. Apply the correct agent label (see table below)
+4. Assign to `@copilot`: `gh issue edit <N> --repo oviney/blog --add-assignee "@copilot"`
+5. The cloud agent picks it up, reads the relevant skill files, and opens a PR
+6. Admin-merge when appropriate: `gh pr merge <N> --repo oviney/blog --admin --squash --delete-branch`
+
+**Reserve direct work for:** triage, orchestration, admin-merges, pipeline debugging,
+and tasks that cannot be expressed cleanly as a GitHub issue.
+
+---
+
+## Local Agent Labels
 
 | Label | Skill File | Domain |
 |-------|-----------|--------|
@@ -28,10 +52,10 @@ and tasks that cannot be expressed as a GitHub issue.
 | `agent:qa-gatekeeper` | `.github/skills/jekyll-qa/SKILL.md` | Tests, CI, bugs, accessibility |
 | `agent:editorial-chief` | `.github/skills/editorial/SKILL.md` | Posts, drafts, SEO, writing |
 | `agent:editorial-manager` | `.github/skills/editorial/SKILL.md` | Alias for editorial-chief |
-| *(no label)* | Use best judgement | Docs, refactoring, misc |
+| *(no label)* | `.github/skills/general/SKILL.md` | Docs, refactoring, misc |
 
-Full roster and scope rules: [`AGENTS.md`](AGENTS.md)  
-Full routing rules and hard boundaries: [`.github/copilot-instructions.md`](.github/copilot-instructions.md)
+Full roster and repo conventions: [`AGENTS.md`](AGENTS.md)  
+Routing rules and hard boundaries: [`.github/copilot-instructions.md`](.github/copilot-instructions.md)
 
 ---
 
@@ -54,8 +78,8 @@ Full routing rules and hard boundaries: [`.github/copilot-instructions.md`](.git
 ## Key Commands
 
 ```bash
-bundle exec jekyll build          # validate (run before every PR)
-bundle exec jekyll serve --port 4000  # local dev server
-npx playwright test               # run all tests (requires dev server)
-bash scripts/validate-posts.sh --all  # validate front matter on all posts
+bundle exec jekyll build               # validate (run before every PR)
+bundle exec jekyll serve --port 4000   # local dev server
+npx playwright test                    # run all tests (requires dev server)
+bash scripts/validate-posts.sh --all   # validate front matter on all posts
 ```

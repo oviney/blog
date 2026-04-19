@@ -1,19 +1,24 @@
 ---
-description: Start spec-driven development — write a well-formed GitHub Issue before writing code
+description: Define what to build — create an approved spec (and issue when needed) before writing code
 ---
 
-Invoke the github-issues-workflow skill.
+Invoke the `spec` skill first. It follows the upstream-aligned
+`spec-driven-development` guide.
 
-Begin by understanding what the user wants to build or fix. Ask clarifying questions about:
-1. Is this a bug or a feature?
-2. Which agent domain does it fall under? (design/content/QA/general)
-3. What are the acceptance criteria?
-4. What priority — P1/P2/P3?
+Begin by understanding what the user wants to build or fix. Produce a structured
+spec that covers:
+1. Objective and desired behaviour
+2. Commands and validation steps
+3. Project structure and likely files
+4. Testing strategy
+5. Boundaries, assumptions, and success criteria
 
-Then create a well-formed GitHub Issue on oviney/blog with:
-- Descriptive title using feat:/fix:/chore: prefix
+If the work should be tracked in oviney/blog, invoke the
+`github-issues-workflow` skill after the spec is clear and turn the approved spec
+into a well-formed GitHub Issue with:
+- Descriptive title using `feat:`, `fix:`, or `chore:`
 - Clear problem statement and desired behaviour
 - Testable acceptance criteria checklist
-- Correct labels (bug/enhancement + agent label + priority)
+- Correct labels (type + agent label + priority)
 
-Confirm with the user before filing the issue.
+Do not write code until the spec (and issue, if applicable) is approved.

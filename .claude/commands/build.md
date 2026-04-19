@@ -2,12 +2,14 @@
 description: Build incrementally — start the Jekyll dev server and implement one slice at a time
 ---
 
-Invoke the jekyll-development skill, then the relevant domain skill (economist-theme, editorial, or jekyll-qa).
+Invoke `build` first. This workflow is backed by the upstream-aligned
+`incremental-implementation` guide, then add the relevant local blog skill:
+`jekyll-development`, `economist-theme`, `editorial`, or `jekyll-qa`.
 
 Follow the incremental implementation pattern:
-1. Start the Jekyll dev server: `bundle exec jekyll serve --config _config_dev.yml`
-2. Implement the smallest possible working slice
-3. Verify visually at http://localhost:4000 before committing
+1. Implement the smallest possible working slice
+2. Start the Jekyll dev server when runtime verification is needed: `bundle exec jekyll serve --config _config_dev.yml`
+3. Verify the slice before committing
 4. Commit with a descriptive message referencing the issue
 5. Move to the next slice
 
