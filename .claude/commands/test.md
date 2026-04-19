@@ -2,7 +2,8 @@
 description: Prove it works — run the full test suite (Playwright, pa11y, Lighthouse, Jekyll build)
 ---
 
-Invoke the jekyll-qa skill.
+Invoke `test` first. This workflow is backed by the upstream-aligned
+`test-driven-development` guide, then use `jekyll-qa` for repo-specific QA workflows.
 
 Run the test suite in this order:
 1. `bundle exec jekyll build` — must pass before anything else
