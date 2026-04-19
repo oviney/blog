@@ -3,7 +3,7 @@ layout: post
 title: "Software's Trillion-Dollar Tax: The Cost Nobody Itemises"
 date: 2026-04-05
 author: "Ouray Viney"
-categories: ["quality-engineering"]
+categories: ["Quality Engineering"]
 image: /assets/images/copq-software-engineering.png
 image_alt: "Cool photorealistic newspaper front page displaying a trillion-dollar bill for software bugs, broadsheet layout with formal serif typography on aged newsprint"
 description: "CISQ estimates poor software quality costs the US $2.41 trillion a year. CrowdStrike's single untested update destroyed $500 million in one afternoon."

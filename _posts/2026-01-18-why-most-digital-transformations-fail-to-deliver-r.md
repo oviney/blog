@@ -3,7 +3,7 @@ layout: post
 title: "Digital transformation's dirty secret: the 70% that never deliver"
 date: 2026-01-18
 author: "Ouray Viney"
-categories: ["software-engineering"]
+categories: ["Software Engineering"]
 image: /assets/images/digital-transformation-secret.png
 image_alt: "Monochrome architectural rendering of a half-built digital bridge crumbling on the far side, rendered with precise pencil-sketch crosshatching in pewter and ivory"
 description: "McKinsey's data shows 70% of digital transformations fail their stated objectives. Why the failure rate persists despite a decade of accumulated wisdom."

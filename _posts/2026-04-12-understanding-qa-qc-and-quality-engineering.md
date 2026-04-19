@@ -3,7 +3,7 @@ layout: post
 title: "The quality confusion tax: when QA, QC and QE blur"
 date: 2026-04-12
 author: "Ouray Viney"
-categories: ["quality-engineering"]
+categories: ["Quality Engineering"]
 tags: [quality-assurance, quality-control, quality-engineering, quality-management]
 image: /assets/images/understanding-qa-qc-quality-engineering.png
 image_alt: "Crisp infographic diagram showing three distinct quality disciplines — QA, QC and QE — converging into a unified quality strategy, rendered in a clean editorial style with navy, grey and red accents"

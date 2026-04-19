@@ -3,7 +3,7 @@ layout: post
 title: "The Golden Path: Platform Engineering's Quiet Revolution"
 date: 2026-04-12
 author: "Ouray Viney"
-categories: ["software-engineering"]
+categories: ["Software Engineering"]
 tags: [platform-engineering, developer-portals, backstage, developer-experience, internal-developer-platform]
 image: /assets/images/platform-engineering-developer-portals.png
 image_alt: "Abstract illustration of interconnected developer tools forming a unified platform"
