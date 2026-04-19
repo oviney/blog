@@ -3,7 +3,7 @@ layout: post
 title: "Coverage Obsession: The Metric That Ate Quality Engineering"
 date: 2026-04-05
 author: "Ouray Viney"
-categories: ["test-automation"]
+categories: ["Test Automation"]
 image: /assets/images/test-coverage-paradox.png
 image_alt: "Cold infographic showing a coverage meter pegged at 100% while a cartoon bug slips through an unchecked gap, technical diagram style in slate grey and white"
 description: "Research shows coverage has low correlation with fault detection after controlling for suite size. Google enforces no coverage target — here is why."
