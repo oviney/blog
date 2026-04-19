@@ -3,7 +3,7 @@ layout: post
 title: "Testing times: why AI conquered QA without improving it"
 date: 2025-12-31
 author: "Ouray Viney"
-categories: ["quality-engineering"]
+categories: ["Quality Engineering"]
 image: /assets/images/testing-times-renovation.png
 image_alt: "Warm sepia editorial illustration of robots holding QA dashboards while human testers observe from the sidelines, vintage newspaper engraving style"
 description: "80% of software teams will use AI testing tools by 2025. Vendors raised $2.3 billion. Yet defect rates remain unchanged. An examination of the gap."
