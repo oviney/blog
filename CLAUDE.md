@@ -42,6 +42,10 @@ For non-trivial work on oviney/blog, prefer tracked GitHub Issues:
 **Reserve direct work for:** triage, orchestration, admin-merges, pipeline debugging,
 and tasks that cannot be expressed cleanly as a GitHub issue.
 
+**Governance-surface reminder:** PRs that intentionally modify `.github/skills/`
+or `.github/instructions/` should carry the `governance-update` label so the repo
+scope guard treats them as deliberate governance work.
+
 ---
 
 ## Local Agent Labels

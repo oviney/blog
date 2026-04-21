@@ -229,6 +229,18 @@ bundle exec jekyll build
 bash scripts/check-pr-scope.sh
 ```
 
+If the PR intentionally changes governance surfaces such as `.github/skills/` or
+`.github/instructions/`, mirror CI locally with:
+
+```bash
+PR_LABELS=governance-update bash scripts/check-pr-scope.sh
+```
+
+Those PRs must also carry the `governance-update` label on GitHub. Add the label
+immediately after opening the PR. If the first workflow run started before the
+label was present, push an empty commit to refresh the PR event payload and rerun
+checks against the labeled PR.
+
 Automate this with git hooks:
 
 ```json
