@@ -1,18 +1,19 @@
 ---
-description: Review before merge — evaluate a PR or diff across correctness, style, security, and accessibility
+description: Review before merge — evaluate a PR or diff across correctness, readability, architecture, security, and performance
 ---
 
-Invoke the code-review skill, then adopt the code-reviewer agent persona from .claude/agents/code-reviewer.md.
+Invoke `review` first. This workflow is backed by the upstream-aligned
+`code-review-and-quality` guide, then add the local `code-review` skill.
 
 For a given PR number or diff:
 1. Fetch the diff: `gh pr diff <N> --repo oviney/blog`
 2. Evaluate across five dimensions:
    - **Correctness** — does it do what the issue requires?
-   - **Style** — SCSS variables only, no hardcoded values, follows economist-theme conventions
+   - **Readability** — are naming, structure, and surrounding patterns easy to follow?
    - **Architecture** — does it follow existing patterns? No scope creep.
    - **Security** — no secrets, no unsafe Liquid, no new unreviewed dependencies
-   - **Accessibility** — WCAG AA contrast, semantic HTML, keyboard navigable
-3. Categorise findings as MUST FIX / SHOULD FIX / CONSIDER
-4. Post review comment on the PR or summarise findings
+   - **Performance** — no obvious regressions in runtime, asset size, or CI cost
+3. Layer in repo-specific checks where relevant (for example SCSS variables, WCAG AA, or agent-scope rules)
+4. Summarise findings using the repo's 5-axis review format
 
 Always check: does `bundle exec jekyll build` pass on the branch?

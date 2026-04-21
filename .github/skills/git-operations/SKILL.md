@@ -91,11 +91,11 @@ git commit -m "feat: implement defect tracking dashboard" -m "- Created GitHub P
 ### 5. Push to Remote
 
 ```bash
-# Push to main branch
-git push origin main
+# Push the current feature branch
+git push -u origin feat/GH-123-short-description
 
-# Push new branch
-git push -u origin feature-branch-name
+# Or push a bugfix branch
+git push -u origin bugfix/GH-456-short-description
 ```
 
 ### 6. Verify Push
@@ -148,8 +148,8 @@ git add .github/skills/ docs/AI_CODING_GUIDELINES.md
 # Commit with descriptive message
 git commit -m "feat: implement Claude Skills persistence architecture"
 
-# Push to remote
-git push origin main
+# Push the feature branch to remote
+git push -u origin feat/GH-123-short-description
 ```
 
 **When to use**: Every code change
@@ -158,14 +158,14 @@ git push origin main
 
 ```bash
 # Create and switch to new branch
-git checkout -b feature/new-feature
+git checkout -b feat/GH-123-new-feature
 
 # Make changes and commit
 git add .
 git commit -m "feat: implement new feature"
 
 # Push branch to remote
-git push -u origin feature/new-feature
+git push -u origin feat/GH-123-new-feature
 
 # Create PR on GitHub, then merge
 ```
