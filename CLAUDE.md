@@ -75,7 +75,7 @@ Routing rules and hard boundaries: [`.github/copilot-instructions.md`](.github/c
 
 ## Protected Files (never modify)
 
-`_config.yml` · `.github/CODEOWNERS` · `.github/copilot-instructions.md` · `Gemfile` · `Gemfile.lock`
+`_config.yml` · `AGENTS.md` · `ARCHITECTURE.md` · `.github/CODEOWNERS` · `.github/copilot-instructions.md` · `Gemfile` · `Gemfile.lock`
 
 ---
 
