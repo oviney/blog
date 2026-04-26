@@ -10,35 +10,43 @@ and engineering leaders.
 
 | Metric | Current | Target | Timeframe |
 |--------|---------|--------|-----------|
-| Published posts | 19 | 30 | End of 2026 |
+| Published posts | 23 | 30 | End of 2026 |
 | Post cadence | Ad-hoc | 2 per month | Ongoing |
 
-**Topic priorities** (current distribution is heavily skewed):
+**Topic priorities** (current distribution is improving, but still uneven):
 
-- **Security** (1 post) — most underrepresented; publish 4–5 new posts
-- **Software Engineering** (2 posts) — grow to 6–8 posts
-- **Test Automation** (1 as primary) — grow to 5–6 posts
-- **Quality Engineering** (15 posts) — well-covered; maintain but don't over-index
+- **Security** (3 posts) — still the thinnest category; make this the next 2-post priority so the archive is less lopsided
+- **Software Engineering** (5 posts) — second priority; add 1–2 strong essays to close the gap with the two testing-heavy categories
+- **Test Automation** (7 posts) — maintain a steady cadence, but avoid letting it crowd out the smaller categories
+- **Quality Engineering** (8 posts) — best-covered topic today; publish selectively when there is a distinct data point or strong contrarian angle
 
 The [economist-agents](https://github.com/oviney/economist-agents) pipeline can
 generate 2–3 drafts per week; the bottleneck is human review, not production.
 
+There is currently **no `_drafts/` backlog** in this repository. New content ideas
+should be prioritised through issues and only opened as drafts when there is a
+clear publication path.
+
 ## Feature Goals
 
-1. **Retire stale drafts** — 7 drafts from 2023 use pre-Economist formatting.
-   Decide per-draft: rewrite with the pipeline, or delete.
-2. **Add an RSS/Atom subscribe prompt** — the feed exists (`/feed.xml`) but is
-   not discoverable from the homepage or post layout.
-3. **Related-posts section** — surface 2–3 related articles at the end of each
-   post to improve engagement and reduce bounce rate.
+1. **Improve topic discovery** — make Security and Software Engineering easier to
+   browse from the homepage, blog index, and archive surfaces so backlog
+   priorities are reflected in reader journeys.
+2. **Tune shipped discovery features** — RSS entry points and related-reading are
+   already live; the next step is optimising placement, copy, and internal
+   linking rather than treating those features as missing.
+3. **Strengthen series planning** — package new posts into short thematic runs
+   (for example, security debt, platform engineering, or AI adoption) so the
+   roadmap produces clusters rather than isolated essays.
 
 ## Tech Debt
 
 1. **Sass `@import` → `@use`/`@forward`** — Dart Sass has deprecated `@import`;
    migrate `_sass/economist-theme.scss` before Dart Sass 3.0 drops support.
    *(Source: `docs/DEVELOPMENT_WORKFLOW.md`)*
-2. **Non-standard categories** — several posts use `"AI Testing"`, which is not
-   in the approved taxonomy (ADR-002). Normalise to the four permitted values.
+2. **Manual content inventory reporting** — published-post counts and category
+   mix are still updated by hand in roadmap documents, which makes drift likely.
+   Add a lightweight way to regenerate these metrics when planning changes land.
 
 ## Out of Scope
 
