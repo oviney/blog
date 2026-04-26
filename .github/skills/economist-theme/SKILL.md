@@ -1,7 +1,7 @@
 ---
 name: economist-theme
 description: 'Design system for The Economist visual style. Use when modifying CSS, SCSS, layouts, responsive design, typography, or UI components.'
-version: 1.1.0
+version: 1.1.1
 triggers:
   - Adding new styles or components
   - Modifying existing SCSS
@@ -346,11 +346,11 @@ assets/images/blog-default.svg
 
 ## Related Files
 
-- [`_sass/economist-theme.scss`](../../_sass/economist-theme.scss) - Main theme file (600+ lines)
-- [`_layouts/default.html`](../../_layouts/default.html) - Base layout
-- [`_layouts/post.html`](../../_layouts/post.html) - Article layout
-- [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md) - Theme implementation history
-- [`README.md`](../../README.md) - Theme overview
+- [`_sass/economist-theme.scss`](../../../_sass/economist-theme.scss) - Main theme file (600+ lines)
+- [`_layouts/default.html`](../../../_layouts/default.html) - Base layout
+- [`_layouts/post.html`](../../../_layouts/post.html) - Article layout
+- [`docs/CURRENT_STATE.md`](../../../docs/CURRENT_STATE.md) - Theme implementation history
+- [`README.md`](../../../README.md) - Theme overview
 
 ## Success Criteria
 
@@ -366,5 +366,6 @@ assets/images/blog-default.svg
 
 ## Version History
 
+- **1.1.1** (2026-04-26): Corrected related-file links for repo-root documentation and theme files
 - **1.1.0** (2026-01-05): Added Economist date format patterns (ordinal suffixes), image fallback strategy, default blog-default.svg asset documentation
 - **1.0.0** (2026-01-05): Initial skill creation from README.md and AI_CODING_GUIDELINES.md

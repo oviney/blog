@@ -152,10 +152,8 @@ author:
 ## Notes
 
 ### Rollback Procedure
-See [MIGRATION_LOG.md](./MIGRATION_LOG.md#rollback-plan) for complete rollback instructions.
+Migration rollback notes were kept in one-off rollout documents and remain available in git history.
 
 ### Documentation
-- **Migration details**: [MIGRATION_LOG.md](./MIGRATION_LOG.md)
-- **GitHub Actions setup**: [GITHUB_ACTIONS_SETUP.md](./GITHUB_ACTIONS_SETUP.md)
-- **Development workflow**: [DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md)
-- **Theme evaluation**: [THEME_EVALUATION.md](./THEME_EVALUATION.md)
+- **Development workflow**: [docs/DEVELOPMENT_WORKFLOW.md](./docs/DEVELOPMENT_WORKFLOW.md)
+- **Historical rollout notes**: archived in git history

@@ -337,9 +337,9 @@ gh issue list --repo oviney/blog --state closed --milestone "Sprint 1"
 ## Integration with Existing Workflow
 
 **This persona complements:**
-- [Creative Director](../skills/economist-theme/SKILL.md) - Executes design tasks
-- [QA Gatekeeper](../skills/jekyll-qa/SKILL.md) - Verifies quality
-- [Editorial Chief](../skills/editorial/SKILL.md) - Manages content
+- [Creative Director](../../.github/skills/economist-theme/SKILL.md) - Executes design tasks
+- [QA Gatekeeper](../../.github/skills/jekyll-qa/SKILL.md) - Verifies quality
+- [Editorial Chief](../../.github/skills/editorial/SKILL.md) - Manages content
 
 **GitHub Integration:**
 - All issues stored at: https://github.com/oviney/blog/issues
@@ -347,8 +347,8 @@ gh issue list --repo oviney/blog --state closed --milestone "Sprint 1"
 - Labels for routing: `agent:*`, priority: `P0-P3`, type: `bug`/`enhancement`
 
 **File dependencies:**
-- [.github/skills/github-issues-workflow/SKILL.md](../skills/github-issues-workflow/SKILL.md) - Issue workflow
-- [docs/SPRINT_X_RETROSPECTIVE.md](../SPRINT_1_RETROSPECTIVE.md) - Sprint tracking
+- [.github/skills/github-issues-workflow/SKILL.md](../../.github/skills/github-issues-workflow/SKILL.md) - Issue workflow
+- `docs/SPRINT_X_RETROSPECTIVE.md` - Sprint tracking
 - [CHANGELOG.md](../../CHANGELOG.md) - Release history
 
 ## Success Criteria

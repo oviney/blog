@@ -1,7 +1,7 @@
 ---
 name: skill-name
 description: 'What this skill does. Use when TRIGGER1, TRIGGER2, or TRIGGER3.'
-version: 1.0.0
+version: 1.0.1
 triggers:
   - When to use this skill
   - Another trigger condition
@@ -57,8 +57,8 @@ Provide background information about why this skill exists and what problem it s
 
 ## Related Files
 
-- [`file/path.ext`](../../file/path.ext) - Description
-- [`another/file.md`](../../another/file.md) - Description
+- `path/to/file.ext` - Example related file path
+- `docs/example.md` - Example documentation path
 - External links if relevant
 
 ## Success Criteria
@@ -69,4 +69,5 @@ Provide background information about why this skill exists and what problem it s
 
 ## Version History
 
+- **1.0.1** (2026-04-26): Replaced broken placeholder links with non-link examples
 - **1.0.0** (YYYY-MM-DD): Initial skill creation

@@ -30,7 +30,7 @@ Once strategy becomes theatre, automation is usually where the script turns expe
 
 The pattern is predictable. A strategy mandates 80% automation coverage. The team automates the easy tests first — login flows, simple CRUD operations and happy-path scenarios. These reach 40% coverage quickly, so progress charts look healthy. Then the team reaches integration tests, complex data setups and dependencies on third-party services. Progress stalls. The remaining 40% costs far more than the first 40%, and nobody budgeted for the asymmetry.
 
-Qyrus's 2026 Guide to Software Testing Cost Estimation describes why. Organisations that forecast automation costs from early pilot results underestimated total programme costs by an average factor of 2.8. Pilot systems tend to have cleaner APIs, narrower workflows and more senior attention than the estate that follows. The hidden costs of maintaining those automation assets compound the problem further — as explored in [Test automation's hidden ledger: the costs nobody budgets for](/2026/04/04/the-real-cost-of-test-automation-balancing-speed-and-sustai/).
+Qyrus's 2026 Guide to Software Testing Cost Estimation describes why. Organisations that forecast automation costs from early pilot results underestimated total programme costs by an average factor of 2.8. Pilot systems tend to have cleaner APIs, narrower workflows and more senior attention than the estate that follows. The hidden costs of maintaining those automation assets compound the problem further — as explored in [Test automation's hidden ledger: the costs nobody budgets for](https://www.viney.ca/2026/04/04/the-real-cost-of-test-automation-balancing-speed-and-sustai/).
 
 ## What the effective minority does differently
 
