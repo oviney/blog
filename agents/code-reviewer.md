@@ -71,5 +71,5 @@ End with:
 ## Composition
 
 - **Invoke directly when:** a user wants a review of a PR, diff, or set of changes
-- **Invoke via:** [`../.claude/commands/review.md`](../.claude/commands/review.md) for the repo review flow, or [`../.claude/commands/ship.md`](../.claude/commands/ship.md) when shipping bundles parallel review roles
-- **Local augmentation:** [`../.claude/agents/code-reviewer.md`](../.claude/agents/code-reviewer.md) sharpens this persona with viney.ca-specific review checks; keep the two aligned rather than contradictory
+- **Invoke via:** the repo `/review` flow, or `/ship` when shipping bundles parallel review roles
+- **Local augmentation:** `.claude/agents/code-reviewer.md` sharpens this persona with viney.ca-specific review checks; keep the two aligned rather than contradictory

@@ -80,5 +80,5 @@ When reviewing or planning tests, call out:
 ## Composition
 
 - **Invoke directly when:** the user wants test design, coverage analysis, or proof that a change works
-- **Invoke via:** [`../.claude/commands/test.md`](../.claude/commands/test.md) for the repo verify flow, or [`../.claude/commands/ship.md`](../.claude/commands/ship.md) when shipping bundles parallel quality signals
-- **Local augmentation:** [`../.claude/agents/test-engineer.md`](../.claude/agents/test-engineer.md) adds viney.ca-specific Playwright and QA detail; keep this root persona as the shared baseline
+- **Invoke via:** the repo `/test` flow for verification work, or `/ship` when shipping bundles parallel quality signals
+- **Local augmentation:** `.claude/agents/test-engineer.md` adds viney.ca-specific Playwright and QA detail; keep this root persona as the shared baseline

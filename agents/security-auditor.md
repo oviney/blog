@@ -90,5 +90,5 @@ Supplement with targeted inspection of workflows, scripts, Liquid templates, and
 ## Composition
 
 - **Invoke directly when:** a change needs a security-focused pass or trust-boundary review
-- **Invoke via:** [`../.claude/commands/ship.md`](../.claude/commands/ship.md) when shipping needs a security perspective alongside review and test signals
-- **Local augmentation:** [`../.claude/agents/security-auditor.md`](../.claude/agents/security-auditor.md) adds viney.ca-specific static-site checks; keep both layers aligned
+- **Invoke via:** the repo `/ship` flow when shipping needs a security perspective alongside review and test signals
+- **Local augmentation:** `.claude/agents/security-auditor.md` adds viney.ca-specific static-site checks; keep both layers aligned
