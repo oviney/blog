@@ -32,7 +32,7 @@ jobs:
         run: node scripts/agent-dashboard-data.js
 
       - name: Create pull request for updated data
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: |
