@@ -12,11 +12,11 @@ description: "Cisco blocks 7 million malicious DNS requests every minute. How th
 ![DNS security impact: phishing reduction and the encrypted DNS blind spot](/assets/charts/understanding-opendns-cybersecurity-protection.svg)
 *Source: Forrester Research, 2023; Gartner Market Guide for DNS Security, 2023*
 
-Cisco processes 620 billion DNS requests daily through its Umbrella platform, formerly OpenDNS. Each query is a chance to stop an attack before it starts — and the company claims to block 7 million malicious requests every minute. In an era when sophisticated threats slip past firewalls and endpoint agents with depressing regularity, the humble Domain Name System has become an unlikely sentinel.
+Cyber-attacks often begin with a question so ordinary that most executives never notice it: where should this click, this email link or this piece of malware connect next? Cisco says Umbrella processes 620 billion DNS requests a day and blocks 7 million malicious ones every minute. That makes the Domain Name System less a background utility than one of cybersecurity's earliest, cheapest and most scalable control points for any enterprise.
 
 ## The DNS advantage
 
-The logic is disarmingly simple. Every internet connection begins with a DNS lookup — a device asking "where is this website?" By intercepting that question, a security provider can refuse to answer when the destination is known to harbour malware, phishing pages, or botnet command infrastructure. No software agent is required on the device. No signature database needs updating on every laptop. The protection blankets everything on the network, from an engineer's workstation to a neglected IoT thermostat that will never receive a security patch.
+The appeal of DNS security lies in its timing. Every internet connection begins with a DNS lookup — a device asking "where is this website?" By intercepting that question, a security provider can refuse to answer when the destination is known to harbour malware, phishing pages, or botnet command infrastructure. No software agent is required on the device. No signature database needs updating on every laptop. The protection blankets everything on the network, from an engineer's workstation to a neglected IoT thermostat that will never receive a security patch.
 
 This architectural elegance explains why Gartner's 2023 Market Guide for DNS Security placed DNS-layer filtering among the fastest-growing segments of enterprise security, projecting 25% compound annual growth through 2027. Forrester's corresponding analysis found that organisations deploying DNS-based security reduced successful phishing incidents by 85% compared with those relying solely on email filtering and endpoint detection.
 
@@ -36,9 +36,7 @@ Microsoft's own enterprise security division has taken a different approach, emb
 
 The choice between network-centric and endpoint-centric DNS security will define the next phase of this market. Organisations that treat DNS as a checkbox — install Umbrella, declare victory — will discover that the shield has gaps they never tested. Those that integrate DNS telemetry into their broader security operations, correlating query patterns with authentication anomalies and endpoint behaviour, will build something genuinely resilient.
 
-The invisible shield works. The question is whether organisations will invest enough to keep it from becoming invisible for the wrong reasons.
-
-DNS filtering is not a substitute for a complete security posture. It is one layer — albeit an unusually cost-effective one — in a broader architecture that must include endpoint detection, identity management, and user education. Organisations that deploy DNS security in isolation, without integrating it into a unified security operations centre, will find themselves chasing alerts from one layer while adversaries exploit gaps in another. The 2023 Cisco Cybersecurity Readiness Index found that organisations with integrated security platforms detected breaches 74 days faster than those with fragmented tools. Speed of detection, in cybersecurity, is often the difference between a recoverable incident and a catastrophic one. DNS visibility, feeding into that integrated platform, is a signal source that most organisations are still failing to use fully.
+DNS filtering is not a substitute for a complete security posture; it is an unusually cost-effective layer within one. The 2023 Cisco Cybersecurity Readiness Index found that organisations with integrated security platforms detected breaches 74 days faster than those with fragmented tools. That sharpens the strategic point: DNS visibility matters most when it feeds a broader operating picture alongside endpoint signals, identity controls, and user education. The invisible shield still works. The real risk is treating it as invisible infrastructure rather than as a front-line sensor that needs investment, testing, and integration.
 
 ## References
 
