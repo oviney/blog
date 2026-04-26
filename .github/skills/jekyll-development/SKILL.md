@@ -1,7 +1,7 @@
 ---
 name: jekyll-development
 description: 'Jekyll local development workflow. Use when starting the dev server, building the site, debugging Liquid templates, or troubleshooting Ruby/Bundler issues.'
-version: 1.1.0
+version: 1.1.1
 triggers:
   - Starting Jekyll server
   - Making content changes (posts, pages)
@@ -308,11 +308,11 @@ paginate_path: "/blog/page:num/"
 
 ## Related Files
 
-- [`docs/DEVELOPMENT_WORKFLOW.md`](../DEVELOPMENT_WORKFLOW.md) - Full workflow documentation
-- [`docs/conventions/testing.md`](../conventions/testing.md) - Testing conventions
-- [`.git/hooks/pre-commit`](../../.git/hooks/pre-commit) - Pre-commit validation script
-- [`.github/workflows/jekyll.yml`](../../.github/workflows/jekyll.yml) - CI/CD pipeline
-- [`_config_dev.yml`](../../_config_dev.yml) - Development config overrides
+- [`docs/DEVELOPMENT_WORKFLOW.md`](../../../docs/DEVELOPMENT_WORKFLOW.md) - Full workflow documentation
+- [`docs/conventions/testing.md`](../../../docs/conventions/testing.md) - Testing conventions
+- `.git/hooks/pre-commit` - Pre-commit validation script
+- [`.github/workflows/jekyll.yml`](../../workflows/jekyll.yml) - CI/CD pipeline
+- [`_config_dev.yml`](../../../_config_dev.yml) - Development config overrides
 
 ## Success Criteria
 
@@ -325,4 +325,5 @@ paginate_path: "/blog/page:num/"
 
 ## Version History
 
+- **1.1.1** (2026-04-26): Fixed related-file links and converted the unversioned hook path to plain text
 - **1.0.0** (2026-01-05): Initial skill creation from DEVELOPMENT_WORKFLOW.md

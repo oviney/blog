@@ -1,7 +1,7 @@
 ---
 name: git-operations
 description: 'Git workflow conventions for this repo. Use when committing, branching, creating PRs, resolving merge conflicts, or pushing changes.'
-version: 1.1.0
+version: 1.1.1
 triggers:
   - Committing code changes
   - Creating feature branches
@@ -17,8 +17,8 @@ triggers:
 
 This repository uses Git for version control with a main branch deployment strategy. Changes are committed locally, pushed to GitHub, and automatically deployed via GitHub Actions.
 
-**Repository**: oviney/blog  
-**Main Branch**: `main`  
+**Repository**: oviney/blog
+**Main Branch**: `main`
 **Remote**: https://github.com/oviney/blog
 
 **Commit Convention**: Use conventional commit format:
@@ -107,28 +107,28 @@ git push -u origin bugfix/GH-456-short-description
 ## Common Pitfalls
 
 ### Pitfall 1: Committing Without Reviewing Changes
-**Problem**: Accidentally commit unwanted files or sensitive data  
-**Solution**: Always run `git status` and `git diff` before committing  
+**Problem**: Accidentally commit unwanted files or sensitive data
+**Solution**: Always run `git status` and `git diff` before committing
 **Prevention**: Use `git add` for specific files, not `git add .` blindly
 
 ### Pitfall 2: Vague Commit Messages
-**Problem**: Messages like "fix stuff" or "updates" that don't explain what changed  
-**Solution**: Write clear, descriptive messages following conventional commit format  
+**Problem**: Messages like "fix stuff" or "updates" that don't explain what changed
+**Solution**: Write clear, descriptive messages following conventional commit format
 **Example**: "feat: add priority labels to bug tracker" instead of "updates"
 
 ### Pitfall 3: Forgetting to Pull Before Push
-**Problem**: Push rejected because remote has changes you don't have  
-**Solution**: Pull first if working with others: `git pull origin main`  
+**Problem**: Push rejected because remote has changes you don't have
+**Solution**: Pull first if working with others: `git pull origin main`
 **Note**: For solo projects, this is less common
 
 ### Pitfall 4: Pushing Directly to Main Without Testing
-**Problem**: Broken code deployed to production  
-**Solution**: Pre-commit hook validates builds locally before commit  
+**Problem**: Broken code deployed to production
+**Solution**: Pre-commit hook validates builds locally before commit
 **Reminder**: Never use `--no-verify` to bypass checks
 
 ### Pitfall 5: Large Binary Files
-**Problem**: Accidentally committing large images, videos, or generated files  
-**Solution**: Check file sizes before committing. Use [`.gitignore`](../../.gitignore) for build artifacts  
+**Problem**: Accidentally committing large images, videos, or generated files
+**Solution**: Check file sizes before committing. Use [`.gitignore`](../../../.gitignore) for build artifacts
 **Example**: Don't commit `_site/`, `node_modules/`, `.DS_Store`
 
 ## Code Snippets/Patterns
@@ -332,10 +332,10 @@ git stash list
 
 ## Related Files
 
-- [`.gitignore`](../../.gitignore) - Files excluded from git
-- [`.git/hooks/pre-commit`](../../.git/hooks/pre-commit) - Pre-commit validation script
-- [`docs/DEVELOPMENT_WORKFLOW.md`](../DEVELOPMENT_WORKFLOW.md) - Full development workflow
-- [`.github/workflows/jekyll.yml`](../../.github/workflows/jekyll.yml) - CI/CD pipeline
+- [`.gitignore`](../../../.gitignore) - Files excluded from git
+- `.git/hooks/pre-commit` - Pre-commit validation script
+- [`docs/DEVELOPMENT_WORKFLOW.md`](../../../docs/DEVELOPMENT_WORKFLOW.md) - Full development workflow
+- [`.github/workflows/jekyll.yml`](../../workflows/jekyll.yml) - CI/CD pipeline
 
 ## Success Criteria
 
@@ -349,5 +349,6 @@ git stash list
 
 ## Version History
 
+- **1.1.1** (2026-04-26): Fixed related-file links and converted the unversioned hook path to plain text
 - **1.1.0** (2026-04-12): Add PR body template, rebase vs merge guidance, branch cleanup, zero CI checks recovery
 - **1.0.0** (2026-01-05): Initial git operations skill creation

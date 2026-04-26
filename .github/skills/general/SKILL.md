@@ -1,7 +1,7 @@
 ---
 name: general
 description: 'General-purpose agent for cross-cutting tasks. Use when working on documentation, refactoring, shared config, AGENTS.md, decisions.md, or anything that does not belong to a specialised agent.'
-version: 1.0.0
+version: 1.0.1
 triggers:
   - No agent label on the issue
   - Cross-cutting or repo-wide change
@@ -125,10 +125,10 @@ grep -r "Read issue description" .github/ AGENTS.md
 
 ## Related Files
 
-- [`AGENTS.md`](../../AGENTS.md) — agent roster and cross-agent conventions
-- [`CLAUDE.md`](../../CLAUDE.md) — repo-level AI agent context
-- [`.github/copilot-instructions.md`](../copilot-instructions.md) — agent routing rules
-- [`decisions.md`](../../decisions.md) — architectural decision log
+- [`AGENTS.md`](../../../AGENTS.md) — agent roster and cross-agent conventions
+- [`CLAUDE.md`](../../../CLAUDE.md) — repo-level AI agent context
+- [`.github/copilot-instructions.md`](../../copilot-instructions.md) — agent routing rules
+- [`decisions.md`](../../../decisions.md) — architectural decision log
 - [`.github/skills/_template/SKILL.md`](./../_template/SKILL.md) — skill file template
 
 ## Success Criteria
@@ -143,4 +143,5 @@ grep -r "Read issue description" .github/ AGENTS.md
 
 ## Version History
 
+- **1.0.1** (2026-04-26): Corrected related-file links to repo-root docs and instructions
 - **1.0.0** (2026-04-08): Initial skill creation — scope, protected files, quality standards, branching convention

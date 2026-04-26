@@ -1,7 +1,7 @@
 ---
 name: github-issues-workflow
 description: 'Bug lifecycle from report to resolution. Use when triaging bugs, creating issue templates, managing labels, or following the defect workflow.'
-version: 1.2.0
+version: 1.2.1
 triggers:
   - User reports a bug
   - QA finds a defect
@@ -70,7 +70,7 @@ gh issue list --repo oviney/blog --state open --label P1
 gh issue list --repo oviney/blog --label "agent:creative-director"
 ```
 
-**See also:** [Flow Orchestrator Agent](../../agents/sprint-orchestrator.md) for backlog management and planning.
+**See also:** [Flow Orchestrator Agent](../../../docs/agents/sprint-orchestrator.md) for backlog management and planning.
 
 ### 1. User Reports Bug (GitHub Issue)
 
@@ -728,8 +728,8 @@ gh label list --repo oviney/blog | grep "P1:high"
 - [`.github/skills/economist-theme/SKILL.md`](../economist-theme/SKILL.md) - Creative Director skill
 - [`.github/skills/jekyll-qa/SKILL.md`](../jekyll-qa/SKILL.md) - QA Gatekeeper skill  
 - [`.github/skills/git-operations/SKILL.md`](../git-operations/SKILL.md) - Git workflow
-- [`.github/workflows/jekyll.yml`](../../.github/workflows/jekyll.yml) - CI/CD pipeline
-- [`docs/DEVELOPMENT_WORKFLOW.md`](../DEVELOPMENT_WORKFLOW.md) - Overall workflow
+- [`.github/workflows/jekyll.yml`](../../workflows/jekyll.yml) - CI/CD pipeline
+- [`docs/DEVELOPMENT_WORKFLOW.md`](../../../docs/DEVELOPMENT_WORKFLOW.md) - Overall workflow
 
 ## Success Criteria
 
@@ -858,5 +858,6 @@ DONE. Total time: ~15 minutes.
 
 ## Version History
 
+- **1.2.1** (2026-04-26): Corrected flow-orchestrator and workflow documentation links
 - **1.1.0** (2026-01-05): Added clarifying questions step (Step 3), GitHub labels setup section, updated QA skill reference to jekyll-qa
 - **1.0.0** (2026-01-05): Initial creation - Established GitHub Issues as single source of truth for bug tracking

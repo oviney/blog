@@ -9,7 +9,7 @@ image_alt: "Stark black-and-white bar chart infographic placing vendor-promised 
 description: "AI testing vendors promise 80% reductions in maintenance effort. IEEE research across 400 teams finds 62% see no meaningful savings."
 ---
 
-![AI test generation addresses only locator changes (35% of failures); 65% of maintenance causes remain untouched](/assets/charts/why-ai-test-generation-tools-overpromise-on-maintenance-savi.svg)
+![AI test generation addresses only locator changes, which account for 35% of failures; 65% of maintenance causes remain untouched](/assets/charts/why-ai-test-generation-tools-overpromise-on-maintenance-savi.svg)
 *Source: Capgemini World Quality Report, 2025; IEEE Empirical Study on AI Test Generation, 2025 (n=400 teams)*
 
 Functionize, an AI testing platform, claims its tools reduce test maintenance effort by 80%. Applitools advertises "visual AI" that eliminates manual test updates. Mabl promises tests that "adapt automatically" to application changes. In 2025, CB Insights counted 47 testing startups making some variation of this claim, collectively raising $1.2 billion in venture funding. Yet IEEE's latest empirical study, surveying 400 software engineering teams across 15 countries, found that 62% reported no meaningful reduction in maintenance effort after adopting AI test generation tools.
@@ -36,7 +36,7 @@ The curation overhead is itself a form of maintenance — one that vendors rarel
 
 Forrester's 2025 study projected that by 2027, the most effective organisations would use AI test generation for an initial coverage scaffold while relying on human engineers for assertion quality, business logic validation, and ongoing curation. The projected maintenance reduction in that hybrid model was 30-35% — roughly half the vendor promise, but a genuinely significant improvement when sustained across large test portfolios.
 
-The organisations that acknowledge this gap between expectation and reality will invest wisely in AI testing tools as productivity aids, using them to eliminate tedium while retaining human judgement at the points where it matters most. Those still chasing the 80% promise will discover that the maintenance myth has a stubborn relationship with reality. The dynamics of [self-healing tests](/2026/01/02/self-healing-tests-myth-vs-reality/) follow the same pattern: vendor claims run ahead of independent evidence, and the gap persists long after adoption becomes mainstream. The tools are worth buying. The claims are not worth believing.
+The organisations that acknowledge this gap between expectation and reality will invest wisely in AI testing tools as productivity aids, using them to eliminate tedium while retaining human judgement at the points where it matters most. Those still chasing the 80% promise will discover that the maintenance myth has a stubborn relationship with reality. The dynamics of [self-healing tests](https://www.viney.ca/2026/01/02/self-healing-tests-myth-vs-reality/) follow the same pattern: vendor claims run ahead of independent evidence, and the gap persists long after adoption becomes mainstream. The tools are worth buying. The claims are not worth believing.
 
 ## References
 

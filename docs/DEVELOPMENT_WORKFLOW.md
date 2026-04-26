@@ -191,9 +191,9 @@ chmod +x .git/hooks/pre-commit
 
 ## Related Documentation
 
-- [Pre-commit Hook](.git/hooks/pre-commit) - Validation script
-- [GitHub Actions](.github/workflows/jekyll.yml) - CI/CD pipeline
-- [Blog QA Agent](../economist-agents/docs/CHANGELOG.md) - Self-learning validation
+- `.git/hooks/pre-commit` - Validation script
+- [GitHub Actions](../.github/workflows/jekyll.yml) - CI/CD pipeline
+- Blog QA agent notes live in the sibling `economist-agents` repository
 
 ---
 

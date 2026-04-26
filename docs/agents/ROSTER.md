@@ -5,35 +5,35 @@ This file lists all available agent personas in this workspace and how to activa
 ## Available Agents
 
 ### 1. Creative Director
-**Domain:** Design / CSS / UI / Visual  
-**Skill File:** [`.github/skills/economist-theme/SKILL.md`](../skills/economist-theme/SKILL.md)  
-**GitHub Label:** `agent:creative-director`  
+**Domain:** Design / CSS / UI / Visual
+**Skill File:** [`.github/skills/economist-theme/SKILL.md`](../../.github/skills/economist-theme/SKILL.md)
+**GitHub Label:** `agent:creative-director`
 **Activation:**
 ```
 Creative Director, fix issue #33
 ```
 
 ### 2. QA Gatekeeper
-**Domain:** Testing / CI / Quality / Bugs  
-**Skill File:** [`.github/skills/jekyll-qa/SKILL.md`](../skills/jekyll-qa/SKILL.md)  
-**GitHub Label:** `agent:qa-gatekeeper`  
+**Domain:** Testing / CI / Quality / Bugs
+**Skill File:** [`.github/skills/jekyll-qa/SKILL.md`](../../.github/skills/jekyll-qa/SKILL.md)
+**GitHub Label:** `agent:qa-gatekeeper`
 **Activation:**
 ```
 QA Gatekeeper, review PR #35
 ```
 
 ### 3. Editorial Chief
-**Domain:** Content / Writing / SEO / Posts  
-**Skill File:** [`.github/skills/editorial/SKILL.md`](../skills/editorial/SKILL.md)  
-**GitHub Label:** `agent:editorial-chief`  
+**Domain:** Content / Writing / SEO / Posts
+**Skill File:** [`.github/skills/editorial/SKILL.md`](../../.github/skills/editorial/SKILL.md)
+**GitHub Label:** `agent:editorial-chief`
 **Activation:**
 ```
 Editorial Chief, write a post about testing
 ```
 
 ### 4. Flow Orchestrator
-**Domain:** Project Management / GitHub Issues / Status / Planning  
-**Skill File:** [`docs/agents/sprint-orchestrator.md`](sprint-orchestrator.md)  
+**Domain:** Project Management / GitHub Issues / Status / Planning
+**Skill File:** [`docs/agents/sprint-orchestrator.md`](sprint-orchestrator.md)
 **Activation:**
 ```
 Flow Orchestrator, what's next?

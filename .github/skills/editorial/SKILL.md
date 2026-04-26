@@ -1,7 +1,7 @@
 ---
 name: editorial
 description: 'Editorial standards for blog content. Use when writing posts, editing articles, managing SEO, updating documentation, or reviewing content quality.'
-version: 1.1.0
+version: 1.1.1
 triggers:
   - Write or edit a blog post
   - SEO improvements needed
@@ -103,7 +103,7 @@ A **mandatory** table listing every statistic, data point, percentage, and quote
 
 | # | Claim | Type | Source in post | Status |
 |---|-------|------|----------------|--------|
-| 1 | "73% of teams report improved velocity" | Stat | Para 2 | ✅ VERIFIED — links to [World Quality Report 2025](url) |
+| 1 | "73% of teams report improved velocity" | Stat | Para 2 | ✅ VERIFIED — links to [World Quality Report 2025](https://www.opentext.com/en/media/report/world-quality-report-17th-edition) |
 | 2 | "velocity improved 2x" | Stat | Para 4 | ❌ UNVERIFIED — no source provided |
 | 3 | "Netflix said quality is everyone's job" | Quote | Para 6 | ❌ UNVERIFIED — paraphrase, not verbatim |
 | 4 | "$4.45 million average breach cost" | Stat | Para 3 | ⚠️ NEEDS-LINK — source cited but hyperlink missing |
@@ -190,5 +190,6 @@ Check that:
 
 ## Version History
 
+- **1.1.1** (2026-04-26): Replaced placeholder verification link with a valid external example
 - **1.1.0** (2026-04-11): Added mandatory two-section editorial review format with Verification Report, blocking rule for unverified claims, and `[Suggested rewrite]` convention
 - **1.0.0** (2026-04-04): Initial skill creation — editorial standards, blog post conventions, documentation guidelines

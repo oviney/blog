@@ -15,7 +15,7 @@ DORA's 2025 State of AI-Assisted Software Development report, based on data from
 
 GitHub reported in its 2025 Octoverse analysis that Copilot now generates over 55% of code on its platform — up from 46% a year earlier. Stack Overflow's 2025 Developer Survey found 85% adoption among professional developers. The tools are ubiquitous. The question is whether ubiquity correlates with quality.
 
-![AI coding tools: the real productivity picture — bar chart comparing code throughput (+25%), task completion time (−19%), code churn (+43%), and failed deployments (+14%)](/assets/charts/practical-applications-of-ai-in-software-development.svg)
+![AI coding tools: the real productivity picture — bar chart comparing code throughput up 25%, task completion time down 19%, code churn up 43%, and failed deployments up 14%](/assets/charts/practical-applications-of-ai-in-software-development.svg)
 *Source: DORA, 2025; METR, 2025; GitClear, 2025*
 
 DORA's research suggests it does not. Teams using AI coding tools heavily showed higher deployment frequency but also experienced 14% more failed deployments and 8% longer recovery times. The code shipped faster. It also broke more often. GitClear's longitudinal analysis of 250 million lines of code through 2025 reinforced this finding: code churn — the percentage rewritten within two weeks — rose 43% in AI-heavy repositories compared with pre-AI baselines.
