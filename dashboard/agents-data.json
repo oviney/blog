@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-04-10T02:02:16.271Z",
+  "generatedAt": "2026-04-26T11:03:19.677Z",
   "kpis": {
-    "agentPRsMerged30d": 0,
+    "agentPRsMerged30d": 6,
     "evalPassRate": 33,
     "contentAvgScore": null,
-    "openBacklog": 0,
-    "openPRCount": 0,
+    "openBacklog": 5,
+    "openPRCount": 2,
     "evalCount": 3,
     "remediationQueueDepth": 8,
     "remediationThreshold": 85
@@ -68,8 +68,242 @@
     }
   ],
   "content": null,
-  "recentPRs": [],
-  "openIssuesByLabel": {},
+  "recentPRs": [
+    {
+      "number": 852,
+      "title": "test(GH-846): add Playwright ARIA smoke coverage",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T11:01:20Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 851,
+      "title": "docs: refresh roadmap metrics and priorities",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T11:00:56Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 842,
+      "title": "fix(GH-801): route dashboard updates through PRs",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T01:31:03Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 841,
+      "title": "fix: remediate LHCI audit baseline",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T01:18:40Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 838,
+      "title": "docs(GH-817): add root agents and mapping layer",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T00:44:46Z",
+      "labels": [
+        "enhancement",
+        "P2:medium",
+        "governance-update"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 836,
+      "title": "docs(GH-817): add verification and review guides",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T00:30:40Z",
+      "labels": [
+        "enhancement",
+        "P2:medium",
+        "needs-human-review",
+        "governance-update"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 837,
+      "title": "revert: remove platform-engineering-third-era post (pipeline-published with multiple defects)",
+      "author": "oviney",
+      "mergedAt": "2026-04-25T00:22:54Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 833,
+      "title": "docs(GH-817): align lifecycle foundation docs",
+      "author": "oviney",
+      "mergedAt": "2026-04-21T02:19:02Z",
+      "labels": [
+        "enhancement",
+        "P2:medium",
+        "governance-update"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 828,
+      "title": "fix(GH-824): normalize remaining test automation categories",
+      "author": "oviney",
+      "mergedAt": "2026-04-19T23:13:11Z",
+      "labels": [
+        "bug",
+        "P2:medium",
+        "agent:editorial-manager"
+      ],
+      "isAgent": true
+    },
+    {
+      "number": 826,
+      "title": "fix(GH-824): normalize quality and software categories",
+      "author": "oviney",
+      "mergedAt": "2026-04-19T18:39:24Z",
+      "labels": [
+        "bug",
+        "P2:medium",
+        "agent:editorial-manager",
+        "needs-human-review"
+      ],
+      "isAgent": true
+    },
+    {
+      "number": 827,
+      "title": "fix(GH-824): normalize test automation categories",
+      "author": "oviney",
+      "mergedAt": "2026-04-19T12:17:12Z",
+      "labels": [
+        "bug",
+        "P2:medium",
+        "agent:editorial-manager"
+      ],
+      "isAgent": true
+    },
+    {
+      "number": 819,
+      "title": "fix(GH-818): pin basic-ftp to 5.3.0",
+      "author": "oviney",
+      "mergedAt": "2026-04-17T00:59:52Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 815,
+      "title": "feat(GH-812): add code-reviewer, test-engineer, security-auditor agent personas",
+      "author": "oviney",
+      "mergedAt": "2026-04-14T13:23:10Z",
+      "labels": [
+        "enhancement"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 814,
+      "title": "feat(GH-810): add .claude/commands/ slash commands",
+      "author": "oviney",
+      "mergedAt": "2026-04-14T13:23:06Z",
+      "labels": [
+        "enhancement"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 813,
+      "title": "feat(GH-811): add hooks, session-start, and using-agent-skills meta-skill",
+      "author": "oviney",
+      "mergedAt": "2026-04-14T13:23:03Z",
+      "labels": [
+        "enhancement"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 809,
+      "title": "fix: regenerate featured image — understanding-qa-qc-quality-engineering",
+      "author": "oviney",
+      "mergedAt": "2026-04-14T12:58:50Z",
+      "labels": [
+        "bug",
+        "P2:medium",
+        "type:content"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 807,
+      "title": "fix(GH-804): validate image dimensions in validate-posts.sh",
+      "author": "oviney",
+      "mergedAt": "2026-04-13T12:54:44Z",
+      "labels": [
+        "bug",
+        "P2:medium",
+        "agent:qa-gatekeeper",
+        "type:ci-cd"
+      ],
+      "isAgent": true
+    },
+    {
+      "number": 791,
+      "title": "📝 New Article: 2026-04-12-the-hidden-economics-of-security-debt",
+      "author": "oviney",
+      "mergedAt": "2026-04-12T20:43:28Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 789,
+      "title": "editorial: rewrite 2024 QA/QC/QE draft to Economist style",
+      "author": "Copilot",
+      "mergedAt": "2026-04-12T20:44:16Z",
+      "labels": [],
+      "isAgent": true
+    },
+    {
+      "number": 788,
+      "title": "feat: add excerpt to related-posts cards, require ≥2 posts",
+      "author": "Copilot",
+      "mergedAt": "2026-04-12T20:44:14Z",
+      "labels": [],
+      "isAgent": true
+    }
+  ],
+  "openIssuesByLabel": {
+    "agent:creative-director": [],
+    "agent:qa-gatekeeper": [
+      {
+        "number": 847,
+        "title": "Add WCAG 2.2 focus and target-size checks to QA suite",
+        "age": 0
+      }
+    ],
+    "agent:editorial-chief": [
+      {
+        "number": 849,
+        "title": "Improve: Digital transformation dirty secret for Software Engineering quality and SEO",
+        "age": 0
+      },
+      {
+        "number": 848,
+        "title": "Improve: The Financial Toll of Security Debt for stronger Security coverage",
+        "age": 0
+      },
+      {
+        "number": 798,
+        "title": "[Editorial] Improve: \"The test strategy trap: why quality plans fail\" (score: 83 → 95)",
+        "age": 13
+      },
+      {
+        "number": 797,
+        "title": "[Editorial] Improve: \"The invisible shield: DNS as cybersecurity's first line\" (score: 83 → 95)",
+        "age": 13
+      }
+    ],
+    "agent:editorial-manager": []
+  },
   "remediationQueue": [
     {
       "file": "_posts/2023-08-09-building-a-test-strategy-that-works.md",
@@ -325,6 +559,6 @@
     "billingCycleEnd": "2026-04-30",
     "seatCostPerMonth": 19,
     "apiAvailable": false,
-    "note": "Offline mode — skipping Copilot API calls."
+    "note": "Copilot billing API unavailable. Add a PAT with manage_billing:copilot or read:org scope as secret COPILOT_BILLING_PAT to enable live seat data."
   }
 }
