@@ -174,6 +174,32 @@ test.describe('@content @navigation Homepage Redesign @REQ-CONTENT-01 @REQ-VISUA
     expect(currentUrl).not.toBe('http://localhost:4000/');
   });
 
+  test('Homepage main landmark matches ARIA smoke snapshot', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.locator('main').first()).toMatchAriaSnapshot(`
+      - main:
+        - heading /Latest post:.+/ [level=1]
+        - region "Focus Areas":
+          - heading "Focus Areas" [level=2]
+        - region "From the Blog":
+          - heading "From the Blog" [level=2]
+          - article
+          - article
+          - article
+        - region "About the author":
+          - heading [level=2]
+          - link "About me"
+          - link /LinkedIn/
+          - link /GitHub/
+          - link "RSS Feed"
+        - complementary:
+          - heading "Stay informed" [level=3]
+          - link "Subscribe via RSS →"
+    `);
+  });
+
 });
 
 test.describe('@visual @navigation Homepage Responsive Layout @REQ-VISUAL-01 @REQ-CONTENT-01', () => {
