@@ -13,9 +13,20 @@ callable local lifecycle skills first, then use the upstream-aligned reference
 guides in `.github/skills/` plus any viney.ca blog skill needed for repo-specific
 constraints and conventions.
 
-Issue-assigned cloud agents still follow the label-first routing in
+Issue-assigned **Copilot cloud agents** still follow the label-first routing in
 `.github/copilot-instructions.md`; this file describes the lifecycle backbone for
 local/direct execution and command-driven workflows in the repo.
+
+## Repo Instruction Layers
+
+Use the repo's instruction sources as complementary layers:
+
+1. `.github/copilot-instructions.md` — repo-wide instructions and hard boundaries for issue-assigned Copilot cloud agent work
+2. `.github/instructions/` — path instructions that add file- or directory-specific rules when a touched path matches
+3. `AGENTS.md` — shared memory for personas, scope boundaries, ownership, and handoffs; it adds repo context but does not override repo or path instructions
+4. `CLAUDE.md` — local/direct execution guidance for lifecycle skill order and command-layer workflows
+
+Runtime features such as custom agents or MCP/tool integrations can vary by execution environment. Use them when available, but do not imply every runtime exposes the same surface area.
 
 ## Persona Layers
 
@@ -46,7 +57,7 @@ For non-trivial work on oviney/blog, prefer tracked GitHub Issues:
 2. Create or identify the GitHub issue
 3. Apply the correct agent label (see table below)
 4. Assign to `@copilot`: `gh issue edit <N> --repo oviney/blog --add-assignee "@copilot"`
-5. The cloud agent picks it up, reads the relevant skill files, and opens a PR
+5. The Copilot cloud agent picks it up, reads the relevant skill files, and opens a PR
 6. Admin-merge when appropriate: `gh pr merge <N> --repo oviney/blog --admin --squash --delete-branch`
 
 **Reserve direct work for:** triage, orchestration, admin-merges, pipeline debugging,
