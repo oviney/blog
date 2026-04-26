@@ -4,10 +4,18 @@ For direct/local agent work in this repo, the upstream `agent-skills` lifecycle
 is the working backbone, with viney.ca blog skills layered on top where
 repo-specific guidance is helpful.
 
-Issue-assigned cloud agents still follow `.github/copilot-instructions.md`.
-The upstream-aligned files in this directory are reference guides; the callable
-skills in this environment are the local lifecycle skills such as `spec`,
-`planning-and-task-breakdown`, `build`, `test`, `review`, and `ship`.
+Issue-assigned **Copilot cloud agents** still follow repo instructions in
+`.github/copilot-instructions.md`, then any matching path instructions in
+`.github/instructions/`.
+
+Use `AGENTS.md` for persona boundaries, ownership, and handoffs, and use
+`CLAUDE.md` for the local/direct lifecycle backbone. The upstream-aligned files in
+this directory are reference guides; the callable skills in this environment are the
+local lifecycle skills such as `spec`, `planning-and-task-breakdown`, `build`,
+`test`, `review`, and `ship`.
+
+Custom agents and MCP/tool integrations are runtime-dependent. Treat them as
+optional execution aids when available, not as guarantees across every runtime.
 
 ## Lifecycle Backbone
 

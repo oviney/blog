@@ -18,7 +18,17 @@ The upstream-aligned guides live in `.github/skills/spec-driven-development/`,
 reference docs backing the callable local skills such as `spec`, `build`, `test`,
 `review`, and `ship`.
 
-Issue-assigned cloud agents still follow `.github/copilot-instructions.md`.
+For issue-assigned **Copilot cloud agent** work, stay inside this repo-authored
+instruction envelope:
+
+1. Start with repo instructions in `.github/copilot-instructions.md`
+2. Apply any matching path instructions from `.github/instructions/`
+3. Use `AGENTS.md` and the relevant skill files as supporting repo context
+
+This meta-skill helps choose the right lifecycle skill inside that envelope; it does
+not replace the repo or path instructions. Runtime features such as custom agents or
+MCP/tool integrations are useful when available, but they are runtime-dependent and
+should not be documented as guaranteed everywhere.
 
 ## Skill Discovery Flowchart
 
