@@ -239,6 +239,29 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
     }
   });
 
+  test('Representative post article matches ARIA smoke snapshot', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    const representativePostLink = page.locator('.hero-post-title a, .hero-post-cta').first();
+    await expect(representativePostLink).toBeVisible();
+    await representativePostLink.click();
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.locator('main article').first()).toMatchAriaSnapshot(`
+      - article:
+        - link /.+/
+        - heading /.+/ [level=1]
+        - button "Copy link to this article"
+        - figure "ILLUSTRATION"
+        - time
+        - navigation "Table of contents"
+        - heading "References" [level=2]
+        - list
+        - heading "Explore more" [level=3]
+    `);
+  });
+
   test('Main navigation accessibility and keyboard support', async ({ page }) => {
     await page.goto('/');
 
@@ -451,6 +474,34 @@ test.describe('@navigation Mobile Navigation Specific Tests @REQ-NAV-01 @REQ-NAV
     await toggle.click();
     await expect(nav).toBeHidden();
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('Mobile navigation landmark matches ARIA smoke snapshot', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    const toggle = page.getByRole('button', { name: /open navigation menu/i });
+    await expect(toggle).toBeVisible();
+    await toggle.click();
+
+    await expect(page.locator('#site-navigation')).toMatchAriaSnapshot(`
+      - navigation:
+        - list:
+          - listitem:
+            - link "Home"
+          - listitem:
+            - link "Blog"
+          - listitem:
+            - link "Software Engineering"
+          - listitem:
+            - link "Test Automation"
+          - listitem:
+            - link "About"
+          - listitem:
+            - link "Search"
+          - listitem:
+            - link "RSS"
+    `);
   });
 
   test('Nav link tap closes the hamburger menu', async ({ page }) => {
