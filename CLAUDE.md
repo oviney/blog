@@ -17,6 +17,16 @@ Issue-assigned cloud agents still follow the label-first routing in
 `.github/copilot-instructions.md`; this file describes the lifecycle backbone for
 local/direct execution and command-driven workflows in the repo.
 
+## Persona Layers
+
+Use the repo's agent documentation in three complementary layers:
+
+- `agents/` — upstream-aligned root personas for reusable review, test, and security roles. Treat these as the shared baseline for cross-runtime orchestration and future upstream sync.
+- `.claude/agents/` — Claude-local variants of those personas, carrying older repo-specific prompt detail for the command layer until each persona is reconciled with the root baseline.
+- `.github/skills/` — lifecycle and repo support skills that shape *when* and *how* work happens.
+
+When both `agents/` and `.claude/agents/` define the same persona, treat the root file as the portable baseline and use the `.claude/` file as a runtime-specific layer. Align them when that persona is actively being edited rather than assuming they already match line-for-line.
+
 | Phase | Default backbone | Add local augmentation when needed |
 |-------|------------------|------------------------------------|
 | **DEFINE** | `spec` | `github-issues-workflow` if the work should become a tracked GitHub issue |
@@ -83,7 +93,7 @@ Routing rules and hard boundaries: [`.github/copilot-instructions.md`](.github/c
 
 ```bash
 bundle exec jekyll build               # validate (run before every PR)
-bundle exec jekyll serve --port 4000   # local dev server
+bundle exec jekyll serve --config _config_dev.yml   # local dev server
 npx playwright test                    # run all tests (requires dev server)
 bash scripts/validate-posts.sh --all   # validate front matter on all posts
 ```
