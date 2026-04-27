@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-04-26T11:03:19.677Z",
+  "generatedAt": "2026-04-27T10:15:55.076Z",
   "kpis": {
-    "agentPRsMerged30d": 6,
+    "agentPRsMerged30d": 4,
     "evalPassRate": 33,
     "contentAvgScore": null,
-    "openBacklog": 5,
-    "openPRCount": 2,
+    "openBacklog": 0,
+    "openPRCount": 5,
     "evalCount": 3,
     "remediationQueueDepth": 8,
     "remediationThreshold": 85
@@ -69,6 +69,48 @@
   ],
   "content": null,
   "recentPRs": [
+    {
+      "number": 858,
+      "title": "docs: clarify Copilot cloud agent instruction flow",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T12:01:57Z",
+      "labels": [
+        "governance-update"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 857,
+      "title": "[Editorial] Improve test strategy trap post",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T12:01:55Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 856,
+      "title": "[Editorial] Improve DNS security post narrative",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T12:01:52Z",
+      "labels": [],
+      "isAgent": true
+    },
+    {
+      "number": 855,
+      "title": "docs: improve digital transformation post SEO",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T12:01:48Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 853,
+      "title": "📊 dashboard: refresh agent observability data",
+      "author": "github-actions[bot]",
+      "mergedAt": "2026-04-26T11:27:34Z",
+      "labels": [],
+      "isAgent": false
+    },
     {
       "number": 852,
       "title": "test(GH-846): add Playwright ARIA smoke coverage",
@@ -220,88 +262,12 @@
         "enhancement"
       ],
       "isAgent": false
-    },
-    {
-      "number": 809,
-      "title": "fix: regenerate featured image — understanding-qa-qc-quality-engineering",
-      "author": "oviney",
-      "mergedAt": "2026-04-14T12:58:50Z",
-      "labels": [
-        "bug",
-        "P2:medium",
-        "type:content"
-      ],
-      "isAgent": false
-    },
-    {
-      "number": 807,
-      "title": "fix(GH-804): validate image dimensions in validate-posts.sh",
-      "author": "oviney",
-      "mergedAt": "2026-04-13T12:54:44Z",
-      "labels": [
-        "bug",
-        "P2:medium",
-        "agent:qa-gatekeeper",
-        "type:ci-cd"
-      ],
-      "isAgent": true
-    },
-    {
-      "number": 791,
-      "title": "📝 New Article: 2026-04-12-the-hidden-economics-of-security-debt",
-      "author": "oviney",
-      "mergedAt": "2026-04-12T20:43:28Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 789,
-      "title": "editorial: rewrite 2024 QA/QC/QE draft to Economist style",
-      "author": "Copilot",
-      "mergedAt": "2026-04-12T20:44:16Z",
-      "labels": [],
-      "isAgent": true
-    },
-    {
-      "number": 788,
-      "title": "feat: add excerpt to related-posts cards, require ≥2 posts",
-      "author": "Copilot",
-      "mergedAt": "2026-04-12T20:44:14Z",
-      "labels": [],
-      "isAgent": true
     }
   ],
   "openIssuesByLabel": {
     "agent:creative-director": [],
-    "agent:qa-gatekeeper": [
-      {
-        "number": 847,
-        "title": "Add WCAG 2.2 focus and target-size checks to QA suite",
-        "age": 0
-      }
-    ],
-    "agent:editorial-chief": [
-      {
-        "number": 849,
-        "title": "Improve: Digital transformation dirty secret for Software Engineering quality and SEO",
-        "age": 0
-      },
-      {
-        "number": 848,
-        "title": "Improve: The Financial Toll of Security Debt for stronger Security coverage",
-        "age": 0
-      },
-      {
-        "number": 798,
-        "title": "[Editorial] Improve: \"The test strategy trap: why quality plans fail\" (score: 83 → 95)",
-        "age": 13
-      },
-      {
-        "number": 797,
-        "title": "[Editorial] Improve: \"The invisible shield: DNS as cybersecurity's first line\" (score: 83 → 95)",
-        "age": 13
-      }
-    ],
+    "agent:qa-gatekeeper": [],
+    "agent:editorial-chief": [],
     "agent:editorial-manager": []
   },
   "remediationQueue": [
