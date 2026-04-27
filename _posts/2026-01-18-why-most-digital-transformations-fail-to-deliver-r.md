@@ -6,7 +6,8 @@ author: "Ouray Viney"
 categories: ["Software Engineering"]
 tags: [digital-transformation, software-engineering, change-management, engineering-leadership]
 image: /assets/images/digital-transformation-secret.png
-image_alt: "Monochrome architectural rendering of a half-built digital bridge crumbling on the far side, rendered with precise pencil-sketch crosshatching in pewter and ivory"
+image_alt: "A digital bridge collapsing before it reaches the far side"
+image_caption: "Illustration: transformation programmes fail when the bridge to outcomes never closes"
 description: "Why digital transformations fail: most programmes still miss targets because governance, talent and operating-model problems overwhelm the technology."
 ---
 

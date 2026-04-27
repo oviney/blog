@@ -1,7 +1,7 @@
 ---
 name: editorial
 description: 'Editorial standards for blog content. Use when writing posts, editing articles, managing SEO, updating documentation, or reviewing content quality.'
-version: 1.1.0
+version: 1.2.0
 triggers:
   - Write or edit a blog post
   - SEO improvements needed
@@ -30,8 +30,18 @@ author: "Ouray Viney"
 categories: ["Quality Engineering"]  # One of: Quality Engineering, Software Engineering, Test Automation, Security
 tags: [tag1, tag2]
 image: /assets/images/post-slug.png
+image_alt: "Concise description of the visible scene"
+image_caption: "Illustration: short line explaining the image's editorial point"
 ---
 ```
+
+### Hero image rules
+
+- `image_alt` must describe the visible scene for readers using assistive technology
+- `image_alt` must **not** contain image-generation prompt language, art direction, or rendering style notes
+- `image_caption` is required and should explain the image's story in one short line
+- Prefer one clear metaphor or conflict over diagrams, taxonomies, or labelled explainer art
+- Avoid in-image copy; Economist-style theme images should usually carry the idea visually
 
 ### Categories (use exactly one)
 
@@ -53,7 +63,8 @@ image: /assets/images/post-slug.png
 - [ ] Title under 60 characters
 - [ ] Meta description via excerpt (first paragraph, under 160 chars)
 - [ ] One H1 (the title), logical H2/H3 hierarchy
-- [ ] Image with descriptive alt text
+- [ ] Image with descriptive alt text that describes the scene, not the art direction
+- [ ] Image caption that explains the image's editorial point
 - [ ] Internal links to related posts where natural
 - [ ] Category and tags set correctly
 
@@ -103,7 +114,7 @@ A **mandatory** table listing every statistic, data point, percentage, and quote
 
 | # | Claim | Type | Source in post | Status |
 |---|-------|------|----------------|--------|
-| 1 | "73% of teams report improved velocity" | Stat | Para 2 | ✅ VERIFIED — links to [World Quality Report 2025](url) |
+| 1 | "73% of teams report improved velocity" | Stat | Para 2 | ✅ VERIFIED — links to [World Quality Report 2025](https://www.opentext.com/en/media/report/world-quality-report-17th-edition) |
 | 2 | "velocity improved 2x" | Stat | Para 4 | ❌ UNVERIFIED — no source provided |
 | 3 | "Netflix said quality is everyone's job" | Quote | Para 6 | ❌ UNVERIFIED — paraphrase, not verbatim |
 | 4 | "$4.45 million average breach cost" | Stat | Para 3 | ⚠️ NEEDS-LINK — source cited but hyperlink missing |

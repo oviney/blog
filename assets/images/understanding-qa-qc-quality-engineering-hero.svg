@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Quality ownership tangled around one product</title>
+  <desc id="desc">A cream product box is caught in a red knot on a conveyor while a checklist, magnifying glass, and gear close in from three directions.</desc>
+
+  <rect width="1600" height="900" fill="#55bb50"/>
+
+  <ellipse cx="810" cy="650" rx="310" ry="56" fill="#2f7f31" opacity="0.28"/>
+
+  <g fill="#111111">
+    <rect x="0" y="670" width="1600" height="56"/>
+    <rect x="0" y="760" width="1600" height="56"/>
+  </g>
+  <g fill="#f4f1e7">
+    <polygon points="70,726 170,726 320,816 220,816"/>
+    <polygon points="280,726 380,726 530,816 430,816"/>
+    <polygon points="490,726 590,726 740,816 640,816"/>
+    <polygon points="700,726 800,726 950,816 850,816"/>
+    <polygon points="910,726 1010,726 1160,816 1060,816"/>
+    <polygon points="1120,726 1220,726 1370,816 1270,816"/>
+    <polygon points="1330,726 1430,726 1580,816 1480,816"/>
+  </g>
+
+  <g>
+    <circle cx="472" cy="430" r="132" fill="#111111"/>
+    <circle cx="472" cy="430" r="56" fill="#55bb50"/>
+    <rect x="552" y="506" width="214" height="56" rx="24" fill="#111111" transform="rotate(28 659 534)"/>
+  </g>
+
+  <g transform="translate(700 78)">
+    <rect x="0" y="0" width="240" height="292" rx="28" fill="#111111"/>
+    <rect x="90" y="-18" width="60" height="44" rx="14" fill="#111111"/>
+    <rect x="34" y="44" width="172" height="212" rx="16" fill="#f4f1e7"/>
+    <g stroke="#e3120b" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M62 102 L84 124 L122 80"/>
+      <path d="M62 156 L84 178 L122 134"/>
+      <path d="M62 210 L84 232 L122 188"/>
+    </g>
+  </g>
+
+  <g transform="translate(1128 430)">
+    <circle cx="0" cy="0" r="124" fill="#111111"/>
+    <circle cx="0" cy="0" r="56" fill="#55bb50"/>
+    <circle cx="0" cy="-154" r="30" fill="#111111"/>
+    <circle cx="109" cy="-109" r="30" fill="#111111"/>
+    <circle cx="154" cy="0" r="30" fill="#111111"/>
+    <circle cx="109" cy="109" r="30" fill="#111111"/>
+    <circle cx="0" cy="154" r="30" fill="#111111"/>
+    <circle cx="-109" cy="109" r="30" fill="#111111"/>
+    <circle cx="-154" cy="0" r="30" fill="#111111"/>
+    <circle cx="-109" cy="-109" r="30" fill="#111111"/>
+  </g>
+
+  <g transform="rotate(-8 808 520)">
+    <polygon points="650,360 940,360 1050,430 760,430" fill="#dfd7c8" stroke="#111111" stroke-width="10"/>
+    <polygon points="650,360 650,590 760,660 760,430" fill="#b8b0a1" stroke="#111111" stroke-width="10"/>
+    <polygon points="760,430 1050,430 1050,660 760,660" fill="#f4f1e7" stroke="#111111" stroke-width="10"/>
+    <polygon points="1050,430 940,360 940,590 1050,660" fill="#cbc2b3" stroke="#111111" stroke-width="10"/>
+  </g>
+
+  <g stroke="#e3120b" stroke-width="24" stroke-linecap="round" fill="none">
+    <path d="M590 480 C660 500, 708 510, 760 526"/>
+    <path d="M820 346 C812 408, 804 458, 800 514"/>
+    <path d="M1012 432 C958 462, 906 490, 844 520"/>
+    <path d="M740 500 C790 574, 852 574, 896 502"/>
+    <path d="M768 452 C818 524, 866 524, 922 448"/>
+    <path d="M730 454 C806 408, 886 410, 952 462"/>
+  </g>
+
+  <g fill="#e3120b">
+    <ellipse cx="596" cy="480" rx="40" ry="32"/>
+    <ellipse cx="820" cy="346" rx="42" ry="32"/>
+    <ellipse cx="1016" cy="432" rx="38" ry="30"/>
+  </g>
+</svg>

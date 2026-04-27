@@ -5,7 +5,8 @@ date: 2025-12-31
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
 image: /assets/images/testing-times-renovation.png
-image_alt: "Warm sepia editorial illustration of robots holding QA dashboards while human testers observe from the sidelines, vintage newspaper engraving style"
+image_alt: "Robots present QA dashboards while human testers watch from the edge of the room"
+image_caption: "Illustration: automation takes centre stage while quality outcomes barely move"
 description: "80% of software teams will use AI testing tools by 2025. Vendors raised $2.3 billion. Yet defect rates remain unchanged. An examination of the gap."
 ---
 

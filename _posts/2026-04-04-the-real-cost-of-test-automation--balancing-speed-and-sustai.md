@@ -5,7 +5,8 @@ date: 2026-04-04
 author: "Ouray Viney"
 categories: ["Test Automation"]
 image: /assets/images/automation-hidden-ledger.png
-image_alt: "Close-up editorial photomontage of an oversized accountant's ledger where red-ink automation costs sprawl beyond the margins onto the surrounding desk"
+image_alt: "An oversized cost ledger spread across a desk with red ink running through the totals"
+image_caption: "Illustration: automation costs keep widening once the hidden ledger is opened"
 description: "Test automation now consumes 42% of QA budgets—up from 31% in 2020. The rise isn't from expanded coverage; it's from the cost of keeping automation alive."
 ---
 
@@ -57,7 +58,7 @@ Netflix's test engineering team publishes its internal metrics with unusual cand
 
 The lesson is counterintuitive but consistent across organisations that control automation costs effectively: the goal is not more tests. It is better tests — fewer scripts that each deliver higher confidence, maintained by engineers who understand both the test and the system it validates. The most expensive test in any suite is the one that passes every day and has never found a bug.
 
-Understanding these dynamics before committing to an automation programme makes the difference between a realistic business case and a promising-looking failure. The economics of test automation — when measured accurately — can still justify investment, as [detailed analysis of enterprise ROI trajectories](/2026/01/19/the-surprising-economics-of-test-automation-roi/) shows: median returns reach 143%, but only after 23 months, and only for programmes that correctly forecast the full cost base from the outset. The organisations that budget for infrastructure, maintenance, and the talent required to manage complexity are the ones that eventually reach those returns. Those that budget only for tooling discover the hidden ledger when it is too late to adjust.
+Understanding these dynamics before committing to an automation programme makes the difference between a realistic business case and a promising-looking failure. The economics of test automation — when measured accurately — can still justify investment, as [detailed analysis of enterprise ROI trajectories](/2026/01/19/the-automation-accountant-what-test-roi-looks-like/) shows: median returns reach 143%, but only after 23 months, and only for programmes that correctly forecast the full cost base from the outset. The organisations that budget for infrastructure, maintenance, and the talent required to manage complexity are the ones that eventually reach those returns. Those that budget only for tooling discover the hidden ledger when it is too late to adjust.
 
 ## References
 

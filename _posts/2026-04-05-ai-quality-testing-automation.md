@@ -5,7 +5,8 @@ date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Test Automation"]
 image: /assets/images/ai-quality-testing-adoption.png
-image_alt: "Bold infographic showing a yawning chasm separating 'pilot' enterprises from 'deployed at scale', rendered in vivid burnt-orange and electric-blue block-print style"
+image_alt: "A wide chasm separates a small pilot group from a distant production deployment"
+image_caption: "Illustration: many AI testing tools stall between the pilot and scaled adoption"
 description: "89% of enterprises are piloting AI in QA, but only 15% have deployed it at scale — the gap is organisational inertia, not technology readiness."
 ---
 

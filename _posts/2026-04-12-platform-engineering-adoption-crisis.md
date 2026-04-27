@@ -7,6 +7,8 @@ categories: ["Software Engineering"]
 description: "Most platform engineering initiatives stall before delivering value. Here is why cultural inertia, poor tooling, and misaligned expectations derail the promise."
 tags: [platform-engineering, developer-experience, devops, adoption]
 image: /assets/images/platform-engineering-adoption-crisis.png
+image_alt: "A platform engineering rollout stalling before team-wide adoption"
+image_caption: "Illustration: platform engineering stalls when teams never get onto the path"
 ---
 
 Only 30% of companies fully realise the benefits of platform engineering within the first three years of adoption. Despite significant capital and engineering time invested, organisations repeatedly find that the gap between what platform engineering promises and what it delivers in practice is wider than expected. The culprits are rarely technical.

@@ -21,6 +21,8 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ERRORS=0
 WARNINGS=0
 
+PROMPT_ALT_PATTERN='editorial illustration|editorial photomontage|photorealistic|technical diagram|infographic|blueprint|cartoon|risograph|duotone|monochrome|palette|lighting|texture|crosshatching|newspaper engraving|block-print|rendered|style'
+
 VALID_CATEGORIES=(
   "Quality Engineering"
   "Software Engineering"
@@ -76,6 +78,7 @@ for post in $POSTS; do
   rel="${post#$REPO_ROOT/}"
   post_errors=0
   post_warnings=0
+  image_abs=""
 
   # Skip files without front matter
   if ! head -1 "$post" | grep -q "^---$"; then
@@ -112,7 +115,44 @@ for post in $POSTS; do
   fi
 
   # ------------------------------------------------------------------
-  # 3. SEO description — present and ≤160 chars  [ERROR]
+  # 3. Hero metadata — alt text + caption required and reader-facing  [ERROR]
+  # ------------------------------------------------------------------
+  alt_val=$(fm_value "$post" "image_alt")
+  alt_clean=$(echo "$alt_val" | sed 's/^["'"'"']//; s/["'"'"']$//')
+  alt_lower=$(echo "$alt_clean" | tr '[:upper:]' '[:lower:]')
+  if [[ -z "$alt_clean" ]]; then
+    echo "❌  $rel — missing image_alt"
+    ERRORS=$((ERRORS + 1))
+    post_errors=$((post_errors + 1))
+  elif echo "$alt_lower" | grep -Eq "$PROMPT_ALT_PATTERN"; then
+    echo "❌  $rel — image_alt reads like prompt/style text, not accessible alt text"
+    ERRORS=$((ERRORS + 1))
+    post_errors=$((post_errors + 1))
+  fi
+
+  caption_val=$(fm_value "$post" "image_caption")
+  caption_clean=$(echo "$caption_val" | sed 's/^["'"'"']//; s/["'"'"']$//')
+  caption_lower=$(echo "$caption_clean" | tr '[:upper:]' '[:lower:]')
+  if [[ -z "$caption_clean" ]]; then
+    echo "❌  $rel — missing image_caption"
+    ERRORS=$((ERRORS + 1))
+    post_errors=$((post_errors + 1))
+  elif [[ "$caption_lower" =~ ^(illustration|photo|chart)$ ]]; then
+    echo "❌  $rel — image_caption is too generic"
+    ERRORS=$((ERRORS + 1))
+    post_errors=$((post_errors + 1))
+  fi
+
+  if [[ -n "${image_abs:-}" && -f "${image_abs:-}" && "$image_abs" == *.svg ]]; then
+    if grep -qi '<text[[:space:]>]' "$image_abs"; then
+      echo "❌  $rel — SVG hero contains embedded text"
+      ERRORS=$((ERRORS + 1))
+      post_errors=$((post_errors + 1))
+    fi
+  fi
+
+  # ------------------------------------------------------------------
+  # 4. SEO description — present and ≤160 chars  [ERROR]
   # ------------------------------------------------------------------
   desc_val=$(fm_value "$post" "description")
   # Strip surrounding quotes for length check
@@ -131,7 +171,7 @@ for post in $POSTS; do
   fi
 
   # ------------------------------------------------------------------
-  # 4. Author — must be "Ouray Viney"  [ERROR]
+  # 5. Author — must be "Ouray Viney"  [ERROR]
   # ------------------------------------------------------------------
   author_val=$(fm_value "$post" "author")
   author_clean=$(echo "$author_val" | sed 's/^["'"'"']//; s/["'"'"']$//')
@@ -142,7 +182,7 @@ for post in $POSTS; do
   fi
 
   # ------------------------------------------------------------------
-  # 5. Category — each value must be one of 4 valid values  [ERROR]
+  # 6. Category — each value must be one of 4 valid values  [ERROR]
   # ------------------------------------------------------------------
   cat_val=$(fm_value "$post" "categories")
   # Parse YAML array: ["Quality Engineering", "Test Automation"] → individual items
@@ -168,7 +208,7 @@ for post in $POSTS; do
   done < <(echo "$cat_inner" | sed 's/", "/\n/g; s/","/\n/g')
 
   # ------------------------------------------------------------------
-  # 6. References — ## References section with ≥3 items  [WARNING]
+  # 7. References — ## References section with ≥3 items  [WARNING]
   # ------------------------------------------------------------------
   body=$(body_content "$post")
   has_refs=$(echo "$body" | grep -c "^## References" || true)
@@ -187,7 +227,7 @@ for post in $POSTS; do
   fi
 
   # ------------------------------------------------------------------
-  # 7. Word count — ≥800 words  [WARNING]
+  # 8. Word count — ≥800 words  [WARNING]
   # ------------------------------------------------------------------
   word_count=$(echo "$body" | wc -w | tr -d ' ')
   if [[ $word_count -lt 800 ]]; then
@@ -197,7 +237,7 @@ for post in $POSTS; do
   fi
 
   # ------------------------------------------------------------------
-  # 8. H2 subheadings — ≥3  [WARNING]
+  # 9. H2 subheadings — ≥3  [WARNING]
   # ------------------------------------------------------------------
   h2_count=$(echo "$body" | grep -c "^## " || true)
   if [[ $h2_count -lt 3 ]]; then
@@ -207,7 +247,7 @@ for post in $POSTS; do
   fi
 
   # ------------------------------------------------------------------
-  # 9. Data chart — /assets/charts/<slug>.* exists or embedded  [WARNING]
+  # 10. Data chart — /assets/charts/<slug>.* exists or embedded  [WARNING]
   # ------------------------------------------------------------------
   slug=$(basename "$post" .md | sed 's/^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}-//')
   chart_file=$(find "$REPO_ROOT/assets/charts" -maxdepth 1 -name "${slug}.*" 2>/dev/null | head -1 || true)
@@ -217,17 +257,6 @@ for post in $POSTS; do
     WARNINGS=$((WARNINGS + 1))
     post_warnings=$((post_warnings + 1))
   fi
-
-  # ------------------------------------------------------------------
-  # 10. Image style — image_alt must not contain bad terms  [WARNING]
-  # ------------------------------------------------------------------
-  alt_val=$(fm_value "$post" "image_alt")
-  alt_lower=$(echo "$alt_val" | tr '[:upper:]' '[:lower:]')
-  for term in $(echo "$alt_lower" | grep -oiE 'watercolour|pastel|whimsical' || true); do
-    echo "⚠️   $rel — image_alt contains prohibited style term: '$term'"
-    WARNINGS=$((WARNINGS + 1))
-    post_warnings=$((post_warnings + 1))
-  done
 
   # ------------------------------------------------------------------
   # 11. Published status — no published: false  [ERROR]

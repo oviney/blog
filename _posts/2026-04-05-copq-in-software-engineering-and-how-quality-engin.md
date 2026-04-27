@@ -5,7 +5,8 @@ date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
 image: /assets/images/copq-software-engineering.png
-image_alt: "Cool photorealistic newspaper front page displaying a trillion-dollar bill for software bugs, broadsheet layout with formal serif typography on aged newsprint"
+image_alt: "A newspaper front page announcing a trillion-dollar software quality bill"
+image_caption: "Illustration: poor quality lands as a bill large enough to make headlines"
 description: "CISQ estimates poor software quality costs the US $2.41 trillion a year. CrowdStrike's single untested update destroyed $500 million in one afternoon."
 summary: "Poor software quality costs the US economy $2.41 trillion annually — and the CrowdStrike outage proved that a single untested deployment can destroy half a billion dollars in an afternoon."
 ---

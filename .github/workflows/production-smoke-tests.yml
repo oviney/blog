@@ -1,0 +1,32 @@
+name: Production Smoke Tests
+
+on:
+  workflow_run:
+    workflows: ["Deploy Jekyll site to Pages"]
+    types: [completed]
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Post-deploy smoke suite
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Run production smoke checks
+        env:
+          PROD_URL: https://www.viney.ca
+          SMOKE_RETRIES: "12"
+          SMOKE_RETRY_DELAY: "10"
+        run: bash scripts/production-smoke-tests.sh

@@ -6,7 +6,8 @@ author: "Ouray Viney"
 categories: ["Security"]
 tags: [cybersecurity, AI, threat-detection, machine-learning, enterprise-security]
 image: /assets/images/ai-threat-detection-enterprise.png
-image_alt: "Abstract representation of AI-driven threat detection scanning enterprise network traffic patterns"
+image_alt: "An AI monitoring layer scanning enterprise network traffic for threats"
+image_caption: "Illustration: AI models scan dense enterprise traffic for signs of intrusion"
 description: "Signature-based intrusion detection misses 60% of novel attacks. AI-driven threat detection is replacing legacy IDS/IPS across enterprise networks."
 ---
 

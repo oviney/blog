@@ -1,7 +1,7 @@
 ---
 name: economist-theme
 description: 'Design system for The Economist visual style. Use when modifying CSS, SCSS, layouts, responsive design, typography, or UI components.'
-version: 1.1.0
+version: 1.2.0
 triggers:
   - Adding new styles or components
   - Modifying existing SCSS
@@ -289,6 +289,14 @@ The Economist uses ordinal date format: "Jan 5th 2026|X min read"
 
 ## Image Fallback Strategy
 
+## Article Hero Art Standards
+
+- Lead with **one** focal metaphor, not a multi-panel explainer
+- Build visible tension or conflict into the scene so the image tells a story at a glance
+- Keep hero artwork mostly text-free; do not rely on labels inside the image
+- Avoid diagram, infographic, blueprint, or prompt-driven art direction for feature images
+- Support the image with reader-facing metadata: concise `image_alt` plus a short editorial `image_caption`
+
 ### Default Blog Images
 
 For blog posts without featured images, use default fallback asset.
@@ -346,11 +354,11 @@ assets/images/blog-default.svg
 
 ## Related Files
 
-- [`_sass/economist-theme.scss`](../../_sass/economist-theme.scss) - Main theme file (600+ lines)
-- [`_layouts/default.html`](../../_layouts/default.html) - Base layout
-- [`_layouts/post.html`](../../_layouts/post.html) - Article layout
-- [`docs/CURRENT_STATE.md`](../CURRENT_STATE.md) - Theme implementation history
-- [`README.md`](../../README.md) - Theme overview
+- [`_sass/economist-theme.scss`](../../../_sass/economist-theme.scss) - Main theme file (600+ lines)
+- [`_layouts/default.html`](../../../_layouts/default.html) - Base layout
+- [`_layouts/post.html`](../../../_layouts/post.html) - Article layout
+- [`docs/CURRENT_STATE.md`](../../../docs/CURRENT_STATE.md) - Theme implementation history
+- [`README.md`](../../../README.md) - Theme overview
 
 ## Success Criteria
 

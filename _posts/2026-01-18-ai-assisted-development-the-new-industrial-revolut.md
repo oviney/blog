@@ -5,7 +5,8 @@ date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Software Engineering"]
 image: /assets/images/ai-assisted-code-generation.png
-image_alt: "Whimsical watercolour scene of unsupervised intern robots typing furiously at keyboards in an empty open-plan office, pastel tones with loose brushwork"
+image_alt: "Office robots write code at keyboards with no human supervision"
+image_caption: "Illustration: code generators move fast when nobody is reviewing them"
 description: "AI code generators boost typing speed but degrade code quality — METR found developers are 19% slower on tasks, while GitClear shows 41% higher code churn."
 ---
 

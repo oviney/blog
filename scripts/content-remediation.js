@@ -67,6 +67,27 @@ const STOPWORDS = new Set([
   'most','each','both','well','just','very','been','through',
 ]);
 
+const PROMPT_ALT_TERMS = [
+  'editorial illustration',
+  'editorial photomontage',
+  'photorealistic',
+  'technical diagram',
+  'infographic',
+  'blueprint',
+  'cartoon',
+  'risograph',
+  'duotone',
+  'monochrome',
+  'palette',
+  'lighting',
+  'texture',
+  'crosshatching',
+  'newspaper engraving',
+  'block-print',
+  'rendered',
+  'style',
+];
+
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
 function keywords(text) {
@@ -87,11 +108,20 @@ function jaccard(setA, setB) {
   return union === 0 ? 0 : intersection / union;
 }
 
-function slugFromFilename(filename) {
-  // 2023-08-09-building-a-test-strategy.md → /2023/08/09/building-a-test-strategy/
+function slugifyTitle(title) {
+  return String(title || '')
+    .toLowerCase()
+    .replace(/[’']/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function permalinkFromPost(filename, fm = {}) {
+  // Jekyll config uses /:year/:month/:day/:title/, with optional slug override.
   const m = filename.match(/^(\d{4})-(\d{2})-(\d{2})-(.+)\.md$/);
   if (!m) return null;
-  return `/${m[1]}/${m[2]}/${m[3]}/${m[4]}/`;
+  const routeSlug = fm.slug || slugifyTitle(fm.title) || m[4];
+  return `/${m[1]}/${m[2]}/${m[3]}/${routeSlug}/`;
 }
 
 function titleCase(str) {
@@ -120,6 +150,22 @@ function readPostBody(filename) {
     const match   = content.match(/^---[\s\S]*?---\r?\n([\s\S]*)$/);
     return match ? match[1] : content;
   } catch { return ''; }
+}
+
+function imageFilePath(imagePath) {
+  return path.join(REPO_ROOT, String(imagePath || '').replace(/^\/+/, ''));
+}
+
+function promptLikeAltTerms(text) {
+  const lower = String(text || '').toLowerCase();
+  return PROMPT_ALT_TERMS.filter(term => lower.includes(term));
+}
+
+function svgHasEmbeddedText(imagePath) {
+  if (path.extname(String(imagePath || '')).toLowerCase() !== '.svg') return false;
+  const filePath = imageFilePath(imagePath);
+  if (!fs.existsSync(filePath)) return false;
+  return /<text(?:\s|>)/i.test(fs.readFileSync(filePath, 'utf8'));
 }
 
 function sectionWordCounts(body) {
@@ -158,7 +204,7 @@ function buildActions(result, allResults) {
     .map(r => {
       const otherBody = readPostBody(r.filename);
       const sim       = jaccard(postKws, keywords(otherBody));
-      const url       = slugFromFilename(r.filename);
+       const url       = permalinkFromPost(r.filename, r.fm);
       return { url, title: r.fm?.title || r.filename, sim: Math.round(sim * 100) };
     })
     .filter(c => c.sim > 10 && c.url)
@@ -166,7 +212,7 @@ function buildActions(result, allResults) {
     .slice(0, 3);
 
   // ── Front matter ────────────────────────────────────────────────────────────
-  const REQUIRED = ['title', 'date', 'author', 'categories', 'image', 'description'];
+  const REQUIRED = ['title', 'date', 'author', 'categories', 'image', 'image_alt', 'image_caption', 'description'];
   for (const field of REQUIRED) {
     const val = fm[field];
     const missing = !val || (Array.isArray(val) ? val.length === 0 : String(val).trim() === '');
@@ -223,25 +269,89 @@ function buildActions(result, allResults) {
   // ── Image validation ─────────────────────────────────────────────────────────
   const imgPath = String(fm.image || '');
   if (imgPath && path.basename(imgPath) !== 'blog-default.svg') {
+    const altText = String(fm.image_alt || '').trim();
+    const imageCaption = String(fm.image_caption || '').trim();
+    const imgExt = path.extname(imgPath).toLowerCase();
     const base    = path.basename(imgPath).replace(/\.[^.]+$/, '');
     const pngPath = path.join(REPO_ROOT, 'assets', 'images', `${base}.png`);
     const webpPath= path.join(REPO_ROOT, 'assets', 'images', `${base}.webp`);
-    if (!fs.existsSync(pngPath)) {
+    const sourcePath = imageFilePath(imgPath);
+
+    if (!altText) {
       actions.push({
-        dimension:          'image_png',
+        dimension:          'image_alt',
         priority:           1,
-        deficit:            `PNG not found: assets/images/${base}.png`,
-        instruction:        `Add a PNG image at \`assets/images/${base}.png\`. Recommended: 1200×630px, compressed. Run \`cwebp assets/images/${base}.png -o assets/images/${base}.webp\` to generate WebP.`,
+        deficit:            'Missing `image_alt` field',
+        instruction:        'Add concise alt text that describes the visible scene in reader-facing language. Do not paste image-generation prompt text, style notes, or rendering instructions into `image_alt`.',
         estimatedScoreDelta: 7,
       });
-    } else if (!fs.existsSync(webpPath)) {
+    } else {
+      const promptTerms = promptLikeAltTerms(altText);
+      if (promptTerms.length) {
+        actions.push({
+          dimension:          'image_alt_quality',
+          priority:           1,
+          deficit:            `\`image_alt\` contains prompt/style terms: ${promptTerms.join(', ')}`,
+          instruction:        'Rewrite `image_alt` as a concise scene description. Keep art direction, rendering style, palette, and prompt vocabulary out of the alt text.',
+          estimatedScoreDelta: 6,
+        });
+      }
+    }
+
+    if (!imageCaption) {
       actions.push({
-        dimension:          'image_webp',
+        dimension:          'image_caption',
         priority:           1,
-        deficit:            `WebP not found: assets/images/${base}.webp`,
-        instruction:        `Generate the WebP version: \`cwebp assets/images/${base}.png -o assets/images/${base}.webp\`. Required by \`_includes/responsive-image.html\` to avoid sitewide HTML-Proofer failures.`,
+        deficit:            'Missing `image_caption` field',
+        instruction:        'Add an `image_caption` that explains the editorial point of the hero image in one short line.',
         estimatedScoreDelta: 8,
       });
+    } else if (/^(illustration|photo|chart)$/i.test(imageCaption)) {
+      actions.push({
+        dimension:          'image_caption_quality',
+        priority:           2,
+        deficit:            '`image_caption` is too generic',
+        instruction:        'Replace the generic caption with a short editorial caption that explains the story the image is telling.',
+        estimatedScoreDelta: 4,
+      });
+    }
+
+    if (!fs.existsSync(sourcePath)) {
+      actions.push({
+        dimension:          'image_file',
+        priority:           1,
+        deficit:            `Image not found: ${imgPath}`,
+        instruction:        `Add the hero image file at \`${imgPath}\` or update the front matter to the correct asset path.`,
+        estimatedScoreDelta: 8,
+      });
+    } else if (imgExt === '.svg') {
+      if (svgHasEmbeddedText(imgPath)) {
+        actions.push({
+          dimension:          'image_svg_text',
+          priority:           1,
+          deficit:            'SVG hero contains embedded text',
+          instruction:        'Remove embedded text from the SVG hero art. Economist-style theme images should carry the story visually, not through labels or copy inside the image.',
+          estimatedScoreDelta: 7,
+        });
+      }
+    } else {
+      if (!fs.existsSync(pngPath)) {
+        actions.push({
+          dimension:          'image_png',
+          priority:           1,
+          deficit:            `PNG not found: assets/images/${base}.png`,
+          instruction:        `Add a PNG image at \`assets/images/${base}.png\`. Recommended: 1200×630px, compressed. Run \`cwebp assets/images/${base}.png -o assets/images/${base}.webp\` to generate WebP.`,
+          estimatedScoreDelta: 7,
+        });
+      } else if (!fs.existsSync(webpPath)) {
+        actions.push({
+          dimension:          'image_webp',
+          priority:           1,
+          deficit:            `WebP not found: assets/images/${base}.webp`,
+          instruction:        `Generate the WebP version: \`cwebp assets/images/${base}.png -o assets/images/${base}.webp\`. Required by \`_includes/responsive-image.html\` to avoid sitewide HTML-Proofer failures.`,
+          estimatedScoreDelta: 8,
+        });
+      }
     }
   }
 
@@ -322,7 +432,7 @@ function buildActions(result, allResults) {
 
 function buildIssueBody(plan) {
   const { file, currentScore, targetScore, actions } = plan;
-  const slug = slugFromFilename(path.basename(file));
+  const slug = permalinkFromPost(path.basename(file), plan.fm || {});
   let md = `## Post\n\n`;
   md += `**File**: \`${file}\`\n`;
   if (slug) md += `**URL**: \`${slug}\`\n`;
@@ -372,6 +482,7 @@ function main() {
       return {
         file:         `_posts/${r.filename}`,
         title:        r.fm?.title || r.filename,
+        fm:           r.fm || {},
         currentScore: r.score,
         targetScore:  Math.min(r.score + totalDelta, 100),
         actionCount:  actions.length,

@@ -6,7 +6,8 @@ author: "Ouray Viney"
 categories: ["Software Engineering"]
 tags: [platform-engineering, developer-portals, backstage, developer-experience, internal-developer-platform]
 image: /assets/images/platform-engineering-developer-portals.png
-image_alt: "Abstract illustration of interconnected developer tools forming a unified platform"
+image_alt: "Developer tools linked together through a single platform portal"
+image_caption: "Illustration: a developer portal turns scattered tools into one path through the platform"
 description: "Platform engineering is reshaping how organisations deliver software. Internal developer portals are cutting onboarding times and cognitive load."
 ---
 
@@ -49,7 +50,7 @@ There is also the question of who builds the platform. The CNCF's 2024 survey re
 
 ## Implications for engineering leadership
 
-For organisations evaluating platform engineering, the pattern is now clear enough to act on. First, start with developer pain points rather than technology selection. The portal is a means, not an end. Second, staff the platform team as a product team: a product manager, dedicated engineers, and a clear mandate to serve internal customers. Third, instrument adoption. If developers are not using the golden path voluntarily, the path needs repaving. As explored in [a previous analysis of AI-assisted development's hidden costs](/2026/04/05/practical-applications-of-ai-in-software-development/), tooling that promises productivity gains without accounting for developer behaviour and cognitive load often fails to deliver lasting results.
+For organisations evaluating platform engineering, the pattern is now clear enough to act on. First, start with developer pain points rather than technology selection. The portal is a means, not an end. Second, staff the platform team as a product team: a product manager, dedicated engineers, and a clear mandate to serve internal customers. Third, instrument adoption. If developers are not using the golden path voluntarily, the path needs repaving. As explored in [a previous analysis of AI-assisted development's hidden costs](/2026/04/05/the-coders-crutch-ai-assisted-developments-hidden-costs/), tooling that promises productivity gains without accounting for developer behaviour and cognitive load often fails to deliver lasting results.
 
 The organisations that will benefit most are those already feeling the strain of scale — teams tripping over inconsistent deployment practices, security reviews bottlenecked by bespoke configurations, and new hires taking months to become productive. For them, platform engineering is not a trend to watch. It is infrastructure to build.
 

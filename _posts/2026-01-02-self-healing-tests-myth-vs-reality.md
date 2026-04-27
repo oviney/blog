@@ -5,7 +5,8 @@ date: 2026-01-02
 author: "Ouray Viney"
 categories: ["Test Automation"]
 image: /assets/images/self-healing-broken-promise.png
-image_alt: "High-contrast photorealistic close-up of a cracked mechanical arm attempting to reassemble itself mid-fracture, industrial photography with stark studio lighting"
+image_alt: "A cracked robotic arm trying to bolt itself back together"
+image_caption: "Illustration: self-healing tests promise repair while the system keeps breaking"
 description: "Vendors promise 80% reductions in test maintenance. Independent data tells a different story: only 30% of teams achieve meaningful autonomy."
 ---
 
@@ -38,7 +39,7 @@ Gartner predicted that 70% of enterprises would incorporate self-healing tests i
 
 The test suites that truly heal themselves remain a research aspiration. Today's self-healing tools are, more accurately, self-adjusting — and the distinction between healing and adjusting is precisely the gap between the marketing and the reality.
 
-This pattern — where AI tooling delivers incremental gains on narrow tasks while leaving the broader maintenance problem largely intact — is not unique to self-healing tests. The [same dynamic applies to AI test generation tools](/2026/04/05/why-ai-test-generation-tools-overpromise-on-maintenance-savi/), where vendor claims of 60-80% maintenance reduction consistently outpace what independent studies find in practice. According to the Capgemini 2025 Quality Engineering Report, organisations that had adopted both self-healing and AI generation together reported a combined maintenance reduction of 28% — useful, but a fraction of the combined 120-160% reduction implied by vendors marketing each tool independently. The tools are complements to skilled testing teams, not replacements for them.
+This pattern — where AI tooling delivers incremental gains on narrow tasks while leaving the broader maintenance problem largely intact — is not unique to self-healing tests. The [same dynamic applies to AI test generation tools](/2026/04/05/the-maintenance-myth-what-ai-test-generation-costs/), where vendor claims of 60-80% maintenance reduction consistently outpace what independent studies find in practice. According to the Capgemini 2025 Quality Engineering Report, organisations that had adopted both self-healing and AI generation together reported a combined maintenance reduction of 28% — useful, but a fraction of the combined 120-160% reduction implied by vendors marketing each tool independently. The tools are complements to skilled testing teams, not replacements for them.
 
 ## References
 

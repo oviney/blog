@@ -5,7 +5,8 @@ date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
 image: /assets/images/the-end-of-manual-qa.png
-image_alt: "Dramatic duotone illustration of a lone human tester at a desk surrounded by advancing robotic assembly lines, film noir lighting in deep teal and amber"
+image_alt: "A lone tester sits at a desk as robotic lines close in from both sides"
+image_caption: "Illustration: manual QA is squeezed as industrial automation moves in"
 description: "89% of enterprises are piloting AI in QA, yet only 16% have adopted it. The 59-point gap is closing fast — and manual QA's economics have collapsed."
 summary: "Manual testing is not declining gradually — it is being economically exterminated by AI tools that 89% of enterprises are piloting, even as only 15% have deployed them at scale."
 ---

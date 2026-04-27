@@ -5,7 +5,8 @@ date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Test Automation"]
 image: /assets/images/test-automation-technical-debt.png
-image_alt: "Stark data-visualisation style chart showing compounding technical debt curves in crimson on white, inspired by financial charting with annotated inflection points"
+image_alt: "A rising debt curve climbing above an automation dashboard"
+image_caption: "Illustration: automation debt compounds long after teams stop counting it"
 description: "Flaky tests caused 57% of Slack's CI failures. Test suites now consume 40% of QA capacity in maintenance — becoming the debt they were built to prevent."
 summary: "Test suites have become the fastest-growing source of technical debt, with flaky tests consuming up to 8% of enterprise development time and maintenance devouring 40% of QA capacity."
 ---
