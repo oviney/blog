@@ -35,7 +35,7 @@ These constraints lead organisations to spend an average of 10% more on security
 
 Despite the rising consensus on the escalating costs of security debt, a contrarian viewpoint suggests that strategic investments in security tools and automation could mitigate these projected costs significantly. Proponents argue that, when integrated with robust management practices, such investments could provide a more stable financial impact than expected, allowing organisations to maintain operational efficiency without succumbing to rising cybersecurity costs.
 
-This view is partly right and often overstated. Tooling does help when it reduces detection latency, prioritises exploitable findings, and gives analysts better visibility into attack paths. But automation does not cancel the debt on its own. Even the strongest [AI-driven threat-detection programmes](/2026/04/12/ai-driven-threat-detection-in-enterprise-networks/) still depend on disciplined patch management, asset inventories, exposure tracking, and leadership willing to fund remediation work that produces no immediate applause.
+This view is partly right and often overstated. Tooling does help when it reduces detection latency, prioritises exploitable findings, and gives analysts better visibility into attack paths. But automation does not cancel the debt on its own. Even the strongest [AI-driven threat-detection programmes](/2026/04/12/ai-threat-detection-enterprise/) still depend on disciplined patch management, asset inventories, exposure tracking, and leadership willing to fund remediation work that produces no immediate applause.
 
 ## What leaders should fund first
 

@@ -55,7 +55,7 @@ Organisations initiating test automation programmes should budget for 18-24 mont
 <p style="font-size:0.7em;color:#999;margin:0.75em 0 0;padding-top:0.6em;border-top:1px solid #ddd;">Sources: Forrester, <em>Total Economic Impact of Enterprise Test Automation</em>, 2025; Capgemini, <em>World Quality Report</em>, 2025</p>
 </figure>
 
-Understanding why automation costs escalate is as important as projecting returns. The [hidden costs of test automation](/2026/04/04/test-automations-hidden-ledger-costs-nobody-budgets/) — infrastructure, maintenance overhead, and the opportunity cost of engineers maintaining brittle suites — routinely consume the efficiency gains that ROI models forecast. Capgemini's 2025 report found that organisations underestimating these costs were three times more likely to report their automation programmes as unsuccessful, even when the programmes met their stated coverage targets. ROI is real. So is the risk of measuring it incorrectly.
+Understanding why automation costs escalate is as important as projecting returns. The [hidden costs of test automation](/2026/04/04/the-real-cost-of-test-automation-balancing-speed-and-sustai/) — infrastructure, maintenance overhead, and the opportunity cost of engineers maintaining brittle suites — routinely consume the efficiency gains that ROI models forecast. Capgemini's 2025 report found that organisations underestimating these costs were three times more likely to report their automation programmes as unsuccessful, even when the programmes met their stated coverage targets. ROI is real. So is the risk of measuring it incorrectly.
 
 ## References
 

@@ -38,6 +38,88 @@ ensure_label() {
     --repo "$REPO" 2>/dev/null || true
 }
 
+resolve_site_route() {
+  local link_path="${1#/}"
+  link_path="${link_path%/}"
+
+  case "$link_path" in
+    "") echo "index.md"; return 0 ;;
+    about) echo "about.md"; return 0 ;;
+    blog) echo "blog/index.html"; return 0 ;;
+    search) echo "search.html"; return 0 ;;
+    software-engineering) echo "software-engineering.md"; return 0 ;;
+    test-automation) echo "blog/index.html"; return 0 ;;
+    feed.xml|robots.txt|manifest.webmanifest|favicon.ico|favicon.svg) echo "$link_path"; return 0 ;;
+  esac
+
+  if [[ "$link_path" =~ ^([0-9]{4})/([0-9]{2})/([0-9]{2})/(.+)$ ]]; then
+    local year="${BASH_REMATCH[1]}"
+    local month="${BASH_REMATCH[2]}"
+    local day="${BASH_REMATCH[3]}"
+    local slug="${BASH_REMATCH[4]}"
+    local resolved_post
+    resolved_post="$(python3 - "$year" "$month" "$day" "$slug" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+year, month, day, requested_slug = sys.argv[1:5]
+posts_dir = Path("_posts")
+
+def slugify(value: str) -> str:
+    value = value.strip().lower()
+    value = value.replace("’", "").replace("'", "")
+    value = re.sub(r"[^a-z0-9]+", "-", value)
+    return value.strip("-")
+
+for post in sorted(posts_dir.glob("*.md")):
+    title = ""
+    explicit_slug = ""
+    in_front_matter = False
+    filename_slug = post.stem.split("-", 3)[3] if len(post.stem.split("-", 3)) == 4 else ""
+    route_date = "-".join(post.stem.split("-", 3)[:3]) if len(post.stem.split("-", 3)) >= 3 else ""
+    with post.open(encoding="utf-8") as fh:
+        for raw_line in fh:
+            line = raw_line.rstrip("\n")
+            if line == "---":
+                if not in_front_matter:
+                    in_front_matter = True
+                    continue
+                break
+            if not in_front_matter:
+                continue
+            if line.startswith("title:"):
+                title = line.split(":", 1)[1].strip().strip('"').strip("'")
+            elif line.startswith("slug:"):
+                explicit_slug = line.split(":", 1)[1].strip().strip('"').strip("'")
+            elif line.startswith("date:"):
+                route_date = line.split(":", 1)[1].strip().strip('"').strip("'")[:10]
+
+    candidate_slugs = [
+        candidate for candidate in (
+            explicit_slug,
+            slugify(title),
+            filename_slug,
+            slugify(filename_slug.replace("-", " ")),
+        ) if candidate
+    ]
+    if route_date == f"{year}-{month}-{day}" and requested_slug in candidate_slugs:
+        print(post.as_posix())
+        raise SystemExit(0)
+
+raise SystemExit(1)
+PY
+)" || true
+
+    if [[ -n "$resolved_post" && -f "$resolved_post" ]]; then
+      echo "$resolved_post"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
 issue_exists() {
   local title="$1"
   local count
@@ -99,6 +181,9 @@ while IFS= read -r md_file; do
     # Handle absolute paths (starting with /)
     if [[ "$link" == /* ]]; then
       resolved="${link#/}"   # relative to repo root
+      if [[ ! -e "$resolved" ]]; then
+        resolved="$(resolve_site_route "$link" 2>/dev/null || echo "$resolved")"
+      fi
     else
       resolved="${dir}/${link}"
     fi
@@ -118,9 +203,19 @@ while IFS= read -r md_file; do
       broken_links+=("${md_file}: broken link → ${raw_link}")
       echo "  [broken] ${md_file}: ${raw_link} → ${resolved}"
     fi
-  done < <(grep -oE '\[([^]]+)\]\(([^)]+)\)' "$md_file" 2>/dev/null \
-           | grep -oE '\(([^)]+)\)' \
-           | tr -d '()')
+  done < <(python3 - "$md_file" <<'PY'
+import re
+import sys
+
+text = open(sys.argv[1], encoding="utf-8").read()
+
+# Extract only actual Markdown link targets (not image links, and not every
+# parenthetical inside link text) so chart alt text like "(+25%)" does not
+# generate false positives.
+for match in re.finditer(r'(?<!\!)\[[^\]]+\]\(([^)]+)\)', text):
+    print(match.group(1).strip())
+PY
+)
 done < <(find . \
   -not -path './.git/*' \
   -not -path './node_modules/*' \
@@ -155,9 +250,10 @@ echo "=== Check 2: Commands in bash/sh code blocks ==="
 
 # Known-good commands allowed as the first token in a code-block line
 KNOWN_COMMANDS=(
-  gh bundle npx npm git bash node ruby python3 jq curl
+  gh bundle npx npm git bash node ruby python3 jq curl rg
   echo printf cat grep find sed awk cut sort uniq head tail
-  cp mv rm mkdir touch chmod export set source "." read
+  cp mv rm mkdir touch chmod export set source "." read cd open
+  rbenv gem md5sum lighthouse pa11y code lsof bc
   true false test "[" "[[" if then else fi for while do done
   local return exit trap kill wait
 )
@@ -167,29 +263,75 @@ unknown_cmds=()
 while IFS= read -r skill_file; do
   in_block=false
   block_lang=""
+  in_multiline_quote=false
+  continuation=false
 
   while IFS= read -r line; do
     # Detect opening fence
     if [[ "$line" =~ ^\`\`\`(bash|sh) ]]; then
       in_block=true
       block_lang="${BASH_REMATCH[1]}"
+      in_multiline_quote=false
+      continuation=false
       continue
     fi
     # Detect closing fence
     if [[ "$in_block" == true && "$line" =~ ^\`\`\` ]]; then
       in_block=false
+      in_multiline_quote=false
+      continuation=false
       continue
     fi
     # Inside a bash/sh block: check first token of non-comment, non-empty lines
     if [[ "$in_block" == true ]]; then
+      scan_line="${line//\\\"/}"
+      quote_marks="${scan_line//[^\"]}"
+
+      if [[ "$in_multiline_quote" == true || "$continuation" == true ]]; then
+        if (( ${#quote_marks} % 2 == 1 )); then
+          if [[ "$in_multiline_quote" == true ]]; then
+            in_multiline_quote=false
+          else
+            in_multiline_quote=true
+          fi
+        fi
+        if [[ "$line" == *\\ || "$line" == *"|" ]]; then
+          continuation=true
+        else
+          continuation=false
+        fi
+        continue
+      fi
+
       # Strip leading whitespace, skip blank/comment lines
       stripped="${line#"${line%%[! ]*}"}"  # ltrim
       [[ -z "$stripped" ]] && continue
       [[ "$stripped" == \#* ]] && continue
+      [[ "$stripped" == -* ]] && continue
+      [[ "$stripped" == Closes\ * ]] && continue
+      [[ "$stripped" == \[* ]] && continue
+      [[ "$stripped" == \** ]] && continue
+      [[ "$stripped" == \"* ]] && continue
+      [[ "$stripped" == \'* ]] && continue
+      [[ "$stripped" == \$* ]] && continue
+      [[ "$stripped" == \|* ]] && continue
+      [[ "$stripped" == +* ]] && continue
       # First token
       first_token="${stripped%% *}"
+      if [[ "$first_token" == *'=$(('* ]]; then
+        continue
+      fi
+      if [[ "$first_token" == *'=$('* ]]; then
+        stripped="${stripped#*\$(}"
+        first_token="${stripped%% *}"
+      fi
       # Remove variable assignments like FOO=bar before the command
       while [[ "$first_token" == *=* && "$first_token" != =* ]]; do
+        if [[ "$stripped" == "$first_token" ]]; then
+          stripped=""
+          first_token=""
+          break
+        fi
         stripped="${stripped#* }"
         first_token="${stripped%% *}"
         [[ -z "$stripped" ]] && break
@@ -197,6 +339,9 @@ while IFS= read -r skill_file; do
       [[ -z "$first_token" ]] && continue
       # Check against known list
       matched=false
+      if [[ "$first_token" == */* || "$first_token" == ./* ]]; then
+        matched=true
+      fi
       for cmd in "${KNOWN_COMMANDS[@]}"; do
         if [[ "$first_token" == "$cmd" ]]; then
           matched=true
@@ -206,6 +351,12 @@ while IFS= read -r skill_file; do
       if [[ "$matched" == false ]]; then
         unknown_cmds+=("${skill_file}: unknown command '${first_token}'")
         echo "  [unknown] ${skill_file}: '${first_token}'"
+      fi
+      if (( ${#quote_marks} % 2 == 1 )); then
+        in_multiline_quote=true
+      fi
+      if [[ "$line" == *\\ || "$line" == *"|" ]]; then
+        continuation=true
       fi
     fi
   done < "$skill_file"
@@ -353,7 +504,17 @@ while IFS= read -r skill_file; do
   [[ -z "${CUTOFF:-}" ]] && break  # skip if CUTOFF could not be determined
   # Last commit date for this file
   last_commit=$(git log -1 --format="%cs" -- "$skill_file" 2>/dev/null || echo "")
-  [[ -z "$last_commit" ]] && last_commit="1970-01-01"  # Unix epoch ensures untracked files are flagged
+  if [[ -z "$last_commit" ]]; then
+    last_commit="$(python3 - "$skill_file" <<'PY'
+from datetime import datetime
+from pathlib import Path
+import sys
+
+print(datetime.fromtimestamp(Path(sys.argv[1]).stat().st_mtime).strftime("%Y-%m-%d"))
+PY
+)" || last_commit=""
+  fi
+  [[ -z "$last_commit" ]] && continue
   if [[ "$last_commit" < "$CUTOFF" ]]; then
     stale_skills+=("${skill_file} (last updated: ${last_commit})")
     echo "  [stale] ${skill_file}: last commit ${last_commit}"
@@ -394,7 +555,7 @@ done < <(grep -oE 'agent:[a-z-]+' AGENTS.md 2>/dev/null | sort -u || true)
 
 missing_gh_labels=()
 for label in "${roster_labels[@]}"; do
-  exists=$(gh label list --repo "$REPO" --json name \
+  exists=$(gh label list --repo "$REPO" --limit 200 --json name \
     --jq "[.[] | select(.name == \"${label}\")] | length" 2>/dev/null || echo "0")
   if [[ "${exists:-0}" -eq 0 ]]; then
     missing_gh_labels+=("$label")
