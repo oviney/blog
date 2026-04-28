@@ -23,6 +23,8 @@ The maintenance burden, meanwhile, has barely budged. When TestGuild surveyed 3,
 
 The pattern is familiar. Selenium promised to eliminate manual regression testing; it created a new category of maintenance burden instead. Codeless tools promised to let business analysts write tests; they shifted the bottleneck from creation to debugging. Each generation of tooling solves one problem while quietly creating another.
 
+That is why the current AI cycle deserves a colder reading than the one investors and vendors prefer. The tools are changing how test assets are produced, but they have not changed the economic structure of quality work. Someone still has to decide what matters, verify the outputs, and pay for the false confidence that accumulates when teams confuse faster generation with better assurance.
+
 ## Where the value hides
 
 AI delivers genuine gains, but not where the marketing suggests. At Microsoft, the Developer Division found that AI-generated unit tests were 62% faster to create than manually written ones, with equivalent defect detection rates. The savings materialised in the most tedious work — boundary value analysis, null-input handling, simple integration checks — while human testers continued to own the exploratory testing and complex scenario design where AI tools produced unreliable results.

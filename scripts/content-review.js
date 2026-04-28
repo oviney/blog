@@ -153,11 +153,37 @@ function wordCount(text) {
     .filter(w => w.length > 0).length;
 }
 
+function excerptText(block) {
+  return String(block || '')
+    .replace(/<figure[\s\S]*?<\/figure>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/!\[.*?\]\(.*?\)/g, ' ')
+    .replace(/\[([^\]]+)\]\((.*?)\)/g, '$1')
+    .replace(/[*_~`>#-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function isSourceOnlyParagraph(block) {
+  const text = excerptText(block).toLowerCase();
+  return /^source:\s+/.test(text) || /^illustration:\s+/.test(text);
+}
+
 function firstParagraph(body) {
   const paras = body.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
-  // Skip headings
+  // Skip headings, figures, images, and standalone source/credit lines.
   for (const p of paras) {
-    if (!p.startsWith('#') && !p.startsWith('---') && p.length > 20) return p;
+    const cleaned = excerptText(p);
+    if (
+      !p.startsWith('#') &&
+      !p.startsWith('---') &&
+      !p.startsWith('<figure') &&
+      !p.startsWith('![') &&
+      cleaned.length > 20 &&
+      !isSourceOnlyParagraph(p)
+    ) {
+      return cleaned;
+    }
   }
   return '';
 }

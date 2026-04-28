@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Platform Engineering's Adoption Crisis: Why Potential Goes Unrealised"
+title: "Platform engineering's adoption trap"
 date: 2026-04-12
 author: "Ouray Viney"
 categories: ["Software Engineering"]
