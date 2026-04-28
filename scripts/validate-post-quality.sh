@@ -212,6 +212,11 @@ for post in $POSTS; do
   # ------------------------------------------------------------------
   body=$(body_content "$post")
   has_refs=$(echo "$body" | grep -c "^## References" || true)
+  if echo "$body" | grep -Eq '[^[:space:]][[:space:]]##[[:space:]]'; then
+    echo "❌  $rel — heading markers are embedded inside paragraph text"
+    ERRORS=$((ERRORS + 1))
+    post_errors=$((post_errors + 1))
+  fi
   if [[ $has_refs -eq 0 ]]; then
     echo "⚠️   $rel — missing '## References' section"
     WARNINGS=$((WARNINGS + 1))

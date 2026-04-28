@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">AI-assisted code churn is projected to double relative to 2021 baseline</title>
+  <desc id="desc">A two-bar Economist-style chart showing a 2021 baseline index of 1.0x and a 2024 projected churn index of 2.0x from GitClear's Coding on Copilot report.</desc>
+
+  <rect width="1200" height="720" fill="#f3efe4"/>
+  <rect x="22" y="18" width="84" height="18" fill="#e3120b"/>
+
+  <text x="22" y="90" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="700" fill="#1f1f1f">Rework rises</text>
+  <text x="22" y="138" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="600" fill="#2a2a2a">GitClear projects AI-era code churn in 2024</text>
+  <text x="22" y="168" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="600" fill="#2a2a2a">at roughly 2x the 2021 pre-AI baseline</text>
+
+  <g transform="translate(0,6)">
+    <line x1="120" y1="560" x2="1060" y2="560" stroke="#2f2f2f" stroke-width="2"/>
+
+    <line x1="120" y1="470" x2="1060" y2="470" stroke="#d8d1c3" stroke-width="2"/>
+    <line x1="120" y1="380" x2="1060" y2="380" stroke="#d8d1c3" stroke-width="2"/>
+    <line x1="120" y1="290" x2="1060" y2="290" stroke="#d8d1c3" stroke-width="2"/>
+    <line x1="120" y1="200" x2="1060" y2="200" stroke="#d8d1c3" stroke-width="2"/>
+
+    <text x="1080" y="566" font-family="Inter, Arial, sans-serif" font-size="16" fill="#2f2f2f">0</text>
+    <text x="1080" y="476" font-family="Inter, Arial, sans-serif" font-size="16" fill="#6b675f">0.5x</text>
+    <text x="1080" y="386" font-family="Inter, Arial, sans-serif" font-size="16" fill="#6b675f">1.0x</text>
+    <text x="1080" y="296" font-family="Inter, Arial, sans-serif" font-size="16" fill="#6b675f">1.5x</text>
+    <text x="1080" y="206" font-family="Inter, Arial, sans-serif" font-size="16" fill="#6b675f">2.0x</text>
+
+    <rect x="260" y="380" width="220" height="180" fill="#b9b1a4"/>
+    <rect x="660" y="200" width="220" height="360" fill="#e3120b"/>
+
+    <text x="370" y="362" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="700" fill="#1f1f1f">1.0x</text>
+    <text x="370" y="596" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="20" fill="#6b675f">2021 baseline</text>
+
+    <text x="770" y="182" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="700" fill="#1f1f1f">2.0x</text>
+    <text x="770" y="596" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="20" fill="#6b675f">2024 projection</text>
+
+    <path d="M480 402 C 560 350, 612 314, 660 218" fill="none" stroke="#1f1f1f" stroke-width="2.5"/>
+    <text x="490" y="334" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="600" fill="#1f1f1f">Projected churn roughly doubles</text>
+  </g>
+</svg>
