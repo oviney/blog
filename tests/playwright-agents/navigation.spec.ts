@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 
 /**
  * Navigation & User Journey Tests for Economist Blog v5
@@ -7,6 +7,61 @@ import { test, expect } from '@playwright/test';
  * These tests complement BackstopJS visual regression testing by validating
  * behavioral aspects of navigation and user interactions.
  */
+
+async function tabToElement(page: Page, locator: Locator, maxTabs = 20) {
+  await page.evaluate(() => {
+    document.body.setAttribute('tabindex', '-1');
+    document.body.focus();
+  });
+
+  for (let i = 0; i < maxTabs; i++) {
+    await page.keyboard.press('Tab');
+
+    if (await locator.evaluate((element) => element === document.activeElement)) {
+      return;
+    }
+  }
+
+  throw new Error('Unable to reach target control with keyboard navigation.');
+}
+
+async function expectFocusVisibleAndUnobscured(locator: Locator) {
+  const focusAudit = await locator.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    const samplePoints = [
+      [rect.left + rect.width / 2, rect.top + rect.height / 2],
+      [rect.left + rect.width / 2, rect.top + Math.min(rect.height - 2, 2)],
+      [rect.left + Math.min(rect.width - 2, 2), rect.top + rect.height / 2],
+      [rect.right - Math.min(rect.width - 2, 2), rect.top + rect.height / 2],
+    ].filter(([x, y]) => x >= 0 && y >= 0 && x <= window.innerWidth && y <= window.innerHeight);
+
+    const isUnobscured = samplePoints.some(([x, y]) => {
+      return document.elementsFromPoint(x, y).some((node) => node === element || element.contains(node));
+    });
+
+    return {
+      matchesFocusVisible: element.matches(':focus-visible'),
+      fullyInViewport:
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= window.innerHeight &&
+        rect.right <= window.innerWidth,
+      isUnobscured,
+    };
+  });
+
+  expect(focusAudit.matchesFocusVisible).toBe(true);
+  expect(focusAudit.fullyInViewport).toBe(true);
+  expect(focusAudit.isUnobscured).toBe(true);
+}
+
+async function expectMinimumTargetSize(locator: Locator) {
+  const box = await locator.boundingBox();
+
+  expect(box).not.toBeNull();
+  expect(box!.width).toBeGreaterThanOrEqual(44);
+  expect(box!.height).toBeGreaterThanOrEqual(44);
+}
 
 test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NAV-02', () => {
 
@@ -476,6 +531,18 @@ test.describe('@navigation Mobile Navigation Specific Tests @REQ-NAV-01 @REQ-NAV
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   });
 
+  test('Hamburger toggle remains focus-visible and unobscured for keyboard users', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    const toggle = page.getByRole('button', { name: /open navigation menu/i });
+    await expect(toggle).toBeVisible();
+
+    await tabToElement(page, toggle);
+    await expect(toggle).toBeFocused();
+    await expectFocusVisibleAndUnobscured(toggle);
+  });
+
   test('Mobile navigation landmark matches ARIA smoke snapshot', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
@@ -503,7 +570,6 @@ test.describe('@navigation Mobile Navigation Specific Tests @REQ-NAV-01 @REQ-NAV
             - link "RSS"
     `);
   });
-
   test('Nav link tap closes the hamburger menu', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
@@ -541,26 +607,42 @@ test.describe('@navigation Mobile Navigation Specific Tests @REQ-NAV-01 @REQ-NAV
 
   test('Mobile navigation is touch-friendly', async ({ page }) => {
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
 
     // Open the menu so links are visible before measuring
-    const toggle = page.locator('.nav-toggle');
-    if (await toggle.count() > 0) {
-      await toggle.click();
-    }
+    const toggle = page.getByRole('button', { name: /open navigation menu/i });
+    await expect(toggle).toBeVisible();
+    await expectMinimumTargetSize(toggle);
+    await toggle.click();
 
     // Verify navigation elements are large enough for touch
-    const navLinks = page.getByRole('navigation').getByRole('link');
+    const navLinks = page.locator('#site-navigation').getByRole('link');
     const linkCount = await navLinks.count();
 
     for (let i = 0; i < linkCount; i++) {
       const link = navLinks.nth(i);
-      const box = await link.boundingBox();
-
-      if (box) {
-        // Touch targets should be at least 44px in either dimension
-        expect(Math.max(box.width, box.height)).toBeGreaterThanOrEqual(44);
-      }
+      await expect(link).toBeVisible();
+      await expectMinimumTargetSize(link);
     }
+  });
+
+  test('Mobile Blog link remains focus-visible and unobscured when menu is open', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    const toggle = page.getByRole('button', { name: /open navigation menu/i });
+    await toggle.click();
+
+    const blogLink = page.locator('#site-navigation').getByRole('link', { name: /blog/i }).first();
+    if (await blogLink.count() === 0) {
+      test.skip(true, 'Blog link is not present in the mobile navigation on this page.');
+      return;
+    }
+
+    await expect(blogLink).toBeVisible();
+    await tabToElement(page, blogLink);
+    await expect(blogLink).toBeFocused();
+    await expectFocusVisibleAndUnobscured(blogLink);
   });
 
   test('Mobile navigation doesn\'t overlap content', async ({ page }) => {
