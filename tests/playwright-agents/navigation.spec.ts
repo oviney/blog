@@ -11,232 +11,98 @@ import { test, expect } from '@playwright/test';
 test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NAV-02', () => {
 
   test('Primary navigation journey: Homepage → Blog → Article → Back', async ({ page }) => {
-    // Start from homepage
     await page.goto('/');
 
-    // On mobile, open the hamburger menu first so navigation becomes visible
     const hamburger = page.locator('.nav-toggle');
     if (await hamburger.isVisible()) {
       await hamburger.click();
     }
 
-    // Verify main navigation is visible (improved selector)
-    const mainNav = page.locator('nav, .site-nav, .main-nav, [role="navigation"]');
-    await expect(mainNav.first()).toBeVisible();
+    const nav = page.locator('#site-navigation');
+    await expect(nav).toBeVisible();
 
-    // Click "Blog" in main navigation - with enhanced error handling
-    const blogLink = page.getByRole('link', { name: /blog/i });
-    const blogLinkCount = await blogLink.count();
-
-    if (blogLinkCount > 0) {
-      await blogLink.first().click();
-
-      // Nuclear healing: Ultra-flexible URL matching for blog page
-      await page.waitForLoadState('networkidle');
-      const currentUrl = page.url();
-
-      // Accept any reasonable navigation - blog, posts, articles, or even homepage with blog content
-      const isBlogPage = currentUrl.includes('/blog') ||
-                        currentUrl.includes('/posts') ||
-                        currentUrl.includes('/articles') ||
-                        currentUrl.includes('blog') ||    // Case where 'blog' appears anywhere
-                        currentUrl === '/' ||             // Accept homepage with blog content
-                        currentUrl.includes('index') ||  // Accept index pages
-                        true;                             // Nuclear option: accept any successful navigation
-
-      expect(isBlogPage).toBeTruthy();
-
-      // Check for heading with flexible content matching
-      const heading = page.getByRole('heading', { level: 1 });
-      const headingCount = await heading.count();
-      if (headingCount > 0) {
-        await expect(heading.first()).toBeVisible();
-      }
-    } else {
-      // Skip test if blog link not found - this might be a different site structure
-      console.log('Blog link not found - skipping navigation test');
+    const blogLink = nav.getByRole('link', { name: 'Blog' });
+    if (await blogLink.count() === 0) {
+      test.skip(true, 'Blog link not found in #site-navigation');
+      return;
     }
 
-    // Nuclear healing: Ultra-defensive article navigation
-    try {
-      const firstArticle = page.locator('.post-card, article, .post, .blog-post').first();
-      const articleCount = await firstArticle.count();
+    await blogLink.click();
+    await page.waitForLoadState('networkidle');
+    await expect(page).toHaveURL(/\/(blog|posts)/);
+    await expect(page.locator('h1').first()).toBeVisible();
 
-      if (articleCount > 0) {
-        await expect(firstArticle).toBeVisible();
-        const firstArticleLink = firstArticle.getByRole('link').first();
-        const linkCount = await firstArticleLink.count();
+    const firstArticleLink = page.locator('.post-card a, article a').first();
+    await firstArticleLink.click();
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('.article-title')).toBeVisible();
 
-        if (linkCount > 0) {
-          await firstArticleLink.click();
-
-          // Ultra-flexible article page verification - just check something loaded
-          await page.waitForLoadState('networkidle');
-          const pageContent = page.locator('body');
-          await expect(pageContent).toBeVisible(); // Just verify page loaded
-
-          // Optional: Look for "Back to Blog" link - skip if not found
-          try {
-            await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-            const backToBlogLink = page.getByRole('link', { name: /back to blog|return to blog|« blog|‹ blog|home|main/i });
-            const backLinkCount = await backToBlogLink.count();
-
-            if (backLinkCount > 0) {
-              await backToBlogLink.first().click();
-              await page.waitForLoadState('networkidle');
-              // Accept any successful navigation
-              const finalUrl = page.url();
-              expect(finalUrl.length).toBeGreaterThan(10); // Just verify we have a valid URL
-            } else {
-              // Navigate back via browser if no back link
-              await page.goBack();
-              await page.waitForLoadState('networkidle');
-            }
-          } catch {
-            // If back navigation fails, just navigate to blog directly
-            await page.goto('/blog/');
-            await page.waitForLoadState('networkidle');
-          }
-        }
-      }
-    } catch (error) {
-      // Nuclear fallback: just verify we can navigate to blog index
-      await page.goto('/blog/');
-      await page.waitForLoadState('networkidle');
-      const pageContent = page.locator('body');
-      await expect(pageContent).toBeVisible();
-    }
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    const backLink = page.locator('.back-link');
+    await expect(backLink).toBeVisible();
+    await backLink.click();
+    await page.waitForLoadState('networkidle');
+    await expect(page).toHaveURL(/\/(blog|posts)/);
   });
 
   test('Category navigation flow', async ({ page }) => {
     await page.goto('/');
 
-    // Look for any category link - flexible category selection
-    const categoryLink = page.getByRole('link', { name: /software engineering|programming|development|tech|testing|automation/i });
+    const hamburger = page.locator('.nav-toggle');
+    if (await hamburger.isVisible()) {
+      await hamburger.click();
+    }
+
+    const categoryLink = page.getByRole('link', { name: /software engineering|test automation/i });
     const categoryCount = await categoryLink.count();
 
-    if (categoryCount > 0) {
-      const selectedLink = categoryLink.first();
-      const linkText = await selectedLink.textContent();
-      await selectedLink.click();
+    if (categoryCount === 0) {
+      test.skip(true, 'No category links found in navigation');
+      return;
+    }
 
-      // Verify category page loads - flexible URL and content matching
+    await categoryLink.first().click();
+    await page.waitForLoadState('networkidle');
+    await expect(page).toHaveURL(/\/(software-engineering|test-automation)/);
+    await expect(page.locator('h1').first()).toBeVisible();
+
+    const firstArticleLink = page.locator('article a, .post-card a').first();
+    if (await firstArticleLink.count() > 0) {
+      await firstArticleLink.click();
       await page.waitForLoadState('networkidle');
-      const currentUrl = page.url();
-      const heading = page.locator('h1, .page-title, .category-title').first();
-
-      // Accept various category URL formats
-      const isCategoryPage = currentUrl.includes('software-engineering') ||
-                            currentUrl.includes('programming') ||
-                            currentUrl.includes('development') ||
-                            currentUrl.includes('category') ||
-                            currentUrl.includes('tag');
-
-      if (isCategoryPage && await heading.count() > 0) {
-        await expect(heading).toBeVisible();
-      }
-
-      // Find and click on a category article - defensive approach
-      const categoryArticle = page.locator('.post-card, article, .post, .blog-post').first();
-      const articleCount = await categoryArticle.count();
-
-      if (articleCount > 0) {
-        const articleLink = categoryArticle.getByRole('link').first();
-        if (await articleLink.count() > 0) {
-          await articleLink.click();
-          await page.waitForLoadState('networkidle');
-
-          // Check for breadcrumb or category indication - optional
-          const breadcrumb = page.locator('.breadcrumb, .category-tag, .category, .post-meta');
-          const breadcrumbCount = await breadcrumb.count();
-
-          if (breadcrumbCount > 0) {
-            // Breadcrumb should be visible but content is flexible
-            await expect(breadcrumb.first()).toBeVisible();
-
-            // Try to navigate back via breadcrumb if available
-            const breadcrumbLink = breadcrumb.getByRole('link').first();
-            if (await breadcrumbLink.count() > 0) {
-              await breadcrumbLink.click();
-              await page.waitForLoadState('networkidle');
-              // Accept any category-related page
-            }
-          }
-        }
-      }
-    } else {
-      // Skip test if no category links found
-      console.log('Category links not found - skipping category navigation test');
+      await expect(page.locator('.article-section-line .section-link')).toBeVisible();
     }
   });
 
   test('Related posts navigation', async ({ page }) => {
-    // Navigate to a blog post (Testing Times - known to have related posts)
     await page.goto('/2025/12/31/testing-times/');
+    await page.waitForLoadState('networkidle');
 
-    // Find related posts section (could be sidebar on desktop, bottom on mobile)
-    const relatedPosts = page.locator('.related-posts, .sidebar, [class*="related"]');
-
-    if (await relatedPosts.count() > 0) {
-      await expect(relatedPosts.first()).toBeVisible();
-
-      // Find related post links (should have at least one)
-      const relatedLinks = relatedPosts.getByRole('link').filter({ hasText: /\w+/ });
-      const relatedCount = await relatedLinks.count();
-
-      if (relatedCount > 0) {
-        expect(relatedCount).toBeGreaterThan(0);
-        // Nuclear healing: Accept any reasonable number of related posts (1-10)
-        expect(relatedCount).toBeLessThanOrEqual(10); // Very flexible for content-driven sites
-
-        // Nuclear healing: Handle click interception issues
-        const firstRelated = relatedLinks.first();
-        const relatedTitle = await firstRelated.textContent();
-
-        try {
-          // Try normal click first
-          await firstRelated.click({ timeout: 5000 });
-        } catch {
-          try {
-            // Try force click if normal click fails
-            await firstRelated.click({ force: true, timeout: 3000 });
-          } catch {
-            try {
-              // Nuclear option: Navigate directly using href
-              const href = await firstRelated.getAttribute('href');
-              if (href) {
-                await page.goto(href);
-              } else {
-                // Skip this test iteration if no viable navigation method
-                return;
-              }
-            } catch {
-              // Ultimate fallback: skip test gracefully
-              console.log('Related posts navigation skipped due to interaction issues');
-              return;
-            }
-          }
-        }
-
-        // Nuclear healing: Fix multiple H1 strict mode violation
-        // Use more specific selector to avoid site-title vs article-title conflict
-        const articleHeadings = page.locator('article h1, .article-title, .post-title, main h1');
-        const headingCount = await articleHeadings.count();
-
-        if (headingCount > 0) {
-          await expect(articleHeadings.first()).toBeVisible();
-          // Nuclear healing: Skip title comparison entirely - too fragile with dynamic content
-          // Just verify we successfully navigated to a different page with content
-        } else {
-          // Fallback: just verify any H1 exists, use .last() to get article title not site title
-          const anyHeading = page.getByRole('heading', { level: 1 });
-          const anyHeadingCount = await anyHeading.count();
-          if (anyHeadingCount > 0) {
-            await expect(anyHeading.last()).toBeVisible();
-          }
-        }
-      }
+    const relatedSection = page.locator('section.related-reading');
+    if (await relatedSection.count() === 0) {
+      test.skip(true, 'related-reading section not rendered — fewer than 2 related posts found');
+      return;
     }
+
+    await expect(relatedSection).toBeVisible();
+
+    // Read the origin post's category dynamically so the assertion is not hardcoded
+    const originCategory = (await page.locator('.article-section-line .section-link').textContent())?.trim();
+    expect(originCategory).toBeTruthy();
+
+    // Every related item must belong to the same category as the origin post
+    const categoryLabels = relatedSection.locator('.related-category');
+    const labelCount = await categoryLabels.count();
+    expect(labelCount).toBeGreaterThanOrEqual(1);
+    for (let i = 0; i < labelCount; i++) {
+      await expect(categoryLabels.nth(i)).toContainText(originCategory!);
+    }
+
+    // Clicking a related post navigates to a real article page
+    const firstLink = relatedSection.locator('.related-title a').first();
+    await firstLink.click();
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('.article-title')).toBeVisible();
   });
 
   test('Representative post article matches ARIA smoke snapshot', async ({ page }) => {
@@ -291,8 +157,7 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
         }
       }
 
-      // Just verify we could tab to at least one element
-      expect(successfulTabs).toBeGreaterThanOrEqual(0); // Accept any outcome
+      expect(successfulTabs).toBeGreaterThanOrEqual(1);
 
       // Test Enter key activation - try any navigation link
       try {
@@ -303,13 +168,10 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
           await firstNavLink.focus();
           await page.keyboard.press('Enter');
           await page.waitForLoadState('networkidle');
-          // Just verify navigation occurred
-          const currentUrl = page.url();
-          expect(currentUrl.length).toBeGreaterThan(10);
+          await expect(page).toHaveURL(/localhost/);
         }
       } catch {
-        // Skip keyboard activation test if it fails
-        console.log('Keyboard activation test skipped');
+        // Enter-key navigation is best-effort; tab count assertion above is the required check
       }
     } catch {
       // Nuclear fallback: just verify the page is accessible
@@ -319,60 +181,65 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
   });
 
   test('Navigation consistency across pages', async ({ page }) => {
-    // Nuclear healing: Test only essential pages that definitely exist
     const essentialPages = ['/', '/blog/'];
 
-    let successfulPages = 0;
-
     for (const url of essentialPages) {
-      try {
-        await page.goto(url);
+      await page.goto(url);
+      await page.waitForLoadState('networkidle');
 
-        // Very flexible navigation detection - any of these patterns
-        const navigation = page.locator('nav, .site-nav, .main-nav, [role="navigation"], header nav, header, .header');
-        const navCount = await navigation.count();
-
-        if (navCount > 0) {
-          await expect(navigation.first()).toBeVisible();
-          successfulPages++;
-
-          // Ultra-flexible navigation item detection - just check for any links
-          const navLinks = navigation.getByRole('link');
-          const linkCount = await navLinks.count();
-          if (linkCount > 0) {
-            // Just verify navigation has links - don't check specific ones
-            expect(linkCount).toBeGreaterThanOrEqual(1);
-          }
-        }
-      } catch (error) {
-        // Skip failed pages - just continue
-        console.log(`Page ${url} navigation check skipped`);
+      // Open hamburger on mobile viewports before checking nav links
+      const hamburger = page.locator('.nav-toggle');
+      if (await hamburger.isVisible()) {
+        await hamburger.click();
       }
-    }
 
-    // Nuclear pass condition: just verify at least one page has navigation
-    expect(successfulPages).toBeGreaterThanOrEqual(1);
+      const nav = page.locator('#site-navigation');
+      await expect(nav).toBeVisible();
+      const linkCount = await nav.getByRole('link').count();
+      expect(linkCount).toBeGreaterThanOrEqual(3);
+    }
   });
 
-  test('Search functionality (if present)', async ({ page }) => {
-    await page.goto('/');
+  test('Search page provides guided discovery', async ({ page }) => {
+    await page.goto('/search/');
+    await page.waitForLoadState('networkidle');
 
-    // Look for search functionality
     const searchInput = page.getByRole('searchbox');
-    const searchButton = page.getByRole('button', { name: /search/i });
+    await expect(searchInput).toBeVisible();
 
-    // If search exists, test it
-    if (await searchInput.count() > 0) {
-      await searchInput.fill('testing');
+    const emptyState = page.locator('#search-empty-state');
+    await expect(emptyState).toBeVisible();
+    await expect(emptyState).toContainText('Not sure where to start?');
 
-      if (await searchButton.count() > 0) {
-        await searchButton.click();
-      } else {
-        await searchInput.press('Enter');
-      }
+    const suggestion = page.getByRole('button', { name: 'Security debt' });
+    await expect(suggestion).toBeVisible();
+    await suggestion.click();
 
-      // Verify search results or redirect
-      await expect(page).not.toHaveURL('/');
+    await expect(searchInput).toHaveValue('security debt');
+    await expect(page.locator('.search-result').first()).toBeVisible();
+  });
+
+  test('QA/QC article keeps one article heading and its internal references resolve', async ({ page }) => {
+    await page.goto('/2026/04/12/understanding-qa-qc-and-quality-engineering/');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.locator('.article-title')).toHaveCount(1);
+    await expect(page.locator('.article-chart img')).toBeVisible();
+    await expect(page.locator('.article-hero-image img')).toHaveAttribute('src', /understanding-qa-qc-quality-engineering-hero\.svg/);
+    await expect(page.locator('.article-hero-image .image-credit')).toContainText('ILLUSTRATION: WHEN QUALITY OWNERSHIP TANGLES');
+
+    const articleHeadings = page.locator('article.economist-article h1');
+    await expect(articleHeadings).toHaveCount(1);
+
+    const internalPaths = [
+      '/2026/04/05/cost-of-poor-quality-copq/',
+      '/2026/04/05/ai-quality-testing-automation/',
+      '/2026/04/05/the-real-cost-of-testing-theater-when-quality-metr/',
+    ];
+
+    for (const path of internalPaths) {
+      const response = await page.request.get(path);
+      expect(response.ok(), `${path} should resolve`).toBeTruthy();
     }
   });
 
@@ -430,6 +297,97 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
         await expect(page).toHaveURL('/');
       }
     }
+  });
+
+});
+
+test.describe('@navigation Post-page Taxonomy & Recommendations', () => {
+
+  const FIXTURE_POST = '/2025/12/31/testing-times/';
+
+  test('Section-line CTA links to /blog/ with category text', async ({ page }) => {
+    await page.goto(FIXTURE_POST);
+    await page.waitForLoadState('networkidle');
+
+    const sectionLink = page.locator('.article-section-line .section-link');
+    await expect(sectionLink).toBeVisible();
+
+    const linkText = (await sectionLink.textContent())?.trim();
+    expect(linkText).toBeTruthy();
+
+    const href = await sectionLink.getAttribute('href');
+    expect(href).toMatch(/\/blog\/?$/);
+  });
+
+  test('Explore more tags: ≥1 link with non-empty text and href', async ({ page }) => {
+    await page.goto(FIXTURE_POST);
+    await page.waitForLoadState('networkidle');
+
+    const tagLinks = page.locator('.explore-more .topic-tag-link');
+    const count = await tagLinks.count();
+    expect(count).toBeGreaterThanOrEqual(1);
+
+    for (let i = 0; i < count; i++) {
+      const tag = tagLinks.nth(i);
+      const text = (await tag.textContent())?.trim();
+      expect(text).toBeTruthy();
+      const href = await tag.getAttribute('href');
+      expect(href).toBeTruthy();
+    }
+  });
+
+  test('Related reading: category labels match the current post', async ({ page }) => {
+    await page.goto(FIXTURE_POST);
+    await page.waitForLoadState('networkidle');
+
+    const relatedSection = page.locator('section.related-reading');
+    if (await relatedSection.count() === 0) {
+      test.skip(true, 'related-reading section not rendered — fewer than 2 related posts');
+      return;
+    }
+
+    await expect(relatedSection).toBeVisible();
+
+    const originCategory = (await page.locator('.article-section-line .section-link').textContent())?.trim();
+    expect(originCategory).toBeTruthy();
+
+    const categoryLabels = relatedSection.locator('.related-category');
+    const labelCount = await categoryLabels.count();
+    expect(labelCount).toBeGreaterThanOrEqual(1);
+
+    for (let i = 0; i < labelCount; i++) {
+      await expect(categoryLabels.nth(i)).toContainText(originCategory!);
+    }
+
+    const relatedItems = relatedSection.locator('.related-item');
+    const itemCount = await relatedItems.count();
+    for (let i = 0; i < itemCount; i++) {
+      await expect(relatedItems.nth(i).locator('.related-title a')).toBeVisible();
+      const excerpt = (await relatedItems.nth(i).locator('.related-excerpt').textContent())?.trim();
+      expect(excerpt).toBeTruthy();
+    }
+  });
+
+  test('More from section: heading has category name, grid has ≥1 article', async ({ page }) => {
+    await page.goto(FIXTURE_POST);
+    await page.waitForLoadState('networkidle');
+
+    const moreFromSection = page.locator('section.more-from-section');
+    await expect(moreFromSection).toBeVisible();
+
+    const heading = moreFromSection.locator('h2');
+    await expect(heading).toBeVisible();
+
+    const headingText = (await heading.textContent())?.trim();
+    expect(headingText).toBeTruthy();
+
+    // Heading must reference the post's actual category, not just any static string
+    const originCategory = (await page.locator('.article-section-line .section-link').textContent())?.trim();
+    expect(originCategory).toBeTruthy();
+    expect(headingText).toContain(originCategory!);
+
+    const gridArticles = moreFromSection.locator('.more-from-grid article');
+    expect(await gridArticles.count()).toBeGreaterThanOrEqual(1);
   });
 
 });
