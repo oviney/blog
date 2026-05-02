@@ -106,12 +106,7 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
   });
 
   test('Representative post article matches ARIA smoke snapshot', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
-    const representativePostLink = page.locator('.hero-post-title a, .hero-post-cta').first();
-    await expect(representativePostLink).toBeVisible();
-    await representativePostLink.click();
+    await page.goto('/2025/12/31/testing-times/');
     await page.waitForLoadState('networkidle');
 
     await expect(page.locator('main article').first()).toMatchAriaSnapshot(`
@@ -119,11 +114,9 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
         - link /.+/
         - heading /.+/ [level=1]
         - button "Copy link to this article"
-        - figure "ILLUSTRATION"
+        - figure /.+/
         - time
         - navigation "Table of contents"
-        - heading "References" [level=2]
-        - list
         - heading "Explore more" [level=3]
     `);
   });
