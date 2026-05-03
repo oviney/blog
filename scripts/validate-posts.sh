@@ -91,6 +91,22 @@ for post in $POSTS; do
     fi
   done
 
+  # -- 2b. Tag checks (required: 2–5 lowercase-hyphen tags) -----------------
+  tags_val=$(fm_value "$post" "tags")
+  if [[ -z "$tags_val" ]]; then
+    echo "❌  $rel — missing required front-matter field: 'tags' (add 2–5 lowercase-hyphen tags)"
+    ERRORS=$((ERRORS + 1))
+    post_errors=$((post_errors + 1))
+  else
+    # Count tags: strip brackets, split on commas, count non-empty items
+    tag_count=$(echo "$tags_val" | tr -d '[]' | tr ',' '\n' | grep -c '[^[:space:]]' || true)
+    if [[ "$tag_count" -lt 2 ]]; then
+      echo "❌  $rel — too few tags: $tag_count found (minimum 2 required)"
+      ERRORS=$((ERRORS + 1))
+      post_errors=$((post_errors + 1))
+    fi
+  fi
+
   # -- 3. Image path must resolve to a real file ----------------------------
   image_val=$(fm_value "$post" "image")
   if [[ -n "$image_val" ]]; then
