@@ -113,6 +113,54 @@ test.describe('@content AI Disclosure and Content Badges @REQ-CONTENT-01 @REQ-CO
 
 });
 
+test.describe('@content @links April AI posts: cross-post links resolve @REQ-CONTENT-01', () => {
+
+  test('AI Testing Tools post has 3 cross-post links and all resolve', async ({ page }) => {
+    await page.goto('/2026/04/05/ai-quality-testing-automation/');
+    await page.waitForLoadState('networkidle');
+
+    const expectedLinks = [
+      '/2025/12/31/testing-times/',
+      '/2026/04/05/why-ai-test-generation-tools-overpromise-on-maintenance-savi/',
+      '/2026/01/19/the-surprising-economics-of-test-automation-roi/',
+    ];
+
+    const articleBody = page.locator('.article-content');
+    await expect(articleBody).toBeVisible();
+
+    for (const path of expectedLinks) {
+      const link = articleBody.locator(`a[href="${path}"]`);
+      await expect(link, `link to ${path} should be present in article body`).toBeVisible();
+
+      const response = await page.request.get(path);
+      expect(response.ok(), `${path} should return 2xx`).toBeTruthy();
+    }
+  });
+
+  test('Code Generators post has 3 cross-post links and all resolve', async ({ page }) => {
+    await page.goto('/2026/04/05/ai-assisted-development-the-new-industrial-revolut/');
+    await page.waitForLoadState('networkidle');
+
+    const expectedLinks = [
+      '/2026/04/05/ai-quality-testing-automation/',
+      '/2026/04/05/practical-applications-of-ai-in-software-development/',
+      '/2026/01/02/self-healing-tests-myth-vs-reality/',
+    ];
+
+    const articleBody = page.locator('.article-content');
+    await expect(articleBody).toBeVisible();
+
+    for (const path of expectedLinks) {
+      const link = articleBody.locator(`a[href="${path}"]`);
+      await expect(link, `link to ${path} should be present in article body`).toBeVisible();
+
+      const response = await page.request.get(path);
+      expect(response.ok(), `${path} should return 2xx`).toBeTruthy();
+    }
+  });
+
+});
+
 test.describe('@content @visual Image Handling Edge Cases @REQ-CONTENT-01 @REQ-CONTENT-02', () => {
 
   test('Posts with hero images load correctly', async ({ page }) => {
