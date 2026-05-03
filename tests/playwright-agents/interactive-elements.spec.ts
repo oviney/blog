@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 
 /**
  * Interactive Elements Tests
@@ -7,7 +7,63 @@ import { test, expect } from '@playwright/test';
  */
 
 // Use a post that has multiple h2 headings to trigger the ToC
-const POST_URL = '/2026/01/02/self-healing-tests-myth-vs-reality/';
+const POST_URL = '/test%20automation/2026/01/02/self-healing-tests-myth-vs-reality.html';
+const CODE_POST_URL = '/software%20engineering/2026/04/05/practical-applications-of-ai-in-software-development.html';
+
+async function tabToElement(page: Page, locator: Locator, maxTabs = 40) {
+  await page.evaluate(() => {
+    document.body.setAttribute('tabindex', '-1');
+    document.body.focus();
+  });
+
+  for (let i = 0; i < maxTabs; i++) {
+    await page.keyboard.press('Tab');
+
+    if (await locator.evaluate((element) => element === document.activeElement)) {
+      return;
+    }
+  }
+
+  throw new Error('Unable to reach target control with keyboard navigation.');
+}
+
+async function expectFocusVisibleAndUnobscured(locator: Locator) {
+  const focusAudit = await locator.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    const samplePoints = [
+      [rect.left + rect.width / 2, rect.top + rect.height / 2],
+      [rect.left + rect.width / 2, rect.top + Math.min(rect.height - 2, 2)],
+      [rect.left + Math.min(rect.width - 2, 2), rect.top + rect.height / 2],
+      [rect.right - Math.min(rect.width - 2, 2), rect.top + rect.height / 2],
+    ].filter(([x, y]) => x >= 0 && y >= 0 && x <= window.innerWidth && y <= window.innerHeight);
+
+    const isUnobscured = samplePoints.some(([x, y]) => {
+      return document.elementsFromPoint(x, y).some((node) => node === element || element.contains(node));
+    });
+
+    return {
+      matchesFocusVisible: element.matches(':focus-visible'),
+      fullyInViewport:
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= window.innerHeight &&
+        rect.right <= window.innerWidth,
+      isUnobscured,
+    };
+  });
+
+  expect(focusAudit.matchesFocusVisible).toBe(true);
+  expect(focusAudit.fullyInViewport).toBe(true);
+  expect(focusAudit.isUnobscured).toBe(true);
+}
+
+async function expectMinimumTargetSize(locator: Locator) {
+  const box = await locator.boundingBox();
+
+  expect(box).not.toBeNull();
+  expect(box!.width).toBeGreaterThanOrEqual(44);
+  expect(box!.height).toBeGreaterThanOrEqual(44);
+}
 
 test.describe('@navigation Reading Progress Bar @REQ-NAV-02 @REQ-A11Y-01', () => {
   test('progress bar is present on post pages', async ({ page }) => {
@@ -102,12 +158,21 @@ test.describe('@navigation @content Table of Contents @REQ-NAV-02 @REQ-A11Y-01 @
     const summary = page.locator('#toc .toc-title');
     await expect(summary.first()).toBeVisible();
   });
+
+  test('ToC summary remains focus-visible and unobscured for keyboard users', async ({ page }) => {
+    await page.goto(POST_URL);
+    await page.waitForLoadState('networkidle');
+
+    const summary = page.locator('#toc .toc-title').first();
+    await expect(summary).toBeVisible();
+
+    await tabToElement(page, summary);
+    await expect(summary).toBeFocused();
+    await expectFocusVisibleAndUnobscured(summary);
+  });
 });
 
 test.describe('@content Copy Code Buttons @REQ-A11Y-01 @REQ-NAV-02', () => {
-  // Use a post that is known to have code blocks
-  const CODE_POST = '/2023/08/08/practical-applications-of-ai-in-software-development/';
-
   test('copy code buttons are absent when there are no code blocks', async ({ page }) => {
     await page.goto(POST_URL);
     await page.waitForLoadState('networkidle');
@@ -129,7 +194,7 @@ test.describe('@content Copy Code Buttons @REQ-A11Y-01 @REQ-NAV-02', () => {
   });
 
   test('copy code buttons have accessible label', async ({ page }) => {
-    await page.goto(CODE_POST);
+    await page.goto(CODE_POST_URL);
     await page.waitForLoadState('networkidle');
 
     const copyBtns = page.locator('.copy-code-btn');
@@ -170,13 +235,7 @@ test.describe('@navigation Back to Top Button @REQ-NAV-02 @REQ-A11Y-01', () => {
     await page.waitForLoadState('networkidle');
 
     const btn = page.locator('#back-to-top');
-    const box = await btn.boundingBox();
-
-    if (box) {
-      // Should be at least 44×44px for WCAG touch targets
-      expect(box.width).toBeGreaterThanOrEqual(44);
-      expect(box.height).toBeGreaterThanOrEqual(44);
-    }
+    await expectMinimumTargetSize(btn);
   });
 
   test('back-to-top button becomes visible after scrolling', async ({ page }) => {
@@ -190,10 +249,24 @@ test.describe('@navigation Back to Top Button @REQ-NAV-02 @REQ-A11Y-01', () => {
 
     // Scroll down
     await page.evaluate(() => window.scrollTo(0, 600));
-    await page.waitForTimeout(200);
+    await page.waitForFunction(() => document.getElementById('back-to-top')?.classList.contains('visible') === true);
 
     const hasVisibleAfter = await btn.evaluate((el) => el.classList.contains('visible'));
     expect(hasVisibleAfter).toBe(true);
+  });
+
+  test('back-to-top button remains focus-visible and unobscured when shown', async ({ page }) => {
+    await page.goto(POST_URL);
+    await page.waitForLoadState('networkidle');
+
+    const btn = page.locator('#back-to-top');
+    await page.evaluate(() => window.scrollTo(0, 600));
+    await page.waitForFunction(() => document.getElementById('back-to-top')?.classList.contains('visible') === true);
+    await expect(btn).toBeVisible();
+
+    await tabToElement(page, btn);
+    await expect(btn).toBeFocused();
+    await expectFocusVisibleAndUnobscured(btn);
   });
 });
 
