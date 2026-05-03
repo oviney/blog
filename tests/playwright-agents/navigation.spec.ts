@@ -370,7 +370,8 @@ test.describe('@navigation Post-page Taxonomy & Recommendations @REQ-NAV-01', ()
 
   // AC-4: more-from grid contains only same-category posts
   test('More from section grid contains only same-category posts', async ({ page }) => {
-    await page.goto('/2026/04/05/practical-applications-of-ai-in-software-development/');
+    const FIXTURE = '/2026/04/05/practical-applications-of-ai-in-software-development/';
+    await page.goto(FIXTURE);
     await page.waitForLoadState('networkidle');
 
     const moreFromSection = page.locator('section.more-from-section');
@@ -381,14 +382,19 @@ test.describe('@navigation Post-page Taxonomy & Recommendations @REQ-NAV-01', ()
     await expect(moreFromSection).toBeVisible();
     await expect(moreFromSection.locator('h2')).toContainText('Software Engineering');
 
-    // Navigate to each linked article and verify it is in the same category
-    const articleLinks = moreFromSection.locator('article a[href]');
-    const count = await articleLinks.count();
+    // Scope to title links only — image links in the same article would produce duplicates
+    const titleLinks = moreFromSection.locator('article h3 a[href]');
+    const count = await titleLinks.count();
     expect(count).toBeGreaterThanOrEqual(1);
 
-    for (let i = 0; i < Math.min(count, 3); i++) {
-      const href = await articleLinks.nth(i).getAttribute('href');
-      if (!href) continue;
+    // Collect hrefs before navigating so the locator isn't re-evaluated after page transitions
+    const hrefs: string[] = [];
+    for (let i = 0; i < Math.min(count, 2); i++) {
+      const href = await titleLinks.nth(i).getAttribute('href');
+      if (href) hrefs.push(href);
+    }
+
+    for (const href of hrefs) {
       await page.goto(href);
       await page.waitForLoadState('networkidle');
       const sectionLink = page.locator('.article-section-line .section-link');
@@ -396,8 +402,6 @@ test.describe('@navigation Post-page Taxonomy & Recommendations @REQ-NAV-01', ()
         const catText = (await sectionLink.first().textContent())?.trim();
         expect(catText, `linked post at ${href} should be Software Engineering`).toBe('Software Engineering');
       }
-      await page.goBack();
-      await page.waitForLoadState('networkidle');
     }
   });
 

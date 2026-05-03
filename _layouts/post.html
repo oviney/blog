@@ -185,11 +185,9 @@ layout: default
       {% endunless %}
       {% if more_from_posts.size >= 6 %}{% break %}{% endif %}
     {% endfor %}
-    {% assign related_posts = more_from_posts %}
-
-    {% if related_posts.size > 0 %}
+    {% if more_from_posts.size > 0 %}
     <!-- Featured article (first one, larger) -->
-    {% assign featured = related_posts | first %}
+    {% assign featured = more_from_posts | first %}
     <article class="more-from-featured">
       {% if featured.image %}
       <a href="{{ featured.url | relative_url }}" class="featured-image-link">
@@ -204,7 +202,7 @@ layout: default
 
     <!-- Smaller articles grid -->
     <div class="more-from-list">
-      {% for post in related_posts offset: 1 limit: 5 %}
+      {% for post in more_from_posts offset: 1 limit: 5 %}
       <article class="more-from-item">
         {% if post.image %}
         <a href="{{ post.url | relative_url }}" class="item-image-link">
