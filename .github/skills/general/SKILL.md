@@ -1,7 +1,7 @@
 ---
 name: general
 description: 'General-purpose agent for cross-cutting tasks. Use when working on documentation, refactoring, shared config, AGENTS.md, decisions.md, or anything that does not belong to a specialised agent.'
-version: 1.0.0
+version: 1.1.1
 triggers:
   - No agent label on the issue
   - Cross-cutting or repo-wide change
@@ -30,6 +30,7 @@ change must be intentional, minimal, and fully validated.
 - Issue touches only CSS/SCSS/layouts → hand off to Creative Director (`agent:creative-director`)
 - Issue touches only tests/CI/accessibility → hand off to QA Gatekeeper (`agent:qa-gatekeeper`)
 - Issue touches only blog posts/drafts/SEO → hand off to Editorial Chief (`agent:editorial-chief`)
+- Issue is reader-journey / audience-fit / usability research → hand off to Audience Researcher (`agent:audience-researcher`)
 
 ## Step-by-Step Instructions
 
@@ -77,7 +78,7 @@ These files require human review. No agent — including the General Agent — m
 | `.github/CODEOWNERS` | Repository governance |
 | `.github/copilot-instructions.md` | Agent routing rules |
 | `Gemfile` / `Gemfile.lock` | Ruby dependency lockfile |
-| `.github/agents/` | Agent instruction files |
+| `.github/agents/` | Agent automation internals |
 
 ## Agent Scope
 
@@ -117,18 +118,18 @@ with the correct label instead of making the change yourself.
 **Solution**: Always run `bundle exec jekyll build` after creating or editing any Markdown file.
 
 ### Pitfall 4: Forgetting to update all references
-**Problem**: A new skill file is created but routing tables in `AGENTS.md` and `.github/copilot-instructions.md` are not updated.  
+**Problem**: A new skill file is created but routing tables in `AGENTS.md`, `CLAUDE.md`, or `.github/copilot-instructions.md` are not updated.  
 **Solution**: Search for every location that lists skill files before opening the PR:
 ```bash
-grep -r "Read issue description" .github/ AGENTS.md
+rg "agent:|planning-and-task-breakdown|github-issues-workflow|jekyll-qa|editorial|economist-theme" AGENTS.md CLAUDE.md .github/skills .github/copilot-instructions.md
 ```
 
 ## Related Files
 
-- [`AGENTS.md`](../../AGENTS.md) — agent roster and cross-agent conventions
-- [`CLAUDE.md`](../../CLAUDE.md) — repo-level AI agent context
-- [`.github/copilot-instructions.md`](../copilot-instructions.md) — agent routing rules
-- [`decisions.md`](../../decisions.md) — architectural decision log
+- [`AGENTS.md`](../../../AGENTS.md) — agent roster and cross-agent conventions
+- [`CLAUDE.md`](../../../CLAUDE.md) — repo-level AI agent context
+- [`.github/copilot-instructions.md`](../../copilot-instructions.md) — agent routing rules
+- [`decisions.md`](../../../decisions.md) — architectural decision log
 - [`.github/skills/_template/SKILL.md`](./../_template/SKILL.md) — skill file template
 
 ## Success Criteria
@@ -143,4 +144,5 @@ grep -r "Read issue description" .github/ AGENTS.md
 
 ## Version History
 
+- **1.1.0** (2026-04-26): Removed references to nonexistent `.github/agents/` files and expanded the routing-update check to include `CLAUDE.md`
 - **1.0.0** (2026-04-08): Initial skill creation — scope, protected files, quality standards, branching convention

@@ -1,6 +1,11 @@
 ---
 name: browser-testing-with-devtools
 description: Verifies browser-facing work with live runtime evidence. Use when debugging rendered UI, checking console or network output, validating responsive behavior, or confirming a browser fix before shipping.
+version: 1.0.1
+triggers:
+  - Debugging a rendered browser issue
+  - Validating responsive or interactive behavior in a real browser
+  - Confirming a UI fix before shipping
 ---
 
 # Browser Testing with DevTools
@@ -22,7 +27,7 @@ For oviney/blog, browser work is not done when the source looks right. Verify th
 Start from the repo's real local preview command:
 
 ```bash
-bundle exec jekyll serve --config _config_dev.yml
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 ```
 
 Then follow this loop:

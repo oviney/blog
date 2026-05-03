@@ -1,6 +1,11 @@
 ---
 name: documentation-and-adrs
 description: Records durable decisions and workflow docs for oviney/blog. Use when updating shared docs, architectural rationale, or agent-facing guidance that future contributors will depend on.
+version: 1.1.0
+triggers:
+  - Updating shared workflow or governance docs
+  - Recording a durable repo decision
+  - Fixing agent-facing documentation drift
 ---
 
 # Documentation and ADRs
@@ -23,7 +28,7 @@ Document the decisions that future humans and agents need in order to avoid repe
 |---|---|
 | Architecture or durable repo decision | `decisions.md` |
 | Agent workflow or skill behavior | `.github/skills/<name>/SKILL.md` |
-| Claude slash-command behavior | `.claude/commands/<name>.md` |
+| Runtime command-layer behavior | `CLAUDE.md` and the owning skill docs |
 | Setup or contributor workflow | `README.md`, `GETTING_STARTED.md`, or relevant root docs |
 | Short operational checklist | `references/*.md` |
 
@@ -107,5 +112,5 @@ After documentation work:
 
 - [`../../../decisions.md`](../../../decisions.md) — durable architectural decisions
 - [`../../../AGENTS.md`](../../../AGENTS.md) — ownership map and lifecycle routing
-- [`../../../.claude/commands/`](../../../.claude/commands/) — command-layer entry points
+- [`../../../CLAUDE.md`](../../../CLAUDE.md) — lifecycle backbone and current command-layer guidance
 - [`../../../references/accessibility-checklist.md`](../../../references/accessibility-checklist.md) — example of focused supporting documentation

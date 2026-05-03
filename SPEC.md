@@ -1,8 +1,8 @@
-# SPEC — Tighten Navigation Tests (Issue #909)
+# SPEC — Editorial Strengthening of Two April AI Posts (Issue #908)
 
 **Status:** Draft  
-**Issue:** [#909](https://github.com/oviney/blog/issues/909)  
-**Label:** `agent:qa-gatekeeper`  
+**Issue:** [#908](https://github.com/oviney/blog/issues/908)  
+**Label:** `agent:editorial-chief`  
 **Author:** Ouray Viney  
 **Date:** 2026-05-02
 
@@ -10,100 +10,112 @@
 
 ## 1. Objective
 
-Strengthen the Playwright navigation test suite so that broken navigation semantics — mislabeled taxonomy CTAs, wrong related-post recommendations, always-passing assertions — are caught before merge rather than after.
+Bring two under-performing April posts from their current score of 83 to ≥ 88 on the internal content-review scale by deepening their thinner analytical sections and adding natural internal cross-links to the archive. Both posts are coherent and well-sourced; the gap is structural isolation and argument brevity, not accuracy.
 
-The current `tests/playwright-agents/navigation.spec.ts` contains multiple permanently-passing assertions (`|| true`, `toBeGreaterThanOrEqual(0)`, all-optional guard chains) that make the suite green even when the underlying UX is broken. This spec defines the precise changes needed to make the suite meaningful without introducing new flakiness.
+**Target files:**
+- `_posts/2026-04-05-ai-quality-testing-automation.md` — "AI Testing Tools: The Adoption Chasm Nobody Discusses"
+- `_posts/2026-01-18-ai-assisted-development-the-new-industrial-revolut.md` — "Code Generators: The Brilliant Interns Nobody Supervises"
 
-**Target reader of this spec:** the `qa-gatekeeper` agent (and any human reviewer). This is a test-only change; no production code is modified.
+**Target users:** Engineering leaders and senior developers who read the blog for evidence-based analysis of the AI tooling landscape.
 
 ---
 
-## 2. Problem Analysis
+## 2. Per-Post Diagnosis
 
-### 2a. Permissive assertions to remove
+### Post A — "AI Testing Tools: The Adoption Chasm Nobody Discusses"
+**Current:** 650 words, 0 internal links, score 83  
+**Category:** Test Automation
 
-| Location | Symptom | Line(s) |
+**What is thin:**
+- The "compounding divide" section (~200 words) is the weakest. It cites forward projections (Deloitte, IDC, Rainforest QA) but never explains *how* companies that cross the adoption chasm actually do it — the mechanisms are absent. It reads as a forecast, not an analysis.
+- No discussion of what partial adoption looks like vs. full integration, or what the organisational conditions are for success.
+
+**What to add:**
+1. **Expand "The compounding divide"** (~150–200 words): Describe the practical organisational pattern seen in successful deployments — typically a pilot owned by a platform/QE team with a dedicated 90-day prove-out window, budget ring-fenced from QA's operational budget, and explicit rollback criteria. This can draw on the World Quality Report finding about governance and the Deloitte projection. No fabrication: stay within what the existing citations support plus reasonable synthesis.
+2. **Add a brief "What crossing looks like" paragraph** (~100 words) before the conclusion, describing the conditions that distinguish the 15% at enterprise scale from the 37% in production but not scaled — the difference between a team using AI testing and an organisation that has institutionalised it.
+3. **Add 2–3 internal links** (see §4 below).
+
+**Target word count after revision:** ~850–900
+
+---
+
+### Post B — "Code Generators: The Brilliant Interns Nobody Supervises"
+**Current:** 780 words, 0 internal links, score 83  
+**Category:** Software Engineering
+
+**What is thin:**
+- "The narrow value corridor" section (~170 words) is the weakest. It correctly identifies the domains where AI code generation works but gives only one concrete example (boilerplate/scaffolding) and one supporting data point (GitHub's unit-test-pass rate). The conclusion it draws — that the mistake is generalising narrow results — is right but under-argued.
+- The section ends abruptly with the Kent Beck quote. The transition from "where it works" to "what to do about it" is missing.
+
+**What to add:**
+1. **Expand "The narrow value corridor"** (~150–200 words): Add two more concrete deployment patterns where AI code generation reliably delivers — specifically: API client generation from OpenAPI schemas, and test stub generation from existing function signatures (these are well-documented use cases that the GitHub Copilot research already partially covers). Add a sentence on what "measuring actual impact" looks like in practice — cycle time for AI-assisted tasks vs. human-only, tracked at the PR level.
+2. **Add a closing synthesis paragraph** (~80 words): Connect the intern metaphor from the title back to the evidence — a good intern accelerates well-scoped work but creates supervision overhead on open-ended tasks, and the ROI calculation depends entirely on which kind of work you give them.
+3. **Add 2–3 internal links** (see §4 below).
+
+**Target word count after revision:** ~1,000–1,050
+
+---
+
+## 3. Internal Link Map
+
+Both posts currently have zero internal links. These are the natural anchor points — links should be woven into existing prose where the concept is already mentioned, not appended.
+
+### Post A — AI Testing Tools
+| Insert near | Link target | Anchor text |
 |---|---|---|
-| Primary navigation test | `|| true` nuclear option in URL acceptance block | ~46 |
-| Keyboard accessibility test | `expect(successfulTabs).toBeGreaterThanOrEqual(0)` — 0 ≥ 0 always passes | ~185 |
-| Navigation consistency test | Passes if 1 of 2 pages has any nav at all | ~200 |
-| Related posts test | Only asserts `relatedCount > 0` and that a heading exists after navigation | ~120–145 |
-| Category navigation test | URL check is `if (isCategoryPage)` — skipped rather than asserted | ~100 |
+| "AI testing tools require a different mental model" (§ capability gap) | `/2025/12/31/testing-times/` | the broader pattern of AI adoption in QA |
+| "when an AI test generator produces a scenario..." (§ capability gap) | `/2026/04/05/why-ai-test-generation-tools-overpromise-on-maintenance-savi/` | AI test generation tools promise maintenance savings |
+| New paragraph on partial vs. full adoption | `/2026/01/19/the-surprising-economics-of-test-automation-roi/` | the economics of test automation ROI |
 
-### 2b. Missing coverage areas
-
-The post layout (`_layouts/post.html`) renders three recommendation/taxonomy sections that have **zero test coverage**:
-
-| Section | Selector | Behaviour to assert |
+### Post B — Code Generators
+| Insert near | Link target | Anchor text |
 |---|---|---|
-| Section-line (rubric) | `.article-section-line .section-link` | Present, non-empty text, links to `/blog/` |
-| Explore more tags | `.explore-more .topic-tag-link` | ≥1 tag present, each links somewhere, label matches a real category or tag |
-| Related reading | `section.related-reading` | Rendered only when ≥2 related posts exist; each `.related-item` has a title, excerpt, date, and a category label matching the current post |
-| More from section | `section.more-from-section` | Heading text contains the current post's category; articles in grid are not the current post |
+| "test stub generation" (§ narrow value corridor, new content) | `/2026/04/05/ai-quality-testing-automation/` | the adoption barriers in AI-augmented QA |
+| "the cost of standing still" (conclusion, by analogy) | `/2026/01/02/self-healing-tests-myth-vs-reality/` | self-healing tests follow the same pattern |
+| "measuring its actual impact" (§ narrow value corridor) | `/2026/04/05/practical-applications-of-ai-in-software-development/` | practical applications of AI in development |
+
+**Link format** (Jekyll relative URL):
+```markdown
+[anchor text](/YYYY/MM/DD/post-slug/)
+```
 
 ---
 
-## 3. Acceptance Criteria
+## 4. Acceptance Criteria
 
-- [ ] **AC-1** Remove `|| true` from the primary navigation URL check; replace with an assertion that the resulting URL contains `/blog` or `/posts`.
-- [ ] **AC-2** The keyboard accessibility test must assert `successfulTabs >= 1`, not `>= 0`.
-- [ ] **AC-3** Navigation consistency test must assert that **both** essential pages (`/` and `/blog/`) expose visible navigation with at least 3 links.
-- [ ] **AC-4** Related posts test must assert that at least one `.related-item` displays a `.related-category` label matching the current post's category, not merely that a heading is visible.
-- [ ] **AC-5** Category navigation test must assert the resulting URL, not guard it behind an optional `if`.
-- [ ] **AC-6** New test: post-page section-line links to `/blog/` and its text matches a real category name.
-- [ ] **AC-7** New test: "Explore more" block has ≥1 `.topic-tag-link` with non-empty text.
-- [ ] **AC-8** New test: "Related reading" section (`.related-reading`) — when present — contains articles whose `.related-category` matches the current post's category.
-- [ ] **AC-9** New test: "More from" section heading text contains a non-empty category name (not the literal string "Quality Engineering" as a hardcoded fallback — it must be dynamic).
-- [ ] **AC-10** All strengthened and new tests pass against the running local dev server before merge.
-- [ ] **AC-11** No new test dependencies are introduced (no new npm packages).
-
----
-
-## 4. Tech Stack & Constraints
-
-- **Test runner:** Playwright (TypeScript) — `npx playwright test`
-- **Dev server:** `bundle exec jekyll serve --config _config.yml,_config_dev.yml` at `http://localhost:4000`
-- **Test file to modify:** `tests/playwright-agents/navigation.spec.ts` (single file, no new files needed)
-- **No production code changes.** If a test reveals a genuine site bug, file a separate issue.
-- **No new npm packages.** Use only `@playwright/test` APIs already in use.
-- **Preserve existing test IDs and describe-block structure.** Add new tests inside the existing `@navigation` describe block or as a new `@navigation Post-page Taxonomy` describe block.
+- [ ] **AC-1** Post A reaches content-review score ≥ 88 (`bash scripts/validate-post-quality.sh`)
+- [ ] **AC-2** Post B reaches content-review score ≥ 88
+- [ ] **AC-3** Post A has ≥ 3 internal links
+- [ ] **AC-4** Post B has ≥ 3 internal links  
+- [ ] **AC-5** Post A word count is 850–950
+- [ ] **AC-6** Post B word count is 1,000–1,100
+- [ ] **AC-7** All new prose is supported by existing cited sources or logical synthesis — no new statistics fabricated
+- [ ] **AC-8** `bash scripts/validate-posts.sh --all` exits 0
+- [ ] **AC-9** `bundle exec jekyll build` succeeds with no errors
+- [ ] **AC-10** Before/after scores recorded in the PR description
 
 ---
 
-## 5. Implementation Plan
+## 5. Editorial Style & Constraints
 
-### Phase 1 — Remove permissive assertions (safe, low risk)
-
-1. **Primary navigation test** — delete the `isBlogPage` block with `|| true`; replace with:
-   ```ts
-   await expect(page).toHaveURL(/\/(blog|posts)/);
-   ```
-2. **Keyboard accessibility test** — change `toBeGreaterThanOrEqual(0)` to `toBeGreaterThanOrEqual(1)`.
-3. **Navigation consistency test** — assert both pages and require ≥3 links each.
-4. **Category navigation test** — remove the `if (isCategoryPage)` guard; assert the URL directly after click.
-5. **Related posts test** — after navigating to a related post, verify `.related-category` text matches the origin post's category (`Quality Engineering` when starting from `/2025/12/31/testing-times/`).
-
-### Phase 2 — Add taxonomy/recommendation coverage (new tests)
-
-Add a new `describe` block `'@navigation Post-page Taxonomy & Recommendations'` with:
-
-1. **Section-line CTA** — navigate to a known post, assert `.article-section-line .section-link` is visible, has non-empty text, and href ends with `/blog/`.
-2. **Explore more tags** — assert `.explore-more .topic-tag-link` count ≥ 1 and each link has non-empty text content.
-3. **Related reading semantics** — when `section.related-reading` is present, assert each `.related-category` text matches one of the current post's categories (read from `.article-section-line .section-link` text).
-4. **More from section** — assert `section.more-from-section h2` contains non-empty text and does not match the current post's title; assert ≥1 article in `.more-from-grid`.
-
-### Phase 3 — Verify
-
-Run `npx playwright test tests/playwright-agents/navigation.spec.ts` against a live dev server and confirm all tests pass. Record output in PR description.
+This blog follows an Economist-inspired register:
+- Evidence-first: every claim is either directly cited, logically derived from cited data, or clearly marked as synthesis.
+- No hedging language ("might", "could potentially") when the evidence is clear.
+- Active voice; short paragraphs (3–5 sentences max).
+- Section headings are declarative or metaphorical, not generic ("The capability gap", not "Challenges").
+- Drop caps on first paragraph of each post (rendered by the theme automatically; do not add any special markup).
 
 ---
 
-## 6. Code Style
+## 6. Tech Stack & Commands
 
-- Follow the existing TypeScript style in the file (no semicolons at block level, `const` over `let`, `page.locator` over deprecated `$`).
-- Use `aria-label` and role-based locators where the element has them; fall back to class selectors only for presentational structure (`.related-category`, `.topic-tag-link`).
-- Use `test.skip` with a message (not silent returns) when a section is genuinely conditional (e.g. related reading only appears with ≥2 related posts).
-- Do not add explanatory comments; name assertions clearly instead.
+```bash
+bundle exec jekyll build                     # verify build
+bash scripts/validate-posts.sh --all         # front matter + structural validation
+bash scripts/validate-post-quality.sh        # content quality scoring
+```
+
+No new dependencies. Markdown only. No changes to layouts, SCSS, or config.
 
 ---
 
@@ -111,18 +123,17 @@ Run `npx playwright test tests/playwright-agents/navigation.spec.ts` against a l
 
 | Always do | Ask first | Never do |
 |---|---|---|
-| Modify `navigation.spec.ts` only | Add a second test file if the describe block exceeds ~250 lines | Modify production layouts, SCSS, or config files |
-| Keep existing test names/structure intact | Adjust fixture post URL if it no longer exists | Introduce flakiness via `page.waitForTimeout` |
-| Use the local dev server as the target | — | Hardcode expected category text as a literal string |
-| File a separate issue for any real site bug found | — | Skip tests with `|| true` or equivalent |
+| Cite every new data point against an existing reference already in the post | Add a new external citation not present in the original | Fabricate statistics or invent quotes |
+| Preserve all existing headings and section order | Restructure sections significantly | Change the post's core thesis |
+| Use only relative internal links (`/YYYY/MM/DD/slug/`) | Add more than 5 internal links per post | Link to external pages that are not already in the References section |
+| Keep both posts in their existing categories | — | Move posts to a different category |
+| Run validation before calling the task complete | — | Introduce AI image-generation prompt patterns in `image_alt` or `image_caption` |
 
 ---
 
-## 8. Test Fixtures
+## 8. Out of Scope
 
-| Fixture | URL | Why |
-|---|---|---|
-| Testing Times post | `/2025/12/31/testing-times/` | Category: Quality Engineering; known to have related posts |
-| QA/QC post | `/2026/04/12/understanding-qa-qc-and-quality-engineering/` | Already used in suite; has hero image and internal links |
-| Blog index | `/blog/` | Category landing; used for navigation consistency |
-| Homepage | `/` | Entry point for primary navigation journey |
+- Updating post images or charts
+- Adding new external citations (work within existing sources)
+- Changing post titles, slugs, or front matter dates
+- Fixing issues from #907 (tag taxonomy) or #906 (recommendation UX) — those are separate

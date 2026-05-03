@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  {% assign plain_site_title = site.title | strip_html | normalize_whitespace %}
+  {% assign display_site_title = site.display_title | default: plain_site_title %}
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
+  <title>{% if page.title %}{{ page.title }} - {% endif %}{{ plain_site_title }}</title>
   <meta name="description" content="{{ page.description | default: page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
   <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | absolute_url }}">
@@ -15,7 +17,7 @@
   <meta name="theme-color" content="#E3120B">
 
   <!-- RSS feed discovery -->
-  <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | relative_url }}">
+  <link rel="alternate" type="application/rss+xml" title="{{ plain_site_title }}" href="{{ '/feed.xml' | relative_url }}">
 
   {% include analytics.html %}
   {% include seo-jsonld.html %}
@@ -24,9 +26,9 @@
 </head>
 <body>
   <header class="page-header">
-    <h1 class="site-title">
-      <a href="{{ '/' | relative_url }}">{{ site.title }}</a>
-    </h1>
+    <div class="site-title" role="heading" aria-level="{% if page.url == '/' %}1{% else %}2{% endif %}">
+      <a href="{{ '/' | relative_url }}">{{ display_site_title }}</a>
+    </div>
     <button type="button" class="nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="site-navigation">
       <span class="nav-toggle__bar"></span>
       <span class="nav-toggle__bar"></span>

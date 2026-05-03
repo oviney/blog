@@ -1,5 +1,5 @@
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/bigdecimal-4.1.1/ext/bigdecimal
-/opt/hostedtoolcache/Ruby/3.3.11/x64/bin/ruby extconf.rb
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/bigdecimal-4.1.1/ext/bigdecimal
+/home/ouray/.rbenv/versions/3.3.6/bin/ruby extconf.rb
 checking for __builtin_clz()... yes
 checking for __builtin_clzl()... yes
 checking for __builtin_clzll()... yes
@@ -22,18 +22,18 @@ checking for RB_WARN_CATEGORY_DEPRECATED in ruby.h... yes
 checking for RUBY_TYPED_EMBEDDABLE in ruby.h... yes
 creating Makefile
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/bigdecimal-4.1.1/ext/bigdecimal
-make DESTDIR\= sitearchdir\=./.gem.20260405-2262-a0icp1 sitelibdir\=./.gem.20260405-2262-a0icp1 clean
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/bigdecimal-4.1.1/ext/bigdecimal
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-hi0zmp sitelibdir\=./.gem.20260426-182502-hi0zmp clean
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/bigdecimal-4.1.1/ext/bigdecimal
-make DESTDIR\= sitearchdir\=./.gem.20260405-2262-a0icp1 sitelibdir\=./.gem.20260405-2262-a0icp1
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/bigdecimal-4.1.1/ext/bigdecimal
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-hi0zmp sitelibdir\=./.gem.20260426-182502-hi0zmp
 compiling bigdecimal.c
 compiling missing.c
 linking shared-object bigdecimal.so
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/bigdecimal-4.1.1/ext/bigdecimal
-make DESTDIR\= sitearchdir\=./.gem.20260405-2262-a0icp1 sitelibdir\=./.gem.20260405-2262-a0icp1 install
-/usr/bin/install -c -m 0755 bigdecimal.so ./.gem.20260405-2262-a0icp1
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/bigdecimal-4.1.1/ext/bigdecimal
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-hi0zmp sitelibdir\=./.gem.20260426-182502-hi0zmp install
+/usr/bin/install -c -m 0755 bigdecimal.so ./.gem.20260426-182502-hi0zmp
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/bigdecimal-4.1.1/ext/bigdecimal
-make DESTDIR\= sitearchdir\=./.gem.20260405-2262-a0icp1 sitelibdir\=./.gem.20260405-2262-a0icp1 clean
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/bigdecimal-4.1.1/ext/bigdecimal
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-hi0zmp sitelibdir\=./.gem.20260426-182502-hi0zmp clean

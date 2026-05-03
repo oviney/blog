@@ -40,6 +40,7 @@ These skills remain valuable because they encode repo-specific workflows, constr
 | QA and deployment checks | **Jekyll QA** | [jekyll-qa/SKILL.md](jekyll-qa/SKILL.md) | Playwright, CI, accessibility, deployment verification |
 | Design system | **Economist Theme** | [economist-theme/SKILL.md](economist-theme/SKILL.md) | SCSS, layouts, responsive design, Economist-style UI |
 | Editorial workflow | **Editorial** | [editorial/SKILL.md](editorial/SKILL.md) | Posts, SEO, writing, and content standards |
+| Audience and UX discovery | **Audience Research** | [audience-research/SKILL.md](audience-research/SKILL.md) | Reader journey, navigation, scanability, and audience-fit research before implementation |
 | Repo review conventions | **Code Review** | [code-review/SKILL.md](code-review/SKILL.md) | Blog-specific review expectations layered onto the upstream review skill |
 | Repo git workflow | **Git Operations** | [git-operations/SKILL.md](git-operations/SKILL.md) | PR templates, issue linkage, and branch/PR conventions for this repo |
 | Cross-cutting repo work | **General** | [general/SKILL.md](general/SKILL.md) | Shared docs, refactors, and misc repo-wide changes |
@@ -47,7 +48,8 @@ These skills remain valuable because they encode repo-specific workflows, constr
 
 ## Command Layer
 
-The slash-command files under `.claude/commands/` map the user-facing workflow to this backbone:
+If your runtime exposes slash commands or equivalent command shortcuts, map the
+user-facing workflow to this backbone as follows:
 
 - `/spec` → `spec` + `github-issues-workflow` when tracked repo work is needed
 - `/plan` → `planning-and-task-breakdown`

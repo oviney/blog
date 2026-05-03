@@ -5,6 +5,18 @@ title: Quality Engineering Insights
 
 <div class="homepage">
 
+  {% assign security_posts = site.posts | where_exp: "post", "post.categories contains 'Security'" %}
+  {% assign software_posts = site.posts | where_exp: "post", "post.categories contains 'Software Engineering'" %}
+  {% assign automation_posts = site.posts | where_exp: "post", "post.categories contains 'Test Automation' or post.categories contains 'Quality Engineering'" %}
+
+  <section class="home-intro" aria-label="Site introduction">
+    <p class="home-intro-kicker">For senior engineers and engineering leaders</p>
+    <p class="home-intro-text">Commentary on quality engineering, test automation, software engineering, and security, with a bias toward the operational trade-offs that decide whether systems hold up in production.</p>
+    <p class="home-intro-links">
+      <a href="{{ '/blog/' | relative_url }}">Browse the full archive &rarr;</a>
+    </p>
+  </section>
+
   <!-- 1. HERO SECTION: Latest / featured post -->
   {% assign hero_post = site.posts | where: "featured", true | first %}
   {% unless hero_post %}
@@ -46,9 +58,9 @@ title: Quality Engineering Insights
     </div>
   </section>
 
-  <!-- 2. FOCUS AREAS: 3-column cards with icons -->
+  <!-- 2. FOCUS AREAS: 3-column cards with stronger topic destinations -->
   <section class="home-focus-areas" aria-labelledby="focus-areas-heading">
-    <h2 class="home-recent-heading" id="focus-areas-heading">Focus Areas</h2>
+    <h2 class="home-recent-heading" id="focus-areas-heading">Browse by Topic</h2>
     <div class="home-focus-grid">
 
       <div class="home-focus-card">
@@ -57,9 +69,10 @@ title: Quality Engineering Insights
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
         </div>
-        <h3 class="home-focus-title">Quality Engineering Strategy</h3>
-        <p class="home-focus-desc">Building test strategies that align with business outcomes, not just code coverage metrics.</p>
-        <a href="{{ '/blog/' | relative_url }}" class="home-focus-link">Explore articles &rarr;</a>
+        <p class="home-focus-meta">{{ security_posts.size }} posts</p>
+        <h3 class="home-focus-title">Security and resilience</h3>
+        <p class="home-focus-desc">Explore security debt, enterprise threat detection, and the operating choices that harden systems before incidents turn expensive.</p>
+        <a href="{{ '/security/' | relative_url }}" class="home-focus-link">Browse security reporting &rarr;</a>
       </div>
 
       <div class="home-focus-card">
@@ -69,9 +82,10 @@ title: Quality Engineering Insights
             <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
           </svg>
         </div>
-        <h3 class="home-focus-title">Test Automation Architecture</h3>
-        <p class="home-focus-desc">Designing automation frameworks that scale with your product and team without becoming a maintenance burden.</p>
-        <a href="{{ '/test-automation/' | relative_url }}" class="home-focus-link">Explore articles &rarr;</a>
+        <p class="home-focus-meta">{{ software_posts.size }} posts</p>
+        <h3 class="home-focus-title">Software engineering systems</h3>
+        <p class="home-focus-desc">Read on platform engineering, AI-assisted delivery, and the architectural decisions that separate durable software from short-lived output.</p>
+        <a href="{{ '/software-engineering/' | relative_url }}" class="home-focus-link">Browse software engineering essays &rarr;</a>
       </div>
 
       <div class="home-focus-card">
@@ -83,9 +97,10 @@ title: Quality Engineering Insights
             <line x1="2" y1="20" x2="22" y2="20"/>
           </svg>
         </div>
-        <h3 class="home-focus-title">Performance Engineering</h3>
-        <p class="home-focus-desc">Systematic approaches to performance that go beyond load testing scripts to genuine engineering discipline.</p>
-        <a href="{{ '/software-engineering/' | relative_url }}" class="home-focus-link">Explore articles &rarr;</a>
+        <p class="home-focus-meta">{{ automation_posts.size }} posts</p>
+        <h3 class="home-focus-title">Test automation in practice</h3>
+        <p class="home-focus-desc">Follow the economics, maintenance realities, and framework choices behind automation programmes that have to survive real product change.</p>
+        <a href="{{ '/test-automation/' | relative_url }}" class="home-focus-link">Browse test automation analysis &rarr;</a>
       </div>
 
     </div>

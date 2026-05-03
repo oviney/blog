@@ -1,6 +1,11 @@
 ---
 name: idea-refine
 description: Refines rough ideas into issue-ready direction. Use when a request is still fuzzy and needs sharper scope, assumptions, acceptance criteria, or a clearer path into `/spec`, planning, or implementation.
+version: 1.0.1
+triggers:
+  - A request is promising but underspecified
+  - Multiple solution directions need narrowing
+  - Acceptance criteria need to be sharpened before work starts
 ---
 
 # Idea Refine

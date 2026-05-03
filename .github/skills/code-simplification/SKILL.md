@@ -1,6 +1,11 @@
 ---
 name: code-simplification
 description: Simplifies working code and docs without changing behavior. Use when a solution is correct but harder to read, maintain, or review than it needs to be.
+version: 1.0.1
+triggers:
+  - A working solution is more complex than nearby repo patterns
+  - Review feedback calls for simplification without behavior change
+  - Documentation or scripts can be clarified without changing outcomes
 ---
 
 # Code Simplification
@@ -93,6 +98,6 @@ After a simplification pass:
 
 ## Related Files
 
-- [`../../../.claude/commands/code-simplify.md`](../../../.claude/commands/code-simplify.md) — command-layer entry point
+- [`../../../CLAUDE.md`](../../../CLAUDE.md) — lifecycle backbone and repo-level command guidance
 - [`../../../CLAUDE.md`](../../../CLAUDE.md) — repo conventions and protected files
 - [`../context-engineering/SKILL.md`](../context-engineering/SKILL.md) — loading the right nearby examples before refactoring

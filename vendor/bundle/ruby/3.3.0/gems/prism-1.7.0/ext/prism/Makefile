@@ -13,12 +13,12 @@ NULLCMD = :
 #### Start of system configuration section. ####
 
 srcdir = .
-topdir = /opt/hostedtoolcache/Ruby/3.3.11/x64/include/ruby-3.3.0
+topdir = /home/ouray/.rbenv/versions/3.3.6/include/ruby-3.3.0
 hdrdir = $(topdir)
-arch_hdrdir = /opt/hostedtoolcache/Ruby/3.3.11/x64/include/ruby-3.3.0/x86_64-linux
+arch_hdrdir = /home/ouray/.rbenv/versions/3.3.6/include/ruby-3.3.0/x86_64-linux
 PATH_SEPARATOR = :
 VPATH = $(srcdir):$(arch_hdrdir)/ruby:$(hdrdir)/ruby:$(srcdir)/../../src:$(srcdir)/../../src/util
-prefix = $(DESTDIR)/opt/hostedtoolcache/Ruby/3.3.11/x64
+prefix = $(DESTDIR)/home/ouray/.rbenv/versions/3.3.6
 rubysitearchprefix = $(rubylibprefix)/$(sitearch)
 rubyarchprefix = $(rubylibprefix)/$(arch)
 rubylibprefix = $(libdir)/$(RUBY_BASE_NAME)
@@ -86,9 +86,9 @@ warnflags = -Wall -Wextra -Wdeprecated-declarations -Wdiv-by-zero -Wduplicated-c
 cppflags = 
 CCDLFLAGS = -fPIC
 CFLAGS   = $(CCDLFLAGS) $(cflags)  -fPIC -fvisibility=hidden $(ARCH_FLAG)
-INCFLAGS = -I. -I$(arch_hdrdir) -I$(hdrdir)/ruby/backward -I$(hdrdir) -I$(srcdir) -I/home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/include -I/home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext
+INCFLAGS = -I. -I$(arch_hdrdir) -I$(hdrdir)/ruby/backward -I$(hdrdir) -I$(srcdir) -I/home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/include -I/home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext
 DEFS     = 
-CPPFLAGS =  -DENABLE_PATH_CHECK=0 $(DEFS) $(cppflags)
+CPPFLAGS =   $(DEFS) $(cppflags)
 CXXFLAGS = $(CCDLFLAGS)  $(ARCH_FLAG)
 ldflags  = -L. -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed
 dldflags = -Wl,--compress-debug-sections=zlib 

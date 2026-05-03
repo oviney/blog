@@ -15,6 +15,54 @@ const viewports = {
   desktop: { width: 1920, height: 1080 }
 };
 
+async function expectVisibleFocusIndicator(locator, page) {
+  await locator.scrollIntoViewIfNeeded();
+  const before = await locator.evaluate((el) => {
+    const styles = window.getComputedStyle(el);
+    return {
+      outlineStyle: styles.outlineStyle,
+      outlineWidth: styles.outlineWidth,
+      boxShadow: styles.boxShadow,
+      borderColor: styles.borderColor,
+    };
+  });
+
+  await locator.focus();
+  await expect(locator).toBeFocused();
+
+  const after = await locator.evaluate((el) => {
+    const styles = window.getComputedStyle(el);
+    return {
+      outlineStyle: styles.outlineStyle,
+      outlineWidth: styles.outlineWidth,
+      boxShadow: styles.boxShadow,
+      borderColor: styles.borderColor,
+    };
+  });
+
+  const outlineWidth = parseFloat(after.outlineWidth);
+  const hasOutline = after.outlineStyle !== 'none' && outlineWidth >= 2;
+  const hasShadow = after.boxShadow !== 'none' && after.boxShadow !== before.boxShadow;
+  const hasBorderChange = after.borderColor !== before.borderColor;
+
+  expect(hasOutline || hasShadow || hasBorderChange).toBeTruthy();
+
+  const box = await locator.boundingBox();
+  expect(box).not.toBeNull();
+
+  const isUnobscured = await locator.evaluate((el, point) => {
+    const top = document.elementFromPoint(point.x, point.y);
+    return !!top && (top === el || el.contains(top) || top.contains(el));
+  }, {
+    x: box!.x + box!.width / 2,
+    y: box!.y + box!.height / 2,
+  });
+
+  expect(isUnobscured).toBeTruthy();
+
+  await page.keyboard.press('Escape').catch(() => {});
+}
+
 test.describe('@visual Responsive Layout Adaptation @REQ-NAV-01 @REQ-VISUAL-01', () => {
 
   test('Article grid adapts correctly across viewports', async ({ page }) => {
@@ -147,6 +195,22 @@ test.describe('@visual Responsive Layout Adaptation @REQ-NAV-01 @REQ-VISUAL-01',
     for (let i = 0; i < Math.min(linkCount, 5); i++) {
       await expect(navLinks.nth(i)).toBeVisible();
     }
+  });
+
+  test('@REQ-A11Y-02 mobile navigation toggle meets WCAG 2.2 focus and target-size expectations', async ({ page }) => {
+    await page.goto('/');
+    await page.setViewportSize(viewports.mobile);
+    await page.waitForLoadState('networkidle');
+
+    const toggle = page.locator('.nav-toggle');
+    await expect(toggle).toBeVisible();
+
+    const box = await toggle.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+
+    await expectVisibleFocusIndicator(toggle, page);
   });
 
   test('Content width constraints work properly', async ({ page }) => {

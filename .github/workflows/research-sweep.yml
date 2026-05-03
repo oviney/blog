@@ -29,6 +29,7 @@ jobs:
           const labels = [
             { name: 'research',     color: '0075ca', description: 'Research findings and recommendations' },
             { name: 'enhancement',  color: 'a2eeef', description: 'New feature or request' },
+            { name: 'agent:audience-researcher', color: '0b7285', description: 'Assigned to Audience Researcher (UX/Usability/Audience fit)' },
           ];
           for (const label of labels) {
             try {
@@ -58,8 +59,8 @@ jobs:
           let body = `# Research Sweep — ${today}\n\n`;
           body += `> **Instructions for the researcher:** Work through each section below.\n`;
           body += `> Replace the bullet-point prompts with your actual findings.\n`;
-          body += `> When complete, add the label \`agent:qa-gatekeeper\` or the appropriate agent label\n`;
-          body += `> so the right agent can action the improvements.\n\n`;
+          body += `> When complete, add \`agent:audience-researcher\` if the issue remains a research synthesis task,\n`;
+          body += `> then open follow-up issues with the appropriate implementation label so the right agent can act.\n\n`;
           body += `---\n\n`;
 
           body += `## 1. AI Agent Orchestration — New Developments\n\n`;
@@ -79,7 +80,7 @@ jobs:
           body += `- What new capabilities or bug fixes has GitHub shipped for Copilot Coding Agent since the last sweep?\n`;
           body += `- Are there changes to how the agent handles file scope, branch management, or PR creation?\n`;
           body += `- Any new prompt-engineering guidance from GitHub docs or the community?\n`;
-          body += `- Have the agent routing labels (\`agent:creative-director\`, \`agent:qa-gatekeeper\`, \`agent:editorial-chief\`) been superseded by new conventions?\n\n`;
+          body += `- Have the agent routing labels (\`agent:creative-director\`, \`agent:qa-gatekeeper\`, \`agent:editorial-chief\`, \`agent:audience-researcher\`) been superseded by new conventions?\n\n`;
           body += `**Findings:**\n`;
           body += `<!-- Fill in findings here -->\n\n`;
           body += `**Recommended improvements for this blog:**\n`;
@@ -98,8 +99,20 @@ jobs:
           body += `<!-- e.g., bump Playwright version, add new test scenarios, update pa11yci.json -->\n\n`;
           body += `---\n\n`;
 
+          body += `## 4. Audience Experience / UI / UX / Usability\n\n`;
+          body += `**Research prompts:**\n`;
+          body += `- How easy is it for a first-time reader to understand what the blog covers from the homepage and blog index?\n`;
+          body += `- Where does the reader journey feel weak: navigation, summaries, topic discovery, scanability, mobile ergonomics, or trust cues?\n`;
+          body += `- Are article cards, topic pages, search results, and post CTAs helping readers find the next relevant piece?\n`;
+          body += `- Which issues belong to design, which belong to editorial clarity, and which should be verified with QA automation?\n\n`;
+          body += `**Findings:**\n`;
+          body += `<!-- Fill in findings here -->\n\n`;
+          body += `**Recommended improvements for this blog:**\n`;
+          body += `<!-- e.g., open Creative Director issues for hierarchy/nav changes, Editorial issues for summaries/internal linking, QA issues for regression coverage -->\n\n`;
+          body += `---\n\n`;
+
           if (extraTopics) {
-            body += `## 4. Additional Topics\n\n`;
+            body += `## 5. Additional Topics\n\n`;
             body += `> _Requested via manual trigger:_ ${extraTopics}\n\n`;
             body += `**Findings:**\n`;
             body += `<!-- Fill in findings here -->\n\n`;
@@ -110,7 +123,8 @@ jobs:
 
           body += `## Next Steps\n\n`;
           body += `- [ ] Researcher completes findings above\n`;
-          body += `- [ ] Assign the appropriate agent label (\`agent:qa-gatekeeper\`, \`agent:creative-director\`, or \`agent:editorial-chief\`) based on which improvements are needed\n`;
+          body += `- [ ] Add \`agent:audience-researcher\` if this issue remains a research synthesis task\n`;
+          body += `- [ ] Open follow-up issues with \`agent:qa-gatekeeper\`, \`agent:creative-director\`, or \`agent:editorial-chief\` based on which implementation is needed\n`;
           body += `- [ ] Open follow-up issues for each actionable improvement, referencing this sweep\n\n`;
           body += `_Generated automatically by the [research-sweep workflow](../../actions/workflows/research-sweep.yml)_\n`;
 

@@ -43,7 +43,7 @@ When reviewing or planning tests, call out:
 
 ## Repo-Specific Reminders
 
-- Local preview uses `bundle exec jekyll serve --config _config_dev.yml`
+- Local preview uses `bundle exec jekyll serve --config _config.yml,_config_dev.yml`
 - Playwright runs across Mobile, Tablet, and Desktop projects from `playwright.config.ts`
 - QA docs and test guidance live under `.github/skills/` and `.github/instructions/`
 - Browser-facing work should usually pair automated checks with live browser verification
@@ -81,4 +81,4 @@ When reviewing or planning tests, call out:
 
 - **Invoke directly when:** the user wants test design, coverage analysis, or proof that a change works
 - **Invoke via:** the repo `/test` flow for verification work, or `/ship` when shipping bundles parallel quality signals
-- **Local augmentation:** `.claude/agents/test-engineer.md` adds viney.ca-specific Playwright and QA detail; keep this root persona as the shared baseline
+- **Local augmentation:** if the runtime adds a test-specific wrapper, keep it aligned with this repo baseline rather than duplicating contradictory QA guidance

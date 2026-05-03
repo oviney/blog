@@ -107,7 +107,7 @@ export default defineConfig({
   /* Run your local Jekyll server before starting the tests */
   /* In CI, server is started manually in workflow, so disable webServer */
   webServer: process.env.CI ? undefined : {
-    command: 'bundle exec jekyll serve --port 4000 --detach',
+    command: 'bundle exec jekyll serve --config _config.yml,_config_dev.yml --port 4000 --no-watch',
     port: 4000,
     reuseExistingServer: true,
     stdout: 'pipe',

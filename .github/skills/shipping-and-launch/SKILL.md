@@ -1,6 +1,11 @@
 ---
 name: shipping-and-launch
 description: Prepares oviney/blog changes for release. Use when turning a completed branch into a reviewable PR, verifying production readiness, or planning safe rollout and rollback steps.
+version: 1.0.1
+triggers:
+  - A branch is ready for PR review or merge
+  - Deployment readiness needs a checklist
+  - Rollout or rollback planning is needed
 ---
 
 # Shipping and Launch
@@ -110,4 +115,4 @@ After shipping:
 
 - [`../git-workflow-and-versioning/SKILL.md`](../git-workflow-and-versioning/SKILL.md) — branch and commit discipline
 - [`../../../scripts/check-pr-scope.sh`](../../../scripts/check-pr-scope.sh) — scope and governance gate
-- [`../../../.claude/commands/ship.md`](../../../.claude/commands/ship.md) — command-layer shipping flow
+- [`../../../CLAUDE.md`](../../../CLAUDE.md) — lifecycle backbone and shipping entry points

@@ -30,13 +30,12 @@ Runtime features such as custom agents or MCP/tool integrations can vary by exec
 
 ## Persona Layers
 
-Use the repo's agent documentation in three complementary layers:
+Use the repo's current agent documentation in two complementary layers:
 
-- `agents/` — upstream-aligned root personas for reusable review, test, and security roles. Treat these as the shared baseline for cross-runtime orchestration and future upstream sync.
-- `.claude/agents/` — Claude-local variants of those personas, carrying older repo-specific prompt detail for the command layer until each persona is reconciled with the root baseline.
+- `AGENTS.md` — the shared roster for personas, scope boundaries, ownership, handoffs, and documentation ownership.
 - `.github/skills/` — lifecycle and repo support skills that shape *when* and *how* work happens.
 
-When both `agents/` and `.claude/agents/` define the same persona, treat the root file as the portable baseline and use the `.claude/` file as a runtime-specific layer. Align them when that persona is actively being edited rather than assuming they already match line-for-line.
+If future runtime-specific persona directories are introduced, treat them as optional augmentations to this backbone rather than as the current source of truth.
 
 | Phase | Default backbone | Add local augmentation when needed |
 |-------|------------------|------------------------------------|
@@ -76,6 +75,7 @@ scope guard treats them as deliberate governance work.
 | `agent:creative-director` | `.github/skills/economist-theme/SKILL.md` | CSS, SCSS, layouts, responsive |
 | `agent:qa-gatekeeper` | `.github/skills/jekyll-qa/SKILL.md` | Tests, CI, bugs, accessibility |
 | `agent:editorial-chief` | `.github/skills/editorial/SKILL.md` | Posts, drafts, SEO, writing |
+| `agent:audience-researcher` | `.github/skills/audience-research/SKILL.md` | Audience fit, reader journey, UX research |
 | `agent:editorial-manager` | `.github/skills/editorial/SKILL.md` | Alias for editorial-chief |
 | *(no label)* | `.github/skills/general/SKILL.md` | Docs, refactoring, misc |
 
@@ -96,7 +96,7 @@ Routing rules and hard boundaries: [`.github/copilot-instructions.md`](.github/c
 
 ## Protected Files (never modify)
 
-`_config.yml` · `AGENTS.md` · `ARCHITECTURE.md` · `.github/CODEOWNERS` · `.github/copilot-instructions.md` · `Gemfile` · `Gemfile.lock`
+`_config.yml` · `.github/CODEOWNERS` · `.github/copilot-instructions.md` · `Gemfile` · `Gemfile.lock`
 
 ---
 
@@ -104,7 +104,9 @@ Routing rules and hard boundaries: [`.github/copilot-instructions.md`](.github/c
 
 ```bash
 bundle exec jekyll build               # validate (run before every PR)
-bundle exec jekyll serve --config _config_dev.yml   # local dev server
+bundle exec jekyll serve --config _config.yml,_config_dev.yml   # local dev server
 npx playwright test                    # run all tests (requires dev server)
 bash scripts/validate-posts.sh --all   # validate front matter on all posts
+bash scripts/validate-post-quality.sh  # run the editorial quality gate on all posts
+bash scripts/production-smoke-tests.sh # run the post-deploy production smoke suite
 ```

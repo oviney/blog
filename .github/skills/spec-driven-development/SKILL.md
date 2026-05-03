@@ -1,6 +1,11 @@
 ---
 name: spec-driven-development
 description: Creates specs before coding. Use when starting a new project, feature, or significant change and no specification exists yet. Use when requirements are unclear, ambiguous, or only exist as a vague idea.
+version: 1.0.1
+triggers:
+  - Starting a new feature or significant change
+  - Requirements are ambiguous or underspecified
+  - A task needs explicit success criteria before implementation
 ---
 
 # Spec-Driven Development
@@ -57,7 +62,7 @@ Don't silently fill in ambiguous requirements. The spec's entire purpose is to s
    Build: bundle exec jekyll build
    Test: npm run test:security
    Playwright: npm run test:playwright
-   Dev: bundle exec jekyll serve --config _config_dev.yml
+   Dev: bundle exec jekyll serve --config _config.yml,_config_dev.yml
    ```
 
 3. **Project Structure** — Where source code lives, where tests go, where docs belong.

@@ -89,7 +89,23 @@ bash scripts/validate-posts.sh --all
 
 ---
 
-### 4. General Agent (no label)
+### 4. Audience Researcher
+
+| Property | Value |
+|----------|-------|
+| **Label** | `agent:audience-researcher` |
+| **Skill file** | `.github/skills/audience-research/SKILL.md` |
+| **Domain** | Audience research, UX, usability, reader journey |
+| **May touch** | `docs/`, `references/`, `*.md` (root level) |
+| **Must not touch** | `_posts/`, `_sass/`, `_layouts/`, `.github/workflows/`, `tests/`, `scripts/`, `_config.yml` |
+
+**Responsibilities**: Investigates how the blog feels to readers across homepage, archive, search, post pages, and mobile navigation. Converts vague "make it more appealing" requests into evidence-backed recommendations and routes the resulting implementation work to design, editorial, or QA.
+
+**Handoff triggers**: When findings require layout or visual hierarchy changes, hand off to Creative Director. When findings require copy, headline, SEO, or internal-link improvements, hand off to Editorial Chief. When findings require accessibility, interaction, or regression-proofing work, hand off to QA Gatekeeper.
+
+---
+
+### 5. General Agent (no label)
 
 | Property | Value |
 |----------|-------|
@@ -111,7 +127,7 @@ The following files require human review and must **never** be modified by any a
 - `.github/CODEOWNERS` — repository governance
 - `.github/copilot-instructions.md` — agent routing rules
 - `Gemfile` / `Gemfile.lock` — Ruby dependencies
-- `.github/agents/` — agent instruction files
+- `.github/agents/` — agent automation internals
 
 ---
 
@@ -135,6 +151,7 @@ Each task maps to a development phase. Find your phase, invoke the corresponding
 Task arrives
     │
     ├── Bug / incident / production issue? ────→ github-issues-workflow
+    ├── Audience / UX / reader journey? ───────→ audience-research
     ├── Content / post / SEO? ─────────────────→ editorial
     ├── Design / CSS / layout? ────────────────→ economist-theme
     ├── Tests / CI / QA? ──────────────────────→ jekyll-qa
@@ -147,6 +164,7 @@ Task arrives
 | Phase | What you're doing | Skill |
 |-------|------------------|-------|
 | **REPORT** | Bug, incident, feature request | `github-issues-workflow` |
+| **DISCOVER** | Audience research, usability review, reader journey | `audience-research` |
 | **PLAN** | Sprint planning, task breakdown | `planning` |
 | **BUILD** | Jekyll, SCSS, Liquid, layouts | `jekyll-development` + `economist-theme` |
 | **WRITE** | Blog posts, drafts, SEO | `editorial` |
@@ -179,6 +197,7 @@ docs and assigns issues to the appropriate owner.
 | `.github/skills/economist-theme/SKILL.md` | Creative Director | On any design-system change |
 | `.github/skills/jekyll-qa/SKILL.md` | QA Gatekeeper | On any CI/testing change |
 | `.github/skills/editorial/SKILL.md` | Editorial Chief | On any content-workflow change |
+| `.github/skills/audience-research/SKILL.md` | Audience Researcher | On any research-workflow change |
 | `.github/skills/general/SKILL.md` | General Agent | On any scope/workflow change |
 | `.github/skills/git-operations/SKILL.md` | General Agent | On any git-workflow change |
 | `.github/skills/github-issues-workflow/SKILL.md` | General Agent | On any issue-workflow change |
@@ -197,6 +216,7 @@ The `.github/workflows/doc-audit.yml` workflow runs every Monday at 08:00 UTC (a
 - All `bash` / `sh` code blocks in skill files reference known commands (see `scripts/doc-audit.sh` for the full allow-list)
 - All file paths explicitly referenced in docs (`` `path/to/file` `` patterns) exist in the repo
 - All workflow files referenced in docs exist in `.github/workflows/`
+- Shared routing docs (`AGENTS.md`, `CLAUDE.md`, `.github/skills/README.md`) do not reference missing command-layer or persona-layer directories
 
 **Staleness checks:**
 - Skill files not updated in > 90 days → flag for human review

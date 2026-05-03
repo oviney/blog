@@ -9,6 +9,61 @@ import { test, expect } from '@playwright/test';
 // Use a post that has multiple h2 headings to trigger the ToC
 const POST_URL = '/2026/01/02/self-healing-tests-myth-vs-reality/';
 
+async function expectMinimumTouchTarget(locator, minimum = 44) {
+  const box = await locator.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box!.width).toBeGreaterThanOrEqual(minimum);
+  expect(box!.height).toBeGreaterThanOrEqual(minimum);
+}
+
+async function expectVisibleFocusIndicator(locator, page) {
+  await locator.scrollIntoViewIfNeeded();
+  const before = await locator.evaluate((el) => {
+    const styles = window.getComputedStyle(el);
+    return {
+      outlineStyle: styles.outlineStyle,
+      outlineWidth: styles.outlineWidth,
+      boxShadow: styles.boxShadow,
+      borderColor: styles.borderColor,
+    };
+  });
+
+  await locator.focus();
+  await expect(locator).toBeFocused();
+
+  const after = await locator.evaluate((el) => {
+    const styles = window.getComputedStyle(el);
+    return {
+      outlineStyle: styles.outlineStyle,
+      outlineWidth: styles.outlineWidth,
+      boxShadow: styles.boxShadow,
+      borderColor: styles.borderColor,
+    };
+  });
+
+  const outlineWidth = parseFloat(after.outlineWidth);
+  const hasOutline = after.outlineStyle !== 'none' && outlineWidth >= 2;
+  const hasShadow = after.boxShadow !== 'none' && after.boxShadow !== before.boxShadow;
+  const hasBorderChange = after.borderColor !== before.borderColor;
+
+  expect(hasOutline || hasShadow || hasBorderChange).toBeTruthy();
+
+  const box = await locator.boundingBox();
+  expect(box).not.toBeNull();
+
+  const isUnobscured = await locator.evaluate((el, point) => {
+    const top = document.elementFromPoint(point.x, point.y);
+    return !!top && (top === el || el.contains(top) || top.contains(el));
+  }, {
+    x: box!.x + box!.width / 2,
+    y: box!.y + box!.height / 2,
+  });
+
+  expect(isUnobscured).toBeTruthy();
+
+  await page.keyboard.press('Escape').catch(() => {});
+}
+
 test.describe('@navigation Reading Progress Bar @REQ-NAV-02 @REQ-A11Y-01', () => {
   test('progress bar is present on post pages', async ({ page }) => {
     await page.goto(POST_URL);
@@ -170,13 +225,7 @@ test.describe('@navigation Back to Top Button @REQ-NAV-02 @REQ-A11Y-01', () => {
     await page.waitForLoadState('networkidle');
 
     const btn = page.locator('#back-to-top');
-    const box = await btn.boundingBox();
-
-    if (box) {
-      // Should be at least 44×44px for WCAG touch targets
-      expect(box.width).toBeGreaterThanOrEqual(44);
-      expect(box.height).toBeGreaterThanOrEqual(44);
-    }
+    await expectMinimumTouchTarget(btn);
   });
 
   test('back-to-top button becomes visible after scrolling', async ({ page }) => {
@@ -254,6 +303,43 @@ test.describe('@navigation Share Buttons @REQ-NAV-02', () => {
   });
 });
 
+test.describe('@navigation @REQ-A11Y-02 WCAG 2.2 focus and target checks', () => {
+  test('article share controls show visible focus and stay unobscured', async ({ page }) => {
+    await page.goto(POST_URL);
+    await page.waitForLoadState('networkidle');
+
+    const controls = [
+      page.locator('#copy-link-btn-top'),
+      page.locator('#copy-link-btn-bottom'),
+      page.locator('.share-btn--linkedin'),
+      page.locator('.share-btn--twitter'),
+      page.locator('.share-btn--email'),
+    ];
+
+    for (const control of controls) {
+      await expect(control).toBeVisible();
+      await expectVisibleFocusIndicator(control, page);
+    }
+  });
+
+  test('article share controls meet minimum touch-target expectations', async ({ page }) => {
+    await page.goto(POST_URL);
+    await page.waitForLoadState('networkidle');
+
+    const controls = [
+      page.locator('#copy-link-btn-top'),
+      page.locator('#copy-link-btn-bottom'),
+      page.locator('.share-btn--linkedin'),
+      page.locator('.share-btn--twitter'),
+      page.locator('.share-btn--email'),
+    ];
+
+    for (const control of controls) {
+      await expectMinimumTouchTarget(control);
+    }
+  });
+});
+
 test.describe('@navigation Share Buttons (absent on non-post pages) @REQ-NAV-02', () => {
   test('share section is not present on the blog listing page', async ({ page }) => {
     await page.goto('/blog/');
@@ -315,11 +401,7 @@ test.describe('@navigation @visual Interactive Elements - Mobile @REQ-NAV-02 @RE
 
     const btn = page.locator('#back-to-top');
     await expect(btn).toBeAttached();
-    const box = await btn.boundingBox();
-    if (box) {
-      expect(box.width).toBeGreaterThanOrEqual(44);
-      expect(box.height).toBeGreaterThanOrEqual(44);
-    }
+    await expectMinimumTouchTarget(btn);
   });
 
   test('share section is visible on mobile', async ({ page }) => {

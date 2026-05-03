@@ -1,19 +1,19 @@
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/eventmachine-1.2.7/ext/fastfilereader
-/opt/hostedtoolcache/Ruby/3.3.11/x64/bin/ruby extconf.rb
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/eventmachine-1.2.7/ext/fastfilereader
+/home/ouray/.rbenv/versions/3.3.6/bin/ruby extconf.rb
 creating Makefile
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/eventmachine-1.2.7/ext/fastfilereader
-make DESTDIR\= sitearchdir\=./.gem.20260326-2431-cvmpqd sitelibdir\=./.gem.20260326-2431-cvmpqd clean
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/eventmachine-1.2.7/ext/fastfilereader
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-f793je sitelibdir\=./.gem.20260426-182502-f793je clean
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/eventmachine-1.2.7/ext/fastfilereader
-make DESTDIR\= sitearchdir\=./.gem.20260326-2431-cvmpqd sitelibdir\=./.gem.20260326-2431-cvmpqd
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/eventmachine-1.2.7/ext/fastfilereader
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-f793je sitelibdir\=./.gem.20260426-182502-f793je
 compiling mapper.cpp
 compiling rubymain.cpp
 linking shared-object fastfilereaderext.so
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/eventmachine-1.2.7/ext/fastfilereader
-make DESTDIR\= sitearchdir\=./.gem.20260326-2431-cvmpqd sitelibdir\=./.gem.20260326-2431-cvmpqd install
-/usr/bin/install -c -m 0755 fastfilereaderext.so ./.gem.20260326-2431-cvmpqd
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/eventmachine-1.2.7/ext/fastfilereader
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-f793je sitelibdir\=./.gem.20260426-182502-f793je install
+/usr/bin/install -c -m 0755 fastfilereaderext.so ./.gem.20260426-182502-f793je
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/eventmachine-1.2.7/ext/fastfilereader
-make DESTDIR\= sitearchdir\=./.gem.20260326-2431-cvmpqd sitelibdir\=./.gem.20260326-2431-cvmpqd clean
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/eventmachine-1.2.7/ext/fastfilereader
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-f793je sitelibdir\=./.gem.20260426-182502-f793je clean

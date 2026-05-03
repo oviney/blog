@@ -7,29 +7,58 @@ permalink: /search/
 <div class="topic-page">
   <header class="topic-header">
     <h1 class="topic-title">Search</h1>
+    <p class="topic-description">Search the archive by topic, article title, or recurring themes such as security debt, platform engineering, and AI testing.</p>
   </header>
 
   <div class="search-container">
-    <input type="text" id="search-input" class="search-input" placeholder="Search articles..." autocomplete="off" autofocus>
-    <div id="search-results" class="search-results"></div>
+    <p class="search-helper" id="search-helper">Start with at least two characters, or use one of the suggested searches below.</p>
+    <div class="search-suggested-queries" aria-label="Suggested search queries">
+      <button type="button" class="search-suggestion" data-search-query="security debt">Security debt</button>
+      <button type="button" class="search-suggestion" data-search-query="platform engineering">Platform engineering</button>
+      <button type="button" class="search-suggestion" data-search-query="ai testing">AI testing</button>
+      <button type="button" class="search-suggestion" data-search-query="quality engineering">Quality engineering</button>
+    </div>
+    <input type="search" id="search-input" class="search-input" placeholder="Search articles..." autocomplete="off" autofocus aria-describedby="search-helper">
+    <div id="search-empty-state" class="search-empty-state">
+      <p class="search-empty-title">Not sure where to start?</p>
+      <p class="search-empty-copy">Browse one of the core topic pages or try a suggested query to move from a broad interest to a specific article.</p>
+      <ul class="search-topic-shortcuts">
+        <li><a href="{{ '/security/' | relative_url }}">Security</a></li>
+        <li><a href="{{ '/software-engineering/' | relative_url }}">Software Engineering</a></li>
+        <li><a href="{{ '/test-automation/' | relative_url }}">Test Automation</a></li>
+        <li><a href="{{ '/blog/' | relative_url }}">Full archive</a></li>
+      </ul>
+    </div>
+    <div id="search-results" class="search-results" aria-live="polite"></div>
   </div>
 </div>
 
 <script>
 (function() {
   var searchInput = document.getElementById('search-input');
+  var searchEmptyState = document.getElementById('search-empty-state');
   var resultsContainer = document.getElementById('search-results');
+  var suggestionButtons = document.querySelectorAll('[data-search-query]');
   var posts = [];
 
-  fetch('{{ "/search.json" | relative_url }}')
-    .then(function(response) { return response.json(); })
-    .then(function(data) { posts = data; });
+  function escapeHtml(value) {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
 
-  searchInput.addEventListener('input', function() {
-    var query = this.value.toLowerCase().trim();
+  function renderResults(query) {
     resultsContainer.innerHTML = '';
 
-    if (query.length < 2) return;
+    if (query.length < 2) {
+      searchEmptyState.hidden = false;
+      return;
+    }
+
+    searchEmptyState.hidden = true;
 
     var results = posts.filter(function(post) {
       return post.title.toLowerCase().indexOf(query) !== -1 ||
@@ -38,7 +67,9 @@ permalink: /search/
     });
 
     if (results.length === 0) {
-      resultsContainer.innerHTML = '<p class="search-no-results">No articles found for "' + query + '"</p>';
+      resultsContainer.innerHTML =
+        '<p class="search-no-results">No articles found for "' + escapeHtml(query) + '".</p>' +
+        '<p class="search-no-results-hint">Try broader terms like "security", "automation", or "platform".</p>';
       return;
     }
 
@@ -51,6 +82,23 @@ permalink: /search/
         '<p class="search-result-excerpt">' + post.content + '</p>' +
         '<span class="search-result-date">' + post.date + '</span>';
       resultsContainer.appendChild(article);
+    });
+  }
+
+  fetch('{{ "/search.json" | relative_url }}')
+    .then(function(response) { return response.json(); })
+    .then(function(data) { posts = data; });
+
+  searchInput.addEventListener('input', function() {
+    renderResults(this.value.toLowerCase().trim());
+  });
+
+  suggestionButtons.forEach(function(button) {
+    button.addEventListener('click', function() {
+      var query = button.getAttribute('data-search-query') || '';
+      searchInput.value = query;
+      renderResults(query.toLowerCase());
+      searchInput.focus();
     });
   });
 })();

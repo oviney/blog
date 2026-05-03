@@ -1,6 +1,11 @@
 ---
 name: frontend-ui-engineering
 description: Builds polished, accessible UI for the viney.ca Jekyll site. Use when changing layouts, includes, SCSS, responsive behavior, or browser-side interactions.
+version: 1.0.1
+triggers:
+  - Changing layouts, SCSS, or browser-side interactions
+  - Implementing responsive UI adjustments
+  - Fixing presentation or interaction issues on the site
 ---
 
 # Frontend UI Engineering
@@ -51,7 +56,7 @@ Use the repo's real commands:
 
 ```bash
 bundle exec jekyll build
-bundle exec jekyll serve --config _config_dev.yml
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 npm run test:playwright
 npm run test:a11y
 npm run test:lighthouse

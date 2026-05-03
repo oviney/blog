@@ -7,7 +7,7 @@ Quick reference for the verification stack used in oviney/blog. Use alongside `t
 ```bash
 bundle exec jekyll build
 npm run test:security
-bundle exec jekyll serve --config _config_dev.yml
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 npm run test:playwright
 npm run test:a11y
 npm run test:lighthouse
@@ -63,7 +63,7 @@ expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
 Use the repo scripts instead of raw tool invocations when you want the standard project configuration:
 
 ```bash
-bundle exec jekyll serve --config _config_dev.yml
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 npm run test:a11y
 npm run test:lighthouse
 ```

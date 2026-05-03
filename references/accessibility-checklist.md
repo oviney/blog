@@ -31,7 +31,7 @@ Quick reference for accessibility review on oviney/blog. Use alongside `jekyll-q
 
 ```bash
 bundle exec jekyll build
-bundle exec jekyll serve --config _config_dev.yml
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 npm run test:a11y
 npm run test:playwright
 ```

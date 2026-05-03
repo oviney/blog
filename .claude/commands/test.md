@@ -7,7 +7,7 @@ Invoke `test` first. This workflow is backed by the upstream-aligned
 
 Run the test suite in this order:
 1. `bundle exec jekyll build` — must pass before anything else
-2. Start dev server: `bundle exec jekyll serve --config _config_dev.yml`
+2. Start dev server: `bundle exec jekyll serve --config _config.yml,_config_dev.yml`
 3. `npx playwright test` — all projects (Mobile/Tablet/Desktop)
 4. Check for visual regressions, accessibility failures, and performance issues
 

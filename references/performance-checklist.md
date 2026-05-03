@@ -6,7 +6,7 @@ Quick reference for performance verification on oviney/blog. Use alongside `perf
 
 ```bash
 bundle exec jekyll build
-bundle exec jekyll serve --config _config_dev.yml
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 npm run test:lighthouse
 ```
 
@@ -48,7 +48,7 @@ The current Lighthouse baseline covers `/`, `/blog/`, and `/about/` on the local
 
 ```bash
 bundle exec jekyll build
-bundle exec jekyll serve --config _config_dev.yml
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 npm run test:lighthouse
 npm run test:playwright
 ```

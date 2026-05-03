@@ -1,3 +1,5 @@
-title: "Ouray Viney<br>blog"
+# Development-only overrides. Always load this alongside `_config.yml`.
+title: "Ouray Viney's blog"
+display_title: "Ouray Viney<br>blog"
 url: "http://127.0.0.1:4000/"
 google_analytics:

@@ -128,7 +128,7 @@ git push -u origin bugfix/GH-456-short-description
 
 ### Pitfall 5: Large Binary Files
 **Problem**: Accidentally committing large images, videos, or generated files  
-**Solution**: Check file sizes before committing. Use [`.gitignore`](../../.gitignore) for build artifacts  
+**Solution**: Check file sizes before committing. Use [`.gitignore`](../../../.gitignore) for build artifacts
 **Example**: Don't commit `_site/`, `node_modules/`, `.DS_Store`
 
 ## Code Snippets/Patterns
@@ -332,10 +332,10 @@ git stash list
 
 ## Related Files
 
-- [`.gitignore`](../../.gitignore) - Files excluded from git
-- [`.git/hooks/pre-commit`](../../.git/hooks/pre-commit) - Pre-commit validation script
-- [`docs/DEVELOPMENT_WORKFLOW.md`](../DEVELOPMENT_WORKFLOW.md) - Full development workflow
-- [`.github/workflows/jekyll.yml`](../../.github/workflows/jekyll.yml) - CI/CD pipeline
+- [`.gitignore`](../../../.gitignore) - Files excluded from git
+- [`docs/PRE_COMMIT_HOOK.md`](../../../docs/PRE_COMMIT_HOOK.md) - Pre-commit validation documentation
+- [`docs/DEVELOPMENT_WORKFLOW.md`](../../../docs/DEVELOPMENT_WORKFLOW.md) - Full development workflow
+- [`.github/workflows/jekyll.yml`](../../../.github/workflows/jekyll.yml) - CI/CD pipeline
 
 ## Success Criteria
 

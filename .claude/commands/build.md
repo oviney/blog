@@ -8,7 +8,7 @@ Invoke `build` first. This workflow is backed by the upstream-aligned
 
 Follow the incremental implementation pattern:
 1. Implement the smallest possible working slice
-2. Start the Jekyll dev server when runtime verification is needed: `bundle exec jekyll serve --config _config_dev.yml`
+2. Start the Jekyll dev server when runtime verification is needed: `bundle exec jekyll serve --config _config.yml,_config_dev.yml`
 3. Verify the slice before committing
 4. Commit with a descriptive message referencing the issue
 5. Move to the next slice

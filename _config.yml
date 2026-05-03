@@ -14,6 +14,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: Ouray Viney's blog
+display_title: "Ouray Viney<br>blog"
 email: ouray@viney.ca
 description: >- # this means to ignore newlines until "baseurl:"
   A blog for Software Engineering, Quality Engineering, Test Automation, Performance Engineering and more.
@@ -97,6 +98,8 @@ exclude:
   - vendor/gems/
   - vendor/ruby/
   - docs/
+  - test-results/
+  - playwright-report/
   - backstop.json
   - backstop_data/
   - lighthouserc.json

@@ -1,7 +1,7 @@
 ---
 name: github-issues-workflow
 description: 'Bug lifecycle from report to resolution. Use when triaging bugs, creating issue templates, managing labels, or following the defect workflow.'
-version: 1.2.0
+version: 1.3.0
 triggers:
   - User reports a bug
   - QA finds a defect
@@ -70,7 +70,7 @@ gh issue list --repo oviney/blog --state open --label P1
 gh issue list --repo oviney/blog --label "agent:creative-director"
 ```
 
-**See also:** [Flow Orchestrator Agent](../../agents/sprint-orchestrator.md) for backlog management and planning.
+**See also:** [Flow Orchestrator Agent](../../../docs/agents/sprint-orchestrator.md) for backlog management and planning.
 
 ### 1. User Reports Bug (GitHub Issue)
 
@@ -179,7 +179,8 @@ Add label based on domain:
 |------------|-------|-------|------------|
 | Layout/CSS/Visual | Creative Director | `agent:creative-director` | `economist-theme/SKILL.md` |
 | Tests/CI/Performance | QA Gatekeeper | `agent:qa-gatekeeper` | `jekyll-development/SKILL.md` |
-| Content/Posts/SEO | Editorial Manager | `agent:editorial-manager` | `editorial/SKILL.md` |
+| Content/Posts/SEO | Editorial Chief | `agent:editorial-chief` (alias: `agent:editorial-manager`) | `editorial/SKILL.md` |
+| Audience/UX/Usability Research | Audience Researcher | `agent:audience-researcher` | `audience-research/SKILL.md` |
 
 **Add comment:**
 ```markdown
@@ -358,7 +359,7 @@ cat .github/skills/jekyll-qa/SKILL.md
 2. **Visual Testing** (REQUIRED - not optional)
    ```bash
    # Start local server
-   bundle exec jekyll serve --config _config_dev.yml --livereload
+   bundle exec jekyll serve --config _config.yml,_config_dev.yml --livereload
    
    # Navigate to EXACT URL mentioned in issue
    # - If issue mentions /blog/, test /blog/
@@ -641,6 +642,7 @@ gh issue list --label "agent:creative-director" --state open
 - "Show open P1 bugs" → Query GitHub, list P1 issues
 - "Creative Director fix #123" → Adopt Creative Director persona, start Step 3
 - "What bugs need QA Gatekeeper?" → List issues with agent:qa-gatekeeper label
+- "What UX research needs doing?" → List issues with agent:audience-researcher label
 
 ### Quick Branch Creation
 
@@ -700,7 +702,9 @@ gh label create "P3:low" --repo oviney/blog --color "0e8a16" --description "Low 
 ```bash
 gh label create "agent:creative-director" --repo oviney/blog --color "5319e7" --description "Assigned to Creative Director (CSS/Layout/Design)"
 gh label create "agent:qa-gatekeeper" --repo oviney/blog --color "1d76db" --description "Assigned to QA Gatekeeper (Testing/Quality/CI)"
+gh label create "agent:editorial-chief" --repo oviney/blog --color "5319e7" --description "Editorial Chief: content, writing, SEO"
 gh label create "agent:editorial-manager" --repo oviney/blog --color "c5def5" --description "Assigned to Editorial Manager (Content/Writing/SEO)"
+gh label create "agent:audience-researcher" --repo oviney/blog --color "0b7285" --description "Assigned to Audience Researcher (UX/Usability/Audience fit)"
 ```
 
 **Type Labels** (GitHub defaults):
@@ -728,8 +732,8 @@ gh label list --repo oviney/blog | grep "P1:high"
 - [`.github/skills/economist-theme/SKILL.md`](../economist-theme/SKILL.md) - Creative Director skill
 - [`.github/skills/jekyll-qa/SKILL.md`](../jekyll-qa/SKILL.md) - QA Gatekeeper skill  
 - [`.github/skills/git-operations/SKILL.md`](../git-operations/SKILL.md) - Git workflow
-- [`.github/workflows/jekyll.yml`](../../.github/workflows/jekyll.yml) - CI/CD pipeline
-- [`docs/DEVELOPMENT_WORKFLOW.md`](../DEVELOPMENT_WORKFLOW.md) - Overall workflow
+- [`.github/workflows/jekyll.yml`](../../../.github/workflows/jekyll.yml) - CI/CD pipeline
+- [`docs/DEVELOPMENT_WORKFLOW.md`](../../../docs/DEVELOPMENT_WORKFLOW.md) - Overall workflow
 
 ## Success Criteria
 

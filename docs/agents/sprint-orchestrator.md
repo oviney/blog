@@ -73,7 +73,7 @@ gh issue view 36 --repo oviney/blog
 **Prioritize by:**
 - **Status:** Todo → In Progress → Review → Done (auto-managed by board)
 - **Priority:** priority:high → priority:medium → priority:low
-- **Agent:** agent:creative-director, agent:qa-gatekeeper, agent:editorial-chief
+- **Agent:** agent:creative-director, agent:qa-gatekeeper, agent:editorial-chief, agent:audience-researcher
 - **Type:** bug (fix first), enhancement, documentation
 
 ### 3. Delegation Phase
@@ -89,6 +89,7 @@ gh issue view 36 --repo oviney/blog
 | `agent:creative-director` | Creative Director | `Creative Director, work on issue #36` |
 | `agent:qa-gatekeeper` | QA Gatekeeper | `QA Gatekeeper, verify issue #36` |
 | `agent:editorial-chief` | Editorial Chief | `Editorial Chief, handle issue #36` |
+| `agent:audience-researcher` | Audience Researcher | `Audience Researcher, investigate issue #36` |
 
 **Update issue status via comment:**
 ```bash
@@ -270,6 +271,7 @@ gh issue list --repo oviney/blog --state closed --limit 10
 - #34: Add dark mode toggle (P1, agent:creative-director)
 - #36: RSS feed improvements (P2, agent:editorial-chief)
 - #37: Lighthouse performance (P2, agent:qa-gatekeeper)
+- #38: Improve homepage reader journey (P2, agent:audience-researcher)
 
 **Current Sprint:**
 - Completed: 2/5 issues (40%)
@@ -337,9 +339,9 @@ gh issue list --repo oviney/blog --state closed --milestone "Sprint 1"
 ## Integration with Existing Workflow
 
 **This persona complements:**
-- [Creative Director](../skills/economist-theme/SKILL.md) - Executes design tasks
-- [QA Gatekeeper](../skills/jekyll-qa/SKILL.md) - Verifies quality
-- [Editorial Chief](../skills/editorial/SKILL.md) - Manages content
+- [Creative Director](../../.github/skills/economist-theme/SKILL.md) - Executes design tasks
+- [QA Gatekeeper](../../.github/skills/jekyll-qa/SKILL.md) - Verifies quality
+- [Editorial Chief](../../.github/skills/editorial/SKILL.md) - Manages content
 
 **GitHub Integration:**
 - All issues stored at: https://github.com/oviney/blog/issues
@@ -347,8 +349,8 @@ gh issue list --repo oviney/blog --state closed --milestone "Sprint 1"
 - Labels for routing: `agent:*`, priority: `P0-P3`, type: `bug`/`enhancement`
 
 **File dependencies:**
-- [.github/skills/github-issues-workflow/SKILL.md](../skills/github-issues-workflow/SKILL.md) - Issue workflow
-- [docs/SPRINT_X_RETROSPECTIVE.md](../SPRINT_1_RETROSPECTIVE.md) - Sprint tracking
+- [.github/skills/github-issues-workflow/SKILL.md](../../.github/skills/github-issues-workflow/SKILL.md) - Issue workflow
+- `docs/SPRINT_X_RETROSPECTIVE.md` - Sprint tracking template placeholder
 - [CHANGELOG.md](../../CHANGELOG.md) - Release history
 
 ## Success Criteria

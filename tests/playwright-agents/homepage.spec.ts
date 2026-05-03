@@ -38,17 +38,24 @@ test.describe('@content @navigation Homepage Redesign @REQ-CONTENT-01 @REQ-VISUA
     expect(ctaHref).toBeTruthy();
   });
 
-  test('2. Focus Areas section shows 3 cards with icons and links', async ({ page }) => {
+  test('2. Focus Areas section shows 3 cards with clear topic destinations', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
     // Focus areas section should be visible
     const focusSection = page.locator('.home-focus-areas');
     await expect(focusSection).toBeVisible();
+    await expect(page.locator('.home-intro')).toContainText('quality engineering, test automation, software engineering, and security');
 
     // Should have exactly 3 focus area cards
     const cards = page.locator('.home-focus-card');
     await expect(cards).toHaveCount(3);
+
+    const expectedDestinations = [
+      { href: '/security/', cta: 'Browse security reporting' },
+      { href: '/software-engineering/', cta: 'Browse software engineering essays' },
+      { href: '/test-automation/', cta: 'Browse test automation analysis' },
+    ];
 
     // Each card must have an icon, title, description, and CTA link
     for (let i = 0; i < 3; i++) {
@@ -65,10 +72,14 @@ test.describe('@content @navigation Homepage Redesign @REQ-CONTENT-01 @REQ-VISUA
       const desc = card.locator('.home-focus-desc');
       await expect(desc).toBeVisible();
 
+      const meta = card.locator('.home-focus-meta');
+      await expect(meta).toBeVisible();
+
       const link = card.locator('.home-focus-link');
       await expect(link).toBeVisible();
       const href = await link.getAttribute('href');
-      expect(href).toBeTruthy();
+      expect(href).toContain(expectedDestinations[i].href);
+      await expect(link).toContainText(expectedDestinations[i].cta);
     }
   });
 
@@ -180,9 +191,10 @@ test.describe('@content @navigation Homepage Redesign @REQ-CONTENT-01 @REQ-VISUA
 
     await expect(page.locator('main').first()).toMatchAriaSnapshot(`
       - main:
+        - region "Site introduction"
         - heading /Latest post:.+/ [level=1]
-        - region "Focus Areas":
-          - heading "Focus Areas" [level=2]
+        - region "Browse by Topic":
+          - heading "Browse by Topic" [level=2]
         - region "From the Blog":
           - heading "From the Blog" [level=2]
           - article

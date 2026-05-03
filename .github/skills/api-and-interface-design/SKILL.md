@@ -1,6 +1,11 @@
 ---
 name: api-and-interface-design
 description: Designs stable interfaces and contracts. Use when defining public data shapes, Liquid include parameters, JSON feeds, script inputs, or other repo surfaces that other files or tools consume.
+version: 1.0.1
+triggers:
+  - Defining or changing shared data shapes
+  - Introducing new include parameters or workflow inputs
+  - Modifying repo surfaces consumed by other files or tools
 ---
 
 # API and Interface Design

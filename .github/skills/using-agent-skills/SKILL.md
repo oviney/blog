@@ -1,6 +1,11 @@
 ---
 name: using-agent-skills
 description: Discovers and invokes agent skills for viney.ca blog. Use when starting a session or when you need to discover which skill applies to the current task. This is the meta-skill that governs how all other skills are discovered and invoked.
+version: 1.1.0
+triggers:
+  - Starting a new direct/local agent session
+  - Unsure which lifecycle skill applies next
+  - Routing work between lifecycle and repo-specific skills
 ---
 
 # Using Agent Skills — viney.ca Blog
@@ -37,6 +42,7 @@ When a task arrives, identify the lifecycle phase first, then add any blog-speci
 ```
 Task arrives
     │
+    ├── Need reader-journey / audience-fit research? → audience-research
     ├── Need to define what to build? ─────────→ spec
     │   └── If it should be tracked in GitHub → github-issues-workflow
     ├── Have a spec and need tasks? ───────────→ planning-and-task-breakdown
@@ -62,6 +68,7 @@ Each agent label activates a specific persona with domain constraints:
 | `agent:creative-director` | Creative Director | `economist-theme` | `_sass/`, `_layouts/`, `assets/` |
 | `agent:qa-gatekeeper` | QA Gatekeeper | `jekyll-qa` | `.github/workflows/`, `tests/`, `scripts/` |
 | `agent:editorial-chief` | Editorial Chief | `editorial` | `_posts/`, `_drafts/`, `*.md` |
+| `agent:audience-researcher` | Audience Researcher | `audience-research` | `docs/`, `references/`, `*.md` |
 | *(no label)* | General | best judgement | anything except protected files |
 
 ## Core Operating Behaviours

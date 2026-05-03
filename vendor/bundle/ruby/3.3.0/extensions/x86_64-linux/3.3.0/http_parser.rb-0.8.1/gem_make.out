@@ -1,12 +1,12 @@
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/http_parser.rb-0.8.1/ext/ruby_http_parser
-/opt/hostedtoolcache/Ruby/3.3.11/x64/bin/ruby extconf.rb
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/http_parser.rb-0.8.1/ext/ruby_http_parser
+/home/ouray/.rbenv/versions/3.3.6/bin/ruby extconf.rb
 creating Makefile
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/http_parser.rb-0.8.1/ext/ruby_http_parser
-make DESTDIR\= sitearchdir\=./.gem.20260326-2431-ccoc8k sitelibdir\=./.gem.20260326-2431-ccoc8k clean
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/http_parser.rb-0.8.1/ext/ruby_http_parser
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-ahvyyy sitelibdir\=./.gem.20260426-182502-ahvyyy clean
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/http_parser.rb-0.8.1/ext/ruby_http_parser
-make DESTDIR\= sitearchdir\=./.gem.20260326-2431-ccoc8k sitelibdir\=./.gem.20260326-2431-ccoc8k
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/http_parser.rb-0.8.1/ext/ruby_http_parser
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-ahvyyy sitelibdir\=./.gem.20260426-182502-ahvyyy
 compiling ruby_http_parser.c
 ruby_http_parser.c: In function ‘Parser_execute’:
 ruby_http_parser.c:373:17: warning: comparison of integer expressions of different signedness: ‘size_t’ {aka ‘long unsigned int’} and ‘long int’ [-Wsign-compare]
@@ -23,9 +23,9 @@ cc1: note: unrecognized command-line option ‘-Wno-constant-logical-operand’ 
 compiling ryah_http_parser.c
 linking shared-object ruby_http_parser.so
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/http_parser.rb-0.8.1/ext/ruby_http_parser
-make DESTDIR\= sitearchdir\=./.gem.20260326-2431-ccoc8k sitelibdir\=./.gem.20260326-2431-ccoc8k install
-/usr/bin/install -c -m 0755 ruby_http_parser.so ./.gem.20260326-2431-ccoc8k
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/http_parser.rb-0.8.1/ext/ruby_http_parser
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-ahvyyy sitelibdir\=./.gem.20260426-182502-ahvyyy install
+/usr/bin/install -c -m 0755 ruby_http_parser.so ./.gem.20260426-182502-ahvyyy
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/http_parser.rb-0.8.1/ext/ruby_http_parser
-make DESTDIR\= sitearchdir\=./.gem.20260326-2431-ccoc8k sitelibdir\=./.gem.20260326-2431-ccoc8k clean
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/http_parser.rb-0.8.1/ext/ruby_http_parser
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-ahvyyy sitelibdir\=./.gem.20260426-182502-ahvyyy clean

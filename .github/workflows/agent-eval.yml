@@ -73,6 +73,7 @@ jobs:
         # Creative Director: _sass/, _layouts/, assets/css/, assets/images/
         # QA Gatekeeper: .github/workflows/, tests/, scripts/, playwright.config.ts
         # Editorial Chief: _posts/, _drafts/, docs/, *.md (content)
+        # Audience Researcher: docs/, references/, *.md (research synthesis)
 
         if echo "$LABELS" | grep -q "agent:creative-director"; then
           # Creative Director should NOT touch CI, tests, or config
@@ -92,6 +93,13 @@ jobs:
           # QA Gatekeeper should NOT touch content or design
           if echo "$FILES" | grep -qE "^(_posts/|_sass/|_layouts/)"; then
             VIOLATIONS="QA Gatekeeper modified content/design files"
+          fi
+        fi
+
+        if echo "$LABELS" | grep -q "agent:audience-researcher"; then
+          # Audience Researcher should stay in research/docs surfaces
+          if echo "$FILES" | grep -qE "^(_posts/|_drafts/|_sass/|_layouts/|\.github/workflows/|tests/|scripts/|_config\.yml)"; then
+            VIOLATIONS="Audience Researcher modified implementation files outside research scope"
           fi
         fi
 

@@ -1,6 +1,11 @@
 ---
 name: context-engineering
 description: Optimizes agent context setup. Use when starting a new session, switching tasks, or when output drifts away from oviney/blog conventions.
+version: 1.0.1
+triggers:
+  - Starting a new session or switching lifecycle phases
+  - Output is drifting away from repo conventions
+  - Preparing a governance-surface change that needs the right context stack
 ---
 
 # Context Engineering
@@ -15,7 +20,7 @@ Feed the agent the right repo context at the right time. In oviney/blog, good co
 - Switching from one lifecycle phase to another (`spec` → `build`, `build` → `review`)
 - Working in a different file class (`tests/`, `_sass/`, `_posts/`, `.github/skills/`)
 - Investigating why an agent is inventing commands or ignoring scope rules
-- Preparing a governance-surface change under `.github/skills/` or `.github/instructions/`, or a related command-layer change under `.claude/commands/`
+- Preparing a governance-surface change under `.github/skills/`, `.github/instructions/`, `AGENTS.md`, or `CLAUDE.md`
 
 ## The Repo Context Stack
 
@@ -76,8 +81,8 @@ LOAD:
 
 VERIFY WITH:
 - bundle exec jekyll build
-- `PR_LABELS=governance-update bash scripts/check-pr-scope.sh` for `.github/skills/` or `.github/instructions/`
-- `bash scripts/check-pr-scope.sh` for `.claude/commands/` or other non-governance paths
+- `PR_LABELS=governance-update bash scripts/check-pr-scope.sh` for `.github/skills/`, `.github/instructions/`, `AGENTS.md`, or `CLAUDE.md`
+- `bash scripts/check-pr-scope.sh` for other non-governance paths
 ```
 
 ### 2. Test and QA Changes

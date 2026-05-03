@@ -1,7 +1,7 @@
 ---
 name: jekyll-qa
 description: 'QA and CI/CD pipeline management. Use when reviewing PRs, diagnosing CI failures, running Playwright tests, checking accessibility, or verifying production deploys.'
-version: 1.2.0
+version: 2.1.0
 triggers:
   - PR created for bug fix or feature
   - Need to review code changes
@@ -231,7 +231,7 @@ git checkout bugfix/GH-33-blog-layout
 bundle exec jekyll build
 
 # Visual testing
-bundle exec jekyll serve --config _config_dev.yml --livereload
+bundle exec jekyll serve --config _config.yml,_config_dev.yml --livereload
 # Open http://localhost:4000
 ```
 
@@ -705,7 +705,7 @@ bundle exec jekyll build
 if [ $? -eq 0 ]; then
   echo "\n✅ Build successful!"
   echo "\n🚀 Starting local server..."
-  bundle exec jekyll serve --config _config_dev.yml --livereload
+  bundle exec jekyll serve --config _config.yml,_config_dev.yml --livereload
 else
   echo "\n❌ Build failed!"
   exit 1
@@ -826,6 +826,11 @@ echo "Latest post (${LATEST}): HTTP ${STATUS}"
 - Sitemap `/sitemap.xml`
 
 **Failure action:** File a `type:functional` / `severity:S2:major` bug immediately.
+
+**Current automation:** The smoke suite is enforced by
+`.github/workflows/production-smoke-tests.yml`, which runs
+`scripts/production-smoke-tests.sh` after successful GitHub Pages deploys on
+`main`, on manual dispatch, and on a weekly scheduled sweep.
 
 ### 6.2 Synthetic Link Check
 
@@ -961,7 +966,10 @@ done
 
 ### 6.7 Trigger
 
-All six checks above must run automatically in CI after every merge to `main` (not just on PRs). Add a GitHub Actions job step that runs the smoke suite as a post-deploy verification stage.
+The smoke suite in § 6.1 is now automated after successful deploys to `main`
+via `.github/workflows/production-smoke-tests.yml`. Extend that same post-deploy
+verification path for §§ 6.2–6.6 as their baselines and failure-routing rules
+are operationalised.
 
 ---
 
@@ -1222,6 +1230,7 @@ gh pr list --repo oviney/blog --state open \
 
 ## Version History
 
+- **2.1.0** (2026-04-26): Added automated post-deploy smoke-suite enforcement via `production-smoke-tests.yml` and `scripts/production-smoke-tests.sh`; clarified that §§ 6.2–6.6 remain follow-on automation work
 - **2.0.0** (2026-04-10): Major upgrade — production quality engineering disciplines:
   - Added § 6: Production Test Strategy (smoke tests, link check, content integrity, image integrity, performance baseline, Pa11y baseline)
   - Added § 7: Industry-Standard Defect Classification (type + severity taxonomy, IEEE 1044 aligned)

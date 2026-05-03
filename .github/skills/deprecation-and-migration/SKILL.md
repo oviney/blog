@@ -1,6 +1,11 @@
 ---
 name: deprecation-and-migration
 description: Guides safe retirement and replacement work. Use when sunsetting older skills, commands, docs, templates, or interfaces and migrating the repo to a clearer or more maintainable path.
+version: 1.0.1
+triggers:
+  - Retiring a stale workflow, doc surface, or command
+  - Replacing an older interface with a supported path
+  - Consolidating overlapping guidance into one maintained source
 ---
 
 # Deprecation and Migration
@@ -33,7 +38,7 @@ If you cannot name the replacement or the verification story, you are not ready 
 
 ### 1. Stabilize the Replacement
 
-Make sure the new path is already documented and usable. In this repo that often means the replacement is reflected in `CLAUDE.md`, `.github/skills/`, `.claude/commands/`, or repo validation commands.
+Make sure the new path is already documented and usable. In this repo that often means the replacement is reflected in `CLAUDE.md`, `AGENTS.md`, `.github/skills/`, or repo validation commands.
 
 ### 2. Map Consumers
 

@@ -81,3 +81,8 @@
 - name: "systemic"
   color: "5319e7"
   description: "Recurring root cause — requires systemic fix"
+
+# ── Agent routing ────────────────────────────────────────────────────────────
+- name: "agent:audience-researcher"
+  color: "0b7285"
+  description: "Assigned to Audience Researcher (UX/Usability/Audience fit)"

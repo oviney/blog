@@ -1,6 +1,11 @@
 ---
 name: debugging-and-error-recovery
 description: Guides systematic root-cause debugging. Use when Jekyll builds fail, QA commands fail, scope checks fail, or behavior on viney.ca diverges from expectations.
+version: 1.0.1
+triggers:
+  - A build, QA, or scope check is failing
+  - Production behavior diverges from local expectations
+  - A root-cause debugging workflow is needed
 ---
 
 # Debugging and Error Recovery

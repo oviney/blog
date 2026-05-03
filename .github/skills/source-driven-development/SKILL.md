@@ -1,6 +1,11 @@
 ---
 name: source-driven-development
 description: Grounds implementation decisions in authoritative sources. Use when framework behavior, tool syntax, or workflow guidance must be verified before editing oviney/blog.
+version: 1.0.1
+triggers:
+  - Verifying framework or tool behavior before editing docs
+  - Reconciling official guidance with repo-local commands
+  - Updating workflow docs that other agents will copy
 ---
 
 # Source-Driven Development
@@ -70,7 +75,7 @@ Avoid tutorial blogs and generic AI summaries as primary sources.
 Ask the repo-specific questions that generic docs cannot answer:
 
 - Is the command present in `package.json`?
-- Does the repo already encode a preferred workflow in `.claude/commands/`?
+- Does the repo already encode a preferred workflow in `CLAUDE.md`, `AGENTS.md`, or the relevant skill file?
 - Does the change cross a protected or governance surface?
 - Does the repo intentionally omit a tool (for example generic lint or typecheck defaults)?
 

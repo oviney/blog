@@ -57,8 +57,8 @@ Provide background information about why this skill exists and what problem it s
 
 ## Related Files
 
-- [`file/path.ext`](../../file/path.ext) - Description
-- [`another/file.md`](../../another/file.md) - Description
+- `file/path.ext` - Description
+- `another/file.md` - Description
 - External links if relevant
 
 ## Success Criteria

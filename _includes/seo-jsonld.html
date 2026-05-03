@@ -5,6 +5,7 @@
   - Article schema is rendered on post pages only (layout: post).
   - BreadcrumbList schema is rendered on every page.
 {% endcomment %}
+{% assign plain_site_title = site.title | strip_html | normalize_whitespace %}
 
 {% if page.layout == 'post' %}
 <script type="application/ld+json">
@@ -28,7 +29,7 @@
   },
   "publisher": {
     "@type": "Organization",
-    "name": {{ site.title | jsonify }},
+    "name": {{ plain_site_title | jsonify }},
     "logo": {
       "@type": "ImageObject",
       "url": {{ "/favicon.svg" | absolute_url | jsonify }}

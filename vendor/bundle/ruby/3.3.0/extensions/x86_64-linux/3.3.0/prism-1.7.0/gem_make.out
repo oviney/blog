@@ -1,15 +1,15 @@
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext/prism
-/opt/hostedtoolcache/Ruby/3.3.11/x64/bin/ruby extconf.rb
-checking for prism.h in /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/include... yes
-checking for prism/extension.h in /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext... yes
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext/prism
+/home/ouray/.rbenv/versions/3.3.6/bin/ruby extconf.rb
+checking for prism.h in /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/include... yes
+checking for prism/extension.h in /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext... yes
 checking for whether -fvisibility=hidden is accepted as CFLAGS... yes
 creating Makefile
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext/prism
-make DESTDIR\= sitearchdir\=./.gem.20260326-2431-jxrh2w sitelibdir\=./.gem.20260326-2431-jxrh2w clean
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext/prism
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-ridp8l sitelibdir\=./.gem.20260426-182502-ridp8l clean
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext/prism
-make DESTDIR\= sitearchdir\=./.gem.20260326-2431-jxrh2w sitelibdir\=./.gem.20260326-2431-jxrh2w
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext/prism
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-ridp8l sitelibdir\=./.gem.20260426-182502-ridp8l
 compiling api_node.c
 compiling api_pack.c
 compiling extension.c
@@ -36,9 +36,9 @@ compiling ./../../src/util/pm_strncasecmp.c
 compiling ./../../src/util/pm_strpbrk.c
 linking shared-object prism/prism.so
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext/prism
-make DESTDIR\= sitearchdir\=./.gem.20260326-2431-jxrh2w sitelibdir\=./.gem.20260326-2431-jxrh2w install
-/usr/bin/install -c -m 0755 prism.so ./.gem.20260326-2431-jxrh2w/prism
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext/prism
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-ridp8l sitelibdir\=./.gem.20260426-182502-ridp8l install
+/usr/bin/install -c -m 0755 prism.so ./.gem.20260426-182502-ridp8l/prism
 
-current directory: /home/runner/work/blog/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext/prism
-make DESTDIR\= sitearchdir\=./.gem.20260326-2431-jxrh2w sitelibdir\=./.gem.20260326-2431-jxrh2w clean
+current directory: /home/ouray/blog/vendor/bundle/ruby/3.3.0/gems/prism-1.7.0/ext/prism
+make DESTDIR\= sitearchdir\=./.gem.20260426-182502-ridp8l sitelibdir\=./.gem.20260426-182502-ridp8l clean

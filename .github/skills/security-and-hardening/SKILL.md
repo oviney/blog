@@ -1,6 +1,11 @@
 ---
 name: security-and-hardening
 description: Hardens oviney/blog against content, dependency, and workflow vulnerabilities. Use when handling untrusted input, external scripts, search data, or CI/CD configuration.
+version: 1.0.1
+triggers:
+  - Editing trust boundaries or untrusted input flows
+  - Adding external scripts, APIs, or workflow permissions
+  - Reviewing hardening needs for content, dependencies, or automation
 ---
 
 # Security and Hardening

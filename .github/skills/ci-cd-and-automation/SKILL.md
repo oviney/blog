@@ -1,6 +1,11 @@
 ---
 name: ci-cd-and-automation
 description: Maintains oviney/blog CI/CD and automation guidance. Use when updating workflows, quality gates, PR safeguards, or release automation for this Jekyll site.
+version: 1.0.1
+triggers:
+  - Updating workflows or repo automation
+  - Tightening CI quality gates or PR safeguards
+  - Aligning docs with current GitHub Actions behavior
 ---
 
 # CI/CD and Automation
@@ -23,7 +28,7 @@ Use the repo's real commands as the default automation contract:
 
 ```bash
 bundle exec jekyll build
-bundle exec jekyll serve --config _config_dev.yml
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 npm run test:security
 npm run test:playwright
 npm run test:a11y

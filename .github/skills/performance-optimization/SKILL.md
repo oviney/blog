@@ -1,6 +1,11 @@
 ---
 name: performance-optimization
 description: Optimizes oviney/blog performance with a measure-first workflow. Use when Lighthouse scores dip, page assets grow, or Jekyll output changes risk Core Web Vitals regressions.
+version: 1.0.1
+triggers:
+  - Lighthouse or runtime performance signals regress
+  - Page weight or asset size grows
+  - A change risks Core Web Vitals degradation
 ---
 
 # Performance Optimization

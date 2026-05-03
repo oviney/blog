@@ -69,7 +69,7 @@ For CSS/layout work requiring rapid iteration:
 
 ```bash
 cd /Users/ouray.viney/code/economist-blog-v5
-bundle exec jekyll serve --config _config_dev.yml --livereload
+bundle exec jekyll serve --config _config.yml,_config_dev.yml --livereload
 ```
 
 **URL**: http://localhost:4000/
@@ -210,7 +210,7 @@ echo "Jekyll: $(bundle exec jekyll -v)"
 # All should now show proper versions
 
 # Step 8: NOW start server (will succeed on first try)
-bundle exec jekyll serve --config _config_dev.yml --livereload
+bundle exec jekyll serve --config _config.yml,_config_dev.yml --livereload
 ```
 
 **Token Savings**: This workflow replaces 5+ failed iterations (5000 tokens) with 1 successful setup (500 tokens)
@@ -219,7 +219,7 @@ bundle exec jekyll serve --config _config_dev.yml --livereload
 
 ```bash
 cd /Users/ouray.viney/code/economist-blog-v5
-bundle exec jekyll serve --config _config_dev.yml --livereload
+bundle exec jekyll serve --config _config.yml,_config_dev.yml --livereload
 ```
 
 **When to use**: CSS/layout work requiring rapid iteration  
@@ -308,11 +308,11 @@ paginate_path: "/blog/page:num/"
 
 ## Related Files
 
-- [`docs/DEVELOPMENT_WORKFLOW.md`](../DEVELOPMENT_WORKFLOW.md) - Full workflow documentation
-- [`docs/conventions/testing.md`](../conventions/testing.md) - Testing conventions
-- [`.git/hooks/pre-commit`](../../.git/hooks/pre-commit) - Pre-commit validation script
-- [`.github/workflows/jekyll.yml`](../../.github/workflows/jekyll.yml) - CI/CD pipeline
-- [`_config_dev.yml`](../../_config_dev.yml) - Development config overrides
+- [`docs/DEVELOPMENT_WORKFLOW.md`](../../../docs/DEVELOPMENT_WORKFLOW.md) - Full workflow documentation
+- [`docs/conventions/testing.md`](../../../docs/conventions/testing.md) - Testing conventions
+- [`docs/PRE_COMMIT_HOOK.md`](../../../docs/PRE_COMMIT_HOOK.md) - Pre-commit validation documentation
+- [`.github/workflows/jekyll.yml`](../../../.github/workflows/jekyll.yml) - CI/CD pipeline
+- [`_config_dev.yml`](../../../_config_dev.yml) - Development config overrides
 
 ## Success Criteria
 

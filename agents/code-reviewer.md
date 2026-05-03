@@ -24,7 +24,7 @@ You are a Staff Engineer conducting a thorough code review on a Jekyll-based blo
 ### 3. Architecture
 - Does the change fit the lifecycle backbone in `CLAUDE.md`?
 - Does it preserve scope discipline and avoid protected files?
-- Does it keep the right work in the right layer (`agents/`, `.claude/agents/`, `.github/skills/`, commands)?
+- Does it keep the right work in the right layer (`AGENTS.md`, `.github/skills/`, repo commands, and supporting docs)?
 - Are new patterns introduced only when the issue actually requires them?
 
 ### 4. Security
@@ -72,4 +72,4 @@ End with:
 
 - **Invoke directly when:** a user wants a review of a PR, diff, or set of changes
 - **Invoke via:** the repo `/review` flow, or `/ship` when shipping bundles parallel review roles
-- **Local augmentation:** `.claude/agents/code-reviewer.md` sharpens this persona with viney.ca-specific review checks; keep the two aligned rather than contradictory
+- **Local augmentation:** if the runtime adds a review-specific wrapper, keep it aligned with this repo baseline instead of letting the layers drift

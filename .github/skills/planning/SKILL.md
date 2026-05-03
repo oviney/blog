@@ -1,7 +1,7 @@
 ---
 name: planning-and-task-breakdown
 description: 'Planning and task breakdown before coding. Use when starting any issue, scoping a PR, or splitting work across multiple PRs.'
-version: 1.0.0
+version: 1.1.0
 triggers:
   - Starting work on any issue
   - Scoping a PR before making changes
@@ -77,6 +77,7 @@ Before touching any file, verify it is within your agent's allowed scope:
 | `agent:creative-director` | `_sass/`, `_layouts/`, `assets/css/`, `assets/images/`, `assets/charts/` | `.github/workflows/`, `tests/`, `scripts/`, `_config.yml`, `_posts/` |
 | `agent:qa-gatekeeper` | `.github/workflows/`, `tests/`, `specs/`, `scripts/`, `playwright.config.ts` | `_sass/`, `_layouts/`, `_posts/`, `_config.yml` |
 | `agent:editorial-chief` | `_posts/`, `_drafts/`, `docs/`, `*.md` (root), `blog.html`, `search.html` | `_sass/`, `_layouts/`, `.github/workflows/`, `tests/`, `scripts/`, `_config.yml` |
+| `agent:audience-researcher` | `docs/`, `references/`, `*.md` (root) | `_posts/`, `_sass/`, `_layouts/`, `.github/workflows/`, `tests/`, `scripts/`, `_config.yml` |
 | No agent label | Any non-protected file | `_config.yml`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`, `Gemfile`, `Gemfile.lock` |
 
 If a required change falls outside your scope, **stop and comment on the issue** explaining
