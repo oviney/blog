@@ -12,6 +12,7 @@
  *   15 pts — Content length (800–1500 words)
  *   10 pts — Excerpt quality (first paragraph ≥ 50 words)
  *   10 pts — Internal links (≥ 1 link to another post)
+ *   10 pts — Tags (≥ 2 lowercase-hyphen tags)
  *   10 pts — Citations (≥ 3 references with sources)
  *
  * Cross-article checks (flags only):
@@ -400,7 +401,18 @@ function scorePost(fm, body, filename) {
     warnings.push('No internal links to other posts — consider linking to related content');
   }
 
-  // ── 8. Citations (10 pts) ─────────────────────────────────────────────────
+  // ── 8. Tags (10 pts) ──────────────────────────────────────────────────────
+  const tags = Array.isArray(fm.tags) ? fm.tags : [];
+  if (tags.length >= 2) {
+    score += 10;
+  } else if (tags.length === 1) {
+    score += 5;
+    warnings.push('Only 1 tag — add at least one more (target: 2–5 lowercase-hyphen tags)');
+  } else {
+    issues.push('No tags — add 2–5 lowercase-hyphen tags from the canonical vocabulary');
+  }
+
+  // ── 9. Citations (10 pts) ─────────────────────────────────────────────────
   const citations = countCitations(body);
   if (citations >= 3) {
     score += 10;
@@ -411,7 +423,7 @@ function scorePost(fm, body, filename) {
     issues.push('No citations or external references found — add data points with sources');
   }
 
-  return { score: Math.min(score, 100), words, internalLinks, citations, issues, warnings };
+  return { score: Math.min(score, 100), words, internalLinks, citations, tags: tags.length, issues, warnings };
 }
 
 // ── Cross-article analysis ────────────────────────────────────────────────────

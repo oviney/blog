@@ -1,71 +1,122 @@
-# SPEC — Post-page Taxonomy & Recommendation UX Fix (Issue #906)
+# SPEC — Tag Taxonomy Policy (Issue #907)
 
 **Status:** Draft  
-**Issue:** [#906](https://github.com/oviney/blog/issues/906)  
-**Label:** `agent:creative-director`  
+**Issue:** [#907](https://github.com/oviney/blog/issues/907)  
+**Label:** `agent:editorial-chief`  
 **Date:** 2026-05-03
 
 ---
 
 ## 1. Objective
 
-Fix three routing/filtering bugs in `_layouts/post.html` so that post-page taxonomy CTAs and recommendation blocks behave correctly:
+Establish and enforce a consistent tag taxonomy across the 24-post archive. Currently 18 of 24 posts have zero tags; the 6 that do use inconsistent casing. Validators do not check tags. The editorial skill shows tags as expected but does not enforce them.
 
-1. Category CTAs (section-line link, Explore-more category tags) route to topic landing pages where they exist.
-2. "More from [Category]" block is filtered to the current post's category, not any 6 posts.
-
-**No new pages, no new CSS, no new dependencies.** This is a Liquid template fix only.
+**Target users:** the editorial agent (enforcing on new posts) and future readers/search indexers (benefiting from consistent metadata).
 
 ---
 
-## 2. Bug Map
+## 2. Policy Decision
 
-| Element | Current | Correct |
-|---|---|---|
-| `.section-link` (section-line) | always `/blog/` | topic landing page if it exists, else `/blog/` |
-| `.topic-tag-link` for categories | always `/blog/` | topic landing page if it exists, else `/blog/` |
-| `.topic-tag-link` for post tags | `/blog/` | `/blog/` (no tag archives — acceptable) |
-| `more-from-section` grid query | any 6 posts ≠ current | same-category posts ≠ current, up to 6 |
-| `more-from-section` h2 label | `More from [category] →` | unchanged (label is now accurate once filtering is fixed) |
+**Tags are required.** The policy:
 
----
+- Every post must have 2–5 tags from the canonical vocabulary below.
+- New tags may be introduced when none of the existing ones fit; they must use `lowercase-hyphen` format.
+- `validate-posts.sh` will issue an **ERROR** (not warning) on missing tags — consistent with how `categories` is treated.
+- `content-review.js` will deduct 10 points for missing tags (same as the existing internal-links penalty).
 
-## 3. Category → URL mapping
-
-Resolved at template render time via `site.pages | where: "title", cat | first`. Self-maintaining: adding a new category page automatically picks it up.
-
-| Category | Landing page | URL |
-|---|---|---|
-| Software Engineering | `software-engineering.md` | `/software-engineering/` |
-| Test Automation | `test-automation.md` | `/test-automation/` |
-| Security | `security.md` | `/security/` |
-| Quality Engineering | none | fallback `/blog/` |
+**Rationale for ERROR not warning:** 75% of posts already lack tags. Making it a warning risks perpetuating the status quo. Since the remediation below adds tags to all 18 gaps, the archive will be fully compliant before the stricter check lands.
 
 ---
 
-## 4. Acceptance Criteria
+## 3. Canonical Tag Vocabulary
 
-- [ ] **AC-1** `.section-link` on a Software Engineering post links to `/software-engineering/`
-- [ ] **AC-2** `.section-link` on a Quality Engineering post links to `/blog/` (no landing page)
-- [ ] **AC-3** `.topic-tag-link` for a category in Explore-more links to the topic landing page
-- [ ] **AC-4** `section.more-from-section` grid contains only posts sharing the current post's primary category
-- [ ] **AC-5** `bundle exec jekyll build` succeeds
-- [ ] **AC-6** `bash scripts/validate-posts.sh --all` exits 0
-- [ ] **AC-7** Navigation tests cover the category CTA routing and more-from filtering
+Organised by primary category; tags may be used across categories.
+
+### Quality Engineering
+`quality-engineering` · `software-testing` · `defect-prevention` · `quality-metrics` · `cost-of-quality` · `qa-strategy` · `quality-management`
+
+### Test Automation
+`test-automation` · `ci-cd` · `self-healing-tests` · `playwright` · `test-maintenance` · `test-roi` · `testing-theater`
+
+### Software Engineering
+`software-engineering` · `engineering-leadership` · `technical-debt` · `platform-engineering` · `developer-experience` · `digital-transformation` · `architecture`
+
+### Security
+`security` · `security-debt` · `cybersecurity` · `enterprise-security` · `threat-detection`
+
+### Cross-cutting
+`ai` · `ai-testing` · `code-quality` · `productivity` · `devops` · `cost-benefit`
+
+**Casing rule:** always lowercase-hyphen. Acronyms become lowercase: `AI` → `ai`, `QA` → `qa-strategy`.
 
 ---
 
-## 5. File under change
+## 4. Remediation Map
 
-`_layouts/post.html` — one file, Liquid template changes only. No CSS, no JavaScript, no config.
+Tags to add to the 18 untagged posts:
 
----
-
-## 6. Boundaries
-
-| Always | Never |
+| Post | Proposed tags |
 |---|---|
-| Preserve all existing CSS classes | Change class names used by Playwright tests |
-| Preserve `related-reading` section (separate from more-from) | Modify `_config.yml`, `Gemfile`, SCSS |
-| Use `site.pages | where: "title"` for URL lookup | Hardcode category → URL mappings |
-| Fall back to `/blog/` when no landing page exists | Remove the Explore-more section |
+| `2023-12-28-understanding-opendns-cybersecurity-protection.md` | `security`, `cybersecurity`, `enterprise-security` |
+| `2025-12-31-testing-times.md` | `ai-testing`, `test-automation`, `quality-engineering` |
+| `2026-01-02-self-healing-tests-myth-vs-reality.md` | `self-healing-tests`, `test-automation`, `test-maintenance` |
+| `2026-01-18-ai-assisted-development-the-new-industrial-revolut.md` | `ai`, `software-engineering`, `code-quality`, `productivity` |
+| `2026-01-18-the-hidden-technical-debt-of-test-automation.md` | `test-automation`, `technical-debt`, `test-maintenance` |
+| `2026-01-18-the-productivity-paradox-of-test-coverage-metrics.md` | `test-automation`, `quality-metrics`, `productivity` |
+| `2026-01-18-the-real-cost-of-testing-theater-when-quality-metr.md` | `testing-theater`, `quality-metrics`, `cost-of-quality` |
+| `2026-01-19-the-surprising-economics-of-test-automation-roi.md` | `test-roi`, `test-automation`, `cost-benefit` |
+| `2026-04-04-the-real-cost-of-test-automation--balancing-speed-and-sustai.md` | `test-automation`, `test-roi`, `technical-debt` |
+| `2026-04-05-ai-quality-testing-automation.md` | `ai-testing`, `test-automation`, `qa-strategy` |
+| `2026-04-05-building-a-test-strategy-that-works.md` | `qa-strategy`, `test-automation`, `software-testing` |
+| `2026-04-05-copq-in-software-engineering-and-how-quality-engin.md` | `cost-of-quality`, `quality-engineering`, `software-engineering` |
+| `2026-04-05-cost-of-poor-quality-copq.md` | `cost-of-quality`, `quality-engineering`, `defect-prevention` |
+| `2026-04-05-practical-applications-of-ai-in-software-development.md` | `ai`, `software-engineering`, `productivity`, `code-quality` |
+| `2026-04-05-the-end-of-manual-qa-why-2026-is-the-tipping-point.md` | `test-automation`, `qa-strategy`, `ai-testing` |
+| `2026-04-05-why-ai-test-generation-tools-overpromise-on-maintenance-savi.md` | `ai-testing`, `test-maintenance`, `test-automation` |
+| `2026-04-06-the-concealed-price-tag-of-test-automation.md` | `test-roi`, `cost-of-quality`, `test-automation` |
+| `2026-04-12-the-hidden-economics-of-security-debt.md` | `security-debt`, `security`, `cost-benefit` |
+
+**Also fix casing** in the 6 posts that have tags: `AI` → `ai`.
+
+---
+
+## 5. Acceptance Criteria
+
+- [ ] **AC-1** `validate-posts.sh` issues an ERROR when a post has no tags
+- [ ] **AC-2** `validate-posts.sh` issues an ERROR when a post has fewer than 2 tags  
+- [ ] **AC-3** `content-review.js` deducts 10 points when `tags` is absent
+- [ ] **AC-4** All 24 posts pass `validate-posts.sh --all` after remediation
+- [ ] **AC-5** All 24 posts score ≥ 90 on `content-review.js` after remediation
+- [ ] **AC-6** The canonical tag vocabulary and tag format rules are documented in `.github/skills/editorial/SKILL.md`
+- [ ] **AC-7** `bundle exec jekyll build` succeeds with no errors
+
+---
+
+## 6. Files Under Change
+
+| File | Change |
+|---|---|
+| `scripts/validate-posts.sh` | Add tag presence and count checks (ERROR) |
+| `scripts/content-review.js` | Add tag score component (10 pts) |
+| `.github/skills/editorial/SKILL.md` | Add canonical tag vocabulary and enforcement rules |
+| 18 `_posts/*.md` files | Add tags front matter |
+| 6 `_posts/*.md` files | Normalise tag casing (`AI` → `ai`) |
+
+---
+
+## 7. Boundaries
+
+| Always | Ask first | Never |
+|---|---|---|
+| Use `lowercase-hyphen` format for all tags | Add a tag outside the canonical list | Fabricate tags that don't match post content |
+| Match tags to actual post content | Change the canonical vocabulary significantly | Modify `_config.yml`, `Gemfile`, layouts |
+| Run `validate-posts.sh --all` before committing | — | Remove existing tags |
+| Run `content-review.js` before committing | — | Touch posts' title, date, or slug |
+
+---
+
+## 8. Out of Scope
+
+- Building tag archive pages (no `/tags/` landing pages exist; creating them is a separate feature)
+- Changing the category taxonomy (separate from tags)
+- Adding tag-based filtering to search (separate feature)

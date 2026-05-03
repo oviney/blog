@@ -1,26 +1,21 @@
-# TODO — Issue #908: Editorial Strengthening of Two April AI Posts
+# TODO — Issue #907: Tag Taxonomy Policy
 
-> Score target already met (100/100 both posts). Remaining work: cross-post linking and editorial depth.
+## Phase 1 — Enforcer (RED)
 
-## Phase 1 — Post A: "AI Testing Tools: The Adoption Chasm Nobody Discusses"
+- [ ] **T1** Add tag presence + count (≥2) ERROR checks to `scripts/validate-posts.sh` (AC-1, AC-2)
+- [ ] **CHECKPOINT A** `validate-posts.sh --all | grep tags | wc -l` == 18
 
-- [ ] **T1** Add 3 cross-post links in `_posts/2026-04-05-ai-quality-testing-automation.md` (AC-3)
-  - testing-times → "The capability gap" ¶1
-  - ai-test-generation-costs → "The capability gap" ¶2
-  - test-automation-roi → new ¶ in "The compounding divide"
-- [ ] **T2** Expand "The compounding divide" with ~110-word mechanism paragraph (AC-5)
-- [ ] **CHECKPOINT A** `grep -c '(/20'` ≥ 3 · word count in range · `validate-posts.sh` exits 0
+## Phase 2 — Remediation + Scoring
 
-## Phase 2 — Post B: "Code Generators: The Brilliant Interns Nobody Supervises"
+- [ ] **T3** Add canonical vocabulary + casing rule to `.github/skills/editorial/SKILL.md` (AC-6)
+- [ ] **T4a** Add tags to 7 Quality Engineering posts (testing-times, building-test-strategy, copq×2, productivity-paradox, testing-theater, end-of-manual-qa)
+- [ ] **T4b** Add tags to 7 Test Automation posts (self-healing-tests, hidden-technical-debt, surprising-economics, real-cost-test-automation, ai-quality-testing, ai-test-generation, concealed-price-tag)
+- [ ] **T4c** Add tags to 2 Software Engineering posts (ai-assisted-development, practical-applications)
+- [ ] **T4d** Add tags to 2 Security posts (understanding-opendns, hidden-economics-of-security-debt)
+- [ ] **T5** Fix `AI` → `ai` casing in `ai-threat-detection-enterprise.md`
+- [ ] **CHECKPOINT B** `validate-posts.sh --all` → PASSED (all 24 posts)
+- [ ] **T2** Add 10-pt tag scoring to `scripts/content-review.js` (AC-3) — commit AFTER T4/T5
 
-- [ ] **T3** Add 3 cross-post links in `_posts/2026-01-18-ai-assisted-development-the-new-industrial-revolut.md` (AC-4)
-  - ai-quality-testing-automation → new content in "The narrow value corridor"
-  - practical-applications → "measuring its actual impact"
-  - self-healing-tests → final paragraph
-- [ ] **T4** Expand "The narrow value corridor" + add closing synthesis paragraph (AC-6)
-- [ ] **CHECKPOINT B** Both posts 100/100 · cross-post links ≥ 3 each · `validate-posts.sh --all` exits 0
+## Phase 3 — Final
 
-## Phase 3 — Ship
-
-- [ ] **T5** `bundle exec jekyll build` succeeds
-- [ ] **T6** Commit both posts, record before/after scores, close #908 (AC-10)
+- [ ] **T6** `validate-posts.sh --all` ✓ · `content-review.js` all ≥90 ✓ · `jekyll build` ✓ · close #907 (AC-4, AC-5, AC-7)
