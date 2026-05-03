@@ -4,6 +4,7 @@ title: "The Concealed Price Tag of Test Automation"
 date: 2026-04-06
 author: "Ouray Viney"
 categories: ["Test Automation"]
+tags: [test-roi, cost-of-quality, test-automation]
 image: /assets/images/testing-tax-shifted-costs.png
 image_alt: "Automation machinery covered in hanging price tags"
 image_caption: "Illustration: every layer of automation carries a price tag teams forget to total"

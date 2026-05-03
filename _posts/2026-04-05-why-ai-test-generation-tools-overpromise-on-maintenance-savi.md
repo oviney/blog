@@ -4,6 +4,7 @@ title: "The maintenance myth: what AI test generation costs"
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
+tags: [ai-testing, test-maintenance, test-automation]
 image: /assets/images/why-recent-ai-test-generation-tools-are-overpromising-on-mai.png
 image_alt: "Bars comparing high promised AI test savings with lower measured results"
 image_caption: "Illustration: vendor promises rise higher than the savings teams actually measure"

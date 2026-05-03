@@ -4,6 +4,7 @@ title: "AI Testing Tools: The Adoption Chasm Nobody Discusses"
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Test Automation"]
+tags: [ai-testing, test-automation, qa-strategy]
 image: /assets/images/ai-quality-testing-adoption.png
 image_alt: "A wide chasm separates a small pilot group from a distant production deployment"
 image_caption: "Illustration: many AI testing tools stall between the pilot and scaled adoption"

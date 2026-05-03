@@ -4,6 +4,7 @@ title: "Test Automation's Dirty Secret: The Debt Nobody Budgets For"
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Test Automation"]
+tags: [test-automation, technical-debt, test-maintenance]
 image: /assets/images/test-automation-technical-debt.png
 image_alt: "A rising debt curve climbing above an automation dashboard"
 image_caption: "Illustration: automation debt compounds long after teams stop counting it"

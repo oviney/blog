@@ -4,6 +4,7 @@ title: "Software's Trillion-Dollar Tax: The Cost Nobody Itemises"
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
+tags: [cost-of-quality, quality-engineering, software-engineering]
 image: /assets/images/copq-software-engineering.png
 image_alt: "A newspaper front page announcing a trillion-dollar software quality bill"
 image_caption: "Illustration: poor quality lands as a bill large enough to make headlines"

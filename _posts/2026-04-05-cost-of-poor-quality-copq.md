@@ -4,6 +4,7 @@ title: "Quality's Second Act: What Software Can Steal from Factories"
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
+tags: [cost-of-quality, quality-engineering, defect-prevention]
 image: /assets/images/copq-cross-industry.png
 image_alt: "A factory assembly line faces a chaotic software delivery pipeline split across the same frame"
 image_caption: "Illustration: manufacturing discipline and software chaos collide in the cost of poor quality"

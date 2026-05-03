@@ -4,6 +4,7 @@ title: "Manual QA's Last Stand: The Machines Have Already Won"
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
+tags: [test-automation, qa-strategy, ai-testing]
 image: /assets/images/the-end-of-manual-qa.png
 image_alt: "A lone tester sits at a desk as robotic lines close in from both sides"
 image_caption: "Illustration: manual QA is squeezed as industrial automation moves in"

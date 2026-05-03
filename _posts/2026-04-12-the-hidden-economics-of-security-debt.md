@@ -4,6 +4,7 @@ title: "The Financial Toll of Security Debt: A Growing Concern"
 date: 2026-04-12
 author: "Ouray Viney"
 categories: ["Security"]
+tags: [security-debt, security, cost-benefit]
 description: "Security debt is no metaphor. Delayed patching and underfunded remediation are turning cyber risk into a measurable balance-sheet liability."
 image: /assets/images/the-hidden-economics-of-security-debt.png
 image_alt: "Security debt costs rising as breach exposure grows over time"

@@ -4,6 +4,7 @@ title: "The coder's crutch: AI-assisted development's hidden costs"
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Software Engineering"]
+tags: [ai, software-engineering, productivity, code-quality]
 image: /assets/images/ai-coders-crutch.png
 image_alt: "A developer leaning on a giant crutch shaped like a microchip"
 image_caption: "Illustration: AI becomes a crutch when teams stop building their own strength"

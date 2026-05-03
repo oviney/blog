@@ -4,7 +4,7 @@ title: "AI-Driven Threat Detection in Enterprise Networks"
 date: 2026-04-12
 author: "Ouray Viney"
 categories: ["Security"]
-tags: [cybersecurity, AI, threat-detection, machine-learning, enterprise-security]
+tags: [cybersecurity, ai, threat-detection, machine-learning, enterprise-security]
 image: /assets/images/ai-threat-detection-enterprise.png
 image_alt: "An AI monitoring layer scanning enterprise network traffic for threats"
 image_caption: "Illustration: AI models scan dense enterprise traffic for signs of intrusion"

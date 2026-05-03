@@ -4,6 +4,7 @@ title: "Self-healing tests: the promise that keeps breaking"
 date: 2026-01-02
 author: "Ouray Viney"
 categories: ["Test Automation"]
+tags: [self-healing-tests, test-automation, test-maintenance]
 image: /assets/images/self-healing-broken-promise.png
 image_alt: "A cracked robotic arm trying to bolt itself back together"
 image_caption: "Illustration: self-healing tests promise repair while the system keeps breaking"

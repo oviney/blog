@@ -4,6 +4,7 @@ title: "Test automation's hidden ledger: costs nobody budgets"
 date: 2026-04-04
 author: "Ouray Viney"
 categories: ["Test Automation"]
+tags: [test-automation, test-roi, technical-debt]
 image: /assets/images/automation-hidden-ledger.png
 image_alt: "An oversized cost ledger spread across a desk with red ink running through the totals"
 image_caption: "Illustration: automation costs keep widening once the hidden ledger is opened"

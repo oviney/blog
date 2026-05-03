@@ -4,6 +4,7 @@ title: "The test strategy trap: why quality plans fail"
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
+tags: [qa-strategy, test-automation, software-testing]
 image: /assets/images/test-strategy-trap.png
 image_alt: "A collapsing test pyramid falling in on itself"
 image_caption: "Illustration: a brittle test strategy collapses when the structure is wrong"

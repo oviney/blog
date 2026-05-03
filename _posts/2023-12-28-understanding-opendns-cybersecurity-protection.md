@@ -4,6 +4,7 @@ title: "The invisible shield: DNS as cybersecurity's first line"
 date: 2023-12-28
 author: "Ouray Viney"
 categories: ["Security"]
+tags: [security, cybersecurity, enterprise-security]
 image: /assets/images/dns-invisible-shield.png
 image_alt: "DNS request packets bouncing off a protective shield in front of a network"
 image_caption: "Illustration: DNS filtering acts as an early shield against malicious traffic"

@@ -4,6 +4,7 @@ title: "Coverage Obsession: The Metric That Ate Quality Engineering"
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Test Automation"]
+tags: [test-automation, quality-metrics, productivity]
 image: /assets/images/test-coverage-paradox.png
 image_alt: "A coverage gauge stuck at 100% while a bug slips through an uncovered gap"
 image_caption: "Illustration: high coverage numbers can still leave real defects untouched"

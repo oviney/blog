@@ -4,6 +4,7 @@ title: "Testing Theatre: The QA Metrics That Fool Everyone"
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
+tags: [testing-theater, quality-metrics, cost-of-quality]
 image: /assets/images/testing-theatre-vanity-metrics.png
 image_alt: "Actors perform on a stage built from glowing QA dashboards"
 image_caption: "Illustration: vanity metrics turn testing into performance instead of assurance"

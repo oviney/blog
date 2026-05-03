@@ -4,6 +4,7 @@ title: "Testing times: why AI conquered QA without improving it"
 date: 2025-12-31
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
+tags: [ai-testing, test-automation, quality-engineering]
 image: /assets/images/testing-times-renovation.png
 image_alt: "Robots present QA dashboards while human testers watch from the edge of the room"
 image_caption: "Illustration: automation takes centre stage while quality outcomes barely move"

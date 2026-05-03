@@ -4,6 +4,7 @@ title: "The automation accountant: what test ROI looks like"
 date: 2026-01-19
 author: "Ouray Viney"
 categories: ["Test Automation"]
+tags: [test-roi, test-automation, cost-benefit]
 image: /assets/images/the-surprising-economics-of-test-automation-roi.png
 image_alt: "An accountant studies a ledger as automation costs spill off the page"
 image_caption: "Illustration: the ROI story changes once all automation costs are on the page"

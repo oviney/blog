@@ -4,6 +4,7 @@ title: "Code Generators: The Brilliant Interns Nobody Supervises"
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Software Engineering"]
+tags: [ai, software-engineering, code-quality, productivity]
 image: /assets/images/ai-assisted-code-generation.png
 image_alt: "Office robots write code at keyboards with no human supervision"
 image_caption: "Illustration: code generators move fast when nobody is reviewing them"
