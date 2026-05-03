@@ -113,46 +113,45 @@ test.describe('@content AI Disclosure and Content Badges @REQ-CONTENT-01 @REQ-CO
 
 });
 
-const APRIL_AI_POST_LINKS = [
-  {
-    name: 'AI Testing Tools',
-    postUrl: '/2026/04/05/ai-quality-testing-automation/',
-    links: [
-      '/2025/12/31/testing-times/',
-      '/2026/04/05/why-ai-test-generation-tools-overpromise-on-maintenance-savi/',
-      '/2026/01/19/the-surprising-economics-of-test-automation-roi/',
-    ],
-  },
-  {
-    // filename is 2026-01-18-* but front matter date is 2026-04-05;
-    // Jekyll serves this at /2026/04/05/ — pre-existing mismatch tracked in #916
-    name: 'Code Generators',
-    postUrl: '/2026/04/05/ai-assisted-development-the-new-industrial-revolut/',
-    links: [
-      '/2026/04/05/ai-quality-testing-automation/',
-      '/2026/04/05/practical-applications-of-ai-in-software-development/',
-      '/2026/01/02/self-healing-tests-myth-vs-reality/',
-    ],
-  },
-];
-
 test.describe('@content @links April AI posts: cross-post links resolve @REQ-CONTENT-01 @REQ-LINKS-01', () => {
 
-  for (const { name, postUrl, links } of APRIL_AI_POST_LINKS) {
+  const posts = [
+    {
+      name: 'AI Testing Tools',
+      postUrl: '/2026/04/05/ai-quality-testing-automation/',
+      links: [
+        '/2025/12/31/testing-times/',
+        '/2026/04/05/why-ai-test-generation-tools-overpromise-on-maintenance-savi/',
+        '/2026/01/19/the-surprising-economics-of-test-automation-roi/',
+      ],
+    },
+    {
+      // filename is 2026-01-18-* but front matter date is 2026-04-05;
+      // Jekyll serves this at /2026/04/05/ — pre-existing mismatch tracked in #916
+      name: 'Code Generators',
+      postUrl: '/2026/04/05/ai-assisted-development-the-new-industrial-revolut/',
+      links: [
+        '/2026/04/05/ai-quality-testing-automation/',
+        '/2026/04/05/practical-applications-of-ai-in-software-development/',
+        '/2026/01/02/self-healing-tests-myth-vs-reality/',
+      ],
+    },
+  ];
+
+  for (const { name, postUrl, links } of posts) {
     test(`${name} post: cross-post links are present and resolve`, async ({ page }) => {
       await page.goto(postUrl);
-      await page.waitForLoadState('domcontentloaded');
 
       const articleBody = page.locator('.article-content');
       await expect(articleBody).toBeVisible();
 
       for (const path of links) {
         await expect(
-          articleBody.locator(`a[href="${path}"]`),
-          `link to ${path} should be present in article body`
+          articleBody.locator(`p a[href="${path}"]`),
+          `link to ${path} should be present in article prose`
         ).toBeVisible();
         const response = await page.request.get(path);
-        expect(response.ok(), `${path} should return 2xx`).toBeTruthy();
+        expect(response.status(), `${path} should return 200`).toBe(200);
       }
     });
   }
