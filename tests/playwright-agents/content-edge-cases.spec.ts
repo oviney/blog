@@ -113,11 +113,11 @@ test.describe('@content AI Disclosure and Content Badges @REQ-CONTENT-01 @REQ-CO
 
 });
 
-test.describe('@content @links April AI posts: cross-post links resolve @REQ-CONTENT-01', () => {
+test.describe('@content @links April AI posts: cross-post links resolve @REQ-CONTENT-01 @REQ-LINKS-01', () => {
 
   test('AI Testing Tools post has 3 cross-post links and all resolve', async ({ page }) => {
     await page.goto('/2026/04/05/ai-quality-testing-automation/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const expectedLinks = [
       '/2025/12/31/testing-times/',
@@ -138,8 +138,11 @@ test.describe('@content @links April AI posts: cross-post links resolve @REQ-CON
   });
 
   test('Code Generators post has 3 cross-post links and all resolve', async ({ page }) => {
+    // Note: filename is 2026-01-18-* but front matter date is 2026-04-05, so Jekyll
+    // serves this post at /2026/04/05/. This is a pre-existing mismatch (since commit
+    // 5bd768b) tracked separately; do not change the URL here without fixing the source.
     await page.goto('/2026/04/05/ai-assisted-development-the-new-industrial-revolut/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const expectedLinks = [
       '/2026/04/05/ai-quality-testing-automation/',
