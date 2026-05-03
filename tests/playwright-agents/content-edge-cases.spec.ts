@@ -113,54 +113,49 @@ test.describe('@content AI Disclosure and Content Badges @REQ-CONTENT-01 @REQ-CO
 
 });
 
-test.describe('@content @links April AI posts: cross-post links resolve @REQ-CONTENT-01 @REQ-LINKS-01', () => {
-
-  test('AI Testing Tools post has 3 cross-post links and all resolve', async ({ page }) => {
-    await page.goto('/2026/04/05/ai-quality-testing-automation/');
-    await page.waitForLoadState('domcontentloaded');
-
-    const expectedLinks = [
+const APRIL_AI_POST_LINKS = [
+  {
+    name: 'AI Testing Tools',
+    postUrl: '/2026/04/05/ai-quality-testing-automation/',
+    links: [
       '/2025/12/31/testing-times/',
       '/2026/04/05/why-ai-test-generation-tools-overpromise-on-maintenance-savi/',
       '/2026/01/19/the-surprising-economics-of-test-automation-roi/',
-    ];
-
-    const articleBody = page.locator('.article-content');
-    await expect(articleBody).toBeVisible();
-
-    for (const path of expectedLinks) {
-      const link = articleBody.locator(`a[href="${path}"]`);
-      await expect(link, `link to ${path} should be present in article body`).toBeVisible();
-
-      const response = await page.request.get(path);
-      expect(response.ok(), `${path} should return 2xx`).toBeTruthy();
-    }
-  });
-
-  test('Code Generators post has 3 cross-post links and all resolve', async ({ page }) => {
-    // Note: filename is 2026-01-18-* but front matter date is 2026-04-05, so Jekyll
-    // serves this post at /2026/04/05/. This is a pre-existing mismatch (since commit
-    // 5bd768b) tracked separately; do not change the URL here without fixing the source.
-    await page.goto('/2026/04/05/ai-assisted-development-the-new-industrial-revolut/');
-    await page.waitForLoadState('domcontentloaded');
-
-    const expectedLinks = [
+    ],
+  },
+  {
+    // filename is 2026-01-18-* but front matter date is 2026-04-05;
+    // Jekyll serves this at /2026/04/05/ — pre-existing mismatch tracked in #916
+    name: 'Code Generators',
+    postUrl: '/2026/04/05/ai-assisted-development-the-new-industrial-revolut/',
+    links: [
       '/2026/04/05/ai-quality-testing-automation/',
       '/2026/04/05/practical-applications-of-ai-in-software-development/',
       '/2026/01/02/self-healing-tests-myth-vs-reality/',
-    ];
+    ],
+  },
+];
 
-    const articleBody = page.locator('.article-content');
-    await expect(articleBody).toBeVisible();
+test.describe('@content @links April AI posts: cross-post links resolve @REQ-CONTENT-01 @REQ-LINKS-01', () => {
 
-    for (const path of expectedLinks) {
-      const link = articleBody.locator(`a[href="${path}"]`);
-      await expect(link, `link to ${path} should be present in article body`).toBeVisible();
+  for (const { name, postUrl, links } of APRIL_AI_POST_LINKS) {
+    test(`${name} post: cross-post links are present and resolve`, async ({ page }) => {
+      await page.goto(postUrl);
+      await page.waitForLoadState('domcontentloaded');
 
-      const response = await page.request.get(path);
-      expect(response.ok(), `${path} should return 2xx`).toBeTruthy();
-    }
-  });
+      const articleBody = page.locator('.article-content');
+      await expect(articleBody).toBeVisible();
+
+      for (const path of links) {
+        await expect(
+          articleBody.locator(`a[href="${path}"]`),
+          `link to ${path} should be present in article body`
+        ).toBeVisible();
+        const response = await page.request.get(path);
+        expect(response.ok(), `${path} should return 2xx`).toBeTruthy();
+      }
+    });
+  }
 
 });
 
