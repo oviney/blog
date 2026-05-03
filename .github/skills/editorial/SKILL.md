@@ -50,6 +50,20 @@ image_caption: "Illustration: short line explaining the image's editorial point"
 - `Test Automation` — automation frameworks, self-healing tests, CI/CD
 - `Security` — cybersecurity, network security, compliance
 
+### Tags (required: 2–5 per post)
+
+Format: `lowercase-hyphen`. Acronyms become lowercase (`AI` → `ai`, `QA` → omit or use `qa-strategy`).
+
+| Group | Canonical tags |
+|---|---|
+| Quality Engineering | `quality-engineering` `software-testing` `defect-prevention` `quality-metrics` `cost-of-quality` `qa-strategy` `quality-management` |
+| Test Automation | `test-automation` `ci-cd` `self-healing-tests` `playwright` `test-maintenance` `test-roi` `testing-theater` |
+| Software Engineering | `software-engineering` `engineering-leadership` `technical-debt` `platform-engineering` `developer-experience` `digital-transformation` `architecture` |
+| Security | `security` `security-debt` `cybersecurity` `enterprise-security` `threat-detection` |
+| Cross-cutting | `ai` `ai-testing` `code-quality` `productivity` `devops` `cost-benefit` |
+
+Tags outside this list are allowed when none fit; document the addition in the PR. `validate-posts.sh` enforces presence and a minimum of 2 tags.
+
 ### Writing Style
 
 - **Voice**: Professional, analytical, data-driven — inspired by The Economist
@@ -66,7 +80,8 @@ image_caption: "Illustration: short line explaining the image's editorial point"
 - [ ] Image with descriptive alt text that describes the scene, not the art direction
 - [ ] Image caption that explains the image's editorial point
 - [ ] Internal links to related posts where natural
-- [ ] Category and tags set correctly
+- [ ] Category correct (one of the four allowed values)
+- [ ] Tags: 2–5 entries, `lowercase-hyphen`, from canonical vocabulary
 
 ## Documentation Standards
 
