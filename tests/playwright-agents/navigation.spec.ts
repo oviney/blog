@@ -1,12 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-/**
- * Navigation & User Journey Tests for Economist Blog v5
- * Based on navigation-test-plan.md
- *
- * These tests complement BackstopJS visual regression testing by validating
- * behavioral aspects of navigation and user interactions.
- */
+const TESTING_TIMES = '/2025/12/31/testing-times/';
 
 test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NAV-02', () => {
 
@@ -32,7 +26,7 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
     await expect(page).toHaveURL(/\/(blog|posts)/);
     await expect(page.locator('h1').first()).toBeVisible();
 
-    const firstArticleLink = page.locator('.post-card a, article a').first();
+    const firstArticleLink = page.locator('article a[href]').first();
     await firstArticleLink.click();
     await page.waitForLoadState('networkidle');
     await expect(page.locator('.article-title')).toBeVisible();
@@ -53,7 +47,8 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
       await hamburger.click();
     }
 
-    const categoryLink = page.getByRole('link', { name: /software engineering|test automation/i });
+    const categoryLink = page.locator('#site-navigation')
+      .getByRole('link', { name: /software engineering|test automation/i });
     const categoryCount = await categoryLink.count();
 
     if (categoryCount === 0) {
@@ -75,7 +70,7 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
   });
 
   test('Related posts navigation', async ({ page }) => {
-    await page.goto('/2025/12/31/testing-times/');
+    await page.goto(TESTING_TIMES);
     await page.waitForLoadState('networkidle');
 
     const relatedSection = page.locator('section.related-reading');
@@ -87,7 +82,7 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
     await expect(relatedSection).toBeVisible();
 
     // Read the origin post's category dynamically so the assertion is not hardcoded
-    const originCategory = (await page.locator('.article-section-line .section-link').textContent())?.trim();
+    const originCategory = (await page.locator('.article-section-line .section-link').first().textContent())?.trim();
     expect(originCategory).toBeTruthy();
 
     // Every related item must belong to the same category as the origin post
@@ -106,7 +101,7 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
   });
 
   test('Representative post article matches ARIA smoke snapshot', async ({ page }) => {
-    await page.goto('/2025/12/31/testing-times/');
+    await page.goto(TESTING_TIMES);
     await page.waitForLoadState('networkidle');
 
     await expect(page.locator('main article').first()).toMatchAriaSnapshot(`
@@ -124,52 +119,28 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
   test('Main navigation accessibility and keyboard support', async ({ page }) => {
     await page.goto('/');
 
-    // Nuclear healing: Ultra-flexible keyboard navigation
+    let successfulTabs = 0;
     try {
-      // Focus on first navigation element
       await page.keyboard.press('Tab');
-
-      // Just verify that focus works at all
-      const focusedElement = page.locator(':focus');
-      const focusCount = await focusedElement.count();
-      if (focusCount > 0) {
-        await expect(focusedElement).toBeVisible();
-      }
-
-      // Tab through navigation items - very permissive
-      let successfulTabs = 0;
       for (let i = 0; i < 5; i++) {
-        try {
-          await page.keyboard.press('Tab');
-          const currentFocus = page.locator(':focus');
-          if (await currentFocus.count() > 0) {
-            successfulTabs++;
-          }
-        } catch {
-          // Skip failed tab attempts
-        }
-      }
-
-      expect(successfulTabs).toBeGreaterThanOrEqual(1);
-
-      // Test Enter key activation - try any navigation link
-      try {
-        const navLinks = page.getByRole('link');
-        const linkCount = await navLinks.count();
-        if (linkCount > 0) {
-          const firstNavLink = navLinks.first();
-          await firstNavLink.focus();
-          await page.keyboard.press('Enter');
-          await page.waitForLoadState('networkidle');
-          await expect(page).toHaveURL(/localhost/);
-        }
-      } catch {
-        // Enter-key navigation is best-effort; tab count assertion above is the required check
+        await page.keyboard.press('Tab');
+        if (await page.locator(':focus').count() > 0) successfulTabs++;
       }
     } catch {
-      // Nuclear fallback: just verify the page is accessible
-      const pageContent = page.locator('body');
-      await expect(pageContent).toBeVisible();
+      // keyboard events unavailable in this environment
+    }
+    expect(successfulTabs).toBeGreaterThanOrEqual(1);
+
+    // Enter key on a focused link must navigate away from the current page
+    try {
+      const startUrl = page.url();
+      const firstLink = page.getByRole('link').first();
+      await firstLink.focus();
+      await page.keyboard.press('Enter');
+      await page.waitForLoadState('networkidle');
+      await expect(page).not.toHaveURL(startUrl);
+    } catch {
+      // Enter-key navigation is best-effort; tab count assertion above is the required check
     }
   });
 
@@ -182,14 +153,11 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
 
       // Open hamburger on mobile viewports before checking nav links
       const hamburger = page.locator('.nav-toggle');
-      if (await hamburger.isVisible()) {
-        await hamburger.click();
-      }
+      if (await hamburger.isVisible()) await hamburger.click();
 
       const nav = page.locator('#site-navigation');
       await expect(nav).toBeVisible();
-      const linkCount = await nav.getByRole('link').count();
-      expect(linkCount).toBeGreaterThanOrEqual(3);
+      expect(await nav.getByRole('link').count()).toBeGreaterThanOrEqual(3);
     }
   });
 
@@ -296,10 +264,8 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
 
 test.describe('@navigation Post-page Taxonomy & Recommendations', () => {
 
-  const FIXTURE_POST = '/2025/12/31/testing-times/';
-
   test('Section-line CTA links to /blog/ with category text', async ({ page }) => {
-    await page.goto(FIXTURE_POST);
+    await page.goto(TESTING_TIMES);
     await page.waitForLoadState('networkidle');
 
     const sectionLink = page.locator('.article-section-line .section-link');
@@ -313,7 +279,7 @@ test.describe('@navigation Post-page Taxonomy & Recommendations', () => {
   });
 
   test('Explore more tags: ≥1 link with non-empty text and href', async ({ page }) => {
-    await page.goto(FIXTURE_POST);
+    await page.goto(TESTING_TIMES);
     await page.waitForLoadState('networkidle');
 
     const tagLinks = page.locator('.explore-more .topic-tag-link');
@@ -330,7 +296,7 @@ test.describe('@navigation Post-page Taxonomy & Recommendations', () => {
   });
 
   test('Related reading: category labels match the current post', async ({ page }) => {
-    await page.goto(FIXTURE_POST);
+    await page.goto(TESTING_TIMES);
     await page.waitForLoadState('networkidle');
 
     const relatedSection = page.locator('section.related-reading');
@@ -341,7 +307,7 @@ test.describe('@navigation Post-page Taxonomy & Recommendations', () => {
 
     await expect(relatedSection).toBeVisible();
 
-    const originCategory = (await page.locator('.article-section-line .section-link').textContent())?.trim();
+    const originCategory = (await page.locator('.article-section-line .section-link').first().textContent())?.trim();
     expect(originCategory).toBeTruthy();
 
     const categoryLabels = relatedSection.locator('.related-category');
@@ -362,7 +328,7 @@ test.describe('@navigation Post-page Taxonomy & Recommendations', () => {
   });
 
   test('More from section: heading has category name, grid has ≥1 article', async ({ page }) => {
-    await page.goto(FIXTURE_POST);
+    await page.goto(TESTING_TIMES);
     await page.waitForLoadState('networkidle');
 
     const moreFromSection = page.locator('section.more-from-section');
@@ -375,7 +341,7 @@ test.describe('@navigation Post-page Taxonomy & Recommendations', () => {
     expect(headingText).toBeTruthy();
 
     // Heading must reference the post's actual category, not just any static string
-    const originCategory = (await page.locator('.article-section-line .section-link').textContent())?.trim();
+    const originCategory = (await page.locator('.article-section-line .section-link').first().textContent())?.trim();
     expect(originCategory).toBeTruthy();
     expect(headingText).toContain(originCategory!);
 
