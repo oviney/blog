@@ -8,9 +8,12 @@ layout: default
 <article class="economist-article">
   <header class="article-header">
     {% if page.categories %}
+    {% assign _cat = page.categories | first %}
+    {% assign _cat_page = site.pages | where: "title", _cat | first %}
+    {% if _cat_page %}{% assign _cat_url = _cat_page.url %}{% else %}{% assign _cat_url = '/blog/' %}{% endif %}
     <!-- Section + Rubric (Economist Style) -->
     <div class="article-section-line">
-      <a href="{{ '/blog/' | relative_url }}" class="section-link">{{ page.categories | first }}</a>
+      <a href="{{ _cat_url | relative_url }}" class="section-link">{{ _cat }}</a>
       <span class="section-separator">|</span>
       <span class="article-rubric">{{ page.rubric | default: page.title | truncatewords: 4 }}</span>
     </div>
@@ -75,7 +78,12 @@ layout: default
     <nav class="topic-tags-nav">
       {% if page.categories %}
       {% for category in page.categories %}
+      {% assign _tag_page = site.pages | where: "title", category | first %}
+      {% if _tag_page %}
+      <a href="{{ _tag_page.url | relative_url }}" class="topic-tag-link">{{ category }}</a>
+      {% else %}
       <a href="{{ '/blog/' | relative_url }}" class="topic-tag-link">{{ category }}</a>
+      {% endif %}
       {% endfor %}
       {% endif %}
       {% if page.tags %}
@@ -167,7 +175,17 @@ layout: default
   </div>
 
   <div class="more-from-grid">
-    {% assign related_posts = site.posts | where_exp: "post", "post.url != page.url" | limit: 6 %}
+    {% assign _section = page.categories | first %}
+    {% assign more_from_posts = "" | split: "" %}
+    {% for post in site.posts %}
+      {% unless post.url == page.url %}
+        {% if post.categories contains _section %}
+          {% assign more_from_posts = more_from_posts | push: post %}
+        {% endif %}
+      {% endunless %}
+      {% if more_from_posts.size >= 6 %}{% break %}{% endif %}
+    {% endfor %}
+    {% assign related_posts = more_from_posts %}
 
     {% if related_posts.size > 0 %}
     <!-- Featured article (first one, larger) -->

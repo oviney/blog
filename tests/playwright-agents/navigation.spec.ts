@@ -333,13 +333,72 @@ test.describe('@navigation Post-page Taxonomy & Recommendations @REQ-NAV-01', ()
     const headingText = (await heading.textContent())?.trim();
     expect(headingText).toBeTruthy();
 
-    // Heading must reference the post's actual category, not just any static string
     const originCategory = (await page.locator('.article-section-line .section-link').first().textContent())?.trim();
     expect(originCategory).toBeTruthy();
     expect(headingText).toContain(originCategory!);
 
     const gridArticles = moreFromSection.locator('.more-from-grid article');
     expect(await gridArticles.count()).toBeGreaterThanOrEqual(1);
+  });
+
+  // AC-1: posts with a topic landing page route the section-line CTA there
+  test('Section-line CTA routes to topic landing page when one exists', async ({ page }) => {
+    await page.goto('/2026/04/05/practical-applications-of-ai-in-software-development/');
+    await page.waitForLoadState('networkidle');
+
+    const sectionLink = page.locator('.article-section-line .section-link');
+    await expect(sectionLink).toBeVisible();
+
+    const href = await sectionLink.getAttribute('href');
+    expect(href).toMatch(/\/software-engineering\/?$/);
+
+    const response = await page.request.get('/software-engineering/');
+    expect(response.status()).toBe(200);
+  });
+
+  // AC-3: Explore-more category tags route to the topic landing page
+  test('Explore-more category tag routes to topic landing page when one exists', async ({ page }) => {
+    await page.goto('/2026/04/05/practical-applications-of-ai-in-software-development/');
+    await page.waitForLoadState('networkidle');
+
+    const categoryTag = page.locator('.explore-more .topic-tag-link').first();
+    await expect(categoryTag).toBeVisible();
+
+    const href = await categoryTag.getAttribute('href');
+    expect(href).toMatch(/\/software-engineering\/?$/);
+  });
+
+  // AC-4: more-from grid contains only same-category posts
+  test('More from section grid contains only same-category posts', async ({ page }) => {
+    await page.goto('/2026/04/05/practical-applications-of-ai-in-software-development/');
+    await page.waitForLoadState('networkidle');
+
+    const moreFromSection = page.locator('section.more-from-section');
+    if (await moreFromSection.count() === 0) {
+      test.skip(true, 'more-from-section not rendered — site has only one post');
+      return;
+    }
+    await expect(moreFromSection).toBeVisible();
+    await expect(moreFromSection.locator('h2')).toContainText('Software Engineering');
+
+    // Navigate to each linked article and verify it is in the same category
+    const articleLinks = moreFromSection.locator('article a[href]');
+    const count = await articleLinks.count();
+    expect(count).toBeGreaterThanOrEqual(1);
+
+    for (let i = 0; i < Math.min(count, 3); i++) {
+      const href = await articleLinks.nth(i).getAttribute('href');
+      if (!href) continue;
+      await page.goto(href);
+      await page.waitForLoadState('networkidle');
+      const sectionLink = page.locator('.article-section-line .section-link');
+      if (await sectionLink.count() > 0) {
+        const catText = (await sectionLink.first().textContent())?.trim();
+        expect(catText, `linked post at ${href} should be Software Engineering`).toBe('Software Engineering');
+      }
+      await page.goBack();
+      await page.waitForLoadState('networkidle');
+    }
   });
 
 });
