@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-04-26T11:03:19.677Z",
+  "generatedAt": "2026-05-04T10:15:30.743Z",
   "kpis": {
-    "agentPRsMerged30d": 6,
+    "agentPRsMerged30d": 4,
     "evalPassRate": 33,
     "contentAvgScore": null,
-    "openBacklog": 5,
-    "openPRCount": 2,
+    "openBacklog": 2,
+    "openPRCount": 6,
     "evalCount": 3,
-    "remediationQueueDepth": 8,
+    "remediationQueueDepth": 0,
     "remediationThreshold": 85
   },
   "evalDimensions": {
@@ -69,6 +69,48 @@
   ],
   "content": null,
   "recentPRs": [
+    {
+      "number": 858,
+      "title": "docs: clarify Copilot cloud agent instruction flow",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T12:01:57Z",
+      "labels": [
+        "governance-update"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 857,
+      "title": "[Editorial] Improve test strategy trap post",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T12:01:55Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 856,
+      "title": "[Editorial] Improve DNS security post narrative",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T12:01:52Z",
+      "labels": [],
+      "isAgent": true
+    },
+    {
+      "number": 855,
+      "title": "docs: improve digital transformation post SEO",
+      "author": "oviney",
+      "mergedAt": "2026-04-26T12:01:48Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 853,
+      "title": "📊 dashboard: refresh agent observability data",
+      "author": "github-actions[bot]",
+      "mergedAt": "2026-04-26T11:27:34Z",
+      "labels": [],
+      "isAgent": false
+    },
     {
       "number": 852,
       "title": "test(GH-846): add Playwright ARIA smoke coverage",
@@ -220,343 +262,31 @@
         "enhancement"
       ],
       "isAgent": false
-    },
-    {
-      "number": 809,
-      "title": "fix: regenerate featured image — understanding-qa-qc-quality-engineering",
-      "author": "oviney",
-      "mergedAt": "2026-04-14T12:58:50Z",
-      "labels": [
-        "bug",
-        "P2:medium",
-        "type:content"
-      ],
-      "isAgent": false
-    },
-    {
-      "number": 807,
-      "title": "fix(GH-804): validate image dimensions in validate-posts.sh",
-      "author": "oviney",
-      "mergedAt": "2026-04-13T12:54:44Z",
-      "labels": [
-        "bug",
-        "P2:medium",
-        "agent:qa-gatekeeper",
-        "type:ci-cd"
-      ],
-      "isAgent": true
-    },
-    {
-      "number": 791,
-      "title": "📝 New Article: 2026-04-12-the-hidden-economics-of-security-debt",
-      "author": "oviney",
-      "mergedAt": "2026-04-12T20:43:28Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 789,
-      "title": "editorial: rewrite 2024 QA/QC/QE draft to Economist style",
-      "author": "Copilot",
-      "mergedAt": "2026-04-12T20:44:16Z",
-      "labels": [],
-      "isAgent": true
-    },
-    {
-      "number": 788,
-      "title": "feat: add excerpt to related-posts cards, require ≥2 posts",
-      "author": "Copilot",
-      "mergedAt": "2026-04-12T20:44:14Z",
-      "labels": [],
-      "isAgent": true
     }
   ],
   "openIssuesByLabel": {
     "agent:creative-director": [],
     "agent:qa-gatekeeper": [
       {
-        "number": 847,
-        "title": "Add WCAG 2.2 focus and target-size checks to QA suite",
-        "age": 0
+        "number": 905,
+        "title": "bug: validators treat legacy redirect links as healthy internal links",
+        "age": 2
       }
     ],
     "agent:editorial-chief": [
       {
-        "number": 849,
-        "title": "Improve: Digital transformation dirty secret for Software Engineering quality and SEO",
-        "age": 0
-      },
-      {
-        "number": 848,
-        "title": "Improve: The Financial Toll of Security Debt for stronger Security coverage",
-        "age": 0
-      },
-      {
-        "number": 798,
-        "title": "[Editorial] Improve: \"The test strategy trap: why quality plans fail\" (score: 83 → 95)",
-        "age": 13
-      },
-      {
-        "number": 797,
-        "title": "[Editorial] Improve: \"The invisible shield: DNS as cybersecurity's first line\" (score: 83 → 95)",
-        "age": 13
+        "number": 904,
+        "title": "bug: archive internal links rely on legacy redirect routes",
+        "age": 2
       }
     ],
     "agent:editorial-manager": []
   },
-  "remediationQueue": [
-    {
-      "file": "_posts/2023-08-09-building-a-test-strategy-that-works.md",
-      "title": "The test strategy trap: why most quality plans fail before they start",
-      "currentScore": 72,
-      "targetScore": 100,
-      "actionCount": 3,
-      "actions": [
-        {
-          "dimension": "content_length",
-          "priority": 1,
-          "deficit": "597 words (minimum 800, target 800–1500)",
-          "instruction": "Expand by ~203 words. Thin sections: distribute evenly. Suggested approach: add a concrete real-world example, or one data point with analysis. Relevant data sources for this category: DORA State of DevOps, ISTQB reports, Gartner Magic Quadrant for Software Testing.",
-          "estimatedScoreDelta": 15
-        },
-        {
-          "dimension": "internal_links",
-          "priority": 2,
-          "deficit": "No internal links to other posts",
-          "instruction": "Add at least 1 contextual link to a related post. Top candidates by keyword similarity: `/2026/04/04/the-real-cost-of-test-automation--balancing-speed-and-sustai/` — \"Test automation's hidden ledger: the costs nobody budgets for\" (14% keyword overlap); `/2023/08/08/practical-applications-of-ai-in-software-development/` — \"The coder's crutch: why AI-assisted development is creating more problems than it solves\" (12% keyword overlap); `/2026/01/18/the-hidden-technical-debt-of-test-automation/` — \"Test Automation's Dirty Secret: The Debt Nobody Budgets For\" (12% keyword overlap).",
-          "estimatedScoreDelta": 10
-        },
-        {
-          "dimension": "seo_title",
-          "priority": 3,
-          "deficit": "Title is 69 chars (target ≤ 60)",
-          "instruction": "Shorten the title to ≤ 60 characters. Current: \"The test strategy trap: why most quality plans fail before they start\". Consider: \"The test strategy trap: why most quality plans fail befor…\" or rephrase to be more concise.",
-          "estimatedScoreDelta": 3
-        }
-      ]
-    },
-    {
-      "file": "_posts/2026-04-05-why-ai-test-generation-tools-overpromise-on-maintenance-savi.md",
-      "title": "The maintenance myth: what AI test generation actually costs to keep running",
-      "currentScore": 72,
-      "targetScore": 100,
-      "actionCount": 4,
-      "actions": [
-        {
-          "dimension": "content_length",
-          "priority": 1,
-          "deficit": "573 words (minimum 800, target 800–1500)",
-          "instruction": "Expand by ~227 words. Thin sections: distribute evenly. Suggested approach: add a concrete real-world example, or one data point with analysis. Relevant data sources for this category: DORA State of DevOps, ISTQB reports, Gartner Magic Quadrant for Software Testing.",
-          "estimatedScoreDelta": 15
-        },
-        {
-          "dimension": "category",
-          "priority": 2,
-          "deficit": "Non-standard category: `AI Testing`",
-          "instruction": "Replace `AI Testing` with `Quality Engineering` in the `categories` front matter field. Valid values: Quality Engineering, Software Engineering, Test Automation, Security.",
-          "estimatedScoreDelta": 10
-        },
-        {
-          "dimension": "internal_links",
-          "priority": 3,
-          "deficit": "No internal links to other posts",
-          "instruction": "Add at least 1 contextual link to a related post. Top candidates by keyword similarity: `/2026/01/02/self-healing-tests-myth-vs-reality/` — \"Self-healing tests: the automation promise that keeps breaking\" (17% keyword overlap); `/2026/04/04/the-real-cost-of-test-automation--balancing-speed-and-sustai/` — \"Test automation's hidden ledger: the costs nobody budgets for\" (14% keyword overlap); `/2023/08/08/practical-applications-of-ai-in-software-development/` — \"The coder's crutch: why AI-assisted development is creating more problems than it solves\" (13% keyword overlap).",
-          "estimatedScoreDelta": 10
-        },
-        {
-          "dimension": "seo_title",
-          "priority": 4,
-          "deficit": "Title is 76 chars (target ≤ 60)",
-          "instruction": "Shorten the title to ≤ 60 characters. Current: \"The maintenance myth: what AI test generation actually costs to keep running\". Consider: \"The maintenance myth: what AI test generation actually co…\" or rephrase to be more concise.",
-          "estimatedScoreDelta": 3
-        }
-      ]
-    },
-    {
-      "file": "_posts/2023-12-28-understanding-opendns-cybersecurity-protection.md",
-      "title": "The invisible shield: how DNS became cybersecurity's first line of defence",
-      "currentScore": 80,
-      "targetScore": 100,
-      "actionCount": 3,
-      "actions": [
-        {
-          "dimension": "internal_links",
-          "priority": 1,
-          "deficit": "No internal links to other posts",
-          "instruction": "Add at least 1 contextual link to a related post. Top candidates by keyword similarity: no strong candidates found — link to the most topically related post.",
-          "estimatedScoreDelta": 10
-        },
-        {
-          "dimension": "content_length",
-          "priority": 2,
-          "deficit": "608 words (minimum 800, target 800–1500)",
-          "instruction": "Expand by ~192 words. Thin sections: conclusion (49 words — target ≥ 50). Suggested approach: add a concrete real-world example, or one data point with analysis. Relevant data sources for this category: DORA State of DevOps, ISTQB reports, Gartner Magic Quadrant for Software Testing.",
-          "estimatedScoreDelta": 7
-        },
-        {
-          "dimension": "seo_title",
-          "priority": 3,
-          "deficit": "Title is 74 chars (target ≤ 60)",
-          "instruction": "Shorten the title to ≤ 60 characters. Current: \"The invisible shield: how DNS became cybersecurity's first line of defence\". Consider: \"The invisible shield: how DNS became cybersecurity's firs…\" or rephrase to be more concise.",
-          "estimatedScoreDelta": 3
-        }
-      ]
-    },
-    {
-      "file": "_posts/2026-01-02-self-healing-tests-myth-vs-reality.md",
-      "title": "Self-healing tests: the automation promise that keeps breaking",
-      "currentScore": 80,
-      "targetScore": 100,
-      "actionCount": 4,
-      "actions": [
-        {
-          "dimension": "category",
-          "priority": 1,
-          "deficit": "Non-standard category: `AI Testing`",
-          "instruction": "Replace `AI Testing` with `Quality Engineering` in the `categories` front matter field. Valid values: Quality Engineering, Software Engineering, Test Automation, Security.",
-          "estimatedScoreDelta": 10
-        },
-        {
-          "dimension": "internal_links",
-          "priority": 2,
-          "deficit": "No internal links to other posts",
-          "instruction": "Add at least 1 contextual link to a related post. Top candidates by keyword similarity: `/2026/04/05/why-ai-test-generation-tools-overpromise-on-maintenance-savi/` — \"The maintenance myth: what AI test generation actually costs to keep running\" (17% keyword overlap); `/2025/12/31/testing-times/` — \"Testing times: why AI conquered QA without improving it\" (14% keyword overlap); `/2026/01/18/the-hidden-technical-debt-of-test-automation/` — \"Test Automation's Dirty Secret: The Debt Nobody Budgets For\" (13% keyword overlap).",
-          "estimatedScoreDelta": 10
-        },
-        {
-          "dimension": "content_length",
-          "priority": 3,
-          "deficit": "621 words (minimum 800, target 800–1500)",
-          "instruction": "Expand by ~179 words. Thin sections: conclusion (49 words — target ≥ 50). Suggested approach: add a concrete real-world example, or one data point with analysis. Relevant data sources for this category: ISTQB Global Testing Survey, Capgemini World Quality Report, Tricentis/Mabl vendor studies.",
-          "estimatedScoreDelta": 7
-        },
-        {
-          "dimension": "seo_title",
-          "priority": 4,
-          "deficit": "Title is 62 chars (target ≤ 60)",
-          "instruction": "Shorten the title to ≤ 60 characters. Current: \"Self-healing tests: the automation promise that keeps breaking\". Consider: \"Self-healing tests: the automation promise that keeps bre…\" or rephrase to be more concise.",
-          "estimatedScoreDelta": 3
-        }
-      ]
-    },
-    {
-      "file": "_posts/2026-01-19-the-surprising-economics-of-test-automation-roi.md",
-      "title": "The automation accountant: what test ROI actually looks like at scale",
-      "currentScore": 80,
-      "targetScore": 100,
-      "actionCount": 3,
-      "actions": [
-        {
-          "dimension": "internal_links",
-          "priority": 1,
-          "deficit": "No internal links to other posts",
-          "instruction": "Add at least 1 contextual link to a related post. Top candidates by keyword similarity: `/2026/04/04/the-real-cost-of-test-automation--balancing-speed-and-sustai/` — \"Test automation's hidden ledger: the costs nobody budgets for\" (18% keyword overlap); `/2025/12/31/testing-times/` — \"Testing times: why AI conquered QA without improving it\" (13% keyword overlap); `/2026/01/02/self-healing-tests-myth-vs-reality/` — \"Self-healing tests: the automation promise that keeps breaking\" (12% keyword overlap).",
-          "estimatedScoreDelta": 10
-        },
-        {
-          "dimension": "content_length",
-          "priority": 2,
-          "deficit": "690 words (minimum 800, target 800–1500)",
-          "instruction": "Expand by ~110 words. Thin sections: conclusion (49 words — target ≥ 50). Suggested approach: add a concrete real-world example, or one data point with analysis. Relevant data sources for this category: DORA State of DevOps, ISTQB reports, Gartner Magic Quadrant for Software Testing.",
-          "estimatedScoreDelta": 7
-        },
-        {
-          "dimension": "seo_title",
-          "priority": 3,
-          "deficit": "Title is 69 chars (target ≤ 60)",
-          "instruction": "Shorten the title to ≤ 60 characters. Current: \"The automation accountant: what test ROI actually looks like at scale\". Consider: \"The automation accountant: what test ROI actually looks l…\" or rephrase to be more concise.",
-          "estimatedScoreDelta": 3
-        }
-      ]
-    },
-    {
-      "file": "_posts/2026-04-04-the-real-cost-of-test-automation--balancing-speed-and-sustai.md",
-      "title": "Test automation's hidden ledger: the costs nobody budgets for",
-      "currentScore": 80,
-      "targetScore": 100,
-      "actionCount": 3,
-      "actions": [
-        {
-          "dimension": "internal_links",
-          "priority": 1,
-          "deficit": "No internal links to other posts",
-          "instruction": "Add at least 1 contextual link to a related post. Top candidates by keyword similarity: `/2026/01/19/the-surprising-economics-of-test-automation-roi/` — \"The automation accountant: what test ROI actually looks like at scale\" (18% keyword overlap); `/2026/01/18/the-hidden-technical-debt-of-test-automation/` — \"Test Automation's Dirty Secret: The Debt Nobody Budgets For\" (15% keyword overlap); `/2023/08/09/building-a-test-strategy-that-works/` — \"The test strategy trap: why most quality plans fail before they start\" (14% keyword overlap).",
-          "estimatedScoreDelta": 10
-        },
-        {
-          "dimension": "content_length",
-          "priority": 2,
-          "deficit": "668 words (minimum 800, target 800–1500)",
-          "instruction": "Expand by ~132 words. Thin sections: distribute evenly. Suggested approach: add a concrete real-world example, or one data point with analysis. Relevant data sources for this category: DORA State of DevOps, ISTQB reports, Gartner Magic Quadrant for Software Testing.",
-          "estimatedScoreDelta": 7
-        },
-        {
-          "dimension": "seo_title",
-          "priority": 3,
-          "deficit": "Title is 61 chars (target ≤ 60)",
-          "instruction": "Shorten the title to ≤ 60 characters. Current: \"Test automation's hidden ledger: the costs nobody budgets for\". Consider: \"Test automation's hidden ledger: the costs nobody budgets…\" or rephrase to be more concise.",
-          "estimatedScoreDelta": 3
-        }
-      ]
-    },
-    {
-      "file": "_posts/2023-08-08-practical-applications-of-ai-in-software-development.md",
-      "title": "The coder's crutch: why AI-assisted development is creating more problems than it solves",
-      "currentScore": 82,
-      "targetScore": 100,
-      "actionCount": 2,
-      "actions": [
-        {
-          "dimension": "content_length",
-          "priority": 1,
-          "deficit": "576 words (minimum 800, target 800–1500)",
-          "instruction": "Expand by ~224 words. Thin sections: distribute evenly. Suggested approach: add a concrete real-world example, or one data point with analysis. Relevant data sources for this category: DORA State of DevOps, Stack Overflow Developer Survey, GitHub Octoverse.",
-          "estimatedScoreDelta": 15
-        },
-        {
-          "dimension": "seo_title",
-          "priority": 2,
-          "deficit": "Title is 88 chars (target ≤ 60)",
-          "instruction": "Shorten the title to ≤ 60 characters. Current: \"The coder's crutch: why AI-assisted development is creating more problems than it solves\". Consider: \"The coder's crutch: why AI-assisted development is creati…\" or rephrase to be more concise.",
-          "estimatedScoreDelta": 3
-        }
-      ]
-    },
-    {
-      "file": "_posts/2025-12-31-testing-times.md",
-      "title": "Testing times: why AI conquered QA without improving it",
-      "currentScore": 83,
-      "targetScore": 100,
-      "actionCount": 3,
-      "actions": [
-        {
-          "dimension": "category",
-          "priority": 1,
-          "deficit": "Non-standard category: `AI Testing`",
-          "instruction": "Replace `AI Testing` with `Quality Engineering` in the `categories` front matter field. Valid values: Quality Engineering, Software Engineering, Test Automation, Security.",
-          "estimatedScoreDelta": 10
-        },
-        {
-          "dimension": "internal_links",
-          "priority": 2,
-          "deficit": "No internal links to other posts",
-          "instruction": "Add at least 1 contextual link to a related post. Top candidates by keyword similarity: `/2026/01/18/the-hidden-technical-debt-of-test-automation/` — \"Test Automation's Dirty Secret: The Debt Nobody Budgets For\" (15% keyword overlap); `/2026/01/02/self-healing-tests-myth-vs-reality/` — \"Self-healing tests: the automation promise that keeps breaking\" (14% keyword overlap); `/2026/01/10/the-end-of-manual-qa-why-2026-is-the-tipping-point/` — \"Manual QA's Last Stand: The Machines Have Already Won\" (14% keyword overlap).",
-          "estimatedScoreDelta": 10
-        },
-        {
-          "dimension": "content_length",
-          "priority": 3,
-          "deficit": "662 words (minimum 800, target 800–1500)",
-          "instruction": "Expand by ~138 words. Thin sections: conclusion (46 words — target ≥ 50). Suggested approach: add a concrete real-world example, or one data point with analysis. Relevant data sources for this category: DORA State of DevOps, ISTQB reports, Gartner Magic Quadrant for Software Testing.",
-          "estimatedScoreDelta": 7
-        }
-      ]
-    }
-  ],
+  "remediationQueue": [],
   "copilotUsage": {
     "seatsActive": null,
-    "billingCycleStart": "2026-04-01",
-    "billingCycleEnd": "2026-04-30",
+    "billingCycleStart": "2026-05-01",
+    "billingCycleEnd": "2026-05-31",
     "seatCostPerMonth": 19,
     "apiAvailable": false,
     "note": "Copilot billing API unavailable. Add a PAT with manage_billing:copilot or read:org scope as secret COPILOT_BILLING_PAT to enable live seat data."
