@@ -91,10 +91,13 @@ for post in $POSTS; do
     fi
   done
 
-  # -- 2b. Tag checks (required: 2–5 lowercase-hyphen tags) -----------------
+  # -- 2b. Tag checks (required: ≥ 2 lowercase-hyphen tags) -----------------
+  # Tags must use inline bracket format: tags: [foo, bar]
+  # Block-style YAML (tags:\n  - foo) is not detected by fm_value and will
+  # trigger the missing-field error. Use inline format in all posts.
   tags_val=$(fm_value "$post" "tags")
   if [[ -z "$tags_val" ]]; then
-    echo "❌  $rel — missing required front-matter field: 'tags' (add 2–5 lowercase-hyphen tags)"
+    echo "❌  $rel — missing required front-matter field: 'tags' (use inline format: tags: [foo, bar])"
     ERRORS=$((ERRORS + 1))
     post_errors=$((post_errors + 1))
   else
@@ -102,6 +105,13 @@ for post in $POSTS; do
     tag_count=$(echo "$tags_val" | tr -d '[]' | tr ',' '\n' | grep -c '[^[:space:]]' || true)
     if [[ "$tag_count" -lt 2 ]]; then
       echo "❌  $rel — too few tags: $tag_count found (minimum 2 required)"
+      ERRORS=$((ERRORS + 1))
+      post_errors=$((post_errors + 1))
+    fi
+    # Check for uppercase characters in tag values (all tags must be lowercase-hyphen)
+    tags_stripped=$(echo "$tags_val" | tr -d '[]')
+    if echo "$tags_stripped" | grep -qE '[A-Z]'; then
+      echo "❌  $rel — tags contain uppercase characters — use lowercase-hyphen format (e.g. 'ai' not 'AI')"
       ERRORS=$((ERRORS + 1))
       post_errors=$((post_errors + 1))
     fi

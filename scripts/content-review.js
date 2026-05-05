@@ -15,6 +15,11 @@
  *   10 pts — Tags (≥ 2 lowercase-hyphen tags)
  *   10 pts — Citations (≥ 3 references with sources)
  *
+ * Sections sum to 110 pts; the score is capped at 100. This means a post
+ * can score 100/100 while missing any one of the three 10-point sections
+ * (internal links, tags, or citations). All three together are not required
+ * for a perfect score.
+ *
  * Cross-article checks (flags only):
  *   — Topic uniqueness  : posts with > 60% title-word similarity
  *   — Topic coverage    : if one category > 70% of posts

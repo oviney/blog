@@ -50,9 +50,11 @@ image_caption: "Illustration: short line explaining the image's editorial point"
 - `Test Automation` — automation frameworks, self-healing tests, CI/CD
 - `Security` — cybersecurity, network security, compliance
 
-### Tags (required: 2–5 per post)
+### Tags (required: ≥ 2 per post, target 2–5)
 
-Format: `lowercase-hyphen`. Acronyms become lowercase (`AI` → `ai`, `QA` → omit or use `qa-strategy`).
+Format: `lowercase-hyphen`. Acronyms become lowercase (`AI` → `ai`). Avoid `QA` as a standalone tag; use `qa-strategy` or `quality-engineering` instead.
+
+Tags must use **inline bracket format**: `tags: [foo, bar]`. Block-style YAML is not detected by the validator.
 
 | Group | Canonical tags |
 |---|---|
@@ -60,9 +62,9 @@ Format: `lowercase-hyphen`. Acronyms become lowercase (`AI` → `ai`, `QA` → o
 | Test Automation | `test-automation` `ci-cd` `self-healing-tests` `playwright` `test-maintenance` `test-roi` `testing-theater` |
 | Software Engineering | `software-engineering` `engineering-leadership` `technical-debt` `platform-engineering` `developer-experience` `digital-transformation` `architecture` |
 | Security | `security` `security-debt` `cybersecurity` `enterprise-security` `threat-detection` |
-| Cross-cutting | `ai` `ai-testing` `code-quality` `productivity` `devops` `cost-benefit` |
+| Cross-cutting | `ai` `ai-testing` `code-quality` `productivity` `devops` `cost-benefit` `machine-learning` |
 
-Tags outside this list are allowed when none fit; document the addition in the PR. `validate-posts.sh` enforces presence and a minimum of 2 tags.
+Tags outside this list are allowed when none fit; document the addition in the PR. `validate-posts.sh` enforces presence, a minimum of 2 tags, and lowercase-hyphen casing. The 5-tag maximum is advisory.
 
 ### Writing Style
 
