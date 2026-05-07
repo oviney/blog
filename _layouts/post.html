@@ -88,7 +88,7 @@ layout: default
       {% endif %}
       {% if page.tags %}
       {% for tag in page.tags limit: 3 %}
-      <a href="{{ '/blog/' | relative_url }}" class="topic-tag-link">{{ tag | capitalize }}</a>
+      <a href="{{ '/blog/' | relative_url }}" class="topic-tag-link">{{ tag | capitalize | escape }}</a>
       {% endfor %}
       {% endif %}
     </nav>

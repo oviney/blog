@@ -8,8 +8,10 @@
 # Checks per post:
 #   1. Required front-matter fields are present: layout, title, date, author,
 #      categories, image
-#   2. The image: path resolves to a real file under assets/images/
-#   3. The date: value is not in the future
+#   2. Tags: ≥ 2 tags in inline bracket format (tags: [foo, bar]),
+#      all lowercase-hyphen (tags must not contain uppercase characters)
+#   3. The image: path resolves to a real file under assets/images/
+#   4. The date: value is not in the future
 #
 # Exit codes: 0 = all posts valid, 1 = one or more violations found.
 
