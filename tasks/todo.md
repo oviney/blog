@@ -1,21 +1,21 @@
-# TODO — Issue #907: Tag Taxonomy Policy
+# TODO — Issues #904 / #905: Internal Link Validator Quality
 
-## Phase 1 — Enforcer (RED)
+## Phase 1 — Design
+- [x] **T1** Verify registry algorithm: Python prototype confirms 24/25 posts found; `--` → `-` normalization required for `2026-04-04-the-real-cost-of-test-automation--balancing-speed-and-sustai.md`
 
-- [ ] **T1** Add tag presence + count (≥2) ERROR checks to `scripts/validate-posts.sh` (AC-1, AC-2)
-- [ ] **CHECKPOINT A** `validate-posts.sh --all | grep tags | wc -l` == 18
+## Phase 2 — Implementation
+- [ ] **T2** Update `scripts/content-review.js`:
+  - Add `buildPostRegistry()` (\_site/ primary, front-matter fallback)
+  - Replace `countInternalLinks()` with `classifyInternalLinks(body, registry)` returning `{canonical, broken, brokenUrls}`
+  - Update section 7 scoring: canonical links earn credit; broken links generate an issue
+  - Pass registry to `scorePost()` as 4th param
+  - Update return object: `internalLinks → canonical count`, add `brokenInternalLinks`
+  - Update header comment
+- [ ] **T3** Update `scripts/validate-posts.sh`:
+  - Build POST_REGISTRY once before the per-post loop (Python one-liner)
+  - Add check 2c in per-post loop: ERROR if any `/20xx/` body link not in registry
+  - Update header comment
+- [ ] **CHECKPOINT A** `validate-posts.sh --all` PASSED · `content-review.js` 24/24 at 100/100 · `jekyll build` clean
 
-## Phase 2 — Remediation + Scoring
-
-- [ ] **T3** Add canonical vocabulary + casing rule to `.github/skills/editorial/SKILL.md` (AC-6)
-- [ ] **T4a** Add tags to 7 Quality Engineering posts (testing-times, building-test-strategy, copq×2, productivity-paradox, testing-theater, end-of-manual-qa)
-- [ ] **T4b** Add tags to 7 Test Automation posts (self-healing-tests, hidden-technical-debt, surprising-economics, real-cost-test-automation, ai-quality-testing, ai-test-generation, concealed-price-tag)
-- [ ] **T4c** Add tags to 2 Software Engineering posts (ai-assisted-development, practical-applications)
-- [ ] **T4d** Add tags to 2 Security posts (understanding-opendns, hidden-economics-of-security-debt)
-- [ ] **T5** Fix `AI` → `ai` casing in `ai-threat-detection-enterprise.md`
-- [ ] **CHECKPOINT B** `validate-posts.sh --all` → PASSED (all 24 posts)
-- [ ] **T2** Add 10-pt tag scoring to `scripts/content-review.js` (AC-3) — commit AFTER T4/T5
-
-## Phase 3 — Final
-
-- [ ] **T6** `validate-posts.sh --all` ✓ · `content-review.js` all ≥90 ✓ · `jekyll build` ✓ · close #907 (AC-4, AC-5, AC-7)
+## Phase 3 — Docs + close
+- [ ] **T4** Update `.github/skills/jekyll-qa/SKILL.md`; close #904 (verified clean) and #905 (fixed)
