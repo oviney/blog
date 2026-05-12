@@ -10,6 +10,7 @@
 #      categories, image
 #   2. Tags: ≥ 2 tags in inline bracket format (tags: [foo, bar]),
 #      all lowercase-hyphen (tags must not contain uppercase characters)
+#   2c. Internal links: /YYYY/ body links must resolve to a known post permalink
 #   3. The image: path resolves to a real file under assets/images/
 #   4. The date: value is not in the future
 #
@@ -67,6 +68,40 @@ fm_value() {
     | sed "s/^${key}:[[:space:]]*//" \
     || true
 }
+
+# ---------------------------------------------------------------------------
+# Build post URL registry from front matter.
+# Uses date: front matter (not filename date) for the URL date path.
+# Slug comes from the filename after stripping YYYY-MM-DD- prefix, with
+# consecutive hyphens collapsed to one (Jekyll's slug normalization).
+# No _site/ dependency — works before or without a Jekyll build.
+# ---------------------------------------------------------------------------
+POST_REGISTRY=$(python3 - "$REPO_ROOT/_posts" <<'PYEOF'
+import sys, os, re
+posts_dir = sys.argv[1]
+urls = set()
+for f in sorted(os.listdir(posts_dir)):
+    if not f.endswith('.md'):
+        continue
+    try:
+        content = open(os.path.join(posts_dir, f)).read()
+    except Exception:
+        continue
+    fm_end = content.find('\n---', 3)
+    fm = content[3:fm_end] if fm_end > 0 else ''
+    perma = re.search(r'^permalink:\s*(.+)', fm, re.M)
+    date_m = re.search(r'^date:\s*(\d{4}-\d{2}-\d{2})', fm, re.M)
+    if perma:
+        urls.add(perma.group(1).strip().rstrip('/') + '/')
+    elif date_m:
+        # Slug from filename (not front matter title); apply Jekyll -- normalisation
+        slug = re.sub(r'^\d{4}-\d{2}-\d{2}-', '', f).rstrip('.md').replace('.md', '')
+        slug = re.sub(r'-{2,}', '-', slug)
+        d = date_m.group(1).replace('-', '/')
+        urls.add(f'/{d}/{slug}/')
+print('\n'.join(sorted(urls)))
+PYEOF
+)
 
 # ---------------------------------------------------------------------------
 # Validate each post.
@@ -176,6 +211,26 @@ PYEOF
       post_errors=$((post_errors + 1))
     fi
   fi
+
+  # -- 2c. Internal link targets must resolve to known posts ------------------
+  # Only /YYYY/ date-path links are checked; non-post pages (/blog/, /about/,
+  # etc.) never contain a year segment and are skipped automatically.
+  # The sed 's|#.*||' strips URL fragments — do not remove it; the grep
+  # captures 'post/#section' as a single token that must be cleaned.
+  body_links=$(awk '/^---/{n++; if(n==2){found=1; next}} found{print}' "$post" \
+    | grep -oE '\(/[0-9]{4}/[^)]+\)' \
+    | tr -d '()' \
+    | sed 's|#.*||' \
+    | sed 's|/*$|/|' \
+    || true)
+  while IFS= read -r link_url; do
+    [[ -z "$link_url" ]] && continue
+    if ! echo "$POST_REGISTRY" | grep -qxF "$link_url"; then
+      echo "❌  $rel — internal link points to non-existent post: '$link_url'"
+      ERRORS=$((ERRORS + 1))
+      post_errors=$((post_errors + 1))
+    fi
+  done <<< "$body_links"
 
   if [[ $post_errors -eq 0 ]]; then
     echo "✅  $rel"
