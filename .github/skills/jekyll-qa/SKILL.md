@@ -853,6 +853,15 @@ echo "Link check complete. Errors: ${ERRORS}"
 
 **Target:** Zero broken links. Any broken URL → `type:functional` / `severity:S2:major` bug.
 
+#### 6.2a Pre-build internal link validation
+
+`validate-posts.sh` and `content-review.js` both detect broken internal post links at the source-Markdown level, before Jekyll builds. This complements HTML-Proofer (which runs post-build in CI):
+
+- `validate-posts.sh` (check 2c): ERRORs on any `/YYYY/` body link whose target has no corresponding post front matter. Exits non-zero.
+- `content-review.js` (section 7): Classifies internal links as *canonical* (target exists) or *broken* (target absent). Broken links surface as issues in the content-review report; score credit is only awarded for canonical links.
+
+Both tools build a post URL registry from `_posts/` front matter at startup — no `_site/` build required. The `date:` field is used for the URL date path; slugs derive from the filename with Jekyll's `--` → `-` normalization applied.
+
 ### 6.3 Content Integrity Check
 
 Detect posts whose `date:` front-matter year differs from the body content year:

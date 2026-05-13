@@ -1,249 +1,181 @@
-# Plan — Issue #907: Tag Taxonomy Policy
+# Plan — Issues #904 / #905: Internal Link Validator Quality
 
 **Spec:** [SPEC.md](../SPEC.md)  
-**Date:** 2026-05-03
+**Date:** 2026-05-11
 
 ---
 
-## Current state
+## Context
 
-- 18/24 posts have zero tags (failing after T1)
-- 1/6 tagged posts has `AI` casing that needs normalising to `ai`
-- Both validators ignore tags entirely
-- Editorial SKILL.md mentions tags but gives no vocabulary or count rules
+All 14 internal link targets currently used by posts resolve correctly. One registry design subtlety: the post `2026-04-04-the-real-cost-of-test-automation--balancing-speed-and-sustai.md` has a double-hyphen in its filename, but Jekyll normalizes that to a single hyphen in the generated URL. The registry builder must apply the same normalization (`--+` → `-`).
+
+**Strategy (revised after staff engineer review):** Front-matter derivation is the **sole** source for the registry. `_site/` is explicitly excluded — it is a stale build artifact that creates false-positive cascades when a developer adds a new post and runs the validator before building. The spec's boundary ("Never: Require a Jekyll build") stands. HTML-Proofer in CI handles post-build link verification; these validators handle pre-build author feedback.
 
 ---
 
 ## Dependency graph
 
 ```
-T1 (validator: error on missing tags) ──► CHECKPOINT-A (RED — 18 failures expected)
-                                              │
-T2 (content-review: 10pt tag score)  ──┐     │
-T3 (SKILL.md docs)                   ──┤     ▼
-                                        │  T4a (add tags: QE posts, 8)
-                                        │  T4b (add tags: TA posts, 7)
-                                        │  T4c (add tags: SE posts, 2)
-                                        │  T4d (add tags: Security posts, 1)
-                                        │  T5  (fix casing: 1 post)
-                                        │     │
-                                        └──►  CHECKPOINT-B (GREEN — all 24 pass)
-                                              │
-                                              ▼
-                                          T6 (final build + close issue)
+T1 (shared registry helper) ──► T2 (content-review.js update)
+                             ──► T3 (validate-posts.sh update)
+                                     │
+                                 CHECKPOINT-A (24/24 pass, 100/100, no regressions)
+                                     │
+                                 T4 (docs + issue close)
 ```
 
-**Key sequencing rule:** T1 must land before any remediation so each fix can be verified against the real check. T2 and T3 can run in parallel with T4/T5 — they touch different files.
+T2 and T3 are independent of each other but both depend on T1's design being settled. T4 depends on T2 and T3 passing.
 
 ---
 
-## Phase 1 — Enforcer (TDD RED)
+## Phase 1 — Registry design (settled in T1, implemented inline in T2 and T3)
 
-### T1 — Add tag checks to `validate-posts.sh`
+### T1 — Design and verify the post URL registry
 
-**Files:** `scripts/validate-posts.sh`  
-**ACs:** AC-1, AC-2
+**Not a code task — design only.** Confirmed correct after staff engineer review.
 
-Add a tag-presence check immediately after the existing required-field loop (line ~92). Tags use inline YAML array format: `tags: [tag1, tag2]`. The `fm_value` helper already reads this line.
+**Registry algorithm (front-matter only, no `_site/` dependency):**
 
-```bash
-# -- 2b. Tag checks ----------------------------------------------------------
-tags_val=$(fm_value "$post" "tags")
-if [[ -z "$tags_val" ]]; then
-  echo "❌  $rel — missing required front-matter field: 'tags' (add 2–5 lowercase-hyphen tags)"
-  ERRORS=$((ERRORS + 1))
-  post_errors=$((post_errors + 1))
-else
-  # Count tags in inline array: strip brackets, count comma-separated items
-  tag_count=$(echo "$tags_val" | tr -d '[]' | tr ',' '\n' | grep -c '[^[:space:]]' || true)
-  if [[ "$tag_count" -lt 2 ]]; then
-    echo "❌  $rel — too few tags: $tag_count found (minimum 2 required)"
-    ERRORS=$((ERRORS + 1))
-    post_errors=$((post_errors + 1))
-  fi
-fi
-```
+- Read `permalink:` field if present → use as the canonical URL (trim, ensure trailing `/`)
+- Otherwise: read `date:` front-matter field for YYYY/MM/DD path; strip the `YYYY-MM-DD-` prefix from the filename for the slug; apply `--+` → `-` normalization (the only Jekyll slug normalization this corpus needs); construct `/YYYY/MM/DD/{slug}/`
+- **Key:** `date:` in front matter overrides the filename date for the URL path. The slug always comes from the filename (after stripping the filename-date prefix), not from the front-matter title. This is correct for all four posts with a 2026-01-18 filename / 2026-04-05 front-matter date mismatch.
 
-**Verify (RED):** `bash scripts/validate-posts.sh --all 2>&1 | grep "❌" | grep "tags" | wc -l` → should be 18.
+**Link entry filter (revised — no exclusion list needed):**
+Only links containing a year segment are checked: `/\/(20\d\d)\//.test(url)`.
+Every non-post page (`/blog/`, `/about/`, `/search/`, etc.) lacks a year segment and never matches. No exclusion list required.
+
+**Verify (T1 output):** Python prototype confirms the registry contains 24 posts and all 14 linked URLs resolve, including the double-hyphen post after normalization.
+
+---
+
+## Phase 2 — Validator updates
+
+### T2 — Update `scripts/content-review.js`
+
+**AC:** AC-1, AC-2
+
+**Changes:**
+
+1. Add `buildPostRegistry(postsDir)` function before `scorePost`. Uses front-matter derivation only — no `_site/` dependency. Returns a `Set<string>`. Add an inline comment noting that `date:` front matter is used for the URL date path (not the filename date), and the slug comes from the filename after stripping the filename-date prefix.
+
+2. Replace `countInternalLinks(body)` with `classifyInternalLinks(body, registry)` returning `{ canonical, broken, brokenUrls }`:
+   - Entry filter: `if (!/\/(20\d\d)\//.test(url)) continue;` — only date-segment links are checked
+   - No exclusion list needed: `/blog/`, `/about/`, etc. never contain a year segment
+   - Checks each matched URL against `registry`
+   - Returns `canonical` count (in registry) and `broken` count + list (not in registry)
+
+3. Update section 7 in `scorePost`:
+   ```javascript
+   const { canonical, broken, brokenUrls } = classifyInternalLinks(body, registry);
+   if (canonical >= 1) {
+     score += 10;
+   } else {
+     warnings.push('No internal links to other posts — consider linking to related content');
+   }
+   if (broken > 0) {
+     issues.push(`${broken} internal link(s) point to non-existent post(s): ${brokenUrls.join(', ')}`);
+   }
+   ```
+
+4. Pass registry into `scorePost(fm, body, filename, registry)` — add it as the 4th parameter.
+
+5. Build registry once in `main()` before the scoring loop.
+
+6. Update return object: `{ ..., internalLinks: canonical, brokenInternalLinks: broken }`.
+
+7. Update header comment line: `10 pts — Internal links (≥ 1 canonical link to an existing post)`.
+
+**Verify (RED → GREEN):**
+- Baseline: run `node scripts/content-review.js` — all 24 at 100/100 (no regressions)
+- Manual test: temporarily add `[bad link](/2026/99/99/no-such-post/)` to a post body → should appear as a broken link issue but not drop score if ≥ 1 canonical link still present
+- Restore after test
+
+---
+
+### T3 — Update `scripts/validate-posts.sh`
+
+**AC:** AC-3, AC-4
+
+**Changes:**
+
+Add a new check section (before the closing `if [[ $post_errors -eq 0 ]]` line) that:
+
+1. Builds the post registry once **outside the per-post loop** (before line ~76) using a Python one-liner:
+   ```bash
+   # Build post URL registry from front matter
+   POST_REGISTRY=$(python3 - "$POSTS_DIR" <<'PYEOF'
+   import sys, os, re
+   posts_dir = sys.argv[1]
+   urls = set()
+   for f in os.listdir(posts_dir):
+       if not f.endswith('.md'): continue
+       content = open(os.path.join(posts_dir, f)).read()
+       fm_end = content.find('---', 3)
+       fm = content[3:fm_end]
+       perma = re.search(r'^permalink:\s*(.+)', fm, re.M)
+       date_m = re.search(r'^date:\s*(\d{4}-\d{2}-\d{2})', fm, re.M)
+       if perma:
+           urls.add(perma.group(1).strip().rstrip('/') + '/')
+       elif date_m:
+           slug = re.sub(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}-', '', f).replace('.md', '')
+           slug = re.sub(r'-{2,}', '-', slug)  # Jekyll normalizes -- to -
+           d = date_m.group(1).replace('-', '/')
+           urls.add(f'/{d}/{slug}/')
+   print('\n'.join(sorted(urls)))
+   PYEOF
+   )
+   ```
+
+2. Inside the per-post loop, after tag checks, scan the post body for internal post links and validate each:
+   ```bash
+   # -- 2c. Internal link targets must resolve to known posts -------------------
+   body_links=$(awk '/^---/{n++; if(n==2){found=1; next}} found{print}' "$post" \
+     | grep -oE '\(/20[0-9][0-9]/[^)]+/\)' \
+     | tr -d '()' \
+     | sed 's|#.*||' \
+     | sed 's|/*$|/|' \
+     || true)
+   while IFS= read -r link_url; do
+     [[ -z "$link_url" ]] && continue
+     if ! echo "$POST_REGISTRY" | grep -qF "$link_url"; then
+       echo "❌  $rel — internal link points to non-existent post: '$link_url'"
+       ERRORS=$((ERRORS + 1))
+       post_errors=$((post_errors + 1))
+     fi
+   done <<< "$body_links"
+   ```
+
+3. Update header comment to add: `2c. Internal links: /20xx/ body links resolve to known posts`.
+4. Add comment above the `sed 's|#.*||'` line in the body-link extractor explaining it strips URL fragments before registry lookup — do not remove it even though it looks like dead code (the `grep -oE` pattern captures `post/#section` as a single token).
+
+**Verify (RED → GREEN):**
+- `bash scripts/validate-posts.sh --all` → PASSED (24/24 — no regressions)
+- Manual test: temporarily add `[bad](/2026/99/99/no-such-post/)` to a post → should ERROR; restore
 
 ---
 
 ### CHECKPOINT A
 
-Run `bash scripts/validate-posts.sh --all 2>&1 | grep -c "tags"` → confirms exactly 18 (or 19 if the casing post's `AI` tag count is also wrong) failures before any remediation.
-
----
-
-## Phase 2 — Remediation and Scoring (GREEN)
-
-T2, T3, T4, T5 can run in any order. T4/T5 each self-verify with the validator.
-
----
-
-### T2 — Add tag scoring to `content-review.js`
-
-**File:** `scripts/content-review.js`  
-**AC:** AC-3
-
-Add a new section after the existing `// ── 7. Internal links` block (currently the last scoring section before citations):
-
-```javascript
-// ── 3b. Tags (10 pts) ───────────────────────────────────────────────────────
-const tags = Array.isArray(fm.tags) ? fm.tags : [];
-if (tags.length >= 2) {
-  score += 10;
-} else if (tags.length === 1) {
-  score += 5;
-  warnings.push('Only 1 tag — add at least one more (target: 2–5 lowercase-hyphen tags)');
-} else {
-  issues.push('No tags — add 2–5 lowercase-hyphen tags from the canonical vocabulary');
-}
-```
-
-Also update the header comment (lines ~10-15) to add: `10 pts — Tags (≥ 2 canonical tags)` and raise the implicit max from 100.
-
-**Note:** After adding this section, any post currently at 100/100 without tags will drop to 90/100. All 18 untagged posts must be remediated (T4/T5) before this is committed, or commit T2 after T4/T5.
-
-**Sequencing adjustment:** Commit T2 last in Phase 2 — after T4/T5 — so the score doesn't regress for the archive while remediation is in flight.
-
-**Verify:** `node scripts/content-review.js 2>&1 | grep -E "100/100|90/100"` — after T2+T4+T5 all posts should show ≥ 90/100.
-
----
-
-### T3 — Update `.github/skills/editorial/SKILL.md`
-
-**File:** `.github/skills/editorial/SKILL.md`  
-**AC:** AC-6
-
-Add a `### Tags` section after the existing `### Categories` section:
-
-```markdown
-### Tags (required: 2–5 per post)
-
-Use `lowercase-hyphen` format. Acronyms become lowercase (`AI` → `ai`).
-
-**Canonical vocabulary** (add new tags by exception only):
-
-| Group | Tags |
-|---|---|
-| Quality Engineering | `quality-engineering` `software-testing` `defect-prevention` `quality-metrics` `cost-of-quality` `qa-strategy` `quality-management` |
-| Test Automation | `test-automation` `ci-cd` `self-healing-tests` `playwright` `test-maintenance` `test-roi` `testing-theater` |
-| Software Engineering | `software-engineering` `engineering-leadership` `technical-debt` `platform-engineering` `developer-experience` `digital-transformation` `architecture` |
-| Security | `security` `security-debt` `cybersecurity` `enterprise-security` `threat-detection` |
-| Cross-cutting | `ai` `ai-testing` `code-quality` `productivity` `devops` `cost-benefit` |
-
-Tags outside this list are allowed when none of the above fit; document the addition in the PR.
-```
-
-Also update the SEO checklist item from `- [ ] Category and tags set correctly` to:
-`- [ ] Category correct (one of the four allowed values)`  
-`- [ ] Tags: 2–5 entries, lowercase-hyphen, from canonical vocabulary`
-
-**Verify:** No script check — visual review of the SKILL.md diff.
-
----
-
-### T4a — Add tags to Quality Engineering posts (8 posts)
-
-Tags to add (see SPEC §4 Remediation Map):
-
-| Post | Tags |
-|---|---|
-| `2025-12-31-testing-times.md` | `ai-testing, test-automation, quality-engineering` |
-| `2026-04-05-building-a-test-strategy-that-works.md` | `qa-strategy, test-automation, software-testing` |
-| `2026-04-05-copq-in-software-engineering-and-how-quality-engin.md` | `cost-of-quality, quality-engineering, software-engineering` |
-| `2026-04-05-cost-of-poor-quality-copq.md` | `cost-of-quality, quality-engineering, defect-prevention` |
-| `2026-01-18-the-productivity-paradox-of-test-coverage-metrics.md` | `test-automation, quality-metrics, productivity` |
-| `2026-01-18-the-real-cost-of-testing-theater-when-quality-metr.md` | `testing-theater, quality-metrics, cost-of-quality` |
-| `2026-04-05-the-end-of-manual-qa-why-2026-is-the-tipping-point.md` | `test-automation, qa-strategy, ai-testing` |
-| `2026-04-12-understanding-qa-qc-and-quality-engineering.md` _(has tags)_ | No change needed — already has correct tags |
-
-Wait — `understanding-qa-qc` already has tags. Remove from this batch.
-
-Actual T4a posts (7 untagged QE posts):
-- `2025-12-31-testing-times.md`
-- `2026-04-05-building-a-test-strategy-that-works.md`
-- `2026-04-05-copq-in-software-engineering-and-how-quality-engin.md`
-- `2026-04-05-cost-of-poor-quality-copq.md`
-- `2026-01-18-the-productivity-paradox-of-test-coverage-metrics.md`
-- `2026-01-18-the-real-cost-of-testing-theater-when-quality-metr.md`
-- `2026-04-05-the-end-of-manual-qa-why-2026-is-the-tipping-point.md`
-
-**Verify after each post:** `bash scripts/validate-posts.sh <post-file>` shows ✅ for that post.
-
----
-
-### T4b — Add tags to Test Automation posts (7 posts)
-
-| Post | Tags |
-|---|---|
-| `2026-01-02-self-healing-tests-myth-vs-reality.md` | `self-healing-tests, test-automation, test-maintenance` |
-| `2026-01-18-the-hidden-technical-debt-of-test-automation.md` | `test-automation, technical-debt, test-maintenance` |
-| `2026-01-19-the-surprising-economics-of-test-automation-roi.md` | `test-roi, test-automation, cost-benefit` |
-| `2026-04-04-the-real-cost-of-test-automation--balancing-speed-and-sustai.md` | `test-automation, test-roi, technical-debt` |
-| `2026-04-05-ai-quality-testing-automation.md` | `ai-testing, test-automation, qa-strategy` |
-| `2026-04-05-why-ai-test-generation-tools-overpromise-on-maintenance-savi.md` | `ai-testing, test-maintenance, test-automation` |
-| `2026-04-06-the-concealed-price-tag-of-test-automation.md` | `test-roi, cost-of-quality, test-automation` |
-
-**Verify:** `bash scripts/validate-posts.sh` passes for all 7.
-
----
-
-### T4c — Add tags to Software Engineering posts (2 posts)
-
-| Post | Tags |
-|---|---|
-| `2026-01-18-ai-assisted-development-the-new-industrial-revolut.md` | `ai, software-engineering, code-quality, productivity` |
-| `2026-04-05-practical-applications-of-ai-in-software-development.md` | `ai, software-engineering, productivity, code-quality` |
-
-**Verify:** both pass validator.
-
----
-
-### T4d — Add tags to Security posts (2 posts)
-
-| Post | Tags |
-|---|---|
-| `2023-12-28-understanding-opendns-cybersecurity-protection.md` | `security, cybersecurity, enterprise-security` |
-| `2026-04-12-the-hidden-economics-of-security-debt.md` | `security-debt, security, cost-benefit` |
-
-**Verify:** both pass validator.
-
----
-
-### T5 — Fix casing: `AI` → `ai` in one post
-
-**File:** `_posts/2026-04-12-ai-threat-detection-enterprise.md`
-
-Current: `tags: [cybersecurity, AI, threat-detection, machine-learning, enterprise-security]`  
-New: `tags: [cybersecurity, ai, threat-detection, machine-learning, enterprise-security]`
-
-**Note:** `machine-learning` is outside the canonical vocabulary (it's fine — the policy allows it).
-
-**Verify:** `bash scripts/validate-posts.sh _posts/2026-04-12-ai-threat-detection-enterprise.md` → ✅
-
----
-
-### CHECKPOINT B
-
-After T1 + T4a + T4b + T4c + T4d + T5:
-
+After T2 and T3:
 ```bash
-bash scripts/validate-posts.sh --all
+bash scripts/validate-posts.sh --all                          # PASSED 24/24
+node scripts/content-review.js 2>&1 | grep -c "100/100"      # 24
+bundle exec jekyll build                                       # clean
 ```
-
-Expected: `validate-posts: PASSED — all posts valid.`
 
 ---
 
-## Phase 3 — Verification
+## Phase 3 — Docs + close
 
-### T6 — Final build, content-review, close issue
+### T4 — Update jekyll-qa SKILL.md, close issues
 
-1. `bash scripts/validate-posts.sh --all` → PASSED
-2. `node scripts/content-review.js 2>&1 | grep -E "🔴|🟡|score"` → all ≥ 90/100
-3. `bundle exec jekyll build` → clean
-4. `gh issue close 907 --repo oviney/blog --comment "..."` → closed
+**AC:** AC-7
+
+Add to `.github/skills/jekyll-qa/SKILL.md` under the validator section:
+- `validate-posts.sh` now checks that internal body links (`/20xx/…/`) resolve to known posts
+- `content-review.js` now distinguishes canonical from broken internal links; broken links appear as issues
+
+Close #904 (verified clean — no legacy links found in audit) and #905 (validator now detects broken internal targets).
 
 ---
 
@@ -251,7 +183,7 @@ Expected: `validate-posts: PASSED — all posts valid.`
 
 | Risk | Mitigation |
 |---|---|
-| T1 grep-based tag count fails for multi-line YAML block arrays | All current posts use inline `tags: [...]` format; the count logic handles this correctly |
-| T2 adds tag scoring and existing 100/100 posts drop | Commit T2 after T4/T5 so no regression window |
-| A proposed tag in the remediation map is wrong for a post's content | Read each post title/category before applying tags |
-| `AI` in `ai-threat-detection` post has other implications | It's just a tag value, not a category; normalising to `ai` is purely stylistic |
+| Registry misses a post due to slug normalization differences | T1 Python prototype already verified all 14 linked URLs match; `--` normalization explicitly applied |
+| `_site/` not built when running locally | Registry falls back to front-matter derivation; same normalization logic used in both paths |
+| `/blog/` or `/software-engineering/` links flagged as broken | Non-post page exclusion list hardcoded; only `/20xx/` date-pattern URLs are checked |
+| The QA/QC Playwright test relies on specific link resolution | `validate-posts.sh` check + `content-review.js` broken-link issue catch the same gap; Playwright test (AC-5) is a browser-level guard that runs independently |

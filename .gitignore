@@ -48,6 +48,7 @@ board_decision.json
 board_report.md
 test_outputs/
 model_comparison_results.json
+content-review-results.json
 
 # Secrets
 .env

@@ -11,7 +11,7 @@
  *   15 pts — SEO (title length, description length, heading hierarchy)
  *   15 pts — Content length (800–1500 words)
  *   10 pts — Excerpt quality (first paragraph ≥ 50 words)
- *   10 pts — Internal links (≥ 1 link to another post)
+ *   10 pts — Internal links (≥ 1 canonical link to an existing post; broken targets surface as issues)
  *   10 pts — Tags (≥ 2 lowercase-hyphen tags)
  *   10 pts — Citations (≥ 3 references with sources)
  *
@@ -198,12 +198,61 @@ function extractHeadings(body) {
   return (body.match(/^(#{1,6})\s+/gm) || []).map(h => h.trim().length);
 }
 
-function countInternalLinks(body) {
+// Build a Set of canonical post permalink strings from front matter.
+// Uses date: front matter (not filename date) for the URL date path.
+// Slug comes from the filename after stripping the YYYY-MM-DD- prefix,
+// with consecutive hyphens collapsed to one (Jekyll's slug normalization).
+// No _site/ dependency — works before or without a Jekyll build.
+function buildPostRegistry(postsDir) {
+  const registry = new Set();
+  let files;
+  try {
+    files = fs.readdirSync(postsDir).filter(f => f.endsWith('.md'));
+  } catch {
+    return registry;
+  }
+  for (const file of files) {
+    const content = fs.readFileSync(path.join(postsDir, file), 'utf8');
+    const { fm } = parseFrontMatter(content);
+    if (fm.permalink) {
+      const p = String(fm.permalink).trim().replace(/\/?$/, '/');
+      registry.add(p);
+    } else if (fm.date) {
+      const d = String(fm.date).slice(0, 10).replace(/-/g, '/');
+      const slug = file
+        .replace(/^\d{4}-\d{2}-\d{2}-/, '')
+        .replace(/\.md$/, '')
+        .replace(/-{2,}/g, '-');  // Jekyll normalises -- to -
+      registry.add(`/${d}/${slug}/`);
+    }
+  }
+  return registry;
+}
+
+// Classify internal post links in body as canonical (target exists) or broken.
+// Only links containing a year segment (/20xx/) are checked — non-post pages
+// like /blog/, /about/ never contain a year segment and are skipped automatically.
+function classifyInternalLinks(body, registry) {
   const links = (body.match(/\[.*?\]\((.*?)\)/g) || []);
-  return links.filter(l => {
-    const url = l.match(/\(([^)]+)\)/)[1];
-    return /\/(20\d\d)\//.test(url) || /^\/(?!http)/.test(url);
-  }).length;
+  let canonical = 0;
+  let broken = 0;
+  const brokenUrls = [];
+  for (const l of links) {
+    const raw = l.match(/\(([^)]+)\)/)[1];
+    // Skip external URLs first — external links may contain date segments
+    if (/^https?:/.test(raw)) continue;
+    // Only check date-path links (post permalinks always start with /YYYY/)
+    if (!/^\/(20\d\d)\//.test(raw)) continue;
+    // Strip fragment and optional Markdown title attribute ([text](/path/ "Title"))
+    const url = raw.split(/[\s#]/)[0].replace(/\/+$/, '/').replace(/([^/])$/, '$1/');
+    if (registry.has(url)) {
+      canonical++;
+    } else {
+      broken++;
+      brokenUrls.push(url);
+    }
+  }
+  return { canonical, broken, brokenUrls };
 }
 
 function countCitations(body) {
@@ -251,7 +300,7 @@ function imageHasEmbeddedText(imagePath) {
 
 // ── Scoring ───────────────────────────────────────────────────────────────────
 
-function scorePost(fm, body, filename) {
+function scorePost(fm, body, filename, registry) {
   const issues   = [];
   const warnings = [];
   let   score    = 0;
@@ -399,11 +448,17 @@ function scorePost(fm, body, filename) {
   }
 
   // ── 7. Internal links (10 pts) ────────────────────────────────────────────
-  const internalLinks = countInternalLinks(body);
+  const { canonical: internalLinks, broken: brokenInternalLinks, brokenUrls } =
+    classifyInternalLinks(body, registry || new Set());
   if (internalLinks >= 1) {
     score += 10;
   } else {
     warnings.push('No internal links to other posts — consider linking to related content');
+  }
+  if (brokenInternalLinks > 0) {
+    issues.push(
+      `${brokenInternalLinks} internal link(s) point to non-existent post(s): ${brokenUrls.join(', ')}`
+    );
   }
 
   // ── 8. Tags (10 pts) ──────────────────────────────────────────────────────
@@ -428,7 +483,7 @@ function scorePost(fm, body, filename) {
     issues.push('No citations or external references found — add data points with sources');
   }
 
-  return { score: Math.min(score, 100), words, internalLinks, citations, tags: tags.length, issues, warnings };
+  return { score: Math.min(score, 100), words, internalLinks, brokenInternalLinks, citations, tags: tags.length, issues, warnings };
 }
 
 // ── Cross-article analysis ────────────────────────────────────────────────────
@@ -601,6 +656,9 @@ function main() {
 
   console.error(`Reviewing ${postFiles.length} posts…`);
 
+  // Build registry once — used by every post to validate internal link targets
+  const postRegistry = buildPostRegistry(POSTS_DIR);
+
   const posts   = [];
   const results = [];
 
@@ -612,7 +670,7 @@ function main() {
   }
 
   for (const { filename, fm, body } of posts) {
-    const result = scorePost(fm, body, filename);
+    const result = scorePost(fm, body, filename, postRegistry);
     results.push({ filename, fm, ...result });
     const grade = gradeLabel(result.score);
     console.error(`  ${grade} ${result.score}/100  ${filename}`);
