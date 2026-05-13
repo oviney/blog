@@ -5,6 +5,12 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+    # types: include `labeled`/`unlabeled` so the scope guard re-fires
+    # when `governance-update` (or any label-driven scope skip) is
+    # added or removed mid-PR. Without these, the workflow only observes
+    # the pre-label state and the close-reopen workaround is required
+    # (which desynced PR #935 → forced PR #936 on 2026-05-12). See #937.
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 jobs:
   test:
