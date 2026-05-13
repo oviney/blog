@@ -95,7 +95,7 @@ for f in sorted(os.listdir(posts_dir)):
         urls.add(perma.group(1).strip().rstrip('/') + '/')
     elif date_m:
         # Slug from filename (not front matter title); apply Jekyll -- normalisation
-        slug = re.sub(r'^\d{4}-\d{2}-\d{2}-', '', f).rstrip('.md').replace('.md', '')
+        slug = re.sub(r'^\d{4}-\d{2}-\d{2}-', '', f[:-3])  # strip date prefix; [:-3] removes .md suffix
         slug = re.sub(r'-{2,}', '-', slug)
         d = date_m.group(1).replace('-', '/')
         urls.add(f'/{d}/{slug}/')
@@ -218,8 +218,9 @@ PYEOF
   # The sed 's|#.*||' strips URL fragments — do not remove it; the grep
   # captures 'post/#section' as a single token that must be cleaned.
   body_links=$(awk '/^---/{n++; if(n==2){found=1; next}} found{print}' "$post" \
-    | grep -oE '\(/[0-9]{4}/[^)]+\)' \
-    | tr -d '()' \
+    | grep -oE '\]\(/[0-9]{4}/[^)]+\)' \
+    | tr -d ']()"' \
+    | sed 's|[[:space:]].*||' \
     | sed 's|#.*||' \
     | sed 's|/*$|/|' \
     || true)

@@ -243,7 +243,8 @@ function classifyInternalLinks(body, registry) {
     if (/^https?:/.test(raw)) continue;
     // Only check date-path links (post permalinks always start with /YYYY/)
     if (!/^\/(20\d\d)\//.test(raw)) continue;
-    const url = raw.split('#')[0].replace(/\/?$/, '/');
+    // Strip fragment and optional Markdown title attribute ([text](/path/ "Title"))
+    const url = raw.split(/[\s#]/)[0].replace(/\/+$/, '/').replace(/([^/])$/, '$1/');
     if (registry.has(url)) {
       canonical++;
     } else {
