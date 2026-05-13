@@ -1255,3 +1255,4 @@ gh pr list --repo oviney/blog --state open \
   - Enhanced troubleshooting with step-by-step accessibility verification
 - **1.1.0** (2026-01-05): Added "Step 0: Diagnose CI Failures" - Always investigate logs before fixing
 - **1.0.0** (2026-01-05): Initial skill creation - QA Gatekeeper workflow for PR review, CI monitoring, and production verification
+
