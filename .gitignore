@@ -68,6 +68,10 @@ Thumbs.db
 # Claude settings
 .claude/settings.local.json
 
+# Vendor lifecycle skills (upstream: addyosmani/agent-skills @ refs/tags/0.6.0)
+# Synced locally as tooling; not part of the site or its build.
+.agents/
+
 # Healing monitoring (runtime data)
 healing-metrics/
 healing-reports/
