@@ -592,7 +592,12 @@ function buildReport(results, cross) {
   const sorted = [...results].sort((a, b) => a.score - b.score);
   for (const r of sorted) {
     const title = String(r.fm.title || r.filename).slice(0, 55);
-    md += `| ${r.score}/100 | ${gradeLabel(r.score)} | ${title} | ${r.words} | ${r.internalLinks} | ${r.citations} |\n`;
+    // Surface broken-link debt inline so editors can triage from the table
+    // alone; full URLs still appear in the per-post Critical Issues section.
+    const linksCell = r.brokenInternalLinks > 0
+      ? `${r.internalLinks} (⚠ ${r.brokenInternalLinks} broken)`
+      : String(r.internalLinks);
+    md += `| ${r.score}/100 | ${gradeLabel(r.score)} | ${title} | ${r.words} | ${linksCell} | ${r.citations} |\n`;
   }
   md += '\n';
 
