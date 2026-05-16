@@ -6,7 +6,7 @@
 ---
 
 ## Phase 1 — Setup
-- [ ] **T1** Scaffold `tasks/902-body.md` (with date-floor header) and `tasks/902-followups-plan.md` (column headers only)
+- [x] **T1** Scaffold `tasks/902-body.md` (with date-floor header) and `tasks/902-followups-plan.md` (column headers only) — committed
 
 ## Phase 2 — Research (parallel)
 - [ ] **T2a** Section 1 subagent: AI Agent Orchestration — `general-purpose` agent with SPEC §7 schema embedded; cap 4 findings; date floor 2026-04-15
