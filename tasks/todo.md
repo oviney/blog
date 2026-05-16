@@ -9,22 +9,22 @@
 - [x] **T1** Scaffold `tasks/902-body.md` (with date-floor header) and `tasks/902-followups-plan.md` (column headers only) — committed
 
 ## Phase 2 — Research (parallel)
-- [ ] **T2a** Section 1 subagent: AI Agent Orchestration — `general-purpose` agent with SPEC §7 schema embedded; cap 4 findings; date floor 2026-04-15
-- [ ] **T2b** Section 3 subagent: QE Automation — same prompt requirements; covers Playwright / pa11y / Lighthouse / GHA / WCAG 2.2
-- [ ] **PARALLEL:** T2a + T2b launched in a single message with two `Agent` calls
+- [x] **T2a** Section 1 subagent — 4 findings returned (2 Action / 1 Watch / 1 No-op); SPEC §7-compliant
+- [x] **T2b** Section 3 subagent — 4 findings returned (2 Action / 1 Watch / 1 No-op); SPEC §7-compliant
+- [x] **PARALLEL:** T2a + T2b launched in single message with two `Agent` calls
 
 ## Phase 3 — Synthesis
-- [ ] **T3** Validate both subagent returns against SPEC §7; reject + re-prompt if incomplete; merge into `tasks/902-body.md`; write Section 2 out-of-scope statement
+- [x] **T3** Validated returns; fixed factual nit in §1 No-op citation (`### ` count was 6, refined to `### [0-9]\.` = 5); merged into `tasks/902-body.md`; Section 2 out-of-scope statement intact
 
 ## Phase 4 — Collision + substance
-- [ ] **T4** Build file-overlap map; decide merge-or-sequence for each collision; record in `tasks/902-followups-plan.md`; enforce ≤ 6 cap
-- [ ] **T5** AC-8 substance floor: ≥1 Action per in-scope section, else recorded justification
+- [x] **T4** File-overlap map built; 2 collisions on `package-lock.json` and `.github/skills/jekyll-qa/SKILL.md` between Rec 3 + Rec 4 → **Sequence** (Rec 4 first); 4 rows total, well under 6 cap
+- [x] **T5** AC-8 satisfied: §1 has 2 Action findings, §3 has 2 Action findings
 
-## CHECKPOINT-A — User review
-- [ ] `tasks/902-body.md` complete and SPEC §7-compliant
-- [ ] `tasks/902-followups-plan.md` ≤ 6 rows (or explicit override)
-- [ ] T5 passed
-- [ ] User approves before any `gh issue edit` / `gh issue create`
+## CHECKPOINT-A — User review (CURRENT GATE)
+- [x] `tasks/902-body.md` complete and SPEC §7-compliant
+- [x] `tasks/902-followups-plan.md` 4 rows (well under 6 cap)
+- [x] T5 substance floor passed
+- [ ] **User approves before any `gh issue edit` / `gh issue create` — see followups-plan §"CHECKPOINT-A gate checklist"**
 
 ## Phase 5 — Push to GitHub
 - [ ] **T6** `gh issue edit 902 --body-file tasks/902-body.md`; verify with diff
