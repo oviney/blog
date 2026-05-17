@@ -18,6 +18,16 @@
 #   FAIL: agent:editorial-chief PR changes _sass/ or .github/workflows/
 #   PASS: PR with no agent label (human PR) — agent-scope check is always skipped
 #
+# Label-driven exemptions (deliberate intent, used sparingly):
+#   bulk-content       — skips Rule 2 (scope-explosion). Valid for atomic content
+#                        backfills (post backfill, byline migration, category rename)
+#                        where splitting would create a worse intermediate main state.
+#   governance-update  — skips Rule 3 (governance-surface). Deliberate updates to
+#                        .github/skills/ or .github/instructions/ governance files.
+#   PASS: PR with bulk-content label and 30 changed files — Rule 2 skipped
+#   FAIL: PR with bulk-content label and unrelated changes (anti-pattern, but the
+#         script can't detect this — see CLAUDE.md for human review guidance)
+#
 # Dependencies: git and bash only. No other tools required.
 # Exit codes: 0 = clean, 1 = one or more violations found.
 
@@ -71,11 +81,16 @@ done
 
 # ---------------------------------------------------------------------------
 # Rule 2: >15 files changed (scope explosion)
+# Skip if PR is a deliberate bulk-content change (label: bulk-content)
 # ---------------------------------------------------------------------------
-FILE_COUNT=$(echo "$CHANGED_FILES" | wc -l | tr -d ' ')
-if [ "$FILE_COUNT" -gt 15 ]; then
-  echo "VIOLATION [scope-explosion]: $FILE_COUNT files changed (limit is 15). Split this PR into smaller, focused changes."
-  VIOLATIONS=$((VIOLATIONS + 1))
+if echo "${PR_LABELS:-}" | grep -q 'bulk-content'; then
+  echo "check-pr-scope: bulk-content label present — skipping rule 2."
+else
+  FILE_COUNT=$(echo "$CHANGED_FILES" | wc -l | tr -d ' ')
+  if [ "$FILE_COUNT" -gt 15 ]; then
+    echo "VIOLATION [scope-explosion]: $FILE_COUNT files changed (limit is 15). Split this PR into smaller, focused changes."
+    VIOLATIONS=$((VIOLATIONS + 1))
+  fi
 fi
 
 # ---------------------------------------------------------------------------
