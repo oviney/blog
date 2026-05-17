@@ -51,6 +51,33 @@ diff <(jq -S '.results[] | {filename, score, ...}' /tmp/baseline.json) \
 
 ---
 
+## L3 — Research-sweep "CVE in transitive dep" findings must check `package.json` overrides
+
+**Symptom.** A research sweep identifies a CVE in a transitive dependency (e.g., pa11y-ci → lodash GHSA-X) and recommends bumping the parent package to the version that "patches" the transitive dep. The issue is framed as urgent security work and an Action follow-up gets spawned.
+
+**Trap.** The CVE may already be mitigated by an existing `package.json` `overrides` block. `npm audit` will report **0 vulnerabilities** even though the parent dep is at the older version, because the override is forcing the transitive dep up to the patched line. We hit this on 2026-05-16 with #944 — the sweep claimed pa11y-ci 4.1.0 was vulnerable via lodash and recommended bumping to 4.1.1. In reality, the repo already had `"overrides": { "lodash": "^4.18.1" }` (added by an earlier hygiene cycle), and lodash was already at 4.18.1 in the lockfile. The bump would have been a hygiene win at best, not a CVE response, but the issue body framed it as security-urgent.
+
+**How to detect early — before accepting any "bump X to clear CVE Y" sweep finding:**
+
+```bash
+# Does an override already cover the transitive dep the CVE is in?
+node -e "const p=require('./package.json'); console.log(JSON.stringify(p.overrides||{}, null, 2));"
+
+# Does npm audit actually flag the vuln on the current lockfile?
+npm audit --omit=dev
+```
+
+If `npm audit` is clean **and** an override touches the same transitive dep as the CVE: the CVE is already mitigated. The Action recommendation is mis-framed.
+
+**Recovery.**
+
+- *For the spawned issue:* either close as "already fixed by existing override" (with a link to the override block) or reframe as hygiene-only (remove the security/urgency language, keep the dep-alignment benefit if material). Don't merge the bump under a security framing.
+- *For the methodology gap:* update the research-sweep subagent prompt template to require checking `package.json` `overrides` (and `npm audit` clean state) before classifying any dep-bump recommendation as Action. Failing that check, the finding is at best a **No-op** with the override as the repo-state justification, or a **Watch** for the day the override can be removed.
+
+**Heuristic for the next sweep's SPEC.** The §6 "Subagent prompt requirements" clause should add: *"Any Action recommending a dep version bump for CVE/security reasons must include the exact `node -e ... overrides` and `npm audit` output as part of the citation. Without that evidence, the finding is incomplete."*
+
+---
+
 ## Adding new lessons
 
 Lessons here should be:
