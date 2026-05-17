@@ -273,6 +273,35 @@ for post in $POSTS; do
     post_errors=$((post_errors + 1))
   fi
 
+  # ------------------------------------------------------------------
+  # 12. Subtitle — present and length-bounded  [ERROR / WARNING]
+  #
+  # The site's templates (_layouts/post.html, index.md) render
+  # `<h2 class="article-subtitle">{{ page.subtitle }}</h2>` and the
+  # homepage hero subtitle when this field is present. Every post must
+  # carry an Economist-style standfirst here: declarative, 20-28 words
+  # target, hard cap 40 (warn) / 60 (error). See #951 and SPEC.md §6
+  # in commit 560a889 for style guidance.
+  # ------------------------------------------------------------------
+  subtitle_val=$(fm_value "$post" "subtitle")
+  subtitle_clean=$(echo "$subtitle_val" | sed 's/^["'"'"']//; s/["'"'"']$//')
+  if [[ -z "$subtitle_val" ]]; then
+    echo "❌  $rel — missing required front-matter: subtitle"
+    ERRORS=$((ERRORS + 1))
+    post_errors=$((post_errors + 1))
+  else
+    subtitle_words=$(echo "$subtitle_clean" | wc -w | tr -d ' ')
+    if [[ $subtitle_words -gt 60 ]]; then
+      echo "❌  $rel — subtitle exceeds 60 words (${subtitle_words} words, hard cap 60)"
+      ERRORS=$((ERRORS + 1))
+      post_errors=$((post_errors + 1))
+    elif [[ $subtitle_words -gt 40 ]]; then
+      echo "⚠️   $rel — subtitle exceeds soft cap (${subtitle_words} words, soft cap 40)"
+      WARNINGS=$((WARNINGS + 1))
+      post_warnings=$((post_warnings + 1))
+    fi
+  fi
+
   # Print pass marker for clean posts
   if [[ $post_errors -eq 0 && $post_warnings -eq 0 ]]; then
     echo "✅  $rel"
