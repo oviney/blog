@@ -1,169 +1,210 @@
-# SPEC — `bulk-content` Scope-Guard Exemption Label (#956)
+# SPEC — Puppeteer Chrome-Download Flake Mitigation (#958)
 
 **Status:** Draft — awaiting approval
-**Issue:** [#956](https://github.com/oviney/blog/issues/956)
+**Issue:** [#958](https://github.com/oviney/blog/issues/958)
 **Labels:** `agent:qa-gatekeeper`
 **Date:** 2026-05-17
 **Lifecycle phase:** DEFINE
-**Spawned from:** discovered while shipping #951 — PR #955 hit the 15-file scope-explosion rule with no override mechanism.
+**Spawned from:** observed twice in one day (#944 first run, #957 first run) — Chrome 146.0.7680.153 download flakes from puppeteer's CDN providers.
 
 ---
 
 ## 1. Situation
 
-`scripts/check-pr-scope.sh:73-79` enforces an **unconditional** 15-file maximum on any PR. Rule 3 (governance-surface) already has a deliberate-intent override via the `governance-update` label (mirrored at lines 85-94). Rule 2 has no equivalent.
+`actions/setup-node@v6` is already configured with `cache: 'npm'` in `.github/workflows/test-quality.yml`, so npm packages themselves are cached. **The flake is in puppeteer's post-install script** (`node install.mjs`, run during `npm ci`), which downloads Chrome from a separate CDN into `~/.cache/puppeteer/`. That directory is **not** covered by setup-node's npm cache.
 
-This bit us shipping #951: the SPEC required all 24 posts to be backfilled atomically with the validator gate, so the 26-file PR was structurally unsplittable without creating a half-broken `main` state. We admin-bypassed CI to ship #951. This issue closes the methodology gap so the next bulk-content PR (post backfill, byline migration, category rename, author rename, mass front-matter field addition) doesn't need a bypass.
+Observed flake stack: `Error: ERROR: Failed to set up chrome v146.0.7680.153! ... All providers failed for chrome 146.0.7680.153: DefaultProvider: ENOENT: no such file or directory ...puppeteer/chrome/146.0.7680.153-chrome-linux64.zip`.
 
-Repo state at SHA `ec008ac`:
-- `scripts/check-pr-scope.sh:73-79` — Rule 2, unconditional
-- `scripts/check-pr-scope.sh:85-94` — Rule 3, governance-update precedent
-- `.github/labels.yml` — declares labels; `governance-update` already lives here
-- `gh label list` shows `governance-update` description: "Deliberate governance/skill file update — bypasses governance-surface scope check" — the model wording
+`test-quality.yml` defines 7 jobs that pair `setup-node@v6` + `npm ci`: `quality-checks`, `security`, `playwright-partial`, `playwright-shard1`, `playwright-shard2`, `playwright-shard3`, `quality-report`. Each is an independent flake surface. We've taken ~10 minutes of human time today (2 reruns × 5 min) plus a noticeable interruption to two PR merges (#955 indirectly, #957 directly).
 
 ---
 
 ## 2. Objective
 
-Add a `bulk-content` label to the repo. When a PR carries it, `check-pr-scope.sh` skips **Rule 2 only** (the 15-file scope-explosion cap). All other rules — protected files (Rule 1), governance-surface (Rule 3), agent-scope (Rule 4) — apply unchanged.
+Eliminate the puppeteer Chrome-download flake from `.github/workflows/test-quality.yml` by:
 
-The label is intentionally narrow: it does NOT mean "trust this PR." It means "this change is structurally atomic and splitting it would create a worse outcome." Reviewers and the label itself should treat it as suspect by default.
+1. **Caching `~/.cache/puppeteer/`** keyed on `package-lock.json` so warm runs skip the Chrome download entirely.
+2. **Retrying `npm ci` up to 3 times with 10s backoff** so cold-cache runs (lockfile change, cache eviction) tolerate transient CDN failures.
+
+Both mechanisms live in a **composite action** at `.github/actions/setup-node-with-puppeteer-cache/` so the 7 jobs share a single source of truth. Other workflows (`healing-monitor.yml`, `copilot-setup-steps.yml`) are **out of scope** — migrate later if the pattern proves out.
 
 ---
 
 ## 3. Acceptance Criteria
 
-- [ ] **AC-1** `bulk-content` label declared in `.github/labels.yml` with a clear description that names the rule it exempts and warns against overuse.
-- [ ] **AC-2** Label exists in the repo on GitHub (created via `gh label create` or whatever mechanism `.github/labels.yml` uses to sync — verify both).
-- [ ] **AC-3** `scripts/check-pr-scope.sh` Rule 2 wrapped in a `PR_LABELS contains "bulk-content"` skip check, mirroring the Rule 3 / `governance-update` pattern at lines 85-94. Emits the same one-line skip notice when present.
-- [ ] **AC-4** Behavior matrix verified by inline smoke-test invocations (paste output into PR body):
-  - `PR_LABELS="bulk-content"` + 30-file fixture → Rule 2 skipped, exits 0 (assuming no other violations)
-  - `PR_LABELS=""` + 30-file fixture → Rule 2 fires, exits 1
-  - `PR_LABELS="bulk-content"` + 30 files **including** `.github/skills/foo/SKILL.md` (no `governance-update` label) → Rule 2 skipped BUT Rule 3 fires, exits 1
-  - `PR_LABELS="bulk-content,governance-update"` + 30 files including `.github/skills/foo/SKILL.md` → both Rules 2 and 3 skipped, exits 0
-- [ ] **AC-5** `scripts/check-pr-scope.sh` header comment (lines 4-25) updated to document the `bulk-content` semantics alongside the existing `governance-update` mention. New PASS/FAIL example: `PASS: PR with bulk-content label and 30 changed files — Rule 2 skipped (atomic content backfill)`.
-- [ ] **AC-6** `CLAUDE.md` documents when to use `bulk-content` in the existing governance-reminder section that mentions `governance-update`, with explicit anti-pattern guidance: do NOT use `bulk-content` just because you don't want to split a PR; use it when splitting creates an intermediate `main` state worse than the unsplit PR.
-- [ ] **AC-7** No change to Rule 1 (protected files), Rule 3 (governance-surface), Rule 4 (agent-scope) — verified by running the script with various fixtures and confirming behaviour is unchanged.
-- [ ] **AC-8** PR body includes the four-case behavior matrix from AC-4 with actual exit codes and the script's stdout, plus a note that `bash scripts/check-pr-scope.sh` was invoked locally with each `PR_LABELS` combination.
+- [ ] **AC-1** New composite action at `.github/actions/setup-node-with-puppeteer-cache/action.yml` exists with documented inputs (`node-version` default `'20'`, plus optionally `npm-cache` default `'npm'`).
+- [ ] **AC-2** The composite action's steps are: (a) `actions/setup-node@v6` with `cache: '${{ inputs.npm-cache }}'`, (b) `actions/cache@vN` for `~/.cache/puppeteer/` keyed on `${{ runner.os }}-puppeteer-${{ hashFiles('**/package-lock.json') }}` with a restore-key fallback to `${{ runner.os }}-puppeteer-`, (c) `npm ci` wrapped in a 3-attempt retry shell loop with 10s backoff between attempts.
+- [ ] **AC-3** Every job in `.github/workflows/test-quality.yml` that currently uses the `setup-node@v6` + `npm ci` pair now uses the composite action instead. Count baseline: 7 jobs (confirmed at SHA `b965ddb`). No `npm ci` invocation in `test-quality.yml` ships outside the composite action.
+- [ ] **AC-4** First post-merge run populates the cache: at least one of the 7 jobs reports `Cache not found for input keys` followed by a successful Chrome download and cache save (`Cache saved with key: <runner-os>-puppeteer-<hash>`).
+- [ ] **AC-5** Second post-merge run (or a sibling job in the first run) reports `Cache restored from key: <runner-os>-puppeteer-<hash>` and completes `npm ci` significantly faster than the cold run (target: ≥ 20s saved on the install step).
+- [ ] **AC-6** The retry loop fires on a deliberately-mocked failure — locally verifiable with a shell harness that overrides `npm` to fail twice then succeed; assert exit 0 with 2 retry log lines.
+- [ ] **AC-7** All other test-quality.yml jobs (Jekyll build, content validation, security audit, etc.) still pass green on this PR.
+- [ ] **AC-8** Zero changes to `.github/workflows/healing-monitor.yml`, `.github/workflows/copilot-setup-steps.yml`, `.github/workflows/research-sweep.yml`, `.github/workflows/auto-regression.yml`, `.github/workflows/agent-eval.yml`. AC-8 boundary check: `git diff --stat .github/workflows/` shows only `test-quality.yml` modified.
+- [ ] **AC-9** `action.yml` parses as valid composite action YAML (verified by GitHub Actions during workflow run; locally verifiable via a schema linter if available).
 
 ---
 
 ## 4. Commands
 
 ```bash
-# Local smoke test (no real PR needed)
-PR_LABELS="bulk-content" \
-  bash scripts/check-pr-scope.sh; echo "exit=$?"
+# Inspect baseline
+grep -nE "actions/setup-node|npm ci" .github/workflows/test-quality.yml
+grep -lE "actions/cache" .github/workflows/
 
-# Verify label exists in repo after merge
-gh label list --repo oviney/blog --search "bulk-content"
+# After implementation
+ls .github/actions/setup-node-with-puppeteer-cache/
+grep -c "setup-node-with-puppeteer-cache" .github/workflows/test-quality.yml   # expect ≥ 5
+grep -c "setup-node@v6" .github/workflows/test-quality.yml                      # expect 0
 
-# Verify in-repo declaration
-grep -A3 "bulk-content" .github/labels.yml
+# Local retry-loop test harness
+PATH=/tmp/mock-npm:$PATH bash .github/actions/setup-node-with-puppeteer-cache/_retry-test.sh
 ```
-
-For the smoke test, since the script diffs against `origin/main`, a temporary fixture branch with 30 trivial file edits (e.g., `touch tests/fixture-{1..30}.txt`) is the simplest way to exercise the file-count branch. Don't commit the fixtures; just `git add -N` and run the script locally.
 
 ---
 
-## 5. Files to change
+## 5. Project Structure
 
-| File | Change |
-|---|---|
-| `.github/labels.yml` | Declare `bulk-content` with description naming the Rule 2 exemption + anti-pattern warning |
-| `scripts/check-pr-scope.sh` | Wrap Rule 2 (lines 73-79) in `if PR_LABELS contains "bulk-content" → skip; else → enforce`. Add to header comment (lines 4-25). |
-| `CLAUDE.md` | Add one-line `bulk-content` usage note alongside the existing `governance-update` mention |
-| (optional) `AGENTS.md` | Same one-line note if the repo's convention is to document labels in both files — verify |
+```
+.github/
+  actions/                                          # NEW directory
+    setup-node-with-puppeteer-cache/
+      action.yml                                    # Composite action definition
+  workflows/
+    test-quality.yml                                # Modified: 7 jobs use the composite action
+SPEC.md, tasks/plan.md, tasks/todo.md              # Lifecycle artifacts
+```
 
-Expected file count: **3 or 4**. Well under the 15-file scope-explosion limit — this PR doesn't need its own exemption.
+Total files touched: **2 net new + 1 modified** = 3 files. Well under the 15-file scope-explosion limit; no `bulk-content` label needed.
 
 ---
 
-## 6. Script change pattern (mirrors Rule 3 / `governance-update`)
-
-Reference pattern at `scripts/check-pr-scope.sh:85-94`:
-
-```bash
-if echo "${PR_LABELS:-}" | grep -q 'governance-update'; then
-  echo "check-pr-scope: governance-update label present — skipping rule 3."
-else
-  # Rule 3 body
-fi
-```
-
-Apply the same wrapper to Rule 2:
-
-```bash
-# Rule 2: >15 files changed (scope explosion)
-# Skip if PR is a deliberate bulk-content change (label: bulk-content)
-if echo "${PR_LABELS:-}" | grep -q 'bulk-content'; then
-  echo "check-pr-scope: bulk-content label present — skipping rule 2."
-else
-  FILE_COUNT=$(echo "$CHANGED_FILES" | wc -l | tr -d ' ')
-  if [ "$FILE_COUNT" -gt 15 ]; then
-    echo "VIOLATION [scope-explosion]: $FILE_COUNT files changed (limit is 15). Split this PR into smaller, focused changes."
-    VIOLATIONS=$((VIOLATIONS + 1))
-  fi
-fi
-```
-
-Use the **exact same indentation, comment style, and skip-notice phrasing** as Rule 3 so the two override paths read as siblings. A future reader should immediately see `bulk-content` and `governance-update` as two instances of the same pattern.
-
----
-
-## 7. Label declaration in `.github/labels.yml`
-
-Pattern depends on the file's current format. Likely something like:
+## 6. Composite action interface
 
 ```yaml
-- name: bulk-content
-  color: "<distinct from governance-update; suggest a yellow/amber to signal caution>"
-  description: "Deliberate bulk-content change (post backfill, byline migration, category rename) — bypasses Rule 2 (15-file scope-explosion). Only valid when splitting would create a worse intermediate main state."
+# .github/actions/setup-node-with-puppeteer-cache/action.yml
+name: 'Setup Node with Puppeteer Cache'
+description: 'Sets up Node via actions/setup-node@v6, caches the puppeteer Chrome download, and runs npm ci with retry to tolerate transient CDN failures.'
+inputs:
+  node-version:
+    description: 'Node.js version (default 20)'
+    required: false
+    default: '20'
+  npm-cache:
+    description: 'setup-node cache strategy (default npm)'
+    required: false
+    default: 'npm'
+runs:
+  using: 'composite'
+  steps:
+    # 1. Standard Node setup with npm cache (unchanged behaviour)
+    - uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: ${{ inputs.npm-cache }}
+
+    # 2. Cache puppeteer's Chrome download (the actual flake fix)
+    - uses: actions/cache@v4
+      with:
+        path: ~/.cache/puppeteer
+        key: ${{ runner.os }}-puppeteer-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-puppeteer-
+
+    # 3. Install deps with retry on transient failure
+    - name: Install dependencies (with retry)
+      shell: bash
+      run: |
+        for attempt in 1 2 3; do
+          if npm ci; then
+            echo "npm ci succeeded on attempt $attempt"
+            exit 0
+          fi
+          if [ $attempt -lt 3 ]; then
+            echo "::warning::npm ci attempt $attempt failed; retrying in 10s..."
+            sleep 10
+          fi
+        done
+        echo "::error::npm ci failed after 3 attempts"
+        exit 1
 ```
 
-Verify the file's actual schema before writing. Implementation step 1 is to read `.github/labels.yml` and find the `governance-update` entry to use as the template.
+Pin `actions/cache@v4` (current stable major). Pin `actions/setup-node@v6` to match the rest of the repo's pins.
 
 ---
 
-## 8. Boundaries
+## 7. Call-site migration pattern
+
+For each affected job in `test-quality.yml`, the replacement is mechanical:
+
+**Before:**
+
+```yaml
+- name: Setup Node.js
+  uses: actions/setup-node@v6
+  with:
+    node-version: '20'
+    cache: 'npm'
+
+- name: Install dependencies
+  run: npm ci
+```
+
+**After:**
+
+```yaml
+- name: Setup Node + cache + install deps
+  uses: ./.github/actions/setup-node-with-puppeteer-cache
+```
+
+Defaults match the prior behaviour (`node-version: '20'`, `cache: 'npm'`). No job currently uses different values — confirmed at baseline SHA.
+
+---
+
+## 8. Retry test harness
+
+Local verification of the retry loop without round-tripping CI. Implementation lives in the same composite-action directory:
+
+```
+.github/actions/setup-node-with-puppeteer-cache/
+  action.yml
+  _retry-test.sh          # Local mock; not a CI dependency
+```
+
+`_retry-test.sh` script overrides `npm` via `PATH` manipulation to fail-fail-succeed, asserts the retry loop produces exit 0 with two warning log lines. This is the unit-style coverage for the retry behaviour. Cheap, reliable, doesn't require the GitHub Actions runner.
+
+---
+
+## 9. Boundaries
 
 | Always | Ask first | Never |
 |---|---|---|
-| Mirror the Rule 3 / `governance-update` pattern exactly — comment style, indentation, skip-notice wording | Whether to also add a `governance-update`-style note to `AGENTS.md` (only if convention says both files document labels) | Add overrides to Rule 1 (protected files) — those are hard guards |
-| Verify the label exists on GitHub (`gh label list`), not just in the YAML, before closing | Whether to weaken any **other** rule along the way | Add overrides to Rule 4 (agent-scope) — that's #951's separate problem; don't conflate |
-| Document the anti-pattern (don't use this just to skip splitting) in CLAUDE.md | — | Use the `bulk-content` label on this PR itself (it touches ~4 files, well under 15) |
-| Smoke-test all 4 cases from AC-4 locally before pushing | — | Modify Rule 2's underlying behavior (the 15-file limit stays 15 when the label is absent) |
+| Pin every action to a specific major (`@v4`, `@v6`) | Whether to migrate `healing-monitor.yml` in the same PR (recommended: no — separate cycle) | Upgrade `pa11y`, `puppeteer`, or `@playwright/test` versions in this PR (handled separately under #947 and the lockfile work) |
+| Verify `git diff --stat .github/workflows/` shows only `test-quality.yml` after the migration | Whether to introduce a third-party retry action (`nick-fields/retry`) vs. inline shell loop (recommend inline; one fewer dep) | Change the retry count or backoff timing without ACs to back it up (3 attempts × 10s is the documented default; deviating requires updating SPEC) |
+| Run the local `_retry-test.sh` harness before pushing | Whether to gate the composite action behind a `PUPPETEER_SKIP_DOWNLOAD=1` env var | Touch `package.json`, `package-lock.json`, or any dep |
+| Confirm cache key works as expected by reading workflow run logs post-merge | — | Mask flakes for tests that aren't actually the puppeteer Chrome-download flake (retry should not paper over real test failures) |
 
 ---
 
-## 9. Out of Scope
+## 10. Out of Scope
 
-- Lowering the 15-file limit
-- Adding overrides for Rules 1, 3, or 4
-- Adding a general `--force` flag to the scope guard
-- Reducing other CI checks' strictness
-- Refactoring `check-pr-scope.sh` (resist the temptation; one-purpose PRs)
-- Adding a formal shell-script test framework (bats, shellspec) — out of scope; smoke tests in PR body suffice
-- Backfilling the `bulk-content` label onto #955 retroactively (it's already merged)
-
----
-
-## 10. Definition of Done
-
-- All 8 ACs checked.
-- PR description includes the 4-case behavior matrix with actual exit codes pasted in from local invocation.
-- `gh label list --repo oviney/blog --search bulk-content` returns the label with the correct description after merge.
-- `grep -A3 "bulk-content" .github/labels.yml` returns the entry.
-- The PR does NOT itself carry the `bulk-content` label (would be ironic and undermine the point).
-- Merged via standard PR flow; admin-merge acceptable per repo convention if CI is otherwise green.
+- Migrating `healing-monitor.yml`, `copilot-setup-steps.yml`, or other workflows — separate cycle if and when needed.
+- Upgrading `pa11y`, `puppeteer`, `@playwright/test`, or any other dep — orthogonal concern.
+- Replacing puppeteer with Playwright's bundled browser in pa11y's chain — architectural change.
+- Setting `PUPPETEER_SKIP_DOWNLOAD=1` — pa11y needs Chrome to render pages; the dependency is real.
+- Reducing the Playwright shard count to lower flake surface — fixes symptom, not cause.
+- Adding cache for `~/.cache/ms-playwright/` (Playwright's own browser binaries) — Playwright Shard 1/2/3 use `@playwright/test` which has its own caching story; separate evaluation.
+- Modifying the retry shape (count, backoff) — change requires SPEC amendment.
 
 ---
 
-## 11. Anti-patterns to surface in CLAUDE.md
+## 11. Definition of Done
 
-The doc change should explicitly call out misuses to forestall them:
-
-- ❌ Using `bulk-content` because you don't want the friction of two PRs for unrelated changes
-- ❌ Using `bulk-content` for a refactor that touches 20 files (refactors should be split; intermediate state is usually fine for refactors)
-- ❌ Using `bulk-content` alongside `governance-update` to bypass two guards on a single PR without strong justification (allowed but should be rare and called out in the PR description)
-- ✅ Using `bulk-content` for: post backfills, mass byline / author changes, category or tag renames touching many `_posts/`, atomic front-matter field migrations
+- All 9 ACs checked.
+- `_retry-test.sh` exits 0 locally before push.
+- PR description includes:
+  - Baseline job count (5) and post-migration call-site count (5)
+  - The retry-test output (mock npm fails twice, succeeds on 3rd attempt)
+  - A note that cache hit/miss behaviour will be verifiable in CI logs once merged
+  - AC-8 boundary check confirmation (`git diff --stat` output)
+- PR merged via standard flow; admin-merge acceptable per repo convention.
+- Post-merge: open a new PR (any small change) and verify the cache-hit path logs `Cache restored from key:` for puppeteer. If it doesn't, that's a regression to investigate immediately, not a problem to defer.
