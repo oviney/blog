@@ -28,6 +28,18 @@ Use the repo's instruction sources as complementary layers:
 
 Runtime features such as custom agents or MCP/tool integrations can vary by execution environment. Use them when available, but do not imply every runtime exposes the same surface area.
 
+## Product Boundary
+
+`oviney/blog` is the source repository for the viney.ca publication. The primary
+job of the instructions and skills in this repo is to help agents publish,
+validate, review, and safely operate the blog.
+
+Some agent and governance machinery in this repo is broader than the publishing
+surface itself. Treat that machinery as supporting infrastructure, not as the
+reason the repository exists. If a workflow, skill, or automation pattern
+proves broadly reusable outside this site, it is a candidate for extraction
+rather than indefinite expansion here.
+
 ## Persona Layers
 
 Use the repo's current agent documentation in two complementary layers:

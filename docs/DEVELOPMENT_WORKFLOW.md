@@ -49,6 +49,20 @@ Press `Ctrl-C` in the terminal to stop the server.
 
 The local server is now working, but the pre-commit hook workflow is still recommended for most development. The server is useful for rapid iteration on CSS/layout changes.
 
+## Repository Boundary
+
+This repository is primarily the source of the viney.ca publication. Day-to-day
+development should optimise for:
+
+- publishing content
+- maintaining the Jekyll theme and layouts
+- protecting reader-facing quality with builds, tests, and validation
+
+The repo currently contains some supporting agent/governance automation as well.
+Treat that automation as maintenance infrastructure for the blog, not as the
+primary product. If a script or workflow becomes useful outside this site, it
+should be considered for extraction rather than expanded by default here.
+
 ## Recommended Workflow
 
 ### 1. Make Changes
@@ -99,17 +113,17 @@ The `.git/hooks/pre-commit` script catches:
 - Missing required metadata
 - Broken internal links
 
-### GitHub Actions Handles Build & Deployment
+### GitHub Actions Handle Build & Deployment
 - Jekyll 4.3.2 with full plugin support
 - Consistent build environment (Ubuntu)
 - No local SSL/certificate issues
 - Complete build logs for debugging
-- Minimal Mistakes theme support
+- Static-site publishing and QA support for viney.ca
 
-### Blog QA Agent Learns from Issues
-- Self-improving validation
-- Learns patterns from any missed issues
-- Stores knowledge in `skills/blog_qa_skills.json`
+### External Companion Tooling
+The blog may be operated with companion tooling from other repositories, such as
+`oviney/economist-agents`. Keep that relationship explicit: those tools support
+this site, but they are not part of the publication repo's core product boundary.
 
 ## Benefits Over Local Server
 
@@ -197,4 +211,4 @@ chmod +x .git/hooks/pre-commit
 
 ---
 
-**Bottom Line:** Your current workflow (pre-commit + GitHub Pages) is production-grade. No local `jekyll serve` needed.
+**Bottom Line:** Develop this repo as a publication system first. Keep supporting tooling scoped to what the blog actually needs.
