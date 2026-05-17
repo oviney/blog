@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Software's Trillion-Dollar Tax: The Cost Nobody Itemises"
+subtitle: "Poor software quality costs the US $2.41 trillion a year — and the CrowdStrike outage proved a single untested deployment can destroy half a billion dollars in an afternoon."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
@@ -9,7 +10,6 @@ image: /assets/images/copq-software-engineering.png
 image_alt: "A newspaper front page announcing a trillion-dollar software quality bill"
 image_caption: "Illustration: poor quality lands as a bill large enough to make headlines"
 description: "CISQ estimates poor software quality costs the US $2.41 trillion a year. CrowdStrike's single untested update destroyed $500 million in one afternoon."
-summary: "Poor software quality costs the US economy $2.41 trillion annually — and the CrowdStrike outage proved that a single untested deployment can destroy half a billion dollars in an afternoon."
 ---
 
 On 19 July 2024, a faulty content update pushed by CrowdStrike's Falcon sensor crashed 8.5 million Windows machines worldwide. Delta Air Lines cancelled 7,000 flights over five days, disrupting 1.3 million customers. Delta's CEO Ed Bastian put the cost at $500 million, encompassing lost revenue, tens of millions per day in customer compensation, and hotel costs. Delta has since sued CrowdStrike, seeking damages exceeding that figure. The root cause was not a sophisticated cyberattack. It was a defective configuration file that bypassed validation — a quality engineering lapse so elementary that it would fail a university exam.

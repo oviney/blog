@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Code Generators: The Brilliant Interns Nobody Supervises"
+subtitle: "The keystroke-per-minute gains are real — but METR's randomised trial found developers 19% slower at finishing tasks, while GitClear's data shows code churn up 41%."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Software Engineering"]

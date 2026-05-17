@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Test automation's hidden ledger: costs nobody budgets"
+subtitle: "Automation's share of the QA budget climbed from 31% in 2020 to 42% today — almost none of the increase bought new coverage; it kept yesterday's suite alive."
 date: 2026-04-04
 author: "Ouray Viney"
 categories: ["Test Automation"]

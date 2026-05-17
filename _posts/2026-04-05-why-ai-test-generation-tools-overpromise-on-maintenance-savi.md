@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The maintenance myth: what AI test generation costs"
+subtitle: "Vendors quote 80% maintenance savings; IEEE's 400-team study finds 62% measure no meaningful difference — and the teams reporting real gains share specific practices the slides leave out."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]

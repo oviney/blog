@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The test strategy trap: why quality plans fail"
+subtitle: "Most test strategies fail not because teams skip planning, but because the plan is written as a static document instead of a live allocation system for risk, tooling and feedback."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
@@ -9,7 +10,6 @@ image: /assets/images/test-strategy-trap.png
 image_alt: "A collapsing test pyramid falling in on itself"
 image_caption: "Illustration: a brittle test strategy collapses when the structure is wrong"
 description: "91% of organisations have a documented test strategy; only 19% think it works. Most quality plans fail because delivery moves faster than the document."
-summary: "Most test strategies fail not because teams skip planning, but because the plan is written as a static document instead of a live allocation system for risk, tooling and feedback."
 ---
 
 ![Test strategy effectiveness gap: 91% of organisations have one, only 19% believe it works](/assets/charts/building-a-test-strategy-that-works.svg)

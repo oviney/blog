@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Coverage Obsession: The Metric That Ate Quality Engineering"
+subtitle: "Test coverage has become the most gamed metric in software engineering — empirically uncorrelated with fault detection, yet mandated by managers who mistake activity for quality."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Test Automation"]
@@ -9,7 +10,6 @@ image: /assets/images/test-coverage-paradox.png
 image_alt: "A coverage gauge stuck at 100% while a bug slips through an uncovered gap"
 image_caption: "Illustration: high coverage numbers can still leave real defects untouched"
 description: "Research shows coverage has low correlation with fault detection after controlling for suite size. Google enforces no coverage target — here is why."
-summary: "Test coverage has become the most gamed metric in software engineering — empirically uncorrelated with fault detection, yet mandated by managers who mistake activity for quality."
 ---
 
 ![Coverage targets: 60% of teams mandate high thresholds, yet only 15% find coverage correlates with fewer defects](/assets/charts/the-productivity-paradox-of-test-coverage-metrics.svg)

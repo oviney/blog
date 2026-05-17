@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Test Automation's Dirty Secret: The Debt Nobody Budgets For"
+subtitle: "Test suites have become the fastest-growing source of technical debt — flaky tests devour 8% of enterprise development time, and maintenance consumes 40% of QA capacity."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Test Automation"]
@@ -9,7 +10,6 @@ image: /assets/images/test-automation-technical-debt.png
 image_alt: "A rising debt curve climbing above an automation dashboard"
 image_caption: "Illustration: automation debt compounds long after teams stop counting it"
 description: "Flaky tests caused 57% of Slack's CI failures. Test suites now consume 40% of QA capacity in maintenance — becoming the debt they were built to prevent."
-summary: "Test suites have become the fastest-growing source of technical debt, with flaky tests consuming up to 8% of enterprise development time and maintenance devouring 40% of QA capacity."
 ---
 
 Slack's engineering team discovered that flaky tests — tests that pass and fail on identical code — accounted for 56.76% of their CI failures. More than half of every build failure was a phantom, sending engineers chasing ghosts instead of shipping software. After investing in a dedicated remediation effort, Slack drove flakiness down to 3.85%, but the journey consumed months of engineering capacity that could have built features. The lesson was expensive and universal: the machinery built to catch bugs had itself become the bug.

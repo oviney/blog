@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The Golden Path: Platform Engineering's Quiet Revolution"
+subtitle: "Internal developer portals are doing for software what assembly lines did for manufacturing — codifying the golden path, cutting onboarding from weeks to days, and lifting cognitive load off every engineer."
 date: 2026-04-12
 author: "Ouray Viney"
 categories: ["Software Engineering"]

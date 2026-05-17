@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The automation accountant: what test ROI looks like"
+subtitle: "Forrester's 15-programme cohort hit a median 143% ROI — but the median payback ran 23 months, and four of fifteen never crossed break-even at all."
 date: 2026-01-19
 author: "Ouray Viney"
 categories: ["Test Automation"]
