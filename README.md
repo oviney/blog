@@ -35,7 +35,7 @@ The repository also contains some agent and governance automation used to operat
 bundle install
 
 # Run locally
-bundle exec jekyll serve
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 
 # Visit http://localhost:4000
 ```
@@ -46,8 +46,14 @@ bundle exec jekyll serve
 # Install testing dependencies
 npm install
 
+# Build the site (primary build truth)
+bundle exec jekyll build
+
 # Create baseline screenshots (first time only)
 npm run test:visual:reference
+
+# Start Jekyll before browser-based QA
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 
 # Run visual regression tests
 npm run test:visual
@@ -63,6 +69,12 @@ npm run test:security
 
 # Run all tests
 npm test
+
+# Run the PR scope guard before opening a PR
+bash scripts/check-pr-scope.sh
+
+# If the PR changes .github/skills/ or .github/instructions/
+PR_LABELS=governance-update bash scripts/check-pr-scope.sh
 ```
 
 **Pre-commit Hook:**
@@ -93,6 +105,7 @@ GitHub Actions automatically builds and deploys changes to GitHub Pages.
 - ✅ CI: Accessibility testing (pa11y-ci WCAG 2.1 AA)
 - ✅ CI: Performance testing (Lighthouse CI - Performance, SEO, Best Practices)
 - ✅ CI: Security audit (npm audit)
+- ✅ PR scope guard: `bash scripts/check-pr-scope.sh`
 - ✅ Deployment: Automated to GitHub Pages
 
 ## Custom Theme

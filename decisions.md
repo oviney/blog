@@ -76,4 +76,14 @@ configuration, design conventions, or content standards.
 
 ---
 
+## ADR-008: Publication-First Repository Boundary
+
+**Date**: May 2026
+**Status**: Active
+**Context**: `oviney/blog` grew beyond the blog itself and now contains agent governance, orchestration, reporting, and workflow tooling alongside the publication. That made the repository harder to reason about and blurred whether its primary purpose was the blog or a broader automation platform.
+**Decision**: Treat `oviney/blog` as the source repository for the viney.ca publication first: content, theme, layouts, deployment, and reader-facing quality gates belong here by default. Supporting automation may remain when it directly helps run the site, but reusable agent/governance tooling with standalone value should be treated as an extraction candidate rather than expanded indefinitely in this repo.
+**Consequences**: Contributor and agent documentation should describe the repo as blog-first, not platform-first. New workflows or scripts should justify their place in terms of publishing, validating, deploying, or protecting viney.ca. Extraction discussions should start by classifying automation into keep-in-blog, extract, or decide-later buckets instead of assuming the blog repo is the permanent home for every tool.
+
+---
+
 *Add new decisions below this line, following the ADR-NNN format.*

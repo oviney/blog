@@ -4,8 +4,8 @@
 
 ### Quick Start
 ```bash
-cd /Users/ouray.viney/code/economist-blog-v5
-bundle exec jekyll serve
+cd /home/ouray/blog
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 ```
 
 The server will start at: **http://127.0.0.1:4000/**
@@ -28,14 +28,14 @@ When starting the server, you'll see these warnings that don't affect functional
 
 ### Successful Server Output
 ```
-Configuration file: /Users/ouray.viney/code/economist-blog-v5/_config.yml
-            Source: /Users/ouray.viney/code/economist-blog-v5
-       Destination: /Users/ouray.viney/code/economist-blog-v5/_site
+Configuration file: /home/ouray/blog/_config.yml
+            Source: /home/ouray/blog
+       Destination: /home/ouray/blog/_site
  Incremental build: disabled. Enable with --incremental
       Generating... 
        Jekyll Feed: Generating feed for posts
                     done in 0.329 seconds.
- Auto-regeneration: enabled for '/Users/ouray.viney/code/economist-blog-v5'
+ Auto-regeneration: enabled for '/home/ouray/blog'
     Server address: http://127.0.0.1:4000/
   Server running... press ctrl-c to stop.
 ```
@@ -83,9 +83,30 @@ git commit -m "description"
 
 If any check fails, commit is blocked until fixed.
 
+### 2b. Run the Same Local Checks CI Expects
+```bash
+bundle exec jekyll build
+
+# Start Jekyll before browser-based QA
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
+
+npm run test:security
+npm run test:playwright
+npm run test:a11y
+npm run test:lighthouse
+bash scripts/check-pr-scope.sh
+```
+
+For governance-surface PRs that touch `.github/skills/` or `.github/instructions/`,
+mirror CI locally with:
+
+```bash
+PR_LABELS=governance-update bash scripts/check-pr-scope.sh
+```
+
 ### 3. Push to GitHub
 ```bash
-git push origin main
+git push origin <branch>
 ```
 
 ### 4. GitHub Actions Builds and Deploys
@@ -167,10 +188,11 @@ This skips validation - use with extreme caution.
 Before pushing major changes:
 
 1. **Pre-commit passed** ✅ (automatic)
-2. **Commit message descriptive** ✅
-3. **GitHub Actions status** - Check after push
-4. **Production site** - Verify at viney.ca after 2 minutes
-5. **Blog QA Agent** - Run for additional validation
+2. **`bundle exec jekyll build` passed** ✅
+3. **Relevant QA command(s) passed** ✅ (`npm run test:security`, `npm run test:playwright`, `npm run test:a11y`, `npm run test:lighthouse`)
+4. **Scope guard passed** ✅ (`bash scripts/check-pr-scope.sh`)
+5. **GitHub Actions status** - Check after push
+6. **Production site** - Verify at viney.ca after deployment
 
 ## Troubleshooting
 
