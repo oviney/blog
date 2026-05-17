@@ -61,6 +61,27 @@ jobs:
           body += `> Replace the bullet-point prompts with your actual findings.\n`;
           body += `> When complete, add \`agent:audience-researcher\` if the issue remains a research synthesis task,\n`;
           body += `> then open follow-up issues with the appropriate implementation label so the right agent can act.\n\n`;
+          body += `> **Local Claude Code path:** execute under the \`agent-skills\` lifecycle\n`;
+          body += `> (DEFINE → PLAN → BUILD → VERIFY → REVIEW → SHIP).\n`;
+          body += `> See \`tasks/archive/\` for prior cycles' SPEC.md / plan.md / todo.md templates.\n\n`;
+          body += `---\n\n`;
+
+          body += `## Research Methodology Guardrails\n\n`;
+          body += `Every finding must follow the three-bucket structure or it blocks lifecycle progress:\n\n`;
+          body += `- **Action** — name specific files in this repo **and** a verifiable acceptance criterion. "Update X somehow" is not acceptable.\n`;
+          body += `- **Watch** — include an observable **trigger condition** that would promote it to Action later (e.g., "when Playwright ≥ 1.60 lands").\n`;
+          body += `- **No-op** — include a **repo-state justification** with the exact command **and** commit SHA (e.g., \`grep -n "..." X @ <sha>\`). No carve-outs for cat/ls/Read — SHA + command required on every cited command.\n\n`;
+          body += `**Binding pre-Action checks (failing any of these downgrades the finding):**\n\n`;
+          body += `1. **Dep-bump for CVE / security.** Run these two commands and paste their output as part of the finding's evidence:\n`;
+          body += `   \`\`\`bash\n`;
+          body += `   node -e "const p=require('./package.json'); console.log(JSON.stringify(p.overrides||{}, null, 2));"\n`;
+          body += `   npm audit --omit=dev\n`;
+          body += `   \`\`\`\n`;
+          body += `   If \`npm audit\` is clean **and** an \`overrides\` block already covers the transitive dep the CVE is in: the CVE is already mitigated. Classify as **Watch** (trigger: when the override can be removed) or **No-op** (override is the justification). **Never** file as Action with security-urgency language. See \`tasks/lessons.md\` L3 for the full pattern and the #944 case study.\n`;
+          body += `2. **Protected files** — \`_config.yml\`, \`Gemfile\`, \`Gemfile.lock\`, \`.github/copilot-instructions.md\`, \`.github/CODEOWNERS\`. Never recommend direct edits. Flag as **Watch** with a trigger condition.\n`;
+          body += `3. **\`package.json\` semver-range bumps** — follow-up issue acceptance criteria MUST include (a) \`package-lock.json\` regeneration, (b) the specific CI workflow(s) that must pass against the new version, (c) the skill file(s) that need updating.\n\n`;
+          body += `**Substance floor:** each in-scope section produces ≥ 1 Action finding OR an explicit "no substantive change identified after researching ≥ N sources from [list]" justification. A sweep of all-Watch / all-No-op findings without that justification is incomplete.\n\n`;
+          body += `**Hard cap on spawned issues:** 6 follow-ups total across the whole sweep. More than that requires explicit user override before \`gh issue create\`.\n\n`;
           body += `---\n\n`;
 
           body += `## 1. AI Agent Orchestration — New Developments\n\n`;
