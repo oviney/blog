@@ -1,45 +1,51 @@
-# SPEC — Research Sweep Execution (#902)
+# SPEC — Research Sweep Execution (#943)
 
 **Status:** Draft — awaiting approval
-**Issue:** [#902](https://github.com/oviney/blog/issues/902)
+**Issue:** [#943](https://github.com/oviney/blog/issues/943)
 **Labels:** `enhancement` · `research`
-**Date:** 2026-05-14
+**Date:** 2026-05-17
 **Lifecycle phase:** DEFINE
+**Prior cycle reference:** [tasks/archive/2026-05-14-research-sweep-902/SPEC.md](tasks/archive/2026-05-14-research-sweep-902/SPEC.md) — 8 ACs, full collision/substance machinery; this SPEC reuses that structure and documents only the deltas.
 
 ---
 
 ## 1. Situation
 
-`Research Sweep — 2026-05-01` (#902) is an open-ended template issue produced by the `research-sweep` workflow. Its body has three sections (AI Agent Orchestration, GitHub Copilot Coding Agent, QE Automation), each with research prompts and empty `Findings` / `Recommended improvements` slots. The sweep has been open for 13 days with no findings recorded.
+`Research Sweep — 2026-05-15` (#943) was filed by the biweekly cron workflow two days before [#948 (sweep methodology guardrails)](https://github.com/oviney/blog/pull/950) merged. Therefore #943's **body uses the old template** — no inline three-bucket schema, no `package.json overrides` pre-Action check, no substance floor, no spawn cap. The guardrails are still binding on this execution via:
 
-Concurrently, the project is migrating execution off GitHub Copilot Coding Agent (label-routed cloud agents) onto **local Claude Code with the agent-skills lifecycle**. This shift reframes the sweep:
+- The just-merged workflow source (`.github/workflows/research-sweep.yml` @ `bfe8f5c`) — future sweeps inherit them inline.
+- [`tasks/lessons.md`](tasks/lessons.md) L3 — the durable record of the methodology lesson.
+- This SPEC.md — explicitly imports them.
 
-- **Section 1 (AI Agent Orchestration)** — in scope. Findings directly inform how we use Claude Code subagents, lifecycle skills, and persona files.
-- **Section 2 (GitHub Copilot Coding Agent)** — out of scope. Decision already made: we are moving off Copilot for direct execution. Researching Copilot's latest features does not change that decision.
-- **Section 3 (QE Automation)** — in scope. Playwright, Pa11y, Lighthouse, and GitHub Actions updates affect the validator stack regardless of which agent runtime drives it.
+#943's template adds a **§4 Audience Experience / UI / UX / Usability** section that #902 didn't have, opening fresh research territory.
 
-This sweep is the first lifecycle artifact produced under the local-only Claude Code orchestration model.
+**Existing context that constrains scope:**
+
+- #902 just closed (2026-05-17) with three open follow-ups: **#945** (subagent `memory:` frontmatter), **#946** (`AGENTS.md` handoff graph + Mermaid), **#947** (Playwright 1.60 bump, `Blocked by` recently-merged #944).
+- The date floor for §1/§3 is **2026-05-01** (#902 `created_at`) — only ~2 weeks of "what's new" to research. Most material §1/§3 developments published in that window are already represented in #945/#946/#947, so dedup is the dominant constraint, not novelty.
+- §4 is fresh territory: #902 never covered it. Use a wider 90-day floor (**2026-02-15**) so the section produces meaningful findings instead of "nothing new in two weeks."
 
 ---
 
 ## 2. Objective
 
-Produce evidence-based findings for the two in-scope sections of #902, recorded inline in the issue body, and spawn follow-up issues **only** where a concrete, file-scoped change to this repository is justified.
+Produce evidence-based findings for §1, §3, §4 of #943, recorded inline in the issue body. Spawn up to **4** follow-up issues, with **explicit dedup** against #945/#946/#947 — overlapping recommendations are recorded as `Tracked in #N` references and **do not spawn duplicates**.
 
-**Non-goal:** writing a literature review. Findings exist to drive repo changes; speculative trends without a clear repo action stay in the sweep and do not become issues.
+**Non-goals:** writing a literature review; backfilling methodology guardrails into #943's body (those will appear in the next cron-generated sweep at 2026-06-01).
 
 ---
 
 ## 3. Acceptance Criteria
 
-- [ ] **AC-1** Issue #902 body is updated with findings for Section 1 (AI Agent Orchestration) and Section 3 (QE Automation). Section 2 is explicitly marked **out of scope — migrating off Copilot** with a one-line rationale, not left blank.
-- [ ] **AC-2** Every finding cites at least one verifiable source: a GitHub release URL, official docs URL, dated blog post, or repository state observed in this codebase. No unsourced claims.
-- [ ] **AC-3** Each "Recommended improvement" lists the **specific file(s)** it would change and an acceptance criterion. Recommendations that cannot name files stay as "Worth watching" notes in the sweep body and do **not** spawn issues.
-- [ ] **AC-4** A follow-up GitHub issue is opened for each qualifying recommendation, labelled with the appropriate `agent:*` label, referencing #902 in the body. Issues that touch overlapping files are noted as **sequential** in #902's closing summary; non-overlapping issues are noted as **parallelizable**.
-- [ ] **AC-5** #902 is closed once all follow-up issues are opened and the body is committed. Closure comment summarises: in-scope sections covered, # of findings, # of follow-up issues opened, parallel-vs-sequential map.
-- [ ] **AC-6** `tasks/plan.md` and `tasks/todo.md` exist and track the sweep's own work (the three research tracks + write-up + follow-up issue creation).
-- [ ] **AC-7** No code changes are made in this lifecycle pass. Implementation of recommendations happens in the follow-up issues' own lifecycle cycles.
-- [ ] **AC-8 (substance floor)** Each in-scope section (Section 1 and Section 3) produces **at least one Action-bucket finding** OR an explicit "no substantive change identified after researching ≥ N sources from [list]" justification recorded in the sweep body. A sweep of all-Watch / all-No-op findings does not satisfy this AC without that justification. This prevents a sweep from satisfying every other AC while being substantively empty.
+- [ ] **AC-1** #943 body is updated with findings for §1, §3, §4. §2 (Copilot) explicitly marked **out of scope** with the same statement and reversal trigger used for #902 (see SPEC §10).
+- [ ] **AC-2** Every finding cites at least one verifiable source (URL with date, or repo state with command + commit SHA — no carve-outs).
+- [ ] **AC-3** Each "Recommended improvement" lists specific files + an acceptance criterion. Recommendations that cannot name files stay as **Watch** with trigger condition.
+- [ ] **AC-4 (dedup-aware)** A follow-up GitHub issue is opened only for **net-new** recommendations not already tracked by #945, #946, or #947. Overlapping findings are recorded in the sweep body with `**Tracked in #N**` reference and a one-line note on what the new research adds (if anything). Overlap detection runs **before** `gh issue create`.
+- [ ] **AC-5** #943 closed with summary comment: in-scope sections covered, finding bucket counts (Action / Watch / No-op / Tracked-in), follow-up issues opened, parallel-vs-sequential map.
+- [ ] **AC-6** `tasks/plan.md` and `tasks/todo.md` exist and track sweep execution.
+- [ ] **AC-7** No code changes are made in this lifecycle pass.
+- [ ] **AC-8 (substance floor — per section)** Each of §1, §3, §4 produces **at least one Action-bucket finding** OR a recorded "no substantive change identified" justification. A **Tracked in #N** finding does **not** satisfy the substance floor (the substance lives in the prior sweep's spawned issue, not in this one).
+- [ ] **AC-9 (hard cap)** Spawned follow-ups ≤ **4** (lower than #902's 6 because #945/#946/#947 are still open). > 4 requires explicit user override.
 
 ---
 
@@ -47,141 +53,132 @@ Produce evidence-based findings for the two in-scope sections of #902, recorded 
 
 ```bash
 # Read sweep state
-gh issue view 902 --repo oviney/blog
+gh issue view 943 --repo oviney/blog
 
-# Inspect current repo state for comparison against findings
-cat AGENTS.md .github/skills/*/SKILL.md
-grep -E '"(playwright|pa11y|lighthouse)' package.json
-cat .github/workflows/*.yml
+# Dedup precheck — list existing open #902 follow-ups
+gh issue list --repo oviney/blog --state open --search "Spawned from #902" \
+  --json number,title,body
 
 # Update sweep body
-gh issue edit 902 --repo oviney/blog --body-file <(cat tasks/902-body.md)
+gh issue edit 943 --repo oviney/blog --body-file tasks/943-body.md
 
 # Open follow-up issues
-gh issue create --repo oviney/blog --title "..." --label "agent:qa-gatekeeper" \
-  --body "Spawned from #902 sweep. ..."
+gh issue create --repo oviney/blog --title "..." --label "agent:..." \
+  --body "Spawned from #943 sweep. ..."
 
 # Close sweep
-gh issue close 902 --repo oviney/blog --comment "..."
+gh issue close 943 --repo oviney/blog --comment "..."
 ```
 
 ---
 
-## 5. Project Structure (artifacts produced by this lifecycle pass)
+## 5. Project Structure (artifacts produced)
 
 ```
 SPEC.md                          # this file
 tasks/
-  plan.md                        # research methodology, dependency graph, checkpoints
-  todo.md                        # tracked work items for the sweep
-  902-body.md                    # staged issue body before gh issue edit
-  902-followups-plan.md          # collision-pass output BEFORE gh issue create (planned issues, file-overlap map)
-  902-followups.md               # post-creation ledger: real issue numbers, parallel-vs-sequential mapping, verification results
+  plan.md                        # methodology, dependency graph, checkpoints
+  todo.md                        # tracked work items
+  943-body.md                    # staged issue body
+  943-followups-plan.md          # collision-pass output + dedup decisions (pre-creation)
+  943-followups.md               # post-creation ledger (real issue numbers)
+  lessons.md                     # unchanged — L3 already covers the overrides-check
   archive/
-    2026-05-10-link-validator/   # prior cycle, shipped in 47544eb
+    2026-05-10-link-validator/   # #904/#905 cycle
+    2026-05-14-research-sweep-902/  # the just-closed sweep (archived 2026-05-17)
 ```
 
-No source files (`scripts/`, `_posts/`, `_sass/`) are touched in this pass.
+No source files touched.
 
 ---
 
-## 6. Research Methodology
+## 6. Date Floors (per section)
 
-| Source class | When to use | Tool |
+| Section | Floor | Anchor |
 |---|---|---|
-| **Web search** | "What's new since 2026-04-01?" — release notes, blog posts, papers | `WebSearch`, `WebFetch` |
-| **Official docs** | Verifying a specific feature or API claim | `WebFetch` against project docs site |
-| **Repo state** | Comparing current versions / configs against findings | `Read`, `Bash` (grep/ls) in this repo |
-| **Subagents (parallel)** | Fan out one `general-purpose` agent per in-scope section | `Agent` tool, run concurrently |
+| §1 AI Agent Orchestration | **2026-05-01** | `created_at` of prior sweep #902 |
+| §3 QE Automation | **2026-05-01** | `created_at` of prior sweep #902 |
+| §4 Audience Experience | **2026-02-15** | `today - 90d`; #902 never covered §4 so the standard prior-sweep anchor doesn't apply |
 
-**Subagent strategy:** Section 1 and Section 3 are independent (no shared files between their findings). Spawn both in a single message with two `Agent` tool calls. Each subagent returns: (a) findings with citations, (b) recommended improvements with named files + acceptance criteria, (c) a "worth watching but no action" list.
-
-**Subagent prompt requirements (binding):** The orchestrator's prompt to each subagent MUST embed §7's three-bucket schema (Claim + Source + Repo impact, with trigger-condition for Watch and repo-state-justification for No-op) **verbatim** and instruct the subagent to **reject its own output** if any finding lacks a required field. This prevents drift between §7's quality bar and what subagents actually produce, and removes the need for the orchestrator to re-prompt or hand-fix on return.
-
-**Date discipline:** The date floor is the `created_at` of the most recent prior `Research Sweep —` issue **regardless of state** (open or closed); if none exists, `today - 90d`. The resolved floor MUST be recorded as the first line of `tasks/902-body.md` before any subagent is spawned.
-
-**Repo-state evidence:** Any finding citing repo state must include the exact command run **and** the commit SHA at which it was run (e.g., `grep -E '"playwright"' package.json` @ `dafab0e`). This applies to **every** command shape — `cat`, `ls`, `grep`, `Read`, all of it. No carve-outs. The audit trail is the citation; without SHA + command, the citation is invalid and the finding is incomplete.
-
-**Collision pass (mandatory before spawning issues):** After both subagents return, diff the `Files to change` sets across all recommendations. Any file appearing in two or more recommendations forces either:
-- a **single merged issue** covering both recommendations, or
-- a **`Blocked by #N` chain** with sequential ordering.
-
-The collision pass output is committed to `tasks/902-followups-plan.md` (a table of file → recommendations-touching-it, plus the merge/sequence decision for each collision) **before** any `gh issue create` is run. After `gh issue create` returns real issue numbers, the final mapping (plan + real numbers + `Blocked by` wiring + verification results) is written to `tasks/902-followups.md` as a separate commit. The plan file is the pre-creation truth; the ledger file is the post-creation record.
+The resolved floor for each section is pinned as the first line of `tasks/943-body.md` before any subagent is spawned.
 
 ---
 
-## 7. Finding Quality Bar
+## 7. Research Methodology (deltas from #902 SPEC §6)
 
-Each finding entered into the sweep body MUST have:
+**Inherits from #902 SPEC §6 (subagent prompts MUST embed three-bucket schema verbatim, self-reject incomplete findings, SHA + command on every repo-state citation, collision pass before `gh issue create`).**
 
-1. **Claim** — one sentence stating the development.
-2. **Source** — a clickable URL, with a publish date if available.
-3. **Repo impact** — one of:
-   - **Action:** `<short description>` → spawns follow-up issue
-   - **Watch:** `<why we'd care later>` + **trigger condition** (e.g., "promote to Action when Playwright ≥ 1.50 lands" or "when our pa11y-ci version falls > 2 minors behind") → stays in sweep, no issue
-   - **No-op:** `<why this doesn't apply to us>` + **repo-state justification** citing a specific file or version (e.g., "we already pin `lighthouse@^12.8.2` per `package.json`") → stays in sweep, no issue
+**New for this sweep:**
 
-A finding without all three — and without the trigger condition / repo-state justification for Watch / No-op respectively — is incomplete and blocks AC-1. The trigger / justification exists to make bucket choice **auditable**: a future reviewer can verify the Watch was honest and the No-op was grounded.
+- **Three subagents** (not two) — one for §1, §3, §4. All `general-purpose`. Fan out in a single message with three parallel `Agent` calls.
+- **§4 subagent specifics:** distinct research domain (audience research / UX / reader-journey / a11y from a usability angle). Required sources include Nielsen Norman Group articles, viney.ca repo state (read `_layouts/`, `_includes/`, `_sass/`, `_posts/` index, search/topic pages), and current UX research. Subagent should also browse the live site (`bundle exec jekyll serve` is not running in the subagent's sandbox — use `_site/` artifacts or curl viney.ca production).
+- **Dedup precheck as a binding pre-Action gate.** Every Action recommendation MUST be cross-checked against the bodies of #945, #946, #947 before classification. If any recommendation overlaps any of those issues' `Files to change` or `Acceptance criteria`, it is reclassified as **Tracked in #N** (new bucket — see §8) and does not spawn.
+- **Inherited from #948 / lessons.md L3:** dep-bump-for-CVE recommendations must paste `node -e "console.log(JSON.stringify(require('./package.json').overrides||{}, null, 2));"` and `npm audit --omit=dev` output as evidence. Clean audit + existing override downgrades to Watch or No-op.
 
 ---
 
-## 8. Follow-up Issue Standards
+## 8. Finding Quality Bar (new bucket added)
 
-Every spawned issue MUST include:
+#902 SPEC §7's three buckets (Action / Watch / No-op) remain. **One new bucket** for this sweep:
 
-- **Title:** action-oriented, scoped (`update`, `add`, `bump`, `evaluate`) — not `research`
-- **Body sections:**
-  - `Spawned from #902 — Research Sweep 2026-05-01`
-  - `Finding` (one-paragraph context from the sweep)
-  - `Files to change` (explicit paths)
-  - `Acceptance criteria` (checklist, at least one item)
-  - `Out of scope`
-- **Label:** appropriate `agent:*` label based on the touched file domain
-- **Cross-references:** if it depends on another spawned issue (overlapping files), note `Blocked by #N` in the body
+- **Tracked in #N** — finding restates something already open as a follow-up from a prior sweep. Body lists the existing issue number, optionally a one-line note on what new research (if any) adds — but if the existing issue's AC already covers it, the new note is just "covered". Stays in sweep body; no spawn. Does **not** satisfy AC-8 substance floor (that requires Action-bucket).
+
+All quality-bar fields (Claim, Source, Repo impact, trigger for Watch, repo-state justification for No-op) remain mandatory.
 
 ---
 
-## 9. Boundaries
+## 9. Follow-up Issue Standards
+
+Identical to #902 SPEC §8. Body sections: `Spawned from #943`, Finding, Files to change, Acceptance criteria, Out of scope, optional `Blocked by #N` for sequenced rows.
+
+---
+
+## 10. Collision Pass + Substance Floor
+
+Identical to #902 SPEC §6 / §11 logic, with:
+
+- **Hard cap: 4** (not 6).
+- **Substance floor per-section** (§1, §3, §4 each need ≥1 Action OR justification).
+
+---
+
+## 11. Boundaries
+
+Identical to #902 SPEC §9, plus:
 
 | Always | Ask first | Never |
 |---|---|---|
-| Cite a source for every claim | Whether to spawn a follow-up if a finding feels borderline | Edit `_posts/`, `_sass/`, `scripts/`, or workflows in this lifecycle pass |
-| Mark Section 2 explicitly out of scope with a one-line rationale | Whether to bump a tool version that touches `_config.yml`, `Gemfile`, or `Gemfile.lock` (these are protected) | Recommend `Gemfile`/`Gemfile.lock`/`_config.yml` changes — flag as a "Watch" item and surface to the user |
-| Use `WebFetch` against the canonical doc URL, not a cached/aggregated version | Whether to open more than ~6 follow-up issues (issue spam risk) | Open follow-up issues without explicit file scope |
-| Stage `gh issue edit` body in `tasks/902-body.md` before applying | Whether to close #902 if any AC is not met | Close #902 before all follow-up issues are opened and confirmed |
-| Run subagents in parallel for Section 1 and Section 3 | Bumping any `package.json` dependency version — the follow-up issue body MUST surface the cascading `package-lock.json` churn and CI/Pa11y/Lighthouse/Playwright behaviour impact before the bump is approved | Spawn subagents for already-decided scope (e.g., Copilot section) |
-| Cap follow-up issues at **6** total. Anything beyond 6 requires explicit user override before `gh issue create` | — | Open more than 6 follow-up issues without explicit user approval |
+| Run dedup precheck against #945/#946/#947 before classifying anything as Action | Whether §4 findings route to `agent:audience-researcher`, `agent:editorial-chief`, or `agent:creative-director` — §4 spans all three persona scopes depending on what's recommended | Spawn an issue that duplicates the AC of an open #902 follow-up |
+| Use a single 90-day floor for §4 (2026-02-15) regardless of subagent date discipline | Bumping any `package.json` dependency version (same #902 rule) | Edit #943's body inline with methodology guardrails — those land in the next cron-generated sweep via #948's workflow change, not retroactively |
+| Cap follow-ups at **4** | Whether to exceed 4 follow-ups | Recommend changes to protected files (`_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/copilot-instructions.md`, `.github/CODEOWNERS`) |
 
 ---
 
-## 10. Out of Scope (this lifecycle pass)
+## 12. Out of Scope
 
-- Implementing any recommended improvement (each is its own lifecycle cycle later)
-- Researching GitHub Copilot Coding Agent updates (Section 2 — explicit non-goal)
-- Auditing prior sweeps for completeness
-- Changing the `research-sweep` workflow itself
-- Re-evaluating the local-Claude-Code orchestration decision
-
-**Section 2 reversal trigger:** Reopen Section 2 in a future sweep if Copilot ships a feature that materially affects label-routing or local-agent interop (e.g., local-runtime parity, or a Copilot-Claude-Code bridge). Otherwise, the next sweep inherits the same out-of-scope marker — this is not a one-off skip.
+- Implementing any recommended improvement (each is its own lifecycle cycle later).
+- Researching GitHub Copilot Coding Agent updates (§2 — out per #902's decision and reversal trigger).
+- Removing the `lodash` override in `package.json` — Watch-grade, separate evaluation.
+- Re-running #902's findings — those are already tracked in #945/#946/#947 and the sweep methodology forbids duplication.
+- Backfilling methodology guardrails into #943's body — those activate naturally in the 2026-06-01 sweep via the merged #948 workflow.
+- §2 reversal in this sweep — Section 2 stays out per the same reasoning as #902.
 
 ---
 
-## 11. Definition of Done
+## 13. Definition of Done
 
-- All **eight** Acceptance Criteria checked (AC-1 through AC-8, including the substance floor).
+Identical to #902 SPEC §11. Specifically:
+
+- All **9** ACs checked (AC-1 through AC-9, including the dedup-aware AC-4 and lower cap AC-9).
 - `tasks/plan.md` and `tasks/todo.md` reflect actual progress.
-- Working tree clean (artifacts under `tasks/` and `SPEC.md` committed); no other files modified.
-- `bundle exec jekyll build` still succeeds (sanity check that lifecycle artifacts don't break the site build).
-- **Spawned-issue verification (executing session owns this):** for each follow-up issue, the executing Claude Code session runs `gh issue view <N> --repo oviney/blog` and confirms it has (a) the required `agent:*` label and (b) a `Spawned from #902` line in the body. Suggested automatable batch check (run, don't script in this pass):
+- Working tree clean; no source files modified.
+- `bundle exec jekyll build` still succeeds.
+- **Spawned-issue verification (executing session owns this):** for each follow-up, `gh issue view <N> --repo oviney/blog` confirms label + `Spawned from #943` line. Batch check:
   ```bash
-  gh issue list --repo oviney/blog --search "Spawned from #902" --json number,labels,body \
-    --jq '.[] | select((.labels | map(.name) | any(test("^agent:"))) and (.body | contains("Spawned from #902"))) | .number'
+  gh issue list --repo oviney/blog --search "Spawned from #943" --json number,labels,body \
+    --jq '.[] | select((.labels | map(.name) | any(test("^agent:"))) and (.body | contains("Spawned from #943"))) | .number'
   ```
-  The output must equal the planned spawn set in `tasks/902-followups-plan.md`. Any divergence blocks closure.
-- **Half-spawned remediation:** if verification fails mid-batch (e.g., 4 of 6 issues created, one missing a label), the executing session owns the fix. Two valid remediation paths:
-  1. Patch the failing issue in place via `gh issue edit <N> --add-label "agent:..."` or `gh issue edit <N> --body-file ...`.
-  2. Close the failing issue with comment `superseded by #M` and create a corrected replacement.
-
-  Either way, `tasks/902-followups.md` is updated to record the remediation before #902 closes.
-- `tasks/902-followups.md` (post-creation ledger) is committed and reflects the final spawned-vs-sequential mapping with real issue numbers, distinct from `tasks/902-followups-plan.md` (pre-creation truth).
-- **Future automation (note, not a deliverable here):** the three manual gates above — every finding has a source URL, every spawned issue has `Spawned from #902`, follow-up count ≤ 6 — are cheap to script as `scripts/validate-sweep.sh`. Out of scope for this DEFINE pass (AC-7 forbids new code); capture as a candidate Section 3 / QE Automation Action finding if applicable, otherwise spawn as a separate lifecycle cycle.
+  Output must equal the planned spawn set in `tasks/943-followups-plan.md`.
+- **Half-spawned remediation:** if verification fails mid-batch, executing session patches in place via `gh issue edit` or closes + `superseded by #M`. Either path updates `tasks/943-followups.md` before #943 closes.
+- `tasks/943-followups.md` (post-creation ledger) committed and reflects final spawned-vs-sequential mapping with real issue numbers.
+- **Dedup ledger:** for every finding classified as Tracked in #N, `tasks/943-followups.md` (or a new section in `tasks/943-body.md`) records which #902 follow-up tracks it. Useful for closure summary and future auditors.
