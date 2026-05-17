@@ -1,186 +1,209 @@
-# Plan — Puppeteer Chrome-Download Flake Mitigation (#958)
+# Plan — Bump @playwright/test to ^1.60.0 + Page-Level ARIA Snapshots (#947)
 
-**Spec:** [SPEC.md](../SPEC.md)
-**Issue:** [#958](https://github.com/oviney/blog/issues/958)
+**Spec:** [../SPEC.md](../SPEC.md)
+**Issue:** [#947](https://github.com/oviney/blog/issues/947)
 **Date:** 2026-05-17
 **Lifecycle phase:** PLAN
-**Plan SHA:** `b965ddb`
+**Plan SHA:** `6480f00`
 
-**Anchors confirmed at this SHA:**
+---
 
-- **Affected workflow:** `.github/workflows/test-quality.yml` only (`grep -l setup-node .github/workflows/*.yml` confirms 4 other workflows also use it, but they're explicit Out-of-Scope per SPEC §10)
-- **7 affected jobs** in `test-quality.yml`, each with a `setup-node@v6` + `npm ci` pair to migrate:
-  - `quality-checks` — setup-node line 124, npm ci line 130
-  - `security` — setup-node line 188, npm ci line 194
-  - `playwright-partial` — setup-node line 220, npm ci line 226
-  - `playwright-shard1` — setup-node line 312, npm ci line 318
-  - `playwright-shard2` — setup-node line 377, npm ci line 383
-  - `playwright-shard3` — setup-node line 442, npm ci line 448
-  - `quality-report` — setup-node line 506, npm ci line 512
-- **No `.github/actions/` directory exists yet** — this PR creates it
-- **No existing `actions/cache` usage anywhere** in workflows — confirmed at SHA `b965ddb`
+## Anchors confirmed at this SHA
+
+- **Current pin:** `package.json` line referencing `"@playwright/test": "^1.59.1"` (devDependencies section).
+- **ARIA-snapshot call-sites:** exactly 3, audited via `grep -rn "toMatchAriaSnapshot" tests/`.
+  - `tests/playwright-agents/homepage.spec.ts:192` — `page.locator('main').first()` → **migrate to page-level** (per SPEC §1 table).
+  - `tests/playwright-agents/navigation.spec.ts:96` — `page.locator('main article').first()` → **keep element-scoped**, add rationale comment.
+  - `tests/playwright-agents/navigation.spec.ts:460` — `page.locator('#site-navigation')` → **keep element-scoped**, add rationale comment.
+- **Skill doc edit point:** `.github/skills/jekyll-qa/SKILL.md:40` reads `` - `@playwright/test ^1.59.1` ``. Surrounding lines 41-43 list `pa11y-ci`, `lighthouse`, `lodash override` — the `test.abort()` note belongs after line 40 as a sub-bullet.
+- **Open Dependabot PR #959** mutates exactly `package.json` (+1/-1) and `package-lock.json` (+12/-12). CI is **green** on its current head. We will close it as part of T8 once our PR opens — not earlier (per SPEC §10 "ask first / never do" — closing late avoids a window with no PR open for the bump).
+- **No `tests/playwright-agents/footer.spec.ts` exists** — `ls tests/playwright-agents/*footer*` returns nothing. SPEC §1 already records this. No new file is added by this PR.
+- **`.github/workflows/auto-regression.yml`** triggers on `issues: labeled` (line 3-5) and does **not** run `npm ci` or `npx playwright test` (only `git add tests/playwright-agents/regression/` at line 147). See **Spec Amendment Proposal** below.
+
+---
+
+## Spec Amendment Proposal — AC-4 (raise before BUILD)
+
+**SPEC §3 AC-4 currently reads:** *"`.github/workflows/test-quality.yml` AND `.github/workflows/auto-regression.yml` pass green on a single PR run."*
+
+**Problem:** `auto-regression.yml` triggers exclusively on `issues: labeled` events (specifically when `production` or `bug` is applied to an issue already carrying the other label). It does not run on `pull_request` or `push` — it physically cannot fire on this PR. It also does not install or invoke Playwright; it only generates new test scaffolding files and commits them. The Playwright minor bump has **zero runtime impact** on this workflow.
+
+**Proposed amendment to AC-4:** *"`.github/workflows/test-quality.yml` passes green on a single PR run. `auto-regression.yml` is verified by inspection (it does not install or run Playwright at runtime; it only writes test files that depend on the lockfile-installed version, which is exercised by test-quality.yml shards). No retry tolerated for Playwright-shaped failures; one retry tolerated for the puppeteer Chrome-cache flake pattern from #958."*
+
+**Decision needed before BUILD:** confirm this amendment, or specify an alternate verification path (e.g., labeling a sentinel issue post-merge to fire the workflow once). My recommendation: accept the amendment — adding `workflow_dispatch` to `auto-regression.yml` would be scope creep, and labeling a sentinel issue produces a real PR that we'd then have to clean up.
 
 ---
 
 ## Context
 
-3 files net: 2 new (`action.yml`, `_retry-test.sh`) + 1 modified (`test-quality.yml`). Well under the 15-file scope-explosion limit; no `bulk-content` label needed on this PR.
+5 files net at most (per SPEC AC-8): `package.json`, `package-lock.json`, `tests/playwright-agents/homepage.spec.ts`, `tests/playwright-agents/navigation.spec.ts`, `.github/skills/jekyll-qa/SKILL.md`. Well under the 15-file scope-explosion limit; **no `bulk-content` label needed**.
 
-The migration is mechanical: every call-site is the same `setup-node@v6` (with `node-version: '20'` and `cache: 'npm'`) immediately followed by `npm ci`. The composite action's defaults match those values exactly, so each migration is a pure 8-line → 2-line substitution.
+The risk profile is dominated by **snapshot drift on the migrated test**. Element-scoped `main` snapshot today is 22 lines; page-level will include `banner`, `navigation`, and `contentinfo` landmarks above and below the existing `main` block. The exact text is something Playwright generates via `--update-snapshots` and we review. The plan accommodates a non-trivial diff in `homepage.spec.ts:192` — that's the expected outcome, not a regression.
 
-The retry-loop unit test (`_retry-test.sh`) is the load-bearing local verification. Cache hit/miss behavior is only observable in CI logs post-merge, so the local gate before push is: composite action exists, all 7 call-sites migrated, YAML parses, retry harness passes.
+There is no separate baseline file to manage; ARIA snapshots are **inline template literals** in the spec file. `--update-snapshots` rewrites the literal in place. Git diff carries the entire change.
+
+The migration is one-directional (page-level is strictly more inclusive than element-scoped); if the new snapshot is unstable we narrow it back rather than reverting the API form.
 
 ---
 
 ## Dependency graph
 
 ```
-T1 (composite action: action.yml + _retry-test.sh)
+T1 (bump @playwright/test ^1.60.0 in package.json + regenerate package-lock.json)
   │
-  ├──► T2 (RED retry test: mock npm that fails 3x → harness exits 1)
+  ├──► T2 (homepage.spec.ts:192 → page-level snapshot, regenerate baseline, review diff)
   │       │
   │       ▼
-  │     (proves the harness can detect failure modes)
+  │     (proves the new API works against a live Jekyll server)
   │
   ▼
-T3 (RED→GREEN retry test: mock npm fails 2x, succeeds 3rd → harness exits 0)
+T3 (navigation.spec.ts:96 + :460 → add `// element-scoped: …` rationale comments)
   │
   ▼
-T4 (migrate 7 call-sites in test-quality.yml)
+T4 (.github/skills/jekyll-qa/SKILL.md line 40 → ^1.60.0 + test.abort() note)
   │
   ▼
-T5 (local verification: YAML parses, no other workflows touched, retry harness still green)
+T5 (local full sweep: npx playwright test against bundle exec jekyll serve; AC-8 boundary check)
   │
   ▼
-CHECKPOINT-A — local gate (composite action works, all 7 sites migrated, AC-8 boundary clean)
+CHECKPOINT-A — local gate (all 5 files modified within scope, full Playwright suite green locally)
   │
   ▼
-T6 (/review pass via code-reviewer agent)
+T6 (/review via code-reviewer agent — focus on snapshot diff legibility, AC-3 rationale soundness)
   │
   ▼
-T7 (apply any /review revisions; commit)
+T7 (apply review revisions; commit)
   │
   ▼
-T8 (push branch + open PR with retry-test output, baseline counts, AC-8 confirmation)
+T8 (push branch; close Dependabot PR #959 with supersede comment; open PR with snapshot-diff narrative + AC-7 narrative)
   │
   ▼
-T9 (CI passes — note that THIS PR runs against the OLD workflow + a NEW workflow; the renamed steps may invalidate cached results; tolerate one rerun if Chrome flake hits during transition)
+T9 (CI passes — test-quality.yml all shards green; one puppeteer-cache retry tolerated, zero Playwright-shaped retries)
   │
   ▼
-T10 (admin-merge after CI green)
-  │
-  ▼
-T11 (post-merge: open a tiny follow-up PR to verify `Cache restored from key:` logs appear for puppeteer — confirms AC-5 in real CI)
+T10 (admin-merge after CI green; sync local main)
 ```
 
-T1–T3 deliver the composite action with local proof of the retry behavior. T4 activates it. T5 is the local gate. T6 closes the lifecycle's review-phase gap. T11 is the **AC-5 verification** that can only happen post-merge.
+T1 is the prerequisite for everything (the new API surface only exists post-bump). T2 is the only behavior-changing edit; the rest is documentation + comments. T5 is the local gate. T6 is the lifecycle review-phase requirement. There is no post-merge verification task — unlike #958 (which needed real-CI cache logs), all #947 ACs are observable on the PR itself.
 
 ---
 
-## Phase 1 — Composite action
+## Phase 1 — Version bump
 
-### T1 — Write `action.yml` + `_retry-test.sh` scaffolds
+### T1 — Bump `@playwright/test` to `^1.60.0`
 
-**ACs satisfied:** AC-1 (interface), AC-2 (steps shape — verified by inspection), AC-9 (YAML well-formed)
-**Touches:** `.github/actions/setup-node-with-puppeteer-cache/action.yml` (new), `.github/actions/setup-node-with-puppeteer-cache/_retry-test.sh` (new)
+**ACs satisfied:** AC-1 (pin), AC-2 (lockfile regen)
+**Touches:** `package.json`, `package-lock.json`
 
 **Steps:**
 
-1. `mkdir -p .github/actions/setup-node-with-puppeteer-cache`
-2. Write `action.yml` per SPEC §6 verbatim — pinned `actions/setup-node@v6`, `actions/cache@v4`, inline shell retry loop with `for attempt in 1 2 3` + 10s `sleep` between attempts, `::warning::` / `::error::` log syntax.
-3. Write `_retry-test.sh` as the local harness. It must:
-   - Create a temp dir, write a fake `npm` script that reads a counter file, fails N times, then succeeds
-   - Extract the retry-loop shell code from `action.yml` (or duplicate it in the harness — see T2/T3 decision below)
-   - Assert exit codes and log-line counts for the two scenarios in T2 and T3
-4. Decision: **duplicate the retry-loop code** in `_retry-test.sh` rather than extract from YAML. Reason: parsing the inline shell script out of YAML is fragile; duplication keeps the harness honest about what it's testing. The two copies must stay in sync — `_retry-test.sh` header carries a comment naming `action.yml` as the source of truth and instructing future editors to update both.
+1. From a clean working tree, branch off `main`: `git switch -c feat/playwright-1.60-aria-snapshots`. (Branch name follows the prefix convention of recent PRs: `feat/…`, `chore/…`.)
+2. Edit `package.json`: change the `"@playwright/test": "^1.59.1"` line to `"@playwright/test": "^1.60.0"`. Do not touch any other field.
+3. Run `npm install` (not `npm ci` — the lockfile is mid-regeneration). Confirm `node_modules/@playwright/test/package.json` reports `"version": "1.60.x"`.
+4. Run `npm ls @playwright/test` → expect a `1.60.x` line. No `UNMET` or peer-dep warnings introduced.
+5. Verify the lockfile diff is bounded: `git diff --stat package-lock.json` should show changes confined to `@playwright/test` and its hoisted deps (playwright core, playwright-core). Any drift outside that subtree gets investigated before T2 — a broader lockfile rewrite indicates an npm version mismatch with whoever last regenerated the lockfile, and we'd want a clean `--prefer-offline` re-install to match.
 
-**Verify (mechanical):** `python3 -c "import yaml; yaml.safe_load(open('.github/actions/setup-node-with-puppeteer-cache/action.yml'))"` exits 0; `bash -n .github/actions/setup-node-with-puppeteer-cache/_retry-test.sh` exits 0.
-
----
-
-### T2 — RED retry test (mock npm fails 3 times)
-
-**ACs satisfied:** AC-6 (partial — proves the harness can detect failure)
-**Touches:** none beyond T1
-
-**Steps:**
-
-1. Run `bash .github/actions/setup-node-with-puppeteer-cache/_retry-test.sh fail-fail-fail`
-2. Expect: exit code **1**, stdout contains 3 attempt-failure log lines, ends with `npm ci failed after 3 attempts`
-3. **This is the RED proof** — the retry loop genuinely surfaces failures rather than swallowing them.
-
-**Verify:** assert exit 1, count log lines, no false positives.
+**Verify (mechanical):**
+- `grep -c '"@playwright/test": "\^1.60' package.json` → `1`
+- `npm ls @playwright/test 2>&1 | grep -c '1\.60\.'` → `≥ 1`
+- `git diff --stat | head -3` reports two files: `package.json` (+1/-1), `package-lock.json` (modest diff).
 
 ---
 
-### T3 — GREEN retry test (mock npm fails twice, succeeds on 3rd)
+## Phase 2 — Snapshot migration
 
-**ACs satisfied:** AC-6 (full)
-**Touches:** none beyond T1
-
-**Steps:**
-
-1. Run `bash .github/actions/setup-node-with-puppeteer-cache/_retry-test.sh fail-fail-succeed`
-2. Expect: exit code **0**, stdout contains 2 retry-warning lines, ends with `npm ci succeeded on attempt 3`
-
-**Verify:** assert exit 0, 2 retry-warning lines, no `::error::` lines.
-
----
-
-## Phase 2 — Migrate call-sites
-
-### T4 — Replace 7 `setup-node + npm ci` pairs in `test-quality.yml`
+### T2 — Migrate `homepage.spec.ts:192` to page-level snapshot
 
 **ACs satisfied:** AC-3 (full)
-**Touches:** `.github/workflows/test-quality.yml`
+**Touches:** `tests/playwright-agents/homepage.spec.ts`
 
-**Migration pattern (per SPEC §7) — every call-site:**
+**Steps:**
 
-Before:
-```yaml
-- name: Setup Node.js
-  uses: actions/setup-node@v6
-  with:
-    node-version: '20'
-    cache: 'npm'
+1. Open `tests/playwright-agents/homepage.spec.ts` to the "Homepage main landmark matches ARIA smoke snapshot" test (line ~188-216).
+2. Replace `await expect(page.locator('main').first()).toMatchAriaSnapshot(...)` with `await expect(page).toMatchAriaSnapshot(...)`.
+3. Update the test title to reflect the new scope: `'Homepage page-level landmarks match ARIA smoke snapshot'` (so a future reader knows the scope is page, not `main`). Tag preservation: do not change `@content @navigation Homepage Redesign @REQ-CONTENT-01 @REQ-VISUAL-01` — those tags are how the shard 1 selector finds this test.
+4. Start `bundle exec jekyll serve --config _config.yml,_config_dev.yml` in a background terminal (port 4000). Wait for `Server running... press ctrl-c to stop.`
+5. Run `npx playwright test tests/playwright-agents/homepage.spec.ts -g "page-level landmarks" --update-snapshots`. This rewrites the inline template literal in place with the page's full accessibility tree.
+6. **Manual diff review** of the regenerated snapshot — this is the load-bearing human-judgment step:
+   - Should include `banner` (header), `navigation` (already in the old snapshot's parent), original `main` block, `contentinfo` (footer), and possibly `complementary` if newsletter landmark spans outside `main`.
+   - Watch for dynamic content leaking in: build-date footers, copyright year, post-count badges, anything keyed on `site.time`. Replace each with the existing `/.+/` regex placeholder pattern (already used at line 194-196 for the heading).
+   - Watch for screen-reader-only text becoming visible in the snapshot — accessibility tree includes `aria-label` content, so a label like `aria-label="Skip to main content"` will appear as `link "Skip to main content"`.
+7. Re-run without `--update-snapshots` to confirm stability: `npx playwright test tests/playwright-agents/homepage.spec.ts -g "page-level landmarks"`. Must exit `0` with no diff prompt.
 
-- name: Install dependencies
-  run: npm ci
-```
+**Verify (mechanical):**
+- `grep -c "expect(page).toMatchAriaSnapshot" tests/playwright-agents/homepage.spec.ts` → `1`
+- `grep -c "expect(page.locator('main').first()).toMatchAriaSnapshot" tests/playwright-agents/homepage.spec.ts` → `0`
+- Test passes against a live server, without `--update-snapshots`, on two consecutive runs (proves the snapshot is stable, not a one-shot capture).
 
-After:
-```yaml
-- name: Setup Node + cache + install deps
-  uses: ./.github/actions/setup-node-with-puppeteer-cache
-```
-
-Apply to all 7 jobs listed in "Anchors confirmed" above. The substitution is pure — no input overrides needed because every call-site uses the default values (`node-version: '20'`, `cache: 'npm'`).
-
-**Verify (per-job, after each substitution):**
-- The job's step list is shorter by 6 lines (2 steps × 4 / 3 lines minus the new 2-line step)
-- The job's YAML still parses
-
-**Verify (after all 7 are done):**
-- `grep -c "setup-node@v6" .github/workflows/test-quality.yml` → **0**
-- `grep -c "uses: ./.github/actions/setup-node-with-puppeteer-cache" .github/workflows/test-quality.yml` → **7**
-- `grep -c "^      - name: Install dependencies$" .github/workflows/test-quality.yml` → drops from 7 to 0
-- `python3 -c "import yaml; yaml.safe_load(open('.github/workflows/test-quality.yml'))"` exits 0
+**Risk:** if the page-level snapshot picks up unstable content that resists `/.+/` placeholders, narrow it back — keep the `expect(page)` form but use a `boxes: false` option or wrap a single template literal with strategic `/.*/` placeholders. **Do not revert to element-scoped.** If narrowing fails, escalate to spec amendment (the migration would then move to follow-up work).
 
 ---
 
-## Phase 3 — Local verification
+### T3 — Annotate the two element-scoped sites with `// element-scoped:` rationale
 
-### T5 — AC-8 boundary check + re-run retry harness
+**ACs satisfied:** AC-3 (rationale-comment portion)
+**Touches:** `tests/playwright-agents/navigation.spec.ts`
 
-**ACs satisfied:** AC-8 (boundary), AC-6 (re-confirm post-migration)
+**Steps:**
+
+1. Above the snapshot at `navigation.spec.ts:96`, insert a one-line comment:
+   `// element-scoped: deliberately narrow to the article landmark — page-level would balloon the snapshot with site chrome (#947).`
+2. Above the snapshot at `navigation.spec.ts:460`, insert a one-line comment:
+   `// element-scoped: mobile-nav-open assertion checks the nav landmark in its open state; page-level would dilute the assertion (#947).`
+3. Do not modify the snapshot template literals themselves.
+
+**Verify (mechanical):**
+- `grep -cE "^\s*// element-scoped:" tests/playwright-agents/navigation.spec.ts` → `2`
+- `npx playwright test tests/playwright-agents/navigation.spec.ts -g "ARIA smoke snapshot"` still passes (the comments are no-ops at runtime; this just guards against accidental edits).
+
+---
+
+## Phase 3 — Docs
+
+### T4 — Update `.github/skills/jekyll-qa/SKILL.md`
+
+**ACs satisfied:** AC-6
+**Touches:** `.github/skills/jekyll-qa/SKILL.md`
+
+**Steps:**
+
+1. Open `.github/skills/jekyll-qa/SKILL.md`. Locate line 40: `` - `@playwright/test ^1.59.1` ``.
+2. Replace the version: `` - `@playwright/test ^1.60.0` `` (bumped from ^1.59.1 in #947 — adds page-level `expect(page).toMatchAriaSnapshot()`, `test.abort()`, HAR-on-tracing, `locator.drop()`)
+3. Below this line, add a sub-bullet:
+   `` - `test.abort()` (Playwright 1.60+) is available for "tests must not call X" guardrails (issue #947) ``
+4. Do not edit any other line, do not introduce trailing whitespace, do not reflow surrounding bullets.
+
+**Verify (mechanical):**
+- `grep -n '@playwright/test \^1' .github/skills/jekyll-qa/SKILL.md` → exactly one match, reading `^1.60.0`.
+- `grep -n 'test.abort()' .github/skills/jekyll-qa/SKILL.md` → at least one match referencing #947.
+- `git diff --stat .github/skills/jekyll-qa/SKILL.md` → small diff, single hunk.
+
+---
+
+## Phase 4 — Local verification
+
+### T5 — Full Playwright sweep + scope-guard boundary check
+
+**ACs satisfied:** AC-4 (test-quality side, see Spec Amendment Proposal above), AC-5 (full local sweep), AC-8 (file boundary)
 **Touches:** none (read-only verification)
 
 **Steps:**
 
-1. `git diff --stat .github/workflows/` — expect ONLY `.github/workflows/test-quality.yml` modified.
-2. `git diff --stat .github/actions/` — expect TWO new files under `.github/actions/setup-node-with-puppeteer-cache/`.
-3. `git diff --stat` (whole repo) — expect 3 files total (2 new + 1 modified). No `_posts/`, `_layouts/`, `_sass/`, `package.json`, `package-lock.json`, etc.
-4. Re-run `_retry-test.sh` in both modes (`fail-fail-fail`, `fail-fail-succeed`). Both still pass.
+1. With `bundle exec jekyll serve --config _config.yml,_config_dev.yml` still running on `:4000`:
+   - `npm run test:playwright:shard1` — Navigation & Mobile (covers the `navigation.spec.ts` element-scoped snapshots)
+   - `npm run test:playwright:shard2` — Content, Search & Links (covers the migrated `homepage.spec.ts` snapshot, since `homepage.spec.ts` carries `@REQ-CONTENT-01`)
+   - `npm run test:playwright:shard3` — Accessibility, Visual & Performance
+2. Full sweep as a tiebreaker: `npx playwright test`. Must exit `0`.
+3. AC-8 boundary check: `git diff --name-only main...HEAD` returns **only**:
+   ```
+   .github/skills/jekyll-qa/SKILL.md
+   package-lock.json
+   package.json
+   tests/playwright-agents/homepage.spec.ts
+   tests/playwright-agents/navigation.spec.ts
+   ```
+   5 files exactly. Zero entries under `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`.
+4. **No new files created.** `git status --short` shows only `M` markers (and the existing untracked `specs/copilot-skills-agents-redesign-spec.md`, unrelated).
 
 ---
 
@@ -188,102 +211,94 @@ Apply to all 7 jobs listed in "Anchors confirmed" above. The substitution is pur
 
 **Gate criteria (all must be true before T6):**
 
-- [ ] T1 deliverables exist; YAML and bash both parse cleanly
-- [ ] T2 RED test produces exit 1 with 3 failure log lines
-- [ ] T3 GREEN test produces exit 0 with 2 retry-warning lines + success line
-- [ ] T4 substitutions complete (grep counts match: 0 `setup-node@v6`, 7 composite-action references)
-- [ ] T5 AC-8 boundary check clean (exactly 3 files modified)
-- [ ] `git status --short` shows only the 3 expected files
+- [ ] T1: `package.json` pinned at `^1.60.0`; `npm ls @playwright/test` reports `1.60.x`.
+- [ ] T2: `homepage.spec.ts:192` uses `expect(page).toMatchAriaSnapshot` and passes twice consecutively without `--update-snapshots`.
+- [ ] T3: Two `// element-scoped:` rationale comments present in `navigation.spec.ts`.
+- [ ] T4: `SKILL.md` line ~40 reads `^1.60.0`; `test.abort()` note recorded.
+- [ ] T5: All three Playwright shards pass; full sweep passes; AC-8 boundary is exactly the 5 expected files.
 
 ---
 
-## Phase 4 — REVIEW pass
+## Phase 5 — REVIEW
 
 ### T6 — `/review` via code-reviewer agent
 
-**ACs satisfied:** lifecycle requirement, not a specific spec AC
+**ACs satisfied:** lifecycle requirement (not a specific spec AC)
 **Touches:** none (read-only review)
 
 **Brief the reviewer on:**
-- The composite action's interface and step ordering (cache step **before** npm ci to populate the cache directory before puppeteer reads it)
-- `actions/cache@v4` key strategy — `${{ runner.os }}-puppeteer-${{ hashFiles('**/package-lock.json') }}` with restore-key fallback
-- The retry loop's exit handling — does the wrapper genuinely fail-fast when npm ci returns non-zero, vs. silently retrying forever?
-- AC-3 substitution fidelity — 7 jobs migrated, defaults preserved
-- Whether `_retry-test.sh` is a real test or a placeholder
+- The AC-3 judgment call — 1 of 3 snapshots migrated; the other two kept element-scoped with rationale comments. Reviewer's job is to validate the rationale, not the mechanical change.
+- The regenerated page-level snapshot text in `homepage.spec.ts` — is it stable, are the `/.+/` placeholders covering the right dynamic content, is the test name still accurate?
+- AC-4 spec amendment (auto-regression doesn't run on PRs / doesn't install Playwright) — does the reviewer agree the inspection-based verification is sufficient?
+- That `test.abort()` is documented but not adopted in any test (intentional — separate authoring work).
+- The branch superseding Dependabot PR #959 — call out the closing strategy (close at T8, not earlier).
 
-**Expected findings shape:** Major (cache-key correctness, step ordering, retry-exit-handling), Minor (action.yml descriptive prose, _retry-test.sh hygiene), Nit (commit-message hygiene).
-
-### T7 — Apply revisions; commit any post-review changes
-
-**ACs satisfied:** finishes any open AC items raised by /review
-**Touches:** depends on review findings
+**Expected findings shape:** Major (snapshot stability / placeholder coverage), Minor (rationale comment wording, test rename), Nit (commit-message hygiene).
 
 ---
 
-## Phase 5 — Ship
+### T7 — Apply review revisions
 
-### T8 — Push branch + open PR
+**ACs satisfied:** finishes any open AC items raised by /review.
+**Touches:** depends on review findings; expect at most the same 5 files.
 
-**ACs satisfied:** DoD bullet 4 (PR description includes test output, counts, AC-8 confirmation)
-**Touches:** git remote.
-
-**Commit structure on branch `chore/958-puppeteer-cache-and-retry`:**
-- **Commit A** (T1): `chore(ci): add setup-node-with-puppeteer-cache composite action (#958)` — action.yml + _retry-test.sh; no callers yet (no behaviour change to any workflow).
-- **Commit B** (T4): `chore(ci): migrate 7 test-quality.yml jobs to use puppeteer-cache composite action (#958)` — pure substitution; closes #958.
-- **Commit C** (T7, if any): `chore(ci): apply /review revisions (#958)` — only if revisions were applied.
-
-PR body includes:
-- The 7 affected jobs listed by name
-- Verbatim output of both `_retry-test.sh` runs (3-fail and 2-fail-succeed)
-- `git diff --stat` output showing the AC-8 boundary
-- Note that AC-4 / AC-5 (cache miss + cache hit) verification happens post-merge in CI logs
-
-**Labels:** no `agent:*` label (the PR touches `.github/actions/` and `.github/workflows/` — both are QA scope under `agent:qa-gatekeeper`'s `FORBIDDEN_PATTERN` of `^_sass/|^_layouts/|^_posts/|^_config\.yml$`, so `agent:qa-gatekeeper` is **valid** and should be applied). No `governance-update` (workflows aren't in `.github/skills/` or `.github/instructions/`).
-
-### T9 — CI passes
-
-**Note:** This PR's CI run will execute the **new** composite action against itself (the workflow file changes apply to this PR's own run). Two outcomes possible:
-
-- **Best case:** cache is empty on first run → puppeteer downloads → cache populates → next run uses it. Single CI cycle.
-- **Same-flake case:** Chrome 146 download flake hits the cold-cache install. Retry loop's job is to absorb it. If the retry loop fails (e.g., 3 attempts × 10s isn't enough for a wide CDN outage), one rerun should fix it just like #957's first run.
-
-Tolerate one rerun if the Chrome flake hits during this transition PR; the cache will be primed for subsequent runs.
-
-### T10 — Admin-merge after green
-
-**ACs satisfied:** AC-3 (final, in `main`)
-**Touches:** git remote (merge).
-
-`gh pr merge <N> --admin --squash --delete-branch` once CI green. Sync local `main`. Verify the composite action file and migrated workflow both made it.
+**Hard rule:** if `/review` asks for changes that would push the diff beyond the 5-file scope, stop and escalate to spec amendment rather than silently expanding scope.
 
 ---
 
-### T11 — Post-merge AC-5 verification
+## Phase 6 — Ship
 
-**ACs satisfied:** AC-5 (cache hit observed in real CI)
-**Touches:** open a tiny follow-up PR (e.g., a docs typo fix or whitespace edit) to trigger a fresh CI run.
+### T8 — Push branch; close #959; open PR
+
+**ACs satisfied:** AC-7 (PR description content)
+**Touches:** git remote, GitHub PR state.
 
 **Steps:**
 
-1. Open a trivial PR (any small change) on `main` after #958 merges.
-2. Inspect the CI logs for one of the 7 affected jobs.
-3. Look for `Cache restored from key: <runner-os>-puppeteer-<hash>` near the start of the install step.
-4. If found: AC-5 satisfied, close the trivial PR with a comment linking to the cache-hit log.
-5. If not found: investigate immediately — cache misses on a known key indicate a key-mismatch bug.
+1. `git push -u origin feat/playwright-1.60-aria-snapshots`.
+2. `gh pr create --repo oviney/blog --label "agent:qa-gatekeeper" --title "feat(tests): bump @playwright/test to ^1.60.0 + page-level ARIA snapshot on homepage (#947)"` with body containing:
+   - Closes #947
+   - Supersedes #959 (Dependabot lockfile-only bump)
+   - Spec amendment note for AC-4 (auto-regression workflow trigger surface)
+   - Rationale for keeping 2 of 3 ARIA snapshots element-scoped (one paragraph per call-site)
+   - Snapshot diff narrative — what new landmarks the page-level snapshot picked up, what `/.+/` placeholders were added
+   - Local verification evidence (3 shards + full sweep, all green)
+3. **Then** close #959: `gh pr close 959 --repo oviney/blog --comment "Superseded by PR #<new> — single atomic bundle of lockfile, snapshot migration, and skill doc update per SPEC #947."`
 
-**Justification for the trivial PR:** AC-5 can only be observed in real CI, not local. Without the post-merge check, AC-5 remains unverified. A small follow-up PR is the cheapest way to observe cache-hit behavior without waiting for an unrelated future change.
+**Order matters:** open the new PR first, then close #959. The opposite order leaves the repo with no open bump PR for the window between commands.
 
 ---
 
-## Risk register
+### T9 — CI passes
 
-| Risk | Mitigation |
-|---|---|
-| `actions/cache@v4` is not available or API changed | Pin to `@v4` (current stable major); if unavailable, fall back to `@v3` with a comment. Confirm at runtime via CI logs. |
-| Cache key collision between Node versions or OS variants | Key includes `${{ runner.os }}-puppeteer-…`; restore-keys fallback to OS-prefix. Different Node versions on the same OS share the puppeteer dir, which is correct (Chrome binary is OS+arch-dependent, not Node-dependent). |
-| Retry loop swallows a genuine, non-transient failure | Loop preserves npm ci's exit code on the third attempt; `::error::` log line on terminal failure makes it visible in the workflow run summary. Reviewer should confirm. |
-| Composite action's relative-path reference (`./.github/actions/...`) doesn't resolve when called from a workflow | This is the standard GitHub Actions convention for in-repo composite actions; works as long as `actions/checkout@v6` runs before the composite-action call (verified in all 7 affected jobs at baseline). |
-| First post-merge run still hits the Chrome flake before cache populates | Acceptable — the retry loop absorbs it; if even the retry exhausts, one manual rerun (same pattern we paid twice today). Once cache is primed, subsequent runs skip the download. |
-| One of the 7 jobs has a subtly different setup-node configuration that the composite action's defaults don't match | Verified at baseline: all 7 use `node-version: '20'` + `cache: 'npm'` verbatim. T4's grep checks would flag any drift mid-migration. |
-| The reviewer raises a "use third-party retry action" objection | Documented in SPEC §9 boundaries (chose inline shell loop for fewer deps). Reviewer is free to disagree; absent strong evidence, defer to the SPEC's decision. |
-| AC-5 verification PR (T11) doesn't trigger the right jobs (e.g., change-based test selection skips them) | If `select-tests` skips the affected jobs, manually `gh workflow run test-quality.yml` against the branch to force a full run. Documented as a fallback in T11. |
+**ACs satisfied:** AC-4 (test-quality side)
+**Touches:** none.
+
+**Steps:**
+
+1. Wait for Quality Tests workflow (Playwright shards 1+2+3) to complete on the PR.
+2. **Retry policy:** zero Playwright-shaped retries. One puppeteer Chrome-cache retry is tolerated only if the failure stack matches the pattern from #958 (the composite action's retry-wrapped `npm ci` should make this nearly impossible after the first run, but if cold-cache hits and the retry-loop genuinely fires, that's a tolerated outcome — log it in the PR comments).
+3. If any Playwright-shaped failure occurs: do **not** retry. Investigate the diff, fix locally, push a follow-up commit.
+
+---
+
+### T10 — Admin-merge
+
+**ACs satisfied:** none new — closes the lifecycle.
+**Touches:** main branch.
+
+**Steps:**
+
+1. `gh pr merge <new-PR> --repo oviney/blog --admin --squash --delete-branch`.
+2. `git switch main && git pull origin main`. Confirm local `main` carries the merge commit and `git status` is clean.
+3. Archive the lifecycle artifacts: `mkdir -p tasks/archive/2026-05-17-playwright-1.60-947 && git mv SPEC.md tasks/archive/2026-05-17-playwright-1.60-947/ && git mv tasks/plan.md tasks/archive/2026-05-17-playwright-1.60-947/ && git mv tasks/todo.md tasks/archive/2026-05-17-playwright-1.60-947/` (in a one-line cleanup commit on a follow-up branch, or in the same PR if archive-on-ship is the convention — confirm with maintainer; #958's lifecycle artifacts were archived in the next session, not the same PR).
+
+---
+
+## Definition of Done
+
+- [ ] All 8 SPEC §3 ACs satisfied (AC-4 satisfied per the amended wording proposed above, assuming the user accepts the amendment).
+- [ ] PR description records the AC-7 narrative (snapshot rationale, #959 supersedure, #944 unblock).
+- [ ] `gh pr view <new> --json statusCheckRollup` shows all required checks green; merged via admin-squash.
+- [ ] Local `main` synced post-merge; lifecycle artifacts archived (in this PR or a follow-up cleanup commit).
+- [ ] No follow-up issue needed — `test.abort()` adoption and HAR tracing are explicitly deferred in SPEC §10 and require no tracking issue beyond what's already in #902 (Watch list).

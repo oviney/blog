@@ -1,46 +1,47 @@
-# TODO — Puppeteer Chrome-Download Flake Mitigation (#958)
+# TODO — Bump @playwright/test to ^1.60.0 + Page-Level ARIA Snapshots (#947)
 
 **Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
-**Plan SHA:** `b965ddb` · 3 files (2 new + 1 modified) · 7 jobs to migrate
+**Plan SHA:** `6480f00` · 5 files (0 new + 5 modified) · 1 snapshot migration + 2 rationale comments
 
 ---
 
-## Phase 1 — Composite action
-- [x] **T1** Created `.github/actions/setup-node-with-puppeteer-cache/action.yml` + `_retry-test.sh`. YAML parses; bash syntax-checks clean.
-- [x] **T2** RED retry test passed: `_retry-test.sh fail-fail-fail` → exit 1, 2 `::warning::` + 1 `::error::` lines.
-- [x] **T3** GREEN retry test passed: `_retry-test.sh fail-fail-succeed` → exit 0, 2 `::warning::` + success-on-attempt-3 line.
+## Spec amendment to confirm before BUILD
+- [x] **A1** AC-4 amendment accepted by user 2026-05-17 — `auto-regression.yml` verified by inspection (no Playwright runtime; `issues: labeled` trigger only). SPEC §3 AC-4 updated in place.
 
-## Phase 2 — Migrate call-sites
-- [x] **T4** Replaced 7 call-sites in `test-quality.yml`. Grep counts verified (0 `setup-node@v6`, 7 composite-action references). YAML still parses.
+## Phase 1 — Version bump
+- [ ] **T1** Branch `feat/playwright-1.60-aria-snapshots` from clean `main`; edit `package.json` to `"@playwright/test": "^1.60.0"`; `npm install`; confirm `npm ls @playwright/test` reports `1.60.x`; confirm `package-lock.json` diff is bounded to the `@playwright/test` subtree.
 
-## Phase 3 — Local verification
-- [x] **T5** AC-8 boundary clean (3 files total: 2 new under `.github/actions/`, 1 modified workflow). Retry harness re-runs green post-migration.
+## Phase 2 — Snapshot migration
+- [ ] **T2** Rewrite `homepage.spec.ts:192` snapshot to `expect(page).toMatchAriaSnapshot(...)`; update test title to "Homepage page-level landmarks…"; `--update-snapshots` against live Jekyll server; manually review regenerated snapshot for dynamic-content drift, add `/.+/` placeholders as needed; re-run twice without `--update-snapshots` to confirm stability.
+- [ ] **T3** Add two `// element-scoped: …` rationale comments above `navigation.spec.ts:96` and `:460`; do not modify the snapshot literals; re-run nav spec to confirm comments are benign.
+
+## Phase 3 — Docs
+- [ ] **T4** Edit `.github/skills/jekyll-qa/SKILL.md` line 40: `@playwright/test ^1.59.1` → `^1.60.0`; add `test.abort()` availability sub-bullet referencing #947.
+
+## Phase 4 — Local verification
+- [ ] **T5** `bundle exec jekyll serve` running; run shards 1, 2, 3 individually; run full `npx playwright test`; confirm AC-8 boundary — `git diff --name-only main...HEAD` returns exactly the 5 expected files.
 
 ## CHECKPOINT-A — Local gate before /review
-- [x] All T1–T5 ACs satisfied. Commits A (`5924993`) + B (`901c95b`) on branch.
+- [ ] All T1–T5 ACs satisfied. Stable working tree. No protected files touched.
 
-## Phase 4 — /review pass
-- [x] **T6** Code-reviewer agent verdict: **Approve**, no blockers. 2 Majors + 2 minor revisions identified.
-- [x] **T7** Applied all 4 revisions in Commit C (`5c72a7a`): M2 cache-key salts on Node version; M1 tightened sync-comment in both files (retry SHAPE not byte-identical); m1 set-uo-pipefail rationale comment; n1 RETRY-TEST PASS/FAIL banner prefix. Harness still green post-revision.
+## Phase 5 — /review pass
+- [ ] **T6** Code-reviewer agent brief: AC-3 rationale (2-of-3 element-scoped), page-level snapshot stability, AC-4 amendment, `test.abort()` documented-but-unused.
+- [ ] **T7** Apply review revisions; commit. Hard rule: if revisions push the diff beyond 5 files, escalate to spec amendment rather than expand scope silently.
 
-## Phase 5 — Ship
-- [ ] **T8** Push branch; `gh pr create` with retry-test outputs + 7-job list + AC-8 diff stat; label `agent:qa-gatekeeper`.
-- [ ] **T9** CI passes — tolerate one Chrome-flake rerun during transition (cache priming on first run).
-- [ ] **T10** `gh pr merge --admin --squash --delete-branch` once green; sync local main.
-
-## Phase 6 — Post-merge verification
-- [ ] **T11** Open a trivial follow-up PR (any small change) to trigger fresh CI; inspect logs for `Cache restored from key:` on at least one of the 7 affected jobs (AC-5 verification — only observable in real CI)
+## Phase 6 — Ship
+- [ ] **T8** `git push -u origin feat/playwright-1.60-aria-snapshots`; `gh pr create` with snapshot-diff narrative, AC-7 content (rationale + #959 supersedure + #944 unblock), `agent:qa-gatekeeper` label; **then** close Dependabot PR #959 with supersede comment.
+- [ ] **T9** CI green — zero Playwright-shaped retries; one puppeteer Chrome-cache retry tolerated per #958 pattern (and only if stack matches).
+- [ ] **T10** `gh pr merge --admin --squash --delete-branch` once green; `git switch main && git pull`; archive lifecycle artifacts under `tasks/archive/2026-05-17-playwright-1.60-947/`.
 
 ---
 
 ## Acceptance criteria checklist (mirrors SPEC §3)
 
-- [ ] **AC-1** Composite action exists with documented `node-version` (default `'20'`) and `npm-cache` (default `'npm'`) inputs
-- [ ] **AC-2** Steps order: setup-node, cache puppeteer dir, retry-wrapped npm ci
-- [ ] **AC-3** 7 jobs in `test-quality.yml` use composite action; no `setup-node@v6 + npm ci` pair remains outside it
-- [ ] **AC-4** First post-merge run logs cache miss + cache save (verified via CI logs at T11)
-- [ ] **AC-5** Subsequent run logs cache restored from key, ≥ 20s install-step time savings vs cold (T11)
-- [ ] **AC-6** `_retry-test.sh` passes both RED (3-fail) and GREEN (2-fail-succeed) cases
-- [ ] **AC-7** All 11 other test-quality.yml jobs continue passing
-- [ ] **AC-8** `git diff --stat .github/workflows/` shows only `test-quality.yml` modified
-- [ ] **AC-9** `action.yml` parses as valid composite-action YAML
+- [ ] **AC-1** `package.json` pins `@playwright/test ^1.60.0`
+- [ ] **AC-2** `package-lock.json` regenerated, `npm ls @playwright/test` reports `1.60.x`
+- [ ] **AC-3** `homepage.spec.ts:192` migrated to page-level; `navigation.spec.ts:96` + `:460` carry `// element-scoped:` rationale comments
+- [ ] **AC-4** *(amended)* `test-quality.yml` passes green on a single PR run; `auto-regression.yml` verified by inspection (no Playwright runtime)
+- [ ] **AC-5** `npx playwright test` exits `0` locally with live Jekyll server
+- [ ] **AC-6** `.github/skills/jekyll-qa/SKILL.md` line 40 → `^1.60.0` + `test.abort()` availability note
+- [ ] **AC-7** PR description records snapshot rationale, #959 closure, #944 unblock
+- [ ] **AC-8** `git diff --name-only main...HEAD` returns exactly 5 files (no protected-file diffs)
