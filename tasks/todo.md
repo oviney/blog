@@ -22,27 +22,27 @@
 - [x] **T4-collision** §4 F1 (excerpt consistency) + §4 F3 (author byline) touched same 5 card files → **merged** into Rec 2; result is 4 planned spawns, exactly at cap
 - [x] **T5** AC-8: §1 has 1 Action ✓; §3 satisfied via recorded "no substantive change identified after researching ≥3 sources" justification; §4 has 4 Actions (3 spawn-bound post-merge) ✓
 
-## CHECKPOINT-A — User review (CURRENT GATE)
+## CHECKPOINT-A — User review
 - [x] `tasks/943-body.md` complete and SPEC §7-compliant
-- [x] T4-dedup complete; no Action overlaps #945/#946/#947 (the two overlaps reclassified)
-- [x] Planned-spawn count = **4** (exactly at cap, no override needed)
+- [x] T4-dedup complete; no Action overlaps #945/#946/#947
+- [x] Planned-spawn count = **4** (exactly at cap)
 - [x] T5 substance floor passed for §1, §3, §4
-- [x] §4 persona-routing notes recorded in followups-plan
-- [ ] **User approves before T6 / T7 — see `tasks/943-followups-plan.md` § CHECKPOINT-A gate checklist**
+- [x] §4 persona-routing notes recorded
+- [x] **User approved** — proceeded to T6/T7
 
 ## Phase 5 — Push to GitHub
-- [ ] **T6** `gh issue edit 943 --body-file tasks/943-body.md`; verify with diff
-- [ ] **T7** `gh issue create` per planned spawn row; append real numbers to `tasks/943-followups.md`; wire `Blocked by #N` for sequenced rows
+- [x] **T6** Pushed body to #943 (cosmetic trailing-newline diff only)
+- [x] **T7** Spawned 4 issues: #951 (Rec 3 subtitle) · #952 (Rec 1 skill docs) · #953 (Rec 4 mobile-nav) · #954 (Rec 2 cards, merged §4 F1+F3)
 
 ## Phase 6 — Verify
-- [ ] **T8** Run batch verification query; reconcile against plan
+- [x] **T8** Batch query returned `951 952 953 954` — matches planned set exactly; per-issue labels confirmed; #952 carries both `agent:qa-gatekeeper` and `governance-update`
 
 ## CHECKPOINT-B — Verification clean
-- [ ] T8 output equals planned spawn set, OR half-spawned remediation completed and recorded
+- [x] T8 output equals planned spawn set; no remediation needed
 
 ## Phase 7 — Close + sanity
-- [ ] **T9** `gh issue close 943` with closure summary (Action/Watch/No-op/Tracked-in counts per section, parallel-vs-sequential map for new spawns, Tracked-in references back to #945/#946/#947)
-- [ ] **T10** `bundle exec jekyll build` succeeds; `git status --short` clean except for lifecycle artifacts
+- [x] **T9** #943 closed with SPEC-mandated summary (state=CLOSED, closedAt=2026-05-17T02:09:32Z)
+- [x] **T10** `bundle exec jekyll build` succeeds (0.853s); `git status --short` clean except for `tasks/943-followups.md` (about to commit)
 
 ---
 
