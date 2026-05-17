@@ -82,6 +82,11 @@
   color: "5319e7"
   description: "Recurring root cause — requires systemic fix"
 
+# ── PR scope-guard exemptions (deliberate-intent; use sparingly) ─────────────
+- name: "bulk-content"
+  color: "8957e5"
+  description: "Bypasses Rule 2 (15-file scope-explosion) in check-pr-scope.sh. See CLAUDE.md for anti-patterns."
+
 # ── Agent routing ────────────────────────────────────────────────────────────
 - name: "agent:audience-researcher"
   color: "0b7285"
