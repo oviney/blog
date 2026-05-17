@@ -90,7 +90,9 @@ PATH="$WORKDIR:$PATH"
     ACTUAL_EXIT=1
   fi
 } > "$WORKDIR/.stdout" 2>&1
-set -e
+# Keep `set -e` OFF for the assertion block below. `grep -c` returns
+# exit 1 when there are 0 matches, which is a valid assertion outcome
+# (e.g., expecting 0 success lines in the RED case) — not a script error.
 # ── END duplicated retry loop ───────────────────────────────────────────
 
 OBSERVED_STDOUT="$(cat "$WORKDIR/.stdout")"
