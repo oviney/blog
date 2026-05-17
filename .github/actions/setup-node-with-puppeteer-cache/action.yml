@@ -1,0 +1,74 @@
+name: 'Setup Node with Puppeteer Cache'
+description: >
+  Sets up Node via actions/setup-node@v6, caches puppeteer's Chrome download
+  directory (~/.cache/puppeteer/), and runs `npm ci` with a 3-attempt retry
+  loop to tolerate transient CDN failures from puppeteer's post-install
+  Chrome downloader. See issue #958 for the flake history that motivated
+  this action.
+
+inputs:
+  node-version:
+    description: 'Node.js version to install (default 20)'
+    required: false
+    default: '20'
+  npm-cache:
+    description: 'setup-node cache strategy (default npm)'
+    required: false
+    default: 'npm'
+
+runs:
+  using: 'composite'
+  steps:
+    # 1. Standard Node setup with npm cache (unchanged behaviour from prior
+    # inline pattern). cache: 'npm' keys on package-lock.json automatically.
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: ${{ inputs.npm-cache }}
+
+    # 2. Cache puppeteer's Chrome browser download (the actual flake fix).
+    # Key includes runner OS + Node version + package-lock.json hash. The
+    # Node version salt is defensive: today all callers use node 20, but
+    # adding it now prevents future cache collisions if a sibling caller
+    # ever pins a different Node ABI. Lockfile hash invalidates cleanly
+    # when pa11y/puppeteer/Chrome version pins move. Restore-keys fallback
+    # to OS+Node-prefix lets us keep using the previous Chrome binary
+    # while the new one downloads if needed.
+    - name: Cache puppeteer browsers
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/puppeteer
+        key: ${{ runner.os }}-puppeteer-node${{ inputs.node-version }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-puppeteer-node${{ inputs.node-version }}-
+
+    # 3. Install deps with retry on transient failure.
+    #
+    # IMPORTANT: this retry loop is duplicated in _retry-test.sh for local
+    # unit-testing, but the **control flow differs intentionally**:
+    # - This file uses `exit 0` / `exit 1` to terminate the composite step
+    #   directly (CI propagates the exit code as the step's status).
+    # - _retry-test.sh uses `break` + an `ACTUAL_EXIT` variable so it can
+    #   continue running assertion checks after the loop exits.
+    # Keep the **retry shape** in sync between the two files (3 attempts,
+    # 10s backoff, ::warning:: per non-terminal miss, ::error:: on
+    # exhaust). Don't try to make the control flow byte-identical.
+    # action.yml is the source of truth for "what runs in CI"; the harness
+    # validates that the shape behaves correctly under the failure modes
+    # the action will encounter.
+    - name: Install dependencies (with retry)
+      shell: bash
+      run: |
+        for attempt in 1 2 3; do
+          if npm ci; then
+            echo "npm ci succeeded on attempt $attempt"
+            exit 0
+          fi
+          if [ $attempt -lt 3 ]; then
+            echo "::warning::npm ci attempt $attempt failed; retrying in 10s..."
+            sleep 10
+          fi
+        done
+        echo "::error::npm ci failed after 3 attempts"
+        exit 1

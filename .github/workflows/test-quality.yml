@@ -120,14 +120,8 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup Node + cache + install deps
+        uses: ./.github/actions/setup-node-with-puppeteer-cache
 
       - name: Build Jekyll site
         run: bundle exec jekyll build
@@ -184,14 +178,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup Node + cache + install deps
+        uses: ./.github/actions/setup-node-with-puppeteer-cache
 
       - name: Run security audit
         run: npm run test:security
@@ -216,14 +204,8 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup Node + cache + install deps
+        uses: ./.github/actions/setup-node-with-puppeteer-cache
 
       - name: Build Jekyll site
         run: bundle exec jekyll build
@@ -308,14 +290,8 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup Node + cache + install deps
+        uses: ./.github/actions/setup-node-with-puppeteer-cache
 
       - name: Build Jekyll site
         run: bundle exec jekyll build
@@ -373,14 +349,8 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup Node + cache + install deps
+        uses: ./.github/actions/setup-node-with-puppeteer-cache
 
       - name: Build Jekyll site
         run: bundle exec jekyll build
@@ -438,14 +408,8 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup Node + cache + install deps
+        uses: ./.github/actions/setup-node-with-puppeteer-cache
 
       - name: Build Jekyll site
         run: bundle exec jekyll build
@@ -502,14 +466,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup Node + cache + install deps
+        uses: ./.github/actions/setup-node-with-puppeteer-cache
 
       - name: Download shard 1 results
         uses: actions/download-artifact@v8
