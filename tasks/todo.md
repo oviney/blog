@@ -9,20 +9,20 @@
 - [x] **A1** AC-4 amendment accepted by user 2026-05-17 — `auto-regression.yml` verified by inspection (no Playwright runtime; `issues: labeled` trigger only). SPEC §3 AC-4 updated in place.
 
 ## Phase 1 — Version bump
-- [ ] **T1** Branch `feat/playwright-1.60-aria-snapshots` from clean `main`; edit `package.json` to `"@playwright/test": "^1.60.0"`; `npm install`; confirm `npm ls @playwright/test` reports `1.60.x`; confirm `package-lock.json` diff is bounded to the `@playwright/test` subtree.
+- [x] **T1** ✅ Branch `feat/playwright-1.60-aria-snapshots` created. `package.json` pinned at `^1.60.0`. `npm install` clean (`changed 3 packages, 0 vulnerabilities`). `npm ls @playwright/test` → `1.60.0`; `playwright@1.60.0`; `playwright-core@1.60.0`. Lockfile diff bounded to the 3-package subtree (matches Dependabot #959 shape). Commit `3174891`.
 
 ## Phase 2 — Snapshot migration
-- [ ] **T2** Rewrite `homepage.spec.ts:192` snapshot to `expect(page).toMatchAriaSnapshot(...)`; update test title to "Homepage page-level landmarks…"; `--update-snapshots` against live Jekyll server; manually review regenerated snapshot for dynamic-content drift, add `/.+/` placeholders as needed; re-run twice without `--update-snapshots` to confirm stability.
-- [ ] **T3** Add two `// element-scoped: …` rationale comments above `navigation.spec.ts:96` and `:460`; do not modify the snapshot literals; re-run nav spec to confirm comments are benign.
+- [x] **T2** ✅ `homepage.spec.ts:192` migrated to `expect(page).toMatchAriaSnapshot()`. Snapshot reduced to `- banner / - main / - contentinfo` landmark-presence smoke check. Navigation deliberately excluded (collapses to hamburger button on mobile; nav coverage stays in `navigation.spec.ts`). Inline comment documents trade-offs. Verified on Desktop/Mobile/Tablet Chrome + Desktop Firefox (Safari blocked locally by missing libwoff1/libavif16; CI has them). Full homepage.spec.ts: 11/11 pass on Desktop Chrome. Commit `73d0d8f`.
+- [x] **T3** ✅ Two `// element-scoped: …` rationale comments added above `navigation.spec.ts:99` (article snapshot) and `:466` (mobile-nav-open snapshot). Both tests still pass. Commit `530b611`.
 
 ## Phase 3 — Docs
-- [ ] **T4** Edit `.github/skills/jekyll-qa/SKILL.md` line 40: `@playwright/test ^1.59.1` → `^1.60.0`; add `test.abort()` availability sub-bullet referencing #947.
+- [x] **T4** ✅ SKILL.md line 40 bumped to `^1.60.0` with release-feature summary; `test.abort()` availability sub-bullet added (line 41). Commit `6943275`.
 
 ## Phase 4 — Local verification
-- [ ] **T5** `bundle exec jekyll serve` running; run shards 1, 2, 3 individually; run full `npx playwright test`; confirm AC-8 boundary — `git diff --name-only main...HEAD` returns exactly the 5 expected files.
+- [x] **T5** ✅ Three Playwright shards green on 4 projects (Safari skipped locally — missing libwoff1/libavif16 system libs; CI has them): Shard 1 70/70, Shard 2 44/44, Shard 3 38/38. Full Desktop Chrome sweep 105/105. AC-8 boundary clean: 5 feature files modified (SKILL.md, package.json, package-lock.json, homepage.spec.ts, navigation.spec.ts) + 6 lifecycle files (1 SPEC.md modified, 2 new tasks/*, 3 archived #958 artifacts) — none in the protected set (`_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`).
 
 ## CHECKPOINT-A — Local gate before /review
-- [ ] All T1–T5 ACs satisfied. Stable working tree. No protected files touched.
+- [x] ✅ All T1–T5 ACs satisfied. Working tree clean (only `specs/copilot-skills-agents-redesign-spec.md` untracked, unrelated). No protected files touched. Branch `feat/playwright-1.60-aria-snapshots` at HEAD `6943275` ready for /review.
 
 ## Phase 5 — /review pass
 - [ ] **T6** Code-reviewer agent brief: AC-3 rationale (2-of-3 element-scoped), page-level snapshot stability, AC-4 amendment, `test.abort()` documented-but-unused.
