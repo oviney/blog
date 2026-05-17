@@ -20,25 +20,25 @@
 - [x] **T4** File-overlap map built; 2 collisions on `package-lock.json` and `.github/skills/jekyll-qa/SKILL.md` between Rec 3 + Rec 4 → **Sequence** (Rec 4 first); 4 rows total, well under 6 cap
 - [x] **T5** AC-8 satisfied: §1 has 2 Action findings, §3 has 2 Action findings
 
-## CHECKPOINT-A — User review (CURRENT GATE)
+## CHECKPOINT-A — User review
 - [x] `tasks/902-body.md` complete and SPEC §7-compliant
 - [x] `tasks/902-followups-plan.md` 4 rows (well under 6 cap)
 - [x] T5 substance floor passed
-- [ ] **User approves before any `gh issue edit` / `gh issue create` — see followups-plan §"CHECKPOINT-A gate checklist"**
+- [x] **User approved** — proceeded to T6/T7
 
 ## Phase 5 — Push to GitHub
-- [ ] **T6** `gh issue edit 902 --body-file tasks/902-body.md`; verify with diff
-- [ ] **T7** `gh issue create` per planned row; append real numbers to `tasks/902-followups.md`; wire `Blocked by #N` for sequenced rows
+- [x] **T6** Pushed body to #902 (diff cosmetic-only: trailing newline; content identical)
+- [x] **T7** Spawned 4 issues: #944 (Rec 4, security, first) · #945 (Rec 1) · #946 (Rec 2) · #947 (Rec 3, Blocked by #944)
 
 ## Phase 6 — Verify
-- [ ] **T8** Run batch verification query; reconcile against plan
+- [x] **T8** Batch query returned `944 945 946 947` — matches planned set exactly; per-issue label + `Spawned from #902` confirmed; #947 carries `Blocked by #944`
 
 ## CHECKPOINT-B — Verification clean
-- [ ] T8 output equals planned spawn set, OR half-spawned remediation completed and recorded
+- [x] T8 output equals planned spawn set; no remediation needed
 
 ## Phase 7 — Close + sanity
-- [ ] **T9** `gh issue close 902` with closure summary (Action/Watch/No-op counts, parallel-vs-sequential map)
-- [ ] **T10** `bundle exec jekyll build` succeeds; `git status --short` clean except for lifecycle artifacts
+- [x] **T9** #902 closed with SPEC-mandated summary (state=CLOSED, closedAt=2026-05-17T00:07:19Z)
+- [x] **T10** `bundle exec jekyll build` succeeds (0.819s, no errors); `git status --short` clean except for `tasks/902-followups.md` (about to commit)
 
 ---
 
