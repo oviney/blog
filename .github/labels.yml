@@ -84,11 +84,8 @@
 
 # ── PR scope-guard exemptions (deliberate-intent; use sparingly) ─────────────
 - name: "bulk-content"
-  color: "fbca04"
-  description: "Deliberate bulk-content PR (post backfill, byline/category rename, atomic front-matter migration) — bypasses Rule 2 (15-file scope-explosion) in scripts/check-pr-scope.sh. Only valid when splitting would create a worse intermediate main state. See CLAUDE.md for anti-patterns."
-
-# Note: `governance-update` (Rule 3 exemption) exists on GitHub but is not
-# declared here. Backfilling it is a separate follow-up to #956.
+  color: "8957e5"
+  description: "Bypasses Rule 2 (15-file scope-explosion) in check-pr-scope.sh. See CLAUDE.md for anti-patterns."
 
 # ── Agent routing ────────────────────────────────────────────────────────────
 - name: "agent:audience-researcher"

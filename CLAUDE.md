@@ -84,8 +84,10 @@ Do **NOT** use `bulk-content` for:
 - Unrelated changes you don't want to split into separate PRs
 - Refactors of any size (refactors should be incremental; intermediate state is
   usually fine for refactors)
-- Combining with `governance-update` to bypass two guards on a single PR without
-  strong justification (allowed but should be rare and explicitly called out)
+- Combining with `governance-update` to bypass two guards on a single PR —
+  allowed but **requires an explicit justification in the PR description** naming
+  why both bypasses are needed together. Reviewers should reject PRs that combine
+  the two labels without that justification.
 
 ---
 
