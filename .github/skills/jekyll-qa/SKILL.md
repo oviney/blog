@@ -35,6 +35,13 @@ Optional: Steps to Reproduce, Reference/Screenshots, Affected URL
 **Jekyll Build Time**: ~30-60 seconds
 **Deployment Time**: ~2 minutes after merge
 
+### Toolchain pins (npm side)
+
+- `@playwright/test ^1.59.1`
+- `pa11y-ci ^4.1.0` (lockfile resolves to **4.1.1** as of #944; aligns with native lodash `~4.18.1` dep)
+- `lighthouse ^12.8.2`
+- `package.json` override `lodash: ^4.18.1` — predates pa11y-ci 4.1.1 and may still be load-bearing for other transitive deps; do not remove without auditing the dep graph (see #944 closing notes)
+
 ## S0. Diagnose CI Failures (FIRST STEP)
 
 **When CI tests are failing, ALWAYS investigate before making changes.**
