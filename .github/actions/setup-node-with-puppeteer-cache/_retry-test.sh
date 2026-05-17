@@ -5,10 +5,15 @@
 # action.yml's "Install dependencies (with retry)" step against a mocked
 # `npm` binary that fails a configurable number of times.
 #
-# CRITICAL: the retry loop below is duplicated from action.yml. Keep both
-# copies in sync. action.yml is the source of truth for "what runs in CI";
-# this harness is the source of truth for "did the retry shape change
-# behaviour". Update both when changing retry semantics.
+# CRITICAL: keep the **retry shape** in sync between this file and
+# action.yml (3 attempts, 10s backoff, ::warning:: per non-terminal miss,
+# ::error:: on exhaust). The control flow differs intentionally:
+# - action.yml uses `exit 0` / `exit 1` to terminate the composite step.
+# - This harness uses `break` + an `ACTUAL_EXIT` variable so it can run
+#   assertions after the loop. Don't try to make the loops byte-identical.
+# action.yml is the source of truth for "what runs in CI"; this harness
+# validates that the shape behaves correctly under the failure modes the
+# action will encounter.
 #
 # Usage:
 #   bash _retry-test.sh fail-fail-fail        # expects exit 1 (RED)
@@ -18,6 +23,11 @@
 # harness prints PASS/FAIL banner so it's grep-able in CI logs if we
 # ever decide to run it in a workflow step.
 
+# `-e` is intentionally omitted: the retry loop expects `npm ci` to exit
+# non-zero on the fail attempts; -e would terminate the script on the
+# first failure and defeat the test. `-u` catches typos in variable
+# names; the `${ACTUAL_EXIT:-}` guard below uses default-expansion so it
+# survives -u when the loop exhausts.
 set -uo pipefail
 
 MODE="${1:-}"
@@ -127,9 +137,9 @@ if [ "$SUCCESS_LINES" -ne "$EXPECT_SUCCESS" ]; then
 fi
 
 if [ "$PASS" -eq 1 ]; then
-  echo "PASS: $MODE produced expected behaviour"
+  echo "RETRY-TEST PASS: $MODE produced expected behaviour"
   exit 0
 else
-  echo "FAIL: $MODE deviated from expected behaviour"
+  echo "RETRY-TEST FAIL: $MODE deviated from expected behaviour"
   exit 1
 fi
