@@ -1,68 +1,68 @@
-# SPEC — Backfill `subtitle:` Front-Matter + Validator (#951)
+# SPEC — `bulk-content` Scope-Guard Exemption Label (#956)
 
 **Status:** Draft — awaiting approval
-**Issue:** [#951](https://github.com/oviney/blog/issues/951)
-**Labels:** `agent:editorial-chief`
+**Issue:** [#956](https://github.com/oviney/blog/issues/956)
+**Labels:** `agent:qa-gatekeeper`
 **Date:** 2026-05-17
 **Lifecycle phase:** DEFINE
-**Spawned from:** #943 (research sweep §4)
+**Spawned from:** discovered while shipping #951 — PR #955 hit the 15-file scope-explosion rule with no override mechanism.
 
 ---
 
 ## 1. Situation
 
-`_layouts/post.html` line 24 and `index.md` line 42 both bind to `page.subtitle` / `hero_post.subtitle`, but **0 of 24** posts in `_posts/` populate `subtitle:`. The Economist-style standfirst block is wired up in the design system but never authored, costing the inverted-pyramid scanability advantage NN/G credits with up to a 124% usability lift.
+`scripts/check-pr-scope.sh:73-79` enforces an **unconditional** 15-file maximum on any PR. Rule 3 (governance-surface) already has a deliberate-intent override via the `governance-update` label (mirrored at lines 85-94). Rule 2 has no equivalent.
 
-**Adjacent state worth surfacing:** 8 of 24 posts carry a `summary:` field that the templates **do not read** — it's dead front-matter, possibly a remnant from earlier experimentation. Repurposing the existing copy as the seed for `subtitle:` on those 8 posts saves authoring effort and removes the inconsistency.
+This bit us shipping #951: the SPEC required all 24 posts to be backfilled atomically with the validator gate, so the 26-file PR was structurally unsplittable without creating a half-broken `main` state. We admin-bypassed CI to ship #951. This issue closes the methodology gap so the next bulk-content PR (post backfill, byline migration, category rename, author rename, mass front-matter field addition) doesn't need a bypass.
 
-Repo evidence at synthesis SHA `f56c219`:
-- `grep -l "^subtitle:" _posts/*.md | wc -l` → 0 (of 24)
-- `for f in _posts/*.md; do awk '/^---$/{n++; if(n==2)exit} n==1 && /^summary:/' "$f"; done | wc -l` → 8
-- `_layouts/post.html:24` → `{% if page.subtitle %}`
-- `index.md:42` → `{% if hero_post.subtitle %}`
+Repo state at SHA `ec008ac`:
+- `scripts/check-pr-scope.sh:73-79` — Rule 2, unconditional
+- `scripts/check-pr-scope.sh:85-94` — Rule 3, governance-update precedent
+- `.github/labels.yml` — declares labels; `governance-update` already lives here
+- `gh label list` shows `governance-update` description: "Deliberate governance/skill file update — bypasses governance-surface scope check" — the model wording
 
 ---
 
 ## 2. Objective
 
-1. Author a `subtitle:` line on every post in `_posts/*.md` (24 files), placed immediately under `title:`.
-2. For the 8 posts that already carry `summary:`, **repurpose that text as the subtitle seed** (rephrase to fit standfirst voice if needed), then **delete the `summary:` line** to remove dead front-matter.
-3. For the remaining 16 posts, source the subtitle from each post's existing `description:` field as a starting point, rewritten to fit Economist-standfirst voice — declarative, intriguing, ~25 words. The `description:` field is SEO meta and stays unchanged; the subtitle is editorial copy.
-4. Extend `scripts/validate-post-quality.sh` so missing `subtitle:` is an **ERROR** (exit 1, blocks merge) and over-long subtitles emit a **WARNING** (>40 words) or **ERROR** (>60 words).
+Add a `bulk-content` label to the repo. When a PR carries it, `check-pr-scope.sh` skips **Rule 2 only** (the 15-file scope-explosion cap). All other rules — protected files (Rule 1), governance-surface (Rule 3), agent-scope (Rule 4) — apply unchanged.
+
+The label is intentionally narrow: it does NOT mean "trust this PR." It means "this change is structurally atomic and splitting it would create a worse outcome." Reviewers and the label itself should treat it as suspect by default.
 
 ---
 
 ## 3. Acceptance Criteria
 
-- [ ] **AC-1** `grep -L "^subtitle:" _posts/*.md` returns no results (every post has the field).
-- [ ] **AC-2** `grep -l "^summary:" _posts/*.md | wc -l` returns 0 (the dead `summary:` field is removed from the 8 posts that had it).
-- [ ] **AC-3** Every subtitle is ≤ 40 words; soft target ~25 words. No subtitle is identical-byte-for-byte to its post's `description:` (subtitle is editorial copy, distinct from SEO meta).
-- [ ] **AC-4** `bash scripts/validate-post-quality.sh` exits 1 when run against a test post with `subtitle:` removed; exits 1 against a test subtitle > 60 words; exits 2 against a test subtitle 41–60 words; exits 0 on the actual post corpus after backfill.
-- [ ] **AC-5** Rendered post HTML shows `<h2 class="article-subtitle">…</h2>` on every post (spot-check at least 3 posts in `_site/` after `bundle exec jekyll build`).
-- [ ] **AC-6** `bundle exec jekyll build` exits 0.
-- [ ] **AC-7** **No changes** to `_layouts/post.html`, `_layouts/default.html`, `index.md`, `_includes/`, `_sass/`, or other site templates. This issue is content + validator only.
-- [ ] **AC-8** PR description includes the table of "8 posts repurposed from summary / 16 posts seeded from description" so reviewer can sample each path.
+- [ ] **AC-1** `bulk-content` label declared in `.github/labels.yml` with a clear description that names the rule it exempts and warns against overuse.
+- [ ] **AC-2** Label exists in the repo on GitHub (created via `gh label create` or whatever mechanism `.github/labels.yml` uses to sync — verify both).
+- [ ] **AC-3** `scripts/check-pr-scope.sh` Rule 2 wrapped in a `PR_LABELS contains "bulk-content"` skip check, mirroring the Rule 3 / `governance-update` pattern at lines 85-94. Emits the same one-line skip notice when present.
+- [ ] **AC-4** Behavior matrix verified by inline smoke-test invocations (paste output into PR body):
+  - `PR_LABELS="bulk-content"` + 30-file fixture → Rule 2 skipped, exits 0 (assuming no other violations)
+  - `PR_LABELS=""` + 30-file fixture → Rule 2 fires, exits 1
+  - `PR_LABELS="bulk-content"` + 30 files **including** `.github/skills/foo/SKILL.md` (no `governance-update` label) → Rule 2 skipped BUT Rule 3 fires, exits 1
+  - `PR_LABELS="bulk-content,governance-update"` + 30 files including `.github/skills/foo/SKILL.md` → both Rules 2 and 3 skipped, exits 0
+- [ ] **AC-5** `scripts/check-pr-scope.sh` header comment (lines 4-25) updated to document the `bulk-content` semantics alongside the existing `governance-update` mention. New PASS/FAIL example: `PASS: PR with bulk-content label and 30 changed files — Rule 2 skipped (atomic content backfill)`.
+- [ ] **AC-6** `CLAUDE.md` documents when to use `bulk-content` in the existing governance-reminder section that mentions `governance-update`, with explicit anti-pattern guidance: do NOT use `bulk-content` just because you don't want to split a PR; use it when splitting creates an intermediate `main` state worse than the unsplit PR.
+- [ ] **AC-7** No change to Rule 1 (protected files), Rule 3 (governance-surface), Rule 4 (agent-scope) — verified by running the script with various fixtures and confirming behaviour is unchanged.
+- [ ] **AC-8** PR body includes the four-case behavior matrix from AC-4 with actual exit codes and the script's stdout, plus a note that `bash scripts/check-pr-scope.sh` was invoked locally with each `PR_LABELS` combination.
 
 ---
 
 ## 4. Commands
 
 ```bash
-# Audit before
-grep -l "^subtitle:" _posts/*.md | wc -l        # expected: 0
-grep -l "^summary:"  _posts/*.md | wc -l        # expected: 8
+# Local smoke test (no real PR needed)
+PR_LABELS="bulk-content" \
+  bash scripts/check-pr-scope.sh; echo "exit=$?"
 
-# After backfill
-grep -L "^subtitle:" _posts/*.md                # expected: empty
-grep -l "^summary:"  _posts/*.md | wc -l        # expected: 0
+# Verify label exists in repo after merge
+gh label list --repo oviney/blog --search "bulk-content"
 
-# Validator
-bash scripts/validate-post-quality.sh           # expected: exit 0
-
-# Build sanity
-bundle exec jekyll build
-ls -1 _site/*/*.html | head -3 | xargs grep -l 'class="article-subtitle"' # spot-check
+# Verify in-repo declaration
+grep -A3 "bulk-content" .github/labels.yml
 ```
+
+For the smoke test, since the script diffs against `origin/main`, a temporary fixture branch with 30 trivial file edits (e.g., `touch tests/fixture-{1..30}.txt`) is the simplest way to exercise the file-count branch. Don't commit the fixtures; just `git add -N` and run the script locally.
 
 ---
 
@@ -70,47 +70,58 @@ ls -1 _site/*/*.html | head -3 | xargs grep -l 'class="article-subtitle"' # spot
 
 | File | Change |
 |---|---|
-| `_posts/*.md` (24 files) | Add `subtitle: "…"` line under `title:`. For 8 posts with `summary:`, repurpose that text and remove the `summary:` line. For 16 others, seed from `description:` and rewrite editorially. |
-| `scripts/validate-post-quality.sh` | New check `2x. Subtitle present and length-bounded`: ERROR if missing, WARNING if 41–60 words, ERROR if > 60 words. Follow the script's existing `fm_value` + ERRORS/WARNINGS accumulator pattern. Add to header comment. |
+| `.github/labels.yml` | Declare `bulk-content` with description naming the Rule 2 exemption + anti-pattern warning |
+| `scripts/check-pr-scope.sh` | Wrap Rule 2 (lines 73-79) in `if PR_LABELS contains "bulk-content" → skip; else → enforce`. Add to header comment (lines 4-25). |
+| `CLAUDE.md` | Add one-line `bulk-content` usage note alongside the existing `governance-update` mention |
+| (optional) `AGENTS.md` | Same one-line note if the repo's convention is to document labels in both files — verify |
 
-No new files. No deletions of `_posts/` files. No template/layout/CSS touches.
-
----
-
-## 6. Subtitle Style Guide (binding for this PR)
-
-- **Length:** soft target 20–28 words; hard cap 40. Never identical to `description:`.
-- **Voice:** declarative, present-tense or past-tense (not future). Avoid first-person pronouns. No exclamation marks.
-- **Function:** delivers the "what the reader will learn" payoff in one breath; the title hooks, the subtitle pays off.
-- **Avoid:** clickbait phrasing ("You won't believe…"), generic claims ("Important insights into X"), or restating the title.
-
-Reference: Economist standfirst conventions — see the existing 8 `summary:` examples for tonal calibration before authoring the 16 new ones.
+Expected file count: **3 or 4**. Well under the 15-file scope-explosion limit — this PR doesn't need its own exemption.
 
 ---
 
-## 7. Validator Design (`scripts/validate-post-quality.sh` extension)
+## 6. Script change pattern (mirrors Rule 3 / `governance-update`)
 
-New check block placed immediately after the existing `description:` checks. Pseudocode:
+Reference pattern at `scripts/check-pr-scope.sh:85-94`:
 
 ```bash
-# 2x. Subtitle present and length-bounded
-subtitle=$(fm_value "$post" subtitle)
-if [[ -z "$subtitle" ]]; then
-  echo "❌  $rel — missing required front-matter: subtitle"
-  ERRORS=$((ERRORS + 1))
+if echo "${PR_LABELS:-}" | grep -q 'governance-update'; then
+  echo "check-pr-scope: governance-update label present — skipping rule 3."
 else
-  wc=$(echo "$subtitle" | wc -w)
-  if [[ $wc -gt 60 ]]; then
-    echo "❌  $rel — subtitle exceeds 60 words ($wc words)"
-    ERRORS=$((ERRORS + 1))
-  elif [[ $wc -gt 40 ]]; then
-    echo "⚠️   $rel — subtitle exceeds soft cap of 40 words ($wc words)"
-    WARNINGS=$((WARNINGS + 1))
+  # Rule 3 body
+fi
+```
+
+Apply the same wrapper to Rule 2:
+
+```bash
+# Rule 2: >15 files changed (scope explosion)
+# Skip if PR is a deliberate bulk-content change (label: bulk-content)
+if echo "${PR_LABELS:-}" | grep -q 'bulk-content'; then
+  echo "check-pr-scope: bulk-content label present — skipping rule 2."
+else
+  FILE_COUNT=$(echo "$CHANGED_FILES" | wc -l | tr -d ' ')
+  if [ "$FILE_COUNT" -gt 15 ]; then
+    echo "VIOLATION [scope-explosion]: $FILE_COUNT files changed (limit is 15). Split this PR into smaller, focused changes."
+    VIOLATIONS=$((VIOLATIONS + 1))
   fi
 fi
 ```
 
-Header comment updated to add `2x. Subtitle: present, ≤ 40 words soft cap, ≤ 60 words hard cap`.
+Use the **exact same indentation, comment style, and skip-notice phrasing** as Rule 3 so the two override paths read as siblings. A future reader should immediately see `bulk-content` and `governance-update` as two instances of the same pattern.
+
+---
+
+## 7. Label declaration in `.github/labels.yml`
+
+Pattern depends on the file's current format. Likely something like:
+
+```yaml
+- name: bulk-content
+  color: "<distinct from governance-update; suggest a yellow/amber to signal caution>"
+  description: "Deliberate bulk-content change (post backfill, byline migration, category rename) — bypasses Rule 2 (15-file scope-explosion). Only valid when splitting would create a worse intermediate main state."
+```
+
+Verify the file's actual schema before writing. Implementation step 1 is to read `.github/labels.yml` and find the `governance-update` entry to use as the template.
 
 ---
 
@@ -118,32 +129,41 @@ Header comment updated to add `2x. Subtitle: present, ≤ 40 words soft cap, ≤
 
 | Always | Ask first | Never |
 |---|---|---|
-| Place the new `subtitle:` line directly under `title:` for consistency | Whether a subtitle's voice is too clickbait/promotional before merging | Edit `_layouts/`, `_includes/`, `_sass/`, `index.md`, or any non-`_posts/` file (besides the validator) |
-| Use `description:` as a seed for the 16 posts without `summary:` — but rewrite it | Whether to fix obvious typos in existing post bodies you happen to read (defer to a separate PR) | Modify post titles, dates, slugs, categories, tags, or body copy |
-| Remove `summary:` from the 8 posts whose text is repurposed | Whether the validator's WARNING tier (41–60 words) should be lifted to ERROR | Touch `_drafts/` (out of scope) |
-| Run the validator locally before pushing | — | Use the same string for both `description:` and `subtitle:` (defeats the purpose of two distinct fields) |
+| Mirror the Rule 3 / `governance-update` pattern exactly — comment style, indentation, skip-notice wording | Whether to also add a `governance-update`-style note to `AGENTS.md` (only if convention says both files document labels) | Add overrides to Rule 1 (protected files) — those are hard guards |
+| Verify the label exists on GitHub (`gh label list`), not just in the YAML, before closing | Whether to weaken any **other** rule along the way | Add overrides to Rule 4 (agent-scope) — that's #951's separate problem; don't conflate |
+| Document the anti-pattern (don't use this just to skip splitting) in CLAUDE.md | — | Use the `bulk-content` label on this PR itself (it touches ~4 files, well under 15) |
+| Smoke-test all 4 cases from AC-4 locally before pushing | — | Modify Rule 2's underlying behavior (the 15-file limit stays 15 when the label is absent) |
 
 ---
 
 ## 9. Out of Scope
 
-- Editing `_layouts/post.html`, `_layouts/default.html`, `index.md`, or any template/style file (template already supports the field).
-- Rewriting post titles, dates, body copy, images, captions, or other front-matter fields.
-- Adding `subtitle:` to `_drafts/` — only `_posts/`. Drafts get the validator gate when they move to `_posts/`.
-- Backfilling other dead/unused front-matter fields (this PR addresses `summary:` only because it's directly relevant).
-- Designing a long-form "author about the article" block — different surface, different decision.
-- Changing how `description:` is generated or used elsewhere (SEO meta is its own concern).
+- Lowering the 15-file limit
+- Adding overrides for Rules 1, 3, or 4
+- Adding a general `--force` flag to the scope guard
+- Reducing other CI checks' strictness
+- Refactoring `check-pr-scope.sh` (resist the temptation; one-purpose PRs)
+- Adding a formal shell-script test framework (bats, shellspec) — out of scope; smoke tests in PR body suffice
+- Backfilling the `bulk-content` label onto #955 retroactively (it's already merged)
 
 ---
 
 ## 10. Definition of Done
 
 - All 8 ACs checked.
-- `bash scripts/validate-post-quality.sh` exits 0 on the post-backfill corpus; spot-tested edge cases (missing, >40 words, >60 words) produce the expected exit codes / classifications.
-- `bundle exec jekyll build` succeeds.
-- PR description includes:
-  - Table mapping each of 24 posts to "repurposed from summary" or "seeded from description"
-  - One sample rendered subtitle for spot-check by reviewer
-  - Note that no template/layout/CSS files were touched
-- PR carries no extra labels beyond `agent:editorial-chief` (this isn't governance work).
-- Merged via standard PR flow with CI green; admin-merge acceptable per repo convention.
+- PR description includes the 4-case behavior matrix with actual exit codes pasted in from local invocation.
+- `gh label list --repo oviney/blog --search bulk-content` returns the label with the correct description after merge.
+- `grep -A3 "bulk-content" .github/labels.yml` returns the entry.
+- The PR does NOT itself carry the `bulk-content` label (would be ironic and undermine the point).
+- Merged via standard PR flow; admin-merge acceptable per repo convention if CI is otherwise green.
+
+---
+
+## 11. Anti-patterns to surface in CLAUDE.md
+
+The doc change should explicitly call out misuses to forestall them:
+
+- ❌ Using `bulk-content` because you don't want the friction of two PRs for unrelated changes
+- ❌ Using `bulk-content` for a refactor that touches 20 files (refactors should be split; intermediate state is usually fine for refactors)
+- ❌ Using `bulk-content` alongside `governance-update` to bypass two guards on a single PR without strong justification (allowed but should be rare and called out in the PR description)
+- ✅ Using `bulk-content` for: post backfills, mass byline / author changes, category or tag renames touching many `_posts/`, atomic front-matter field migrations

@@ -1,218 +1,261 @@
-# Plan — Backfill `subtitle:` Front-Matter + Validator (#951)
+# Plan — `bulk-content` Scope-Guard Exemption Label (#956)
 
 **Spec:** [SPEC.md](../SPEC.md)
-**Issue:** [#951](https://github.com/oviney/blog/issues/951)
+**Issue:** [#956](https://github.com/oviney/blog/issues/956)
 **Date:** 2026-05-17
 **Lifecycle phase:** PLAN
-**Plan SHA:** `f56c219`
-**Validator insertion point:** section "5. Subtitle" between the existing "4. SEO description" (line 155+) and whatever currently sits at the next numbered check in `scripts/validate-post-quality.sh`.
+**Plan SHA:** `ec008ac`
+**Anchors confirmed at this SHA:**
+- `.github/labels.yml` schema — flat YAML list of `- name: / color: / description:` entries (no nested groups; comments mark categories)
+- `governance-update` precedent — exists on GitHub (`gh label list`) but is **NOT** declared in `.github/labels.yml`. Silent drift; flagged as future-watching, NOT in scope here.
+- `scripts/check-pr-scope.sh:73-79` — Rule 2 to wrap
+- `scripts/check-pr-scope.sh:85-94` — Rule 3 / `governance-update` pattern to mirror
+- `CLAUDE.md:65-67` — existing "Governance-surface reminder" block; new `bulk-content` mirror lives here
+- `AGENTS.md` — does **not** mention `governance-update`; no `bulk-content` mention needed either (keeps convention consistent: labels documented in CLAUDE.md only)
 
 ---
 
 ## Context
 
-24 posts, 0 with `subtitle:`. Of those:
-- **8 posts** already carry a dead `summary:` field — its text is repurposable as the subtitle seed.
-- **16 posts** have no summary; subtitle is authored fresh from `description:` (rewritten to standfirst voice).
+Small, focused change: 3 files (`.github/labels.yml`, `scripts/check-pr-scope.sh`, `CLAUDE.md`). Well under the 15-file scope-explosion limit — **this PR does NOT need the `bulk-content` label itself**.
 
-Validator extension is small (~20 lines) and isolated. **TDD applies cleanly:** extend the validator first (RED — all 24 posts fail the new check), then backfill posts in two passes (GREEN). Spec's AC-3 — "no subtitle is byte-for-byte identical to its post's `description:`" — is the AC the validator does **not** check; that one is held by editorial judgment + CHECKPOINT-A review.
+RED→GREEN structure is clean: the current script ignores `bulk-content` → smoke test fails → wrapper added → smoke test passes. Same TDD discipline as #951's validator extension.
+
+**Worth-watching (NOT in this PR):** `governance-update` label drift between `.github/labels.yml` and live GitHub. Worth a separate small PR to add the existing label to YAML for source-of-truth correctness. Don't fold into #956.
 
 ---
 
 ## Dependency graph
 
 ```
-T1 (extend validator → RED: 24/24 fail)
+T1 (read labels.yml schema + CLAUDE.md anchor — research only, no commit)
   │
   ▼
-T2 (backfill 8 summary→subtitle posts; remove summary lines)
+T2 (RED smoke test: confirm bulk-content is currently ignored)
   │
-  ▼
-T3 (backfill 16 description→subtitle posts; fresh editorial work)
-  │
-  ▼
-CHECKPOINT-A — user reviews all 24 drafted subtitles
-  │
-  ▼
-T4 (full verification: validator green, jekyll build, AC-7 boundary check)
-  │
-  ▼
-T5 (branch + commit + PR + CI + admin-merge → close #951)
+  ├──► T3 (implement Rule 2 skip wrapper in check-pr-scope.sh)
+  │       │
+  │       ▼
+  │     T4 (GREEN smoke test: all 4 cases from SPEC AC-4)
+  │       │
+  │       ▼
+  │   CHECKPOINT-A — 4-case smoke matrix output captured
+  │       │
+  ├──► T5 (add bulk-content to .github/labels.yml) ──┐
+  │                                                  │
+  └──► T6 (update CLAUDE.md governance-reminder block to mirror)  ──┐
+                                                                    │
+                                                                    ▼
+                                                  T7 (branch + commits + PR + CI)
+                                                                    │
+                                                                    ▼
+                                                  T8 (create label on GitHub via `gh label create` — sync workaround for the YAML-vs-live drift)
+                                                                    │
+                                                                    ▼
+                                                  T9 (admin-merge + verify label exists in repo)
 ```
 
-T2 and T3 are technically independent (different post sets) but sequencing T2 first lets the 8 existing summary lines calibrate editorial voice for T3's fresh authoring. Recommendation: serial T2 → T3.
+T3, T5, T6 are file-level independent. Sequencing T3 first because it's the load-bearing change and the smoke test is the primary verification; T5/T6 are the supporting metadata. Two commits on the branch keep the diff reviewable: **Commit A: script (T3)** then **Commit B: labels.yml + CLAUDE.md (T5 + T6)**.
 
 ---
 
-## Phase 1 — Validator (RED)
+## Phase 1 — Research (read-only)
 
-### T1 — Extend `scripts/validate-post-quality.sh` with subtitle check
+### T1 — Confirm patterns from reference points
 
-**ACs satisfied:** AC-4 (validator behaviour)
-**Touches:** `scripts/validate-post-quality.sh`
+**Already done as part of `/plan`.** Findings recorded in this plan's "Anchors confirmed" block above. No code change. No commit.
+
+---
+
+## Phase 2 — RED smoke test
+
+### T2 — Confirm `bulk-content` is currently ignored
+
+**ACs satisfied:** AC-4 (RED baseline — establishes "before" state)
+**Touches:** none (read-only)
 
 **Steps:**
 
-1. Add a new numbered check `5. Subtitle: present, ≤ 40 words (warning), ≤ 60 words (error)` after the existing `4. SEO description` check (around line 175).
-2. Use the existing `fm_value "$post" "subtitle"` helper. Increment `ERRORS` for missing or > 60 words; increment `WARNINGS` for 41–60 words.
-3. Update the script's header comment (the `# Validates ...` block) to add the new check to the documented list.
+1. Create branch `chore/956-bulk-content-label`.
+2. Create 30 untracked fixture files: `for i in {1..30}; do touch /tmp/scope-fixture-$i.md; cp /tmp/scope-fixture-$i.md tests/scope-fixture-$i.md; done` — then `git add tests/scope-fixture-*.md` (staged but uncommitted).
+3. Run the script with `PR_LABELS="bulk-content"`:
+   ```bash
+   PR_LABELS="bulk-content" bash scripts/check-pr-scope.sh; echo "exit=$?"
+   ```
 
-**Snippet (pattern after the existing description block):**
+**Expected (RED):** script reports `VIOLATION [scope-explosion]: <N> files changed (limit is 15)` and exits **1**, despite the label being present — proving `bulk-content` is currently a no-op.
+
+4. Capture the output for the PR body's behavior matrix.
+5. Restore the working tree: `git reset HEAD tests/scope-fixture-*.md && rm tests/scope-fixture-*.md`. Verify `git status --short` shows no fixture files.
+
+---
+
+## Phase 3 — Implementation
+
+### T3 — Wrap Rule 2 with `bulk-content` skip in `scripts/check-pr-scope.sh`
+
+**ACs satisfied:** AC-3, AC-5 (header comment update)
+**Touches:** `scripts/check-pr-scope.sh`
+
+**Steps:**
+
+1. Wrap Rule 2 (lines 73-79) in an `if echo "${PR_LABELS:-}" | grep -q 'bulk-content'; then ... else ... fi` block. Use the **exact** comment style, indentation, and skip-notice phrasing as Rule 3 / `governance-update` (lines 85-94). The two override paths must read as siblings.
+2. Update the script's header comment block (lines 4-25) to add `bulk-content` to the documented label semantics. New PASS example: `PASS: PR with bulk-content label and 30 changed files — Rule 2 skipped (atomic content backfill)`. Mirror placement of the existing governance-update PASS example.
+
+**Verify (mechanical — actual smoke test is T4):**
+- `bash -n scripts/check-pr-scope.sh` — syntax check exits 0
+- `diff` shows ~10 added lines + comment updates
+- No removal of any existing behavior (Rule 2 itself, no other rule altered)
+
+**Commit on branch as Commit A.** Message: `chore(ci): allow bulk-content label to exempt PRs from scope-explosion check (#956)`.
+
+---
+
+## Phase 4 — GREEN smoke test (4 cases from SPEC AC-4)
+
+### T4 — Run the 4-case behavior matrix
+
+**ACs satisfied:** AC-4, AC-7 (other rules unchanged)
+**Touches:** none (read-only verification using staged fixtures)
+
+For each case below, re-stage 30 fixture files (or 30 + 1 governance file as needed), invoke the script with the specified `PR_LABELS`, capture exit code and the relevant violation/skip lines. Restore working tree between cases.
+
+| Case | `PR_LABELS` | Staged files | Expected exit | Expected stdout key line |
+|---|---|---|---|---|
+| 1 | `"bulk-content"` | 30 fixtures under `tests/` | **0** | `check-pr-scope: bulk-content label present — skipping rule 2.` |
+| 2 | `""` (unset) | 30 fixtures under `tests/` | **1** | `VIOLATION [scope-explosion]: 30 files changed (limit is 15).` |
+| 3 | `"bulk-content"` | 30 fixtures + 1 file under `.github/skills/test-fixture/SKILL.md` | **1** | `VIOLATION [governance-surface]:` (Rule 3 fires; Rule 2 skipped) |
+| 4 | `"bulk-content,governance-update"` | same as Case 3 | **0** | both `... skipping rule 2.` AND `... skipping rule 3.` |
+
+**Verify:** all 4 outputs match expectations. **Save the literal stdout** of each invocation; paste into the PR body per AC-8.
+
+**Cleanup invariant:** after each case, `git status --short` shows no fixture files. The smoke test never leaves residue.
+
+---
+
+### CHECKPOINT-A — 4-case smoke matrix passes
+
+**Gate criteria (all must be true before T5/T6):**
+
+- [ ] All 4 cases in T4 produce the expected exit code AND stdout key line
+- [ ] Working tree is clean of fixtures between every case
+- [ ] Outputs are captured verbatim for PR body
+- [ ] No accidental edits to the script beyond T3's scope
+
+If any case mis-behaves, return to T3 and fix the wrapper.
+
+---
+
+## Phase 5 — Metadata + documentation
+
+### T5 — Add `bulk-content` to `.github/labels.yml`
+
+**ACs satisfied:** AC-1
+**Touches:** `.github/labels.yml`
+
+**Steps:**
+
+1. Choose a placement in the file — likely the same category as `governance-update` would belong to if it were declared. The labels.yml uses category headers (e.g., `# ── Defect lifecycle status ──`). Read the file to find or create an appropriate category (e.g., `# ── PR scope-guard overrides ──`).
+2. Add the entry:
+   ```yaml
+   - name: bulk-content
+     color: "fbca04"   # amber — same caution-class as governance-update
+     description: "Deliberate bulk-content change (post backfill, byline migration, category rename) — bypasses Rule 2 (15-file scope-explosion). Only valid when splitting would create a worse intermediate main state."
+   ```
+3. Verify the YAML still parses: `python3 -c "import yaml; yaml.safe_load(open('.github/labels.yml'))"`.
+
+**Verify:** `grep -A3 "bulk-content" .github/labels.yml` returns the entry; YAML parses clean.
+
+---
+
+### T6 — Mirror the governance-reminder block in `CLAUDE.md`
+
+**ACs satisfied:** AC-6, anti-pattern list per SPEC §11
+**Touches:** `CLAUDE.md`
+
+**Steps:**
+
+1. Insert a new block immediately after the existing "Governance-surface reminder" (`CLAUDE.md:65-67`), structured as a sibling reminder:
+   ```markdown
+   **Scope-explosion reminder:** PRs that are structurally atomic and cannot be split without creating a worse intermediate main state may carry the `bulk-content` label to bypass Rule 2 (15-file cap) in the scope guard. Use sparingly — see anti-patterns below.
+
+   **`bulk-content` anti-patterns (do NOT use the label for):**
+   - PRs that touch unrelated changes you just don't want to split
+   - Refactors of any kind (refactors should be incremental; intermediate state is usually fine)
+   - Combining with `governance-update` to bypass two guards on a single PR without strong justification (allowed but should be rare and explicitly called out in the PR description)
+
+   **`bulk-content` valid use cases:**
+   - Atomic content backfills (e.g., #951's 24-post `subtitle:` field addition)
+   - Mass author / byline / category / tag rename across many `_posts/`
+   - Atomic front-matter field migration that requires all posts together for the validator gate to pass
+   ```
+2. Keep the existing governance-update block unchanged (don't touch its wording).
+
+**Verify:** `grep -c "bulk-content" CLAUDE.md` returns ≥ 5 (1 reminder + 3 anti-pattern bullets + 1 use-case heading and bullets).
+
+**Commit T5 + T6 together as Commit B.** Message: `docs(scope-guard): declare bulk-content label and document anti-patterns (#956)`.
+
+---
+
+## Phase 6 — Ship
+
+### T7 — Push branch, open PR, watch CI
+
+**ACs satisfied:** AC-8 (PR body includes smoke matrix)
+**Touches:** git remote.
+
+**Steps:**
+
+1. `git push -u origin chore/956-bulk-content-label`
+2. `gh pr create` with:
+   - **Summary:** Adds `bulk-content` label and wraps Rule 2 in a skip check mirroring `governance-update`/Rule 3.
+   - **Behavior matrix table:** the 4 cases from T4 with actual exit codes and the literal stdout key-line per case.
+   - **Test plan:** `bash scripts/check-pr-scope.sh` was invoked locally for each case; CI re-validates the script syntax.
+   - **Worth-watching note:** flag the `governance-update` YAML drift as a separate small-PR follow-up.
+   - **No `agent:*` label** — this touches `scripts/` (QA) AND `CLAUDE.md` + `.github/labels.yml` (governance-ish). Same cross-domain situation as #951; falls into "human PR" general-scope path.
+   - **No `governance-update` label** — `.github/labels.yml` is not in `.github/skills/` or `.github/instructions/`, so it doesn't trip Rule 3. `CLAUDE.md` likewise. Verify before pushing.
+3. Wait for CI; investigate any non-flake failure.
+
+**Verify:** PR opens cleanly; all 6 CI checks expected to pass.
+
+---
+
+### T8 — Create label on GitHub (workaround for YAML-vs-live drift)
+
+**ACs satisfied:** AC-2
+**Touches:** GitHub repo settings (label creation, side-effect only)
+
+**Steps:**
 
 ```bash
-# 5. Subtitle — present and length-bounded   [ERROR / WARNING]
-subtitle_val=$(fm_value "$post" "subtitle")
-if [[ -z "$subtitle_val" ]]; then
-  echo "❌  $rel — missing required front-matter: subtitle"
-  ERRORS=$((ERRORS + 1))
-  post_errors=$((post_errors + 1))
-else
-  wc_words=$(echo "$subtitle_val" | wc -w | tr -d ' ')
-  if [[ $wc_words -gt 60 ]]; then
-    echo "❌  $rel — subtitle exceeds 60 words ($wc_words words)"
-    ERRORS=$((ERRORS + 1))
-    post_errors=$((post_errors + 1))
-  elif [[ $wc_words -gt 40 ]]; then
-    echo "⚠️   $rel — subtitle exceeds soft cap of 40 words ($wc_words words)"
-    WARNINGS=$((WARNINGS + 1))
-  fi
-fi
+gh label create bulk-content \
+  --repo oviney/blog \
+  --color "fbca04" \
+  --description "Deliberate bulk-content change (post backfill, byline migration, category rename) — bypasses Rule 2 (15-file scope-explosion). Only valid when splitting would create a worse intermediate main state."
 ```
 
-**Verify (RED phase — the test is the script's exit code against the unchanged corpus):**
+**Rationale:** the repo doesn't appear to have an active label-sync GitHub Action (`governance-update` exists on GitHub but not in YAML). So the YAML is informational source-of-truth, and labels must be created manually for them to exist. Running this BEFORE the PR merges is safer — anyone who hits the script after merge will be able to apply the label without it being missing.
 
-- `bash scripts/validate-post-quality.sh; echo $?` → expect `1`
-- Output shows 24 lines of `❌  <post> — missing required front-matter: subtitle`
-- Sanity-test the warning band: temporarily add a 45-word subtitle to one post, re-run → expect that post's check to **warn** (not error). Restore.
-- Sanity-test the hard cap: temporarily add a 70-word subtitle to one post, re-run → expect that post's check to **error**. Restore.
-
-T1 is its own commit (validator change is reviewable on its own).
+**Verify:** `gh label list --repo oviney/blog --search "bulk-content"` returns the new label with the expected color and description.
 
 ---
 
-## Phase 2 — Editorial backfill
+### T9 — Admin-merge + post-merge verification
 
-### T2 — Repurpose `summary:` → `subtitle:` on 8 posts
-
-**ACs satisfied:** AC-1 (partial 8/24), AC-2 (full)
-**Touches:** 8 files in `_posts/*.md` (the ones with a `summary:` line)
+**ACs satisfied:** AC-2 (final), AC-7 (final)
+**Touches:** git remote (merge), GitHub PR (close).
 
 **Steps:**
 
-1. Identify the 8 posts: `grep -l "^summary:" _posts/*.md`.
-2. For each post:
-   - Read the `summary:` text.
-   - If it already reads as a standfirst (~25 words, declarative, not clickbait, not identical to title): copy verbatim into a new `subtitle:` line placed directly under `title:`.
-   - If it needs polishing: lightly rewrite for SPEC §6 voice while staying close to the original meaning.
-   - Delete the `summary:` line entirely.
-3. Spot-check each by running `fm_value` mentally: post should now have `subtitle:` and no `summary:`.
-
-**Verify (intermediate GREEN — 8/24):**
-
-- `grep -l "^subtitle:" _posts/*.md | wc -l` → 8
-- `grep -l "^summary:" _posts/*.md | wc -l` → 0
-- `bash scripts/validate-post-quality.sh; echo $?` → still 1, but error count drops from 24 to 16
-
----
-
-### T3 — Author `subtitle:` on 16 posts (description seed → editorial rewrite)
-
-**ACs satisfied:** AC-1 (remaining 16/24), AC-3 (no byte-identical subtitle/description)
-**Touches:** 16 files in `_posts/*.md` (the ones without `summary:`)
-
-**Steps:**
-
-1. Identify the 16: `comm -23 <(ls _posts/*.md | sort) <(grep -l "^subtitle:" _posts/*.md | sort)`.
-2. For each post:
-   - Read the existing `title:`, `description:`, and the opening paragraph of the body.
-   - Author a subtitle: declarative, 20–28 words target, not byte-for-byte identical to `description:`, follows SPEC §6 style guide.
-   - Place `subtitle:` immediately under `title:`.
-3. After all 16 are drafted, run a byte-equality check across all 24 posts to enforce AC-3:
+1. `gh pr merge <N> --repo oviney/blog --admin --squash --delete-branch` once CI is green.
+2. Verify the issue closed via the PR's `Closes #956` footer (or close manually if not).
+3. Run `gh label list --repo oviney/blog --search "bulk-content"` — confirm label still present after merge.
+4. Run a final sanity invocation of the merged script locally:
    ```bash
-   for f in _posts/*.md; do
-     s=$(fm_value "$f" subtitle); d=$(fm_value "$f" description)
-     if [[ -n "$s" && "$s" == "$d" ]]; then echo "AC-3 VIOLATION: $f"; fi
-   done
+   git pull --ff-only
+   bash scripts/check-pr-scope.sh; echo "exit=$?"   # without PR_LABELS — should be clean, no fixtures, exit 0
    ```
-   Expect zero output.
-
-**Verify (intermediate GREEN — 24/24):**
-
-- `grep -L "^subtitle:" _posts/*.md` → empty
-- `bash scripts/validate-post-quality.sh; echo $?` → 0 (or 2 if any 41–60 word warnings; acceptable)
-- AC-3 byte-equality check returns no violations.
-
----
-
-### CHECKPOINT-A — User editorial review
-
-**Gate criteria (all must be true before T4):**
-
-- [ ] All 24 posts have a `subtitle:` field; 0 have `summary:`.
-- [ ] Validator output is exit 0 (preferred) or exit 2 with only word-count warnings the author intentionally accepted.
-- [ ] AC-3 byte-equality check is clean.
-- [ ] User has read every drafted subtitle and approves or amends. **This is the editorial gate** — `agent:editorial-chief` work should not ship without an editorial pass.
-
-Specific things for user to review at CHECKPOINT-A:
-- Voice consistency across 24 (do they read like the same author?)
-- No subtitles that just paraphrase the title without adding payoff
-- No clickbait phrasing or first-person pronouns
-- Calibration against the 8 repurposed-from-summary subtitles as the tonal anchor
-
----
-
-## Phase 3 — Verification
-
-### T4 — Full build + boundary verification
-
-**ACs satisfied:** AC-5, AC-6, AC-7
-**Touches:** none (read-only verification)
-
-**Steps:**
-
-1. `bundle exec jekyll build` → exit 0; capture build time for the PR.
-2. Verify `<h2 class="article-subtitle">` renders for every post:
-   ```bash
-   for d in _site/20*/*/; do
-     html=$(ls "$d"*.html 2>/dev/null | head -1)
-     [ -z "$html" ] && continue
-     grep -q 'class="article-subtitle"' "$html" || echo "MISSING SUBTITLE IN RENDER: $html"
-   done
-   ```
-   Expect zero "MISSING" output.
-3. Enforce AC-7 (no templates touched):
-   ```bash
-   git diff --stat _layouts/ _includes/ _sass/ index.md
-   ```
-   Expect empty.
-4. Final validator pass: `bash scripts/validate-post-quality.sh; echo $?` → 0 (or 2 with only intentional warnings).
-
----
-
-## Phase 4 — Ship
-
-### T5 — Branch + commit + PR + CI + admin-merge
-
-**ACs satisfied:** AC-8 (PR description structure)
-**Touches:** git remote, GitHub PR.
-
-**Steps:**
-
-1. `git checkout -b chore/951-subtitle-backfill`
-2. Commits (grouped logically — two commits, not one):
-   - **Commit 1:** validator extension only (T1 work). Message: `chore(validators): add subtitle: presence + length check to validate-post-quality.sh (#951)`
-   - **Commit 2:** all 24 post edits + 8 summary removals (T2 + T3 work). Message: `chore(posts): backfill subtitle: front-matter on all 24 posts (#951)`
-   - Closes #951 in the second commit's footer.
-3. `git push -u origin chore/951-subtitle-backfill`
-4. `gh pr create` with body:
-   - **Summary:** 24 posts backfilled, 8 `summary:` lines removed, validator extended.
-   - **Table:** 24 posts → "repurposed from summary" / "seeded from description".
-   - **Sample subtitles:** 3 examples for visual spot-check.
-   - **Note:** AC-7 verified — zero template/layout/CSS changes.
-   - **Test plan:** validator passes; jekyll build clean; spot-check rendered HTML.
-5. Wait for CI; investigate any non-flake failure.
-6. `gh pr merge --admin --squash --delete-branch` once CI green.
-7. Verify `gh issue view 951 --json state` returns `CLOSED`.
+5. Update `tasks/todo.md` to mark all phases complete.
 
 ---
 
@@ -220,11 +263,10 @@ Specific things for user to review at CHECKPOINT-A:
 
 | Risk | Mitigation |
 |---|---|
-| Authored subtitle ends up byte-identical to description (AC-3 violation) | T3 step 3 byte-equality check runs **before** CHECKPOINT-A; violators are fixed before user review. |
-| Voice inconsistency across 24 subtitles | CHECKPOINT-A is the editorial pass; T2-first sequencing uses the existing 8 summary lines as voice anchors before T3 authors fresh. |
-| One of the 8 repurposed `summary:` texts is itself low-quality | T2 step 2 explicitly allows lightweight rewriting under SPEC §6 voice; not all 8 must be verbatim. |
-| Validator's word-counting splits unexpectedly on punctuation | `wc -w` is standard; sanity-tested at T1 against 45- and 70-word fixtures before backfill begins. |
-| `bundle exec jekyll build` regresses despite AC-7 (e.g., a stray YAML colon in a subtitle string) | T4 build step catches this; YAML-quoting of subtitle values (`subtitle: "..."`) avoids ambiguity. **Convention:** always wrap subtitle in double quotes. |
-| `_drafts/` is accidentally touched | Validator scans `_posts/` only (line 62 `find "$REPO_ROOT/_posts" ...`); T2/T3 grep targets `_posts/*.md` explicitly. AC-7 git-diff boundary check catches any straggler edits. |
-| 8 + 16 = 24 partitioning is wrong (e.g., one post has both `summary:` and is in T3 batch) | T3 step 1 uses `comm -23` against the actual subtitle-present set from T2's output, not a pre-computed list. |
-| CI on the validator commit (Commit 1) reports 24 failing checks and blocks merge | Commit 1 is **on the same branch** as Commit 2; CI runs on the final branch state where all 24 posts have subtitles. The intermediate state is never on `main`. |
+| Label color collision with `governance-update` (both amber) makes them visually indistinguishable in PR triage | Acceptable — they're both caution-class. If user prefers distinction, swap `fbca04` → `ff9800` (orange) before T5 commit. |
+| The smoke test's fixture-staging pattern accidentally commits fixture files | Cleanup step in T2 and T4 explicitly `git reset HEAD tests/scope-fixture-*.md && rm` after each case. Add `git status --short` assertion before each case starts. |
+| `bulk-content` label collides with an existing label I missed | T1's `gh label list ... search "bulk"` confirmed clean. Re-check immediately before T8. |
+| `scripts/check-pr-scope.sh` has a CI workflow that runs against the script change and breaks the script itself (chicken-and-egg) | The CI runs the script via `bash scripts/check-pr-scope.sh` against the changed-files list; the script's own change is just one of the changed files. Self-check on the implementation PR will report 3 files changed and apply Rule 3 (touches `CLAUDE.md`? No — CLAUDE.md isn't governance-surface per the regex `^\.github/(skills|instructions)/`). Clean. |
+| YAML schema rejection at sync time (if a label-sync action exists silently) | T5 verifies via `python3 yaml.safe_load`. No further sync action observed at SHA `ec008ac`. |
+| Anti-pattern wording in CLAUDE.md is too soft and gets ignored | Phrase the section as **hard rules** rather than guidance (e.g., "do NOT use the label for refactors"). User approved this wording strength in SPEC clarifying answer #2. |
+| Worth-watching `governance-update` drift turns out to indicate a broken label-sync action that should be fixed FIRST | Spot-check `.github/workflows/` for label-sync action references. If one exists and is silently failing, surface as a separate issue but don't block #956. |

@@ -1,43 +1,45 @@
-# TODO — Backfill `subtitle:` Front-Matter + Validator (#951)
+# TODO — `bulk-content` Scope-Guard Exemption Label (#956)
 
 **Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
-**Plan SHA:** `f56c219` · 24 posts (8 with `summary:`, 16 without)
+**Plan SHA:** `ec008ac` · 3 files to touch (`.github/labels.yml`, `scripts/check-pr-scope.sh`, `CLAUDE.md`)
 
 ---
 
-## Phase 1 — Validator (RED setup)
-- [x] **T1** Extended `validate-post-quality.sh` section 12 (subtitle present + length). RED phase verified: 24 missing-subtitle errors on unchanged corpus; 45-word fixture → WARN; 70-word fixture → ERROR. Committed as `6027895`.
+## Phase 1 — Research (done in /plan)
+- [x] **T1** `.github/labels.yml` schema confirmed (flat list, no nested groups); `governance-update` lives on GitHub but **not** in YAML (drift — flagged as future-watching, NOT in scope); `CLAUDE.md:65-67` is the anchor; `AGENTS.md` doesn't mention governance labels (skip).
 
-## Phase 2 — Editorial backfill
-- [x] **T2** Repurposed `summary:` → `subtitle:` on 8 posts; deleted summary lines. Intermediate state: 8 subtitles, 0 summaries, 16 missing-subtitle errors remaining (down from 24).
-- [x] **T3** Authored `subtitle:` on 16 remaining posts (description seed → editorial rewrite). AC-3 byte-equality check returned 0 violations across all 24.
+## Phase 2 — RED smoke test
+- [ ] **T2** Create branch `chore/956-bulk-content-label`; stage 30 fixture files under `tests/`; run `PR_LABELS="bulk-content" bash scripts/check-pr-scope.sh` → expect exit 1 (Rule 2 fires despite label). Capture output. Restore working tree.
 
-## CHECKPOINT-A — User editorial review (PRE-COMMIT GATE)
-- [x] All 24 posts have `subtitle:`; 0 have `summary:`
-- [x] Validator exit 0 (all 24 pass, no warnings)
-- [x] AC-3 byte-equality check clean
-- [x] **User approved** after reading all 24 subtitles in the listing
+## Phase 3 — Implementation
+- [ ] **T3** Wrap Rule 2 in `scripts/check-pr-scope.sh:73-79` with `bulk-content` skip check (mirror Rule 3 / `governance-update` pattern exactly). Update header comment (lines 4-25) to document the new label. Commit A on branch.
 
-## Phase 2.5 — Code review (added per lifecycle audit)
-- [x] **/review** via `code-reviewer` agent — Approve with revisions. One real fix applied: dropped transient SHA reference in section 12 comment (committed as `49b4db9`). Other findings informational (9 subtitles at 29-31 words above 20-28 target but under 40 cap; YAML edge cases verified safe).
+## Phase 4 — GREEN smoke test + CHECKPOINT-A
+- [ ] **T4** Run 4-case behavior matrix (per SPEC AC-4):
+  - Case 1: `bulk-content` + 30 files → exit 0, Rule 2 skipped
+  - Case 2: no label + 30 files → exit 1, Rule 2 fires
+  - Case 3: `bulk-content` + governance file → exit 1, Rule 3 fires, Rule 2 skipped
+  - Case 4: `bulk-content,governance-update` + governance file → exit 0, both rules skipped
+- [ ] **CHECKPOINT-A** — All 4 cases match expected exit code + stdout; outputs captured for PR body; no fixture residue.
 
-## Phase 3 — Verification
-- [x] **T4** `bundle exec jekyll build` exits 0 (1.078s); 24/24 rendered post HTML files contain `<h2 class="article-subtitle">`; AC-7 boundary check empty (no `_layouts/_includes/_sass/index.md` touches); validator final pass clean.
+## Phase 5 — Metadata + documentation
+- [ ] **T5** Add `bulk-content` to `.github/labels.yml` (amber color `fbca04` matching governance-update caution class; description per SPEC §7). Verify YAML parses.
+- [ ] **T6** Insert `bulk-content` reminder block in `CLAUDE.md` after line 67, plus anti-pattern list (refactors, unrelated changes, double-bypass) and valid-use-case list. Commit B on branch (T5 + T6 bundle).
 
-## Phase 4 — Ship
-- [x] **T5 (commits)** Branch `chore/951-subtitle-backfill` carries 3 commits: T1 validator (6027895), review fix (49b4db9), T2+T3 post edits (29b38ed).
-- [ ] **T5 (push + PR)** Push branch; `gh pr create` with repurposed/seeded table.
-- [ ] **T5 (CI + merge)** CI green; `gh pr merge --admin --squash --delete-branch`; verify #951 CLOSED.
+## Phase 6 — Ship
+- [ ] **T7** Push branch; `gh pr create` with 4-case behavior matrix in body + worth-watching note about `governance-update` YAML drift; **no `agent:*` label** (cross-domain), **no `governance-update` label** (not touching `.github/skills/` or `.github/instructions/`); wait for CI.
+- [ ] **T8** Create the label on GitHub via `gh label create bulk-content` (workaround for the YAML-vs-live drift since no active label-sync action observed).
+- [ ] **T9** `gh pr merge --admin --squash --delete-branch` once CI green; pull main; verify label persists; sanity-run script on clean tree.
 
 ---
 
 ## Acceptance criteria checklist (mirrors SPEC §3)
 
-- [ ] **AC-1** Every post in `_posts/*.md` has `subtitle:` populated
-- [ ] **AC-2** Zero posts retain the dead `summary:` field
-- [ ] **AC-3** No subtitle is byte-for-byte identical to its post's `description:`
-- [ ] **AC-4** Validator: missing subtitle → exit 1; > 60 words → exit 1; 41–60 words → exit 2; ≤ 40 words on full corpus → exit 0
-- [ ] **AC-5** Every rendered post HTML shows `<h2 class="article-subtitle">…</h2>`
-- [ ] **AC-6** `bundle exec jekyll build` exits 0
-- [ ] **AC-7** Zero changes to `_layouts/`, `_includes/`, `_sass/`, `index.md`, or any non-`_posts/` site file (besides the validator script)
-- [ ] **AC-8** PR description includes the 24-post repurposed/seeded table + 3 sample subtitles + AC-7 boundary note
+- [ ] **AC-1** `bulk-content` declared in `.github/labels.yml` with clear description naming Rule 2 + anti-pattern warning
+- [ ] **AC-2** Label exists in repo on GitHub (verified via `gh label list`)
+- [ ] **AC-3** Rule 2 wrapped in `bulk-content` skip mirroring Rule 3 / `governance-update`
+- [ ] **AC-4** Behavior matrix verified — 4 cases produce expected exit codes
+- [ ] **AC-5** `scripts/check-pr-scope.sh` header comment documents `bulk-content` alongside `governance-update`
+- [ ] **AC-6** `CLAUDE.md` documents when to use `bulk-content` + anti-patterns
+- [ ] **AC-7** No change to Rules 1, 3, or 4 (verified by Case 2 + Case 3 + Case 4 outputs)
+- [ ] **AC-8** PR body includes the 4-case behavior matrix with actual exit codes + literal stdout
