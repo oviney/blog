@@ -280,8 +280,9 @@ for post in $POSTS; do
   # `<h2 class="article-subtitle">{{ page.subtitle }}</h2>` and the
   # homepage hero subtitle when this field is present. Every post must
   # carry an Economist-style standfirst here: declarative, 20-28 words
-  # target, hard cap 40 (warn) / 60 (error). See #951 and SPEC.md §6
-  # in commit 560a889 for style guidance.
+  # target, soft cap 40 (warn), hard cap 60 (error). See issue #951
+  # and SPEC §6 (in tasks/archive/<sweep-date>-…/SPEC.md after merge)
+  # for style guidance.
   # ------------------------------------------------------------------
   subtitle_val=$(fm_value "$post" "subtitle")
   subtitle_clean=$(echo "$subtitle_val" | sed 's/^["'"'"']//; s/["'"'"']$//')
