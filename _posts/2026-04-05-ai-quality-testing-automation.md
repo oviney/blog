@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "AI Testing Tools: The Adoption Chasm Nobody Discusses"
+subtitle: "The pilot-to-production gap in AI testing is 74 points wide — and the bottleneck is rarely the tooling. It is the organisational machinery that decides which pilots ever become defaults."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Test Automation"]

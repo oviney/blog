@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "AI-Driven Threat Detection in Enterprise Networks"
+subtitle: "Signature-based intrusion detection misses six in ten novel attacks — and the shift to behavioural, AI-driven models is no longer optional for any enterprise still running 2015-era IDS/IPS."
 date: 2026-04-12
 author: "Ouray Viney"
 categories: ["Security"]

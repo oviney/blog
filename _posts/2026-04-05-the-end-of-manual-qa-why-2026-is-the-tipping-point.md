@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Manual QA's Last Stand: The Machines Have Already Won"
+subtitle: "Manual testing is not declining gradually — it is being economically exterminated by AI tools that 89% of enterprises are piloting and only 16% have deployed at scale."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
@@ -9,7 +10,6 @@ image: /assets/images/the-end-of-manual-qa.png
 image_alt: "A lone tester sits at a desk as robotic lines close in from both sides"
 image_caption: "Illustration: manual QA is squeezed as industrial automation moves in"
 description: "89% of enterprises are piloting AI in QA, yet only 16% have adopted it. The 59-point gap is closing fast — and manual QA's economics have collapsed."
-summary: "Manual testing is not declining gradually — it is being economically exterminated by AI tools that 89% of enterprises are piloting, even as only 15% have deployed them at scale."
 ---
 
 ![AI non-adoption in quality engineering fell from 31% in 2023 to 11% in 2025; 89% now piloting or deploying](/assets/charts/the-end-of-manual-qa-why-2026-is-the-tipping-point.svg)

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The Financial Toll of Security Debt: A Growing Concern"
+subtitle: "Unpatched CVEs and underfunded remediation queues used to be technical curiosities; they now appear in goodwill impairments, insurance premiums and audit findings — a quantifiable liability boards must price."
 date: 2026-04-12
 author: "Ouray Viney"
 categories: ["Security"]

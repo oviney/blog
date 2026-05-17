@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Self-healing tests: the promise that keeps breaking"
+subtitle: "Vendors pitch 80% maintenance savings, but independent measurement on production suites finds only three in ten teams reach the autonomy threshold — and the rest are paying twice."
 date: 2026-01-02
 author: "Ouray Viney"
 categories: ["Test Automation"]

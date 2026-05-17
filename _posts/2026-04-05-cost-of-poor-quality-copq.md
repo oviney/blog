@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Quality's Second Act: What Software Can Steal from Factories"
+subtitle: "Manufacturing spent decades learning that quality is cheaper than inspection — Boeing's $31 billion lesson and CrowdStrike's $500 million afternoon prove software hasn't learned yet."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
@@ -9,7 +10,6 @@ image: /assets/images/copq-cross-industry.png
 image_alt: "A factory assembly line faces a chaotic software delivery pipeline split across the same frame"
 image_caption: "Illustration: manufacturing discipline and software chaos collide in the cost of poor quality"
 description: "Boeing's $31 billion quality failure mirrors software's inverted cost structure. US firms spend 3.4× more fixing defects than preventing them."
-summary: "Manufacturing spent decades learning that quality is cheaper than inspection — Boeing's $31 billion lesson and CrowdStrike's $500 million afternoon prove software hasn't learned yet."
 ---
 
 ![Cost of poor quality: software organisations spend 3.4 times more fixing defects than preventing them](/assets/charts/cost-of-poor-quality-copq.svg)

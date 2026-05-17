@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The invisible shield: DNS as cybersecurity's first line"
+subtitle: "Most security spend goes to perimeter and endpoint — yet a single DNS lookup decides whether a phishing click ever reaches its target, and millions of attempts a minute prove it."
 date: 2023-12-28
 author: "Ouray Viney"
 categories: ["Security"]

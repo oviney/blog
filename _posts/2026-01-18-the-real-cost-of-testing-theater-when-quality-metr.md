@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Testing Theatre: The QA Metrics That Fool Everyone"
+subtitle: "Most QA dashboards measure activity, not outcomes — and DORA 2025 finds that AI adoption widens the gap, lifting throughput while increasing delivery instability."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
@@ -9,7 +10,6 @@ image: /assets/images/testing-theatre-vanity-metrics.png
 image_alt: "Actors perform on a stage built from glowing QA dashboards"
 image_caption: "Illustration: vanity metrics turn testing into performance instead of assurance"
 description: "Volkswagen's tests hit 94% pass rates — then a two-year launch delay exposed the gap. Most QA dashboards measure activity, not outcomes."
-summary: "Most QA dashboards measure activity, not outcomes — and the 2025 DORA report confirms that AI adoption improves throughput while increasing delivery instability."
 ---
 
 ![Testing theatre: 61% of QA teams still use pass rate as their primary metric; only 12% measure mutation testing](/assets/charts/the-real-cost-of-testing-theater-when-quality-metr.svg)

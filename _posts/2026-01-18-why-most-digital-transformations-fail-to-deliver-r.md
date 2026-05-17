@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Why 70% of Digital Transformations Still Fail"
+subtitle: "Two decades of consulting decks and platform pivots later, the failure rate remains seven in ten — because governance, talent and operating-model gaps outweigh the technology."
 date: 2026-01-18
 author: "Ouray Viney"
 categories: ["Software Engineering"]

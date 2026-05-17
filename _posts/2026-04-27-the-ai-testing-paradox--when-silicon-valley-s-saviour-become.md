@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The AI testing paradox: faster drafts, slower trust"
+subtitle: "AI coding tools accelerate the first commit; they also accelerate the rework cycle when review, testing and governance are not upgraded to match the new draft velocity."
 date: 2026-04-27
 author: "Ouray Viney"
 categories: ["Quality Engineering"]

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The coder's crutch: AI-assisted development's hidden costs"
+subtitle: "Copilot now drafts 46% of new code on GitHub, and shipping cadence is undeniably faster — but the comprehension gap left behind is an inheritance the next maintainer pays for."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Software Engineering"]

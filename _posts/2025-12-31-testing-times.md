@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Testing times: why AI conquered QA without improving it"
+subtitle: "$2.3 billion in vendor funding and 80% adoption later, defect-escape rates look stubbornly familiar — AI changed who tests, but not yet what gets through."
 date: 2025-12-31
 author: "Ouray Viney"
 categories: ["Quality Engineering"]

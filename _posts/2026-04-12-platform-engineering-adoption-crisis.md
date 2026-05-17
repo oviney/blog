@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Platform engineering's adoption trap"
+subtitle: "Platform teams keep getting stood up and the value keeps not appearing — because cultural inertia, premature tooling and misaligned expectations sink the programme before it can prove itself."
 date: 2026-04-12
 author: "Ouray Viney"
 categories: ["Software Engineering"]

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The quality confusion tax: when QA, QC and QE blur"
+subtitle: "When QA, QC and quality engineering are treated as synonyms, the budgets, hiring profiles and processes that follow are also interchangeable — and predictably wrong for two of the three."
 date: 2026-04-12
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
