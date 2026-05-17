@@ -66,6 +66,27 @@ and tasks that cannot be expressed cleanly as a GitHub issue.
 or `.github/instructions/` should carry the `governance-update` label so the repo
 scope guard treats them as deliberate governance work.
 
+**Scope-explosion reminder:** PRs that are **structurally atomic** and cannot be
+split without creating a worse intermediate `main` state may carry the
+`bulk-content` label to bypass Rule 2 (the 15-file scope-explosion cap) in
+`scripts/check-pr-scope.sh`. Use sparingly — the label is a deliberate-intent
+exemption, not a general "split avoidance" tool. The scope guard cannot detect
+misuse; reviewers must.
+
+Valid `bulk-content` use cases:
+- Atomic content backfills (e.g., adding a required front-matter field to every
+  post when a validator gate goes live in the same PR — see #951 / PR #955)
+- Mass author / byline / category / tag rename across many `_posts/`
+- Atomic front-matter migrations that need every post in one commit for the
+  validator to pass
+
+Do **NOT** use `bulk-content` for:
+- Unrelated changes you don't want to split into separate PRs
+- Refactors of any size (refactors should be incremental; intermediate state is
+  usually fine for refactors)
+- Combining with `governance-update` to bypass two guards on a single PR without
+  strong justification (allowed but should be rare and explicitly called out)
+
 ---
 
 ## Local Agent Labels
