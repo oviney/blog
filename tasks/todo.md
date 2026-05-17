@@ -6,27 +6,27 @@
 ---
 
 ## Phase 1 — Composite action
-- [ ] **T1** Create `.github/actions/setup-node-with-puppeteer-cache/action.yml` (per SPEC §6) + `_retry-test.sh` harness (duplicates retry loop; header notes action.yml as source of truth)
-- [ ] **T2** RED retry test: `_retry-test.sh fail-fail-fail` → exit 1, 3 failure log lines, `::error::` terminal line
-- [ ] **T3** GREEN retry test: `_retry-test.sh fail-fail-succeed` → exit 0, 2 retry-warning lines, success line on attempt 3
+- [x] **T1** Created `.github/actions/setup-node-with-puppeteer-cache/action.yml` + `_retry-test.sh`. YAML parses; bash syntax-checks clean.
+- [x] **T2** RED retry test passed: `_retry-test.sh fail-fail-fail` → exit 1, 2 `::warning::` + 1 `::error::` lines.
+- [x] **T3** GREEN retry test passed: `_retry-test.sh fail-fail-succeed` → exit 0, 2 `::warning::` + success-on-attempt-3 line.
 
 ## Phase 2 — Migrate call-sites
-- [ ] **T4** Replace `setup-node@v6 + npm ci` pair with composite-action call in all 7 jobs of `.github/workflows/test-quality.yml`: `quality-checks`, `security`, `playwright-partial`, `playwright-shard1`, `playwright-shard2`, `playwright-shard3`, `quality-report`. Verify grep counts (0 of old, 7 of new).
+- [x] **T4** Replaced 7 call-sites in `test-quality.yml`. Grep counts verified (0 `setup-node@v6`, 7 composite-action references). YAML still parses.
 
 ## Phase 3 — Local verification
-- [ ] **T5** AC-8 boundary: `git diff --stat` shows exactly 3 files (2 new in `.github/actions/`, 1 modified `.github/workflows/test-quality.yml`); YAML parses for action and workflow; retry harness re-runs green.
+- [x] **T5** AC-8 boundary clean (3 files total: 2 new under `.github/actions/`, 1 modified workflow). Retry harness re-runs green post-migration.
 
 ## CHECKPOINT-A — Local gate before /review
-- [ ] All T1–T5 ACs satisfied (composite exists, retry RED+GREEN, 7 sites migrated, AC-8 clean)
+- [x] All T1–T5 ACs satisfied. Commits A (`5924993`) + B (`901c95b`) on branch.
 
 ## Phase 4 — /review pass
-- [ ] **T6** Code-reviewer agent reviews the branch — cache-key correctness, step ordering (cache before npm ci), retry exit-handling, AC-3 substitution fidelity
-- [ ] **T7** Apply any /review revisions; commit as Commit C if needed
+- [x] **T6** Code-reviewer agent verdict: **Approve**, no blockers. 2 Majors + 2 minor revisions identified.
+- [x] **T7** Applied all 4 revisions in Commit C (`5c72a7a`): M2 cache-key salts on Node version; M1 tightened sync-comment in both files (retry SHAPE not byte-identical); m1 set-uo-pipefail rationale comment; n1 RETRY-TEST PASS/FAIL banner prefix. Harness still green post-revision.
 
 ## Phase 5 — Ship
-- [ ] **T8** Push `chore/958-puppeteer-cache-and-retry`; `gh pr create` with retry-test outputs + 7-job list + AC-8 diff stat; label `agent:qa-gatekeeper` (QA scope is valid here); no `governance-update` (no `.github/skills/` or `.github/instructions/` touches)
-- [ ] **T9** CI passes — tolerate one Chrome-flake rerun during transition (cache priming on first run)
-- [ ] **T10** `gh pr merge --admin --squash --delete-branch` once green; sync local main
+- [ ] **T8** Push branch; `gh pr create` with retry-test outputs + 7-job list + AC-8 diff stat; label `agent:qa-gatekeeper`.
+- [ ] **T9** CI passes — tolerate one Chrome-flake rerun during transition (cache priming on first run).
+- [ ] **T10** `gh pr merge --admin --squash --delete-branch` once green; sync local main.
 
 ## Phase 6 — Post-merge verification
 - [ ] **T11** Open a trivial follow-up PR (any small change) to trigger fresh CI; inspect logs for `Cache restored from key:` on at least one of the 7 affected jobs (AC-5 verification — only observable in real CI)
