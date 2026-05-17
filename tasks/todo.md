@@ -6,7 +6,7 @@
 ---
 
 ## Phase 1 — Setup
-- [ ] **T1** Scaffold `tasks/943-body.md` (with §1=2026-05-01 / §3=2026-05-01 / §4=2026-02-15 header) and `tasks/943-followups-plan.md` (column headers + new `Status` column)
+- [x] **T1** Scaffold `tasks/943-body.md` (header pinned w/ per-section date floors + dedup target) and `tasks/943-followups-plan.md` (column headers + Status column + CHECKPOINT-A gate checklist) — committed
 
 ## Phase 2 — Research (parallel)
 - [ ] **T2a** §1 subagent — `general-purpose` with SPEC §7 + Tracked-in bucket; cap 3 findings; date floor 2026-05-01; explicit dedup against #945/#946
