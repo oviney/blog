@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.use({ baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4000' });
 
-test.describe('@content Byline regression coverage', () => {
+test.describe('@content Byline regression coverage @REQ-CONTENT-01 @REQ-CONTENT-02', () => {
   test('blog cards and post headers render a visible byline', async ({ page }) => {
     await page.goto('/blog/');
     await page.waitForLoadState('networkidle');
