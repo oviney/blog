@@ -10,8 +10,12 @@ test.describe('@content Byline regression coverage', () => {
     const firstCard = page.locator('.econ-article-card').first();
     await expect(firstCard).toBeVisible();
 
-    const cardByline = firstCard.getByText(/^By /).first();
+    const cardByline = firstCard.getByText(/^By\s+\S/).first();
     await expect(cardByline).toBeVisible();
+    const cardBylineText = (await cardByline.textContent())?.trim();
+
+    expect(cardBylineText).toBeTruthy();
+    expect(cardBylineText).toMatch(/^By\s+\S.+$/);
 
     const postLink = firstCard.locator('h2 a').first();
     await expect(postLink).toBeVisible();
@@ -26,8 +30,9 @@ test.describe('@content Byline regression coverage', () => {
     const articleHeader = page.locator('.article-header').first();
     await expect(articleHeader).toBeVisible();
 
-    const postByline = articleHeader.getByText(/^By /).first();
+    const postByline = articleHeader.getByText(/^By\s+\S/).first();
     await expect(postByline).toBeVisible();
+    await expect(postByline).toHaveText(cardBylineText!);
 
     const box = await postByline.boundingBox();
     const viewport = page.viewportSize();
