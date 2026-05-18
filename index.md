@@ -43,6 +43,7 @@ title: Quality Engineering Insights
       <p class="hero-post-subtitle">{{ hero_post.subtitle }}</p>
       {% endif %}
 
+      <!-- Deliberately longer than discovery cards so the homepage hero stays distinct. -->
       <p class="hero-post-excerpt">{{ hero_post.excerpt | strip_html | truncatewords: 40 }}</p>
 
       <div class="hero-post-meta">
@@ -127,6 +128,7 @@ title: Quality Engineering Insights
             <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
           </h3>
           <p class="topic-card-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
+          {% include byline.html author=post.author container_class="topic-card-author" text_class="topic-card-author-name" %}
           <div class="topic-card-meta">
             <span class="topic-meta-item">{{ post.date | date: "%B %-d, %Y" }}</span>
           </div>

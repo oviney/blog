@@ -1,0 +1,6 @@
+{% assign byline_author = include.author | default: site.author.name %}
+{% assign byline_container_class = include.container_class | default: 'article-byline' %}
+{% assign byline_text_class = include.text_class | default: 'article-byline-text' %}
+<p class="{{ byline_container_class }}">
+  <span class="{{ byline_text_class }}">By {{ byline_author }}</span>
+</p>

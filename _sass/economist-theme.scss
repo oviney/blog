@@ -1906,6 +1906,18 @@ table {
   margin: 0 0 8px 0;
 }
 
+.econ-card-author {
+  margin: 0 0 $spacing-xs 0;
+}
+
+.econ-card-author-name {
+  font-family: $font-sans;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: $text-secondary;
+  letter-spacing: 0.02em;
+}
+
 .econ-card-meta {
   font-family: $font-sans;
   font-size: 0.75rem;
