@@ -372,6 +372,18 @@ blockquote {
   }
 }
 
+.article-byline {
+  margin: 0 0 $spacing-md 0;
+}
+
+.article-byline-text {
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: $text-secondary;
+  letter-spacing: 0.02em;
+}
+
 // Action buttons (Save/Share)
 .article-actions-top,
 .article-actions-bottom {
