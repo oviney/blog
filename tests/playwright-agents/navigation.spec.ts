@@ -93,6 +93,9 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
     await page.goto(TESTING_TIMES);
     await page.waitForLoadState('networkidle');
 
+    // element-scoped: deliberately narrow to the article landmark — page-level
+    // would balloon the snapshot with site chrome and create review noise on
+    // every layout tweak (#947).
     await expect(page.locator('main article').first()).toMatchAriaSnapshot(`
       - article:
         - link /.+/
@@ -457,6 +460,9 @@ test.describe('@navigation Mobile Navigation Specific Tests @REQ-NAV-01 @REQ-NAV
     await expect(toggle).toBeVisible();
     await toggle.click();
 
+    // element-scoped: mobile-nav-open assertion checks the nav landmark in its
+    // open state; page-level would dilute the assertion by including the rest
+    // of the page (#947).
     await expect(page.locator('#site-navigation')).toMatchAriaSnapshot(`
       - navigation:
         - list:
