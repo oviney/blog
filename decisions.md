@@ -77,3 +77,13 @@ configuration, design conventions, or content standards.
 ---
 
 *Add new decisions below this line, following the ADR-NNN format.*
+
+---
+
+## ADR-008: `oviney/blog` Is the Publication Repo First
+
+**Date**: May 2026
+**Status**: Active
+**Context**: Contributor-facing documentation had drifted toward describing `oviney/blog` as a general agent platform, which obscured its primary purpose and left workflow guidance inconsistent with the actual Jekyll, QA, and Pull Request flow used to publish viney.ca.
+**Decision**: Treat `oviney/blog` first as the production publication repository for viney.ca. Root docs must lead with the site, content, theme, validation, and deployment workflow. Agent, governance, and automation material remains in the repository, but as supporting operational documentation rather than the repo's primary identity.
+**Consequences**: `README.md`, onboarding docs, and workflow guides should describe feature-branch plus PR delivery, `bundle exec jekyll build` as the canonical build validation, and `bash scripts/check-pr-scope.sh` as the standard scope guard. Governance-surface changes under `.github/skills/` or `.github/instructions/` must keep using the `governance-update` label flow without broadening ordinary content or site work into governance updates.

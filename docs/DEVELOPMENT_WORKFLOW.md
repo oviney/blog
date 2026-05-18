@@ -1,200 +1,126 @@
 # Development Workflow
 
-## Starting the Local Jekyll Server
+This repository is the working source for the viney.ca publication site. Use this workflow when changing posts, layouts, styles, scripts, tests, or contributor docs in `oviney/blog`.
 
-### Quick Start
+## 1. Install dependencies
+
 ```bash
-cd /Users/ouray.viney/code/economist-blog-v5
-bundle exec jekyll serve
+bundle install
+npm install
 ```
 
-The server will start at: **http://127.0.0.1:4000/**
+## 2. Run the site locally
 
-### Expected Warnings (Safe to Ignore)
+Use the development config for local work:
 
-When starting the server, you'll see these warnings that don't affect functionality:
-
-1. **CSV Warning**: 
-   ```
-   csv was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.
-   ```
-   - **Fix (optional)**: Add `gem 'csv'` to Gemfile
-
-2. **Faraday Middleware Warning**:
-   ```
-   To use retry middleware with Faraday v2.0+, install `faraday-retry` gem
-   ```
-   - **Fix (optional)**: Run `bundle add faraday-retry`
-
-### Successful Server Output
-```
-Configuration file: /Users/ouray.viney/code/economist-blog-v5/_config.yml
-            Source: /Users/ouray.viney/code/economist-blog-v5
-       Destination: /Users/ouray.viney/code/economist-blog-v5/_site
- Incremental build: disabled. Enable with --incremental
-      Generating... 
-       Jekyll Feed: Generating feed for posts
-                    done in 0.329 seconds.
- Auto-regeneration: enabled for '/Users/ouray.viney/code/economist-blog-v5'
-    Server address: http://127.0.0.1:4000/
-  Server running... press ctrl-c to stop.
+```bash
+bundle exec jekyll serve --config _config.yml,_config_dev.yml --livereload
 ```
 
-### Stopping the Server
-Press `Ctrl-C` in the terminal to stop the server.
+The site is served at http://localhost:4000.
 
----
+## 3. Make a focused change
 
-## Local Development Without `jekyll serve`
+Work on a feature branch and keep the diff scoped to the issue you are solving.
 
-The local server is now working, but the pre-commit hook workflow is still recommended for most development. The server is useful for rapid iteration on CSS/layout changes.
+```bash
+git checkout -b docs/short-description
+```
 
-## Recommended Workflow
+Examples:
 
-### 1. Make Changes
-Edit markdown files, layouts, CSS, or configuration.
+- `docs/issue-963-repo-boundary`
+- `fix/post-slug-date`
+- `feat/mobile-bottom-nav`
 
-### 2. Commit Changes
+## 4. Run the canonical validations
+
+Before opening or updating a PR, run:
+
+```bash
+bundle exec jekyll build
+bash scripts/check-pr-scope.sh
+```
+
+Run the existing repo QA commands that match your change:
+
+```bash
+npm run test:playwright
+npm run test:a11y
+npm run test:lighthouse
+npm run test:security
+```
+
+Browser-facing tests expect the Jekyll server to be running on port 4000.
+
+## 5. Commit and push
+
 ```bash
 git add <files>
-git commit -m "description"
+git commit -m "docs: concise description"
+git push origin docs/short-description
 ```
 
-**Pre-commit hook automatically runs:**
-- ✅ Jekyll build validation
-- ✅ Broken link detection
-- ✅ YAML front matter validation
-- ✅ Required fields check (title, date)
-- ✅ Future date warnings
+Open a Pull Request after pushing. Do not treat direct pushes to `main` as the normal contributor workflow.
 
-If any check fails, commit is blocked until fixed.
+## 6. Let CI validate the PR
 
-### 3. Push to GitHub
-```bash
-git push origin main
-```
+GitHub Actions is the source of truth for repository validation:
 
-### 4. GitHub Actions Builds and Deploys
-- GitHub Actions workflow triggers on push to main
-- Build with Jekyll 4.3.2 and all plugins (~45 seconds)
-- Deploy to GitHub Pages (~30 seconds)
-- Total deployment time: 1-2 minutes
-- View progress: https://github.com/oviney/blog/actions
+- `test-build.yml` checks the Jekyll build
+- `test-quality.yml` runs quality, accessibility, performance, and security checks
+- `jekyll.yml` deploys the site after merge to `main`
 
-### 5. Verify on Production
-Visit https://www.viney.ca/ to see changes live.
+Monitor runs at <https://github.com/oviney/blog/actions>.
 
-Optionally run Blog QA Agent:
-```bash
-cd ~/code/economist-agents
-python3 scripts/blog_qa_agent.py --blog-dir ~/code/economist-blog-v5
-```
+## 7. Merge and deploy
 
-## Why This Works
+Once the PR is reviewed and merged, the deployment workflow publishes the site to GitHub Pages. Verify the published result on <https://www.viney.ca/> when the workflow completes.
 
-### Pre-commit Validation Prevents Bugs
-The `.git/hooks/pre-commit` script catches:
-- Syntax errors (Jekyll build fails)
-- Configuration issues
-- Missing required metadata
-- Broken internal links
+## Governance-surface changes
 
-### GitHub Actions Handles Build & Deployment
-- Jekyll 4.3.2 with full plugin support
-- Consistent build environment (Ubuntu)
-- No local SSL/certificate issues
-- Complete build logs for debugging
-- Minimal Mistakes theme support
-
-### Blog QA Agent Learns from Issues
-- Self-improving validation
-- Learns patterns from any missed issues
-- Stores knowledge in `skills/blog_qa_skills.json`
-
-## Benefits Over Local Server
-
-| Aspect | Local `jekyll serve` | Pre-commit + GitHub Pages |
-|--------|---------------------|---------------------------|
-| Setup complexity | High (Ruby versions, SSL certs) | Low (already configured) |
-| Build environment | Local (may differ from prod) | Production-identical |
-| Validation | Manual (must remember) | Automatic (can't skip) |
-| Preview speed | Instant | 1-2 minutes |
-| SSL certificate issues | Yes (macOS + Ruby 3.3.6) | No |
-| Remote theme fetching | Fails | Works |
-
-## When to Use Each Approach
-
-### Use Pre-commit + GitHub Pages (Recommended)
-- ✅ Content changes (blog posts, pages)
-- ✅ Configuration tweaks
-- ✅ CSS/layout modifications
-- ✅ Daily development workflow
-
-### Use Local Jekyll Server
-- Complex theme development
-- Rapid iteration on layout
-- CSS experimentation
-- Real-time preview of changes
-
-**Command:** `bundle exec jekyll serve` (see section above for details)
-
-## Emergency: Bypass Pre-commit Hook
-
-**Only in emergencies** (hook is broken, urgent hotfix):
+If a PR intentionally changes `.github/skills/` or `.github/instructions/`, mirror the labeled CI path locally:
 
 ```bash
-git commit --no-verify -m "Emergency fix"
+PR_LABELS=governance-update bash scripts/check-pr-scope.sh
 ```
 
-This skips validation - use with extreme caution.
+Those PRs must also carry the `governance-update` label on GitHub.
 
-## Verification Checklist
+## Pre-commit hook
 
-Before pushing major changes:
-
-1. **Pre-commit passed** ✅ (automatic)
-2. **Commit message descriptive** ✅
-3. **GitHub Actions status** - Check after push
-4. **Production site** - Verify at viney.ca after 2 minutes
-5. **Blog QA Agent** - Run for additional validation
+The repository pre-commit hook is useful early feedback, especially for content changes, but it does not replace the full validation commands above.
 
 ## Troubleshooting
 
-### Pre-commit Hook Fails on Jekyll Build
+### `bundle exec jekyll build` fails because a gem is missing
 
-**Symptoms:**
-```
-📦 Testing Jekyll build...
-❌ Jekyll build failed! Fix errors before committing.
-```
+Run:
 
-**Solutions:**
-1. Check `_config.yml` for syntax errors
-2. Verify all posts have valid YAML front matter
-3. Run `bundle install` if dependencies changed
-4. Check that all referenced layouts exist
-
-### GitHub Actions Fails
-
-**Check:**
-- Visit https://github.com/oviney/blog/actions
-- Click latest workflow run
-- Review logs for specific error
-- Fix and push again
-
-### Pre-commit Hook Not Running
-
-**Fix:**
 ```bash
-chmod +x .git/hooks/pre-commit
+bundle install
 ```
 
-## Related Documentation
+Then rerun the build.
 
-- [Pre-commit Hook](PRE_COMMIT_HOOK.md) - Validation script
-- [GitHub Actions](../.github/workflows/jekyll.yml) - CI/CD pipeline
-- Blog QA Agent - external companion project in `oviney/economist-agents`
+### GitHub Actions fails
 
----
+1. Open <https://github.com/oviney/blog/actions>
+2. Inspect the failing workflow
+3. Fix the issue on your branch
+4. Push again to rerun CI
 
-**Bottom Line:** Your current workflow (pre-commit + GitHub Pages) is production-grade. No local `jekyll serve` needed.
+### Scope guard fails
+
+Check whether the PR:
+
+- touches a protected file
+- changes too many files
+- needs the `governance-update` label flow for governance surfaces
+
+## Related docs
+
+- [README.md](../README.md)
+- [GETTING_STARTED.md](../GETTING_STARTED.md)
+- [AGENTS.md](../AGENTS.md)
+- [CLAUDE.md](../CLAUDE.md)
