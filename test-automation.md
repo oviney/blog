@@ -42,6 +42,7 @@ permalink: /test-automation/
           </h2>
 
           <p class="topic-card-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
+          {% include byline.html author=post.author container_class="topic-card-author" text_class="topic-card-author-name" %}
 
           <div class="topic-card-meta">
             {% assign words = post.content | number_of_words %}

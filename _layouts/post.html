@@ -25,6 +25,8 @@ layout: default
     <h2 class="article-subtitle">{{ page.subtitle }}</h2>
     {% endif %}
 
+    {% include byline.html author=page.author container_class="article-byline" text_class="article-byline-text" %}
+
     <!-- Action buttons (top) -->
     <div class="article-actions-top">
       <button class="action-btn" id="copy-link-btn-top" aria-label="Copy link to this article">
