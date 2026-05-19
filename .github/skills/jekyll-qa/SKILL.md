@@ -37,7 +37,8 @@ Optional: Steps to Reproduce, Reference/Screenshots, Affected URL
 
 ### Toolchain pins (npm side)
 
-- `@playwright/test ^1.59.1`
+- `@playwright/test ^1.60.0` (bumped from `^1.59.1` in #947 — adds page-level `expect(page).toMatchAriaSnapshot()`, `test.abort()`, HAR-on-tracing, `locator.drop()`)
+  - `test.abort()` (Playwright 1.60+) is available for "tests must not call X" guardrails (issue #947) — abort the current test from a fixture, hook, or route handler with an optional message
 - `pa11y-ci ^4.1.0` (lockfile resolves to **4.1.1** as of #944; aligns with native lodash `~4.18.1` dep)
 - `lighthouse ^12.8.2`
 - `package.json` override `lodash: ^4.18.1` — predates pa11y-ci 4.1.1 and may still be load-bearing for other transitive deps; do not remove without auditing the dep graph (see #944 closing notes)
