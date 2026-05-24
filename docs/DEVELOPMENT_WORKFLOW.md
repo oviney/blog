@@ -4,8 +4,8 @@
 
 ### Quick Start
 ```bash
-cd /Users/ouray.viney/code/economist-blog-v5
-bundle exec jekyll serve
+cd /home/ouray/blog
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 ```
 
 The server will start at: **http://127.0.0.1:4000/**
@@ -28,14 +28,14 @@ When starting the server, you'll see these warnings that don't affect functional
 
 ### Successful Server Output
 ```
-Configuration file: /Users/ouray.viney/code/economist-blog-v5/_config.yml
-            Source: /Users/ouray.viney/code/economist-blog-v5
-       Destination: /Users/ouray.viney/code/economist-blog-v5/_site
+Configuration file: /home/ouray/blog/_config.yml
+            Source: /home/ouray/blog
+       Destination: /home/ouray/blog/_site
  Incremental build: disabled. Enable with --incremental
       Generating... 
        Jekyll Feed: Generating feed for posts
                     done in 0.329 seconds.
- Auto-regeneration: enabled for '/Users/ouray.viney/code/economist-blog-v5'
+ Auto-regeneration: enabled for '/home/ouray/blog'
     Server address: http://127.0.0.1:4000/
   Server running... press ctrl-c to stop.
 ```
@@ -48,6 +48,20 @@ Press `Ctrl-C` in the terminal to stop the server.
 ## Local Development Without `jekyll serve`
 
 The local server is now working, but the pre-commit hook workflow is still recommended for most development. The server is useful for rapid iteration on CSS/layout changes.
+
+## Repository Boundary
+
+This repository is primarily the source of the viney.ca publication. Day-to-day
+development should optimise for:
+
+- publishing content
+- maintaining the Jekyll theme and layouts
+- protecting reader-facing quality with builds, tests, and validation
+
+The repo currently contains some supporting agent/governance automation as well.
+Treat that automation as maintenance infrastructure for the blog, not as the
+primary product. If a script or workflow becomes useful outside this site, it
+should be considered for extraction rather than expanded by default here.
 
 ## Recommended Workflow
 
@@ -69,9 +83,30 @@ git commit -m "description"
 
 If any check fails, commit is blocked until fixed.
 
+### 2b. Run the Same Local Checks CI Expects
+```bash
+bundle exec jekyll build
+
+# Start Jekyll before browser-based QA
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
+
+npm run test:security
+npm run test:playwright
+npm run test:a11y
+npm run test:lighthouse
+bash scripts/check-pr-scope.sh
+```
+
+For governance-surface PRs that touch `.github/skills/` or `.github/instructions/`,
+mirror CI locally with:
+
+```bash
+PR_LABELS=governance-update bash scripts/check-pr-scope.sh
+```
+
 ### 3. Push to GitHub
 ```bash
-git push origin main
+git push origin <branch>
 ```
 
 ### 4. GitHub Actions Builds and Deploys
@@ -99,17 +134,17 @@ The `.git/hooks/pre-commit` script catches:
 - Missing required metadata
 - Broken internal links
 
-### GitHub Actions Handles Build & Deployment
+### GitHub Actions Handle Build & Deployment
 - Jekyll 4.3.2 with full plugin support
 - Consistent build environment (Ubuntu)
 - No local SSL/certificate issues
 - Complete build logs for debugging
-- Minimal Mistakes theme support
+- Static-site publishing and QA support for viney.ca
 
-### Blog QA Agent Learns from Issues
-- Self-improving validation
-- Learns patterns from any missed issues
-- Stores knowledge in `skills/blog_qa_skills.json`
+### External Companion Tooling
+The blog may be operated with companion tooling from other repositories, such as
+`oviney/economist-agents`. Keep that relationship explicit: those tools support
+this site, but they are not part of the publication repo's core product boundary.
 
 ## Benefits Over Local Server
 
@@ -153,10 +188,11 @@ This skips validation - use with extreme caution.
 Before pushing major changes:
 
 1. **Pre-commit passed** ✅ (automatic)
-2. **Commit message descriptive** ✅
-3. **GitHub Actions status** - Check after push
-4. **Production site** - Verify at viney.ca after 2 minutes
-5. **Blog QA Agent** - Run for additional validation
+2. **`bundle exec jekyll build` passed** ✅
+3. **Relevant QA command(s) passed** ✅ (`npm run test:security`, `npm run test:playwright`, `npm run test:a11y`, `npm run test:lighthouse`)
+4. **Scope guard passed** ✅ (`bash scripts/check-pr-scope.sh`)
+5. **GitHub Actions status** - Check after push
+6. **Production site** - Verify at viney.ca after deployment
 
 ## Troubleshooting
 
@@ -197,4 +233,4 @@ chmod +x .git/hooks/pre-commit
 
 ---
 
-**Bottom Line:** Your current workflow (pre-commit + GitHub Pages) is production-grade. No local `jekyll serve` needed.
+**Bottom Line:** Develop this repo as a publication system first. Keep supporting tooling scoped to what the blog actually needs.

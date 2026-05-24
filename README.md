@@ -22,6 +22,12 @@ Professional commentary on software quality engineering, test automation, and em
 
 **Content Generation**: Articles are produced using [economist-agents](https://github.com/oviney/economist-agents), a multi-agent AI system that generates publication-quality content with The Economist's voice.
 
+## Repository Boundary
+
+`oviney/blog` is the source repository for the **viney.ca publication**: content, theme, layouts, reader-facing quality checks, and deployment all live here.
+
+The repository also contains some agent and governance automation used to operate the site today. That automation exists to support the blog, not to redefine this repository as a general-purpose agent platform. Reusable orchestration, evaluation, or governance tooling that proves valuable beyond this site should be treated as an **extraction candidate** for a separate repository rather than expanded indefinitely here.
+
 ## Local Development
 
 ```bash
@@ -29,7 +35,7 @@ Professional commentary on software quality engineering, test automation, and em
 bundle install
 
 # Run locally
-bundle exec jekyll serve
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 
 # Visit http://localhost:4000
 ```
@@ -40,8 +46,14 @@ bundle exec jekyll serve
 # Install testing dependencies
 npm install
 
+# Build the site (primary build truth)
+bundle exec jekyll build
+
 # Create baseline screenshots (first time only)
 npm run test:visual:reference
+
+# Start Jekyll before browser-based QA
+bundle exec jekyll serve --config _config.yml,_config_dev.yml
 
 # Run visual regression tests
 npm run test:visual
@@ -57,6 +69,12 @@ npm run test:security
 
 # Run all tests
 npm test
+
+# Run the PR scope guard before opening a PR
+bash scripts/check-pr-scope.sh
+
+# If the PR changes .github/skills/ or .github/instructions/
+PR_LABELS=governance-update bash scripts/check-pr-scope.sh
 ```
 
 **Pre-commit Hook:**
@@ -87,6 +105,7 @@ GitHub Actions automatically builds and deploys changes to GitHub Pages.
 - ✅ CI: Accessibility testing (pa11y-ci WCAG 2.1 AA)
 - ✅ CI: Performance testing (Lighthouse CI - Performance, SEO, Best Practices)
 - ✅ CI: Security audit (npm audit)
+- ✅ PR scope guard: `bash scripts/check-pr-scope.sh`
 - ✅ Deployment: Automated to GitHub Pages
 
 ## Custom Theme
@@ -110,6 +129,8 @@ blog/
 ├── _sass/           # Custom Economist theme SCSS  
 ├── _includes/       # Reusable components
 ├── assets/          # Images, CSS, charts
+├── .github/         # Deploy, QA, and repo-governance automation
+├── scripts/         # Blog validation and operational support scripts
 ├── _config.yml      # Jekyll configuration
 └── Gemfile          # Ruby dependencies
 ```
@@ -118,9 +139,11 @@ blog/
 
 For details on the AI content generation pipeline, see [oviney/economist-agents](https://github.com/oviney/economist-agents).
 
-## Agent PR Eval Harness
+## Repo Governance and Maintenance Tooling
 
-Tools that agents run to self-validate their PRs before requesting review.
+This repository includes agent and governance tooling because it currently helps maintain the blog safely. It should be read as **supporting infrastructure for the publication**, not as the primary product of the repo.
+
+Some of this tooling may move to a separate repository over time if it becomes broadly reusable outside viney.ca. Until then, the operating rule is simple: blog publishing, reader experience, and site quality come first; supporting automation should stay tightly scoped to those needs.
 
 ### Scope Self-Check
 
@@ -144,7 +167,8 @@ bash scripts/check-pr-scope.sh
 - Exit `1` → one or more violations found; fix them before pushing.
 
 No dependencies beyond `git` and `bash`.
-## Agent Merge Unblocker
+
+### Agent Merge Unblocker
 
 Every Copilot-authored PR passes through the normal branch-protection rules on
 `main`.  Two settings were found (see [#586](https://github.com/oviney/blog/issues/586))
@@ -197,6 +221,8 @@ user-owned repositories.  After running the script:
 Re-run the script any time branch-protection settings are reset by a GitHub
 UI change, a repository transfer, or a new admin modifying the settings.  The
 script is safe to run repeatedly.
+### Agent PR Eval Harness
+
 `scripts/eval-agent-pr.sh` scores any PR against a five-dimension quality rubric
 and writes a JSON snapshot to `.agent-evals/<pr>.json`.
 

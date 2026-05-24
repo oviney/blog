@@ -39,6 +39,17 @@ clear publication path.
    (for example, security debt, platform engineering, or AI adoption) so the
    roadmap produces clusters rather than isolated essays.
 
+## Operating Model
+
+This repository's roadmap is for the **publication** first: content, discovery,
+reader experience, and the quality gates required to ship viney.ca safely.
+
+Operational automation is in scope only when it directly improves publishing,
+validation, deployment, or reader-facing reliability. Agent orchestration,
+governance experiments, and reusable workflow tooling should be treated as
+supporting infrastructure and, where they become broader than the blog itself,
+as candidates for extraction into a separate repository.
+
 ## Tech Debt
 
 1. **Sass `@import` → `@use`/`@forward`** — Dart Sass has deprecated `@import`;
@@ -58,4 +69,4 @@ clear publication path.
 
 ---
 
-*Last updated: April 2026*
+*Last updated: May 2026*

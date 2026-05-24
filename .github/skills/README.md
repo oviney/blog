@@ -17,6 +17,11 @@ local lifecycle skills such as `spec`, `planning-and-task-breakdown`, `build`,
 Custom agents and MCP/tool integrations are runtime-dependent. Treat them as
 optional execution aids when available, not as guarantees across every runtime.
 
+These skills exist to operate **the viney.ca blog repository**. They are not a
+claim that `oviney/blog` should be the permanent home for every reusable Copilot
+or agent-governance pattern. When a workflow becomes useful beyond this site,
+prefer extracting it rather than broadening the repo's purpose indefinitely.
+
 ## Lifecycle Backbone
 
 | Phase | Callable skill | Reference file | Notes |
@@ -31,7 +36,7 @@ optional execution aids when available, not as guarantees across every runtime.
 
 ## Blog Augmentations
 
-These skills remain valuable because they encode repo-specific workflows, constraints, and quality gates:
+These skills remain valuable because they encode repo-specific workflows, constraints, and quality gates for running the publication safely:
 
 | Domain | Skill | File | Use for |
 |---|---|---|---|

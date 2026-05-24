@@ -4,6 +4,11 @@
 
 A production Jekyll blog with a **custom Economist-inspired theme**, deployed via GitHub Actions to GitHub Pages at **https://www.viney.ca/**.
 
+The primary purpose of this repository is the publication itself: content,
+theme, deployment, and the quality gates needed to keep the site trustworthy for
+readers. Supporting agent and governance automation exists here today, but that
+automation should be treated as operational support rather than the core product.
+
 ## Site Overview
 
 | Property | Value |
@@ -28,7 +33,7 @@ Custom Economist-inspired design system (`_sass/economist-theme.scss`, 600+ line
 
 ## CI/CD Pipeline
 
-Four GitHub Actions workflows run automatically on push to `main`:
+Core workflows that matter directly to the published blog include:
 
 | Workflow | File | Purpose |
 |---|---|---|
@@ -36,6 +41,11 @@ Four GitHub Actions workflows run automatically on push to `main`:
 | Test Build | `test-build.yml` | Jekyll build validation + HTML checks |
 | Quality Tests | `test-quality.yml` | Visual regression, a11y, Lighthouse, security |
 | Healing Monitor | `healing-monitor.yml` | Playwright test healing (runs every 4 hours) |
+
+The repository also contains additional operational workflows for agent support,
+reporting, and governance. Those workflows are part of the current operating
+model, but not all of them necessarily belong in the long-term product boundary
+of `oviney/blog`.
 
 ## Quality Gates
 
@@ -70,6 +80,12 @@ Blog articles are produced using the [economist-agents](https://github.com/ovine
 - **Actions**: https://github.com/oviney/blog/actions
 - **Dashboard**: https://oviney.github.io/blog/dashboard/
 
+## Boundary Note
+
+If a script, workflow, or dashboard has clear value outside this blog, it should
+be evaluated as an extraction candidate into a separate repository rather than
+used to redefine the purpose of `oviney/blog`.
+
 ---
 
-**Last updated**: April 2026
+**Last updated**: May 2026
