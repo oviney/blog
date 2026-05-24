@@ -1,32 +1,33 @@
-# SPEC — Make AGENTS.md handoff targets explicit + Mermaid graph (#946)
+# SPEC — Scope-guard label exemption for legitimate AGENTS.md / ARCHITECTURE.md changes (#985)
 
 **Status:** Draft — awaiting approval
-**Issue:** [#946](https://github.com/oviney/blog/issues/946)
-**Labels:** `agent:qa-gatekeeper`
+**Issue:** [#985](https://github.com/oviney/blog/issues/985)
+**Labels:** `agent:qa-gatekeeper`, `governance-update`
 **Date:** 2026-05-24
 **Lifecycle phase:** DEFINE
-**Spawned from:** Research Sweep [#902](https://github.com/oviney/blog/issues/902) (2026-05-01)
+**Spawned from:** PR [#984](https://github.com/oviney/blog/pull/984) (closed #946) admin-merge follow-up — `check-agent-scope` red against a legitimate issue-driven `AGENTS.md` change.
 
 ---
 
 ## 1. Situation
 
-`AGENTS.md` documents five personas and references handoffs in prose (`**Handoff triggers**:` lines on Creative Director, QA Gatekeeper, Editorial Chief, Audience Researcher) but does not enumerate which personas may transfer to which others. The General Agent block has no handoff prose at all.
+`scripts/check-pr-scope.sh` Rule 1 (lines 75–80) loops over `PROTECTED_FILES` (lines 43–51) — `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`, `AGENTS.md`, `ARCHITECTURE.md` — and emits a `VIOLATION [protected-file]` for any one of them appearing in the diff. **Rule 1 has no `PR_LABELS` bypass**, unlike:
+- **Rule 2** (>15 files / scope-explosion) which respects the `bulk-content` label (lines 86–94)
+- **Rule 3** (`.github/skills/` or `.github/instructions/`) which respects the `governance-update` label (lines 100–109)
 
-LangGraph 1.0 (GA 2025-10) and the OpenAI Agents SDK April 2026 evolution have both standardised **Handoffs** as an explicit primitive — agents transfer control with carried context and a declared list of valid handoff targets. Making the handoff graph explicit and machine-readable lets future automation (and human reviewers) detect when a new persona is added without wiring up its routing.
+This means every PR that legitimately modifies `AGENTS.md` (a `governance-update`-relevant doc, but explicitly listed under Rule 1 not Rule 3) trips the guard. Most recent precedent: PR #984 / issue #946 (handoff-graph PR), admin-merged through the false-positive failure on 2026-05-24T22:33:33Z.
 
-The handoff *topology* is already implicit in the existing prose; this spec promotes it to a structured row on each persona plus a Mermaid diagram.
+The protection itself is correct — accidental side-effect modifications to `AGENTS.md` *should* trip the guard. What's missing is a deliberate-intent escape hatch for the rare issue-driven case.
 
-**File at HEAD `f07e15de`:**
-- `AGENTS.md` — 226 lines; persona blocks at lines 44, 60, 76, 92, 108; `## Cross-Agent Conventions` at line 134.
+`bulk-content` and `governance-update` are precedent: they signal deliberate intent and bypass a specific rule. The same pattern applies here.
 
-Mermaid rendering: the repo already supports Mermaid code fences in Markdown (confirmed via existing Mermaid usage; Jekyll's mermaid-jekyll plugin is loaded). Verify with `bundle exec jekyll build` + a local dev server preview.
+CI surface: the guard runs as the `check-agent-scope` job in `.github/workflows/test-build.yml:95-107`. No test currently exists for `scripts/check-pr-scope.sh`.
 
 ---
 
 ## 2. Objective
 
-Make the persona handoff graph explicit and machine-checkable in `AGENTS.md` by (a) adding a `**Valid handoff targets:**` row to each of the five persona blocks and (b) adding a top-level `## Handoff Graph` section rendering the targets as a Mermaid `graph LR` diagram. Single-file change, no governance surface touched, no functional behaviour change.
+Add a label-based exemption to `scripts/check-pr-scope.sh` Rule 1 that lets a PR modifying `AGENTS.md` or `ARCHITECTURE.md` pass the guard when (and only when) the PR carries a new `protected-file-update` label. Other protected files (`_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`) **remain unbypassable** — they're load-bearing infra, not docs. Cover the change with a small fixture-based test (`tests/scope-guard.sh`) wired into the `test-build.yml` workflow.
 
 ---
 
@@ -34,149 +35,135 @@ Make the persona handoff graph explicit and machine-checkable in `AGENTS.md` by 
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| Topology source | **Derive from existing `**Handoff triggers**` prose** (lines 56, 72, 88, 104) | Single source of truth; no new routing decisions invented in this PR. |
-| General Agent topology | **Terminal — `_(terminal — handles work end-to-end)_`** | General Agent is the cross-cutting / refactor catch-all; once it owns work, it ships it. Keeps the graph minimal. |
-| Section placement | **New top-level `## Handoff Graph` between `## Agent Roster` and `## Protected Files`** | Adjacent to the personas it describes; readers see the graph immediately after meeting the personas. |
-| Row placement inside each persona | **Add as a new row in the existing property table** (above `**Handoff triggers**` prose where present) | Keeps structured info in the table; prose paragraph below explains *when* the transfer happens. |
-| Diagram syntax | **`graph LR` Mermaid block** | Per issue AC; horizontal layout reads better at typical viewing widths than `graph TD` for a 5-node graph. |
-| Diagram node labels | **Short persona names** ("Creative Director", "QA Gatekeeper", etc.) — no labels/abbreviations | Matches the persona headings; avoids a separate legend. |
-| Terminal node visual | **Distinct node shape** `GeneralAgent(["General Agent"])` (rounded rectangle) vs default rectangle for others | Visually signals terminal status without needing a legend; falls back gracefully if shape is unsupported. |
+| Label name | **`protected-file-update`** | Parallels `bulk-content` and `governance-update`; intent is explicit ("this PR intentionally modifies a protected file"). |
+| Bypass scope | **Per-file allow-list** (`AGENTS.md`, `ARCHITECTURE.md` only) | Issue-driven docs work needs an escape hatch; infra files (`_config.yml`, `Gemfile*`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`) should always require a dedicated audit trail beyond a single label. Per-file design preserves that distinction. |
+| Bypass mechanism | **Two-tier check inside Rule 1**: per-file flag + label check, NOT an early-return at the top of Rule 1 | An all-or-nothing rule bypass (matching `governance-update`'s Rule 3 pattern) would expose infra files to the same label — undesirable. Two-tier keeps infra files always-protected. |
+| Bypass log line | `check-pr-scope: protected-file-update label present — bypassing protection for 'AGENTS.md'.` (one per bypassed file) | Mirrors existing skip-message style; explicit per-file logging makes the audit trail obvious in CI logs. |
+| Test strategy | **New `tests/scope-guard.sh` with 3 fixture cases** (temp-git-repo approach) | No production-script changes for testability; black-box test against the real script via env vars. Wired into `test-build.yml` as a new step. |
+| Test fixture mechanism | **Per-case temp git repo** (`mktemp -d` + `git init` + commit baseline + branch + modify) | Self-contained, no fixture files in the main repo, hermetic. ~30 lines of helper code. |
+| Documentation | **Update `scripts/check-pr-scope.sh` header docblock** (lines 21–29 already document `bulk-content` + `governance-update`) AND add a `protected-file-update` row to the label table in `CLAUDE.md` (alongside `bulk-content` and `governance-update`) | One source of truth (the script header) + one human-readable index (`CLAUDE.md`). No new doc file. |
 
 ---
 
-## 4. Handoff Topology (derived from existing prose)
+## 4. Acceptance Criteria
 
-| From | To | Source line in AGENTS.md |
-|---|---|---|
-| Creative Director | Editorial Chief | line 56 ("design change requires content edits") |
-| Creative Director | QA Gatekeeper | line 56 ("visual change requires CI/test updates") |
-| QA Gatekeeper | Creative Director | line 72 ("failing tests stem from a design regression") |
-| QA Gatekeeper | Editorial Chief | line 72 ("content error is caught in CI") |
-| Editorial Chief | Creative Director | line 88 ("post requires a new layout or styling") |
-| Editorial Chief | QA Gatekeeper | line 88 ("published post causes a build failure") |
-| Audience Researcher | Creative Director | line 104 ("layout or visual hierarchy changes") |
-| Audience Researcher | Editorial Chief | line 104 ("copy, headline, SEO, or internal-link improvements") |
-| Audience Researcher | QA Gatekeeper | line 104 ("accessibility, interaction, or regression-proofing work") |
-| General Agent | — (terminal) | No existing handoff prose; confirmed terminal 2026-05-24 |
-
-**Mermaid sketch:**
-
-```
-graph LR
-    CD[Creative Director] --> EC[Editorial Chief]
-    CD --> QA[QA Gatekeeper]
-    QA --> CD
-    QA --> EC
-    EC --> CD
-    EC --> QA
-    AR[Audience Researcher] --> CD
-    AR --> EC
-    AR --> QA
-    GA(["General Agent (terminal)"])
-```
+- [ ] **AC-1** `scripts/check-pr-scope.sh` Rule 1 (protected-file loop) gains a per-file label bypass for `AGENTS.md` and `ARCHITECTURE.md` only.
+- [ ] **AC-2** Bypass triggers only when `PR_LABELS` contains `protected-file-update`. Without the label, the guard still flags `AGENTS.md` / `ARCHITECTURE.md` modifications as `VIOLATION [protected-file]`.
+- [ ] **AC-3** Bypass does NOT apply to `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, or `.github/copilot-instructions.md` — those still trip the guard even with the label.
+- [ ] **AC-4** New `tests/scope-guard.sh` test with three fixture cases:
+  - **Case A:** `AGENTS.md` modified, no `PR_LABELS` → guard fails (exit 1), output contains `VIOLATION [protected-file]: 'AGENTS.md'`.
+  - **Case B:** `AGENTS.md` modified, `PR_LABELS="protected-file-update"` → guard passes (exit 0), output contains `bypassing protection for 'AGENTS.md'`.
+  - **Case C:** `Gemfile` modified, `PR_LABELS="protected-file-update"` → guard fails (exit 1), output contains `VIOLATION [protected-file]: 'Gemfile'`.
+- [ ] **AC-5** `tests/scope-guard.sh` is invoked from `.github/workflows/test-build.yml` (new step or new job under the existing `check-agent-scope` workflow), exits 0 when all three cases pass.
+- [ ] **AC-6** `scripts/check-pr-scope.sh` header docblock (lines 21–29) is updated to document the new label alongside `bulk-content` and `governance-update`, including PASS/FAIL examples.
+- [ ] **AC-7** `CLAUDE.md` "Local Agent Labels" table (or wherever scope-guard labels are documented today) gains a row for `protected-file-update`.
+- [ ] **AC-8** Running the script locally with the live PR #984 diff state (replay) returns exit 0 when `PR_LABELS=protected-file-update` is set, and exit 1 when unset — manual replay check.
+- [ ] **AC-9** `bundle exec jekyll build` exits 0 (the change touches only `scripts/`, `tests/`, `.github/workflows/`, `CLAUDE.md`, and `scripts/check-pr-scope.sh` docblock; no Jekyll content surface).
+- [ ] **AC-10** Scope-guard boundary on this PR: `git diff --name-only main...HEAD` returns exactly — `scripts/check-pr-scope.sh`, `tests/scope-guard.sh` (new), `.github/workflows/test-build.yml`, `CLAUDE.md`, plus the lifecycle artifacts (`SPEC.md`, `tasks/plan.md`, `tasks/todo.md`). Total ≤ 7 files.
 
 ---
 
-## 5. Acceptance Criteria
-
-- [ ] **AC-1** Each of the five persona blocks (`### 1. Creative Director` through `### 5. General Agent`) gains a `**Valid handoff targets:**` row.
-- [ ] **AC-2** `grep -c "Valid handoff targets" AGENTS.md` returns exactly `5`.
-- [ ] **AC-3** A new top-level `## Handoff Graph` section exists between `## Agent Roster` and `## Protected Files`, containing a Mermaid `graph LR` code fence.
-- [ ] **AC-4** The Mermaid graph encodes exactly the 9 edges in §4 plus the terminal General Agent node.
-- [ ] **AC-5** General Agent's row reads `**Valid handoff targets:** _(terminal — handles work end-to-end)_` — no empty target sets.
-- [ ] **AC-6** `bundle exec jekyll build` exits 0.
-- [ ] **AC-7** The Mermaid diagram renders on the local dev server (visual check at `http://localhost:4000/agents/` or wherever AGENTS.md is exposed; if AGENTS.md is not rendered as a Jekyll page, confirm Markdown renders correctly on GitHub by viewing the PR diff).
-- [ ] **AC-8** No persona's existing `**Handoff triggers**:` prose paragraph is removed — the new row supplements, not replaces, the prose.
-
----
-
-## 6. Files to Change
-
-| File | Change |
-|---|---|
-| `AGENTS.md` | (a) Insert `**Valid handoff targets:**` row into each of the five persona property tables. (b) Insert new `## Handoff Graph` section after line ~120 (end of roster) with the Mermaid block. |
-
-**Total scope:** 1 file, ≈ 25 line insertions (5 rows + ~20-line Mermaid section).
-
----
-
-## 7. Commands
+## 5. Commands
 
 ```bash
-# Validation (run before opening PR)
-bundle exec jekyll build              # AC-6
-grep -c "Valid handoff targets" AGENTS.md  # AC-2: expect 5
-grep -c "## Handoff Graph" AGENTS.md       # expect 1
+# Local development loop
+bundle exec jekyll build                          # AC-9
+bash scripts/check-pr-scope.sh                    # baseline (expected: pass — no protected file in our diff today)
+bash tests/scope-guard.sh                         # AC-4 — runs all three fixture cases
 
-# Local preview (AC-7)
-bundle exec jekyll serve --config _config.yml,_config_dev.yml
-# Open http://localhost:4000/ — confirm no build regressions
+# Manual replay against #984's diff shape (AC-8)
+git checkout 4e22be8e^                            # parent of #984's merge commit
+bash scripts/check-pr-scope.sh                    # expected: FAIL on AGENTS.md (no label)
+PR_LABELS="protected-file-update" bash scripts/check-pr-scope.sh   # expected: PASS
+
+# CI verification
+gh pr checks <new PR>                              # check-agent-scope expected pass
 ```
 
 ---
 
-## 8. Code Style
+## 6. Project Structure (touched files)
 
-- **No prose deletion** from existing persona blocks — the new row supplements the existing `**Handoff triggers**:` paragraph.
-- **Match existing table format** — each persona's property table uses `| Property | Value |` headers; add `**Valid handoff targets:**` as a new row with comma-separated linked persona names.
-- **Cross-link with anchor refs** where possible — e.g., `[Editorial Chief](#3-editorial-chief)` to make the row navigable.
-- **Mermaid code fence** uses ```` ```mermaid ```` (Jekyll's mermaid-jekyll plugin convention).
-- **No new variables, no `_config.yml` changes**, no governance surface (`.github/skills/`, `.github/instructions/`, `.github/copilot-instructions.md`) touched.
+```
+scripts/check-pr-scope.sh         M   Rule 1 gains per-file label bypass; docblock updated
+tests/scope-guard.sh              A   New — three fixture cases (~80 lines)
+.github/workflows/test-build.yml  M   Add invocation of tests/scope-guard.sh
+CLAUDE.md                         M   Document protected-file-update label in scope-guard table
+SPEC.md                           M   This file
+tasks/plan.md                     M   #985 plan
+tasks/todo.md                     M   #985 todo
+```
+
+No changes to `_config.yml`, `_layouts/`, `_sass/`, `_posts/`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`, or `AGENTS.md`. The latter is deliberately untouched — this PR fixes the guard, not the doc.
 
 ---
 
-## 9. Testing Strategy
+## 7. Code Style
+
+- **Bash style** — match existing `scripts/check-pr-scope.sh` conventions: `set -euo pipefail`, lowercase `local` vars, `echo` for status, `||` fallbacks for portability. No new dependencies beyond `git` and `bash`.
+- **Label check** — reuse the existing `echo "${PR_LABELS:-}" | grep -q '<label>'` pattern (used by Rules 2 and 3 today). Don't introduce `[[ ]]` or `=~` matching — keep consistent.
+- **Bypass log line** — single line per bypass, prefixed `check-pr-scope:` for grep-ability in CI logs.
+- **Test script** — POSIX-friendly bash where possible; use `mktemp -d` for sandboxing; clean up temp dirs in a `trap`. No external test framework (no bats, no shellspec) — keep the dependency footprint minimal per the existing script's `git + bash only` constraint.
+- **Comments** — only where the *why* is non-obvious (e.g., explaining why the per-file bypass list is separate from `PROTECTED_FILES`). No restating what the code does.
+
+---
+
+## 8. Testing Strategy
 
 | Layer | Check |
 |---|---|
-| Static | `grep -c "Valid handoff targets" AGENTS.md` == 5 (AC-2) |
-| Static | `grep -c "## Handoff Graph" AGENTS.md` == 1 |
-| Build | `bundle exec jekyll build` exits 0 (AC-6) |
-| Visual | Local dev server preview confirms Mermaid renders without errors (AC-7) |
-| Cross-check | Each edge in the Mermaid graph is reflected by existing `**Handoff triggers**:` prose (AC-4, AC-8) |
+| Unit/script | `tests/scope-guard.sh` cases A, B, C (AC-4) — black-box test against `check-pr-scope.sh` with three fixture diffs and PR_LABELS values |
+| Integration | `.github/workflows/test-build.yml` runs `tests/scope-guard.sh` on every PR push (AC-5) — guards against regression |
+| Manual | One-shot replay against #984's diff state (AC-8) — confirms the real-world false positive is now fixed |
+| Build | `bundle exec jekyll build` (AC-9) — sanity check that the change doesn't affect site builds |
 
-No new Playwright spec required — this is a docs-only change with no runtime UI surface. CI will exercise existing build + accessibility + Lighthouse gates on the change.
+No Playwright spec — no UI surface touched.
 
 ---
 
-## 10. Boundaries
+## 9. Boundaries
 
 **Always:**
-- Derive the handoff topology from existing prose; don't invent new routing rules.
-- Preserve existing `**Handoff triggers**:` prose paragraphs verbatim.
-- Run `bundle exec jekyll build` before pushing.
+- Run `bash tests/scope-guard.sh` locally before pushing.
+- Run `bash scripts/check-pr-scope.sh` (without PR_LABELS) against the branch — expect PASS (no protected file in our diff today).
+- Use the existing label-check pattern (`echo "${PR_LABELS:-}" | grep -q '<label>'`).
+- Match existing bash style in `scripts/check-pr-scope.sh`.
 
 **Ask first about:**
-- Adding any new handoff edge not implied by existing prose.
-- Changing the General Agent terminal status (currently confirmed terminal).
-- Moving the `## Handoff Graph` section to a different location than between `## Agent Roster` and `## Protected Files`.
+- Adding any file to the `PROTECTED_FILE_UPDATE_BYPASS` allow-list beyond `AGENTS.md` and `ARCHITECTURE.md`.
+- Changing the label name from `protected-file-update` to anything else (would break docs and CLAUDE.md cross-refs).
+- Renaming or restructuring `scripts/check-pr-scope.sh` (out of scope; this is a targeted addition).
+- Introducing a test framework dependency (bats/shellspec) — the existing constraint is bash + git only.
 
 **Never:**
-- Modify the persona roster itself (additions, removals, renames). [Out of scope per #946]
-- Modify handoff *triggers* — only document the graph, not the conditions. [Out of scope per #946]
-- Touch `.github/skills/`, `.github/instructions/`, or `.github/copilot-instructions.md` — those are governance surfaces under `governance-update` label conventions. [Out of scope per #946]
-- Add cross-repo or cross-org A2A protocol integration. [No-op in #902]
-- Touch any protected file (`_config.yml`, `.github/CODEOWNERS`, `Gemfile`, `Gemfile.lock`).
+- Remove any file from `PROTECTED_FILES` (the existing protection list is intentional). [Out of scope per #985]
+- Make the bypass apply to `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, or `.github/copilot-instructions.md`. [Out of scope per #985]
+- Extend the existing `governance-update` label to cover Rule 1. [Out of scope per #985 — conflates two distinct categories]
+- Touch any file under `_posts/`, `_sass/`, `_layouts/`, or `_config.yml`. [Boundary]
+- Modify `AGENTS.md` or `ARCHITECTURE.md` in this PR (they're the *test subject* of the new exemption, not the implementation target).
 
 ---
 
-## 11. Risks
+## 10. Risks
 
 | Risk | Mitigation |
 |---|---|
-| Mermaid plugin not actually loaded → diagram renders as a code block, not a graph | Verify with `bundle exec jekyll serve` locally before pushing; if unsupported, fall back to a plain Markdown table representing the edges (AC-3/AC-4 would need amending). |
-| AGENTS.md table format varies across personas (verified in §1 — five tables share `\| Property \| Value \|` header) | Audit each table during BUILD; if any deviates, normalise as part of this PR scope. |
-| Reviewer requests `graph TD` instead of `graph LR` | Trivial swap; ack and update. |
-| Future persona added without updating the graph | Out of scope for this PR — but the new structured row makes the gap detectable by a future grep-based CI check (potential follow-up). |
+| The bash label-check pattern `grep -q 'protected-file-update'` substring-matches inside another label like `protected-file-update-experimental` (false positive) | Add anchors: `grep -q '\bprotected-file-update\b'`. But the existing `bulk-content` / `governance-update` checks don't use anchors — match precedent and accept the substring risk (no other labels with this prefix exist today). Flag as a future hardening item if a confusable label is ever added. |
+| `tests/scope-guard.sh` creates temp git repos in CI — slow or flaky | Each case ~1s; three cases total. Negligible CI cost. If flakiness appears, debug via the `trap` cleanup logging. |
+| `.github/workflows/test-build.yml` change touches a workflow file — could trip the scope guard itself when CI re-runs on this PR (Rule 4 forbids `agent:qa-gatekeeper` from touching `.github/workflows/` only if the agent label is set in PR_LABELS) | This PR carries `agent:qa-gatekeeper` + `governance-update`. Rule 4 for `agent:qa-gatekeeper` *allows* `.github/workflows/` (line 67 in AGENTS.md / line 128 in the script). No conflict. |
+| Script change breaks the existing `check-agent-scope` job for non-#985 PRs in flight | Run `bash scripts/check-pr-scope.sh` against the current branch with no protected files in diff → expect PASS. Run with `AGENTS.md` modified + no label → expect FAIL. Both behaviours unchanged. Verified by Cases A and C in the new test. |
+| Manual replay (AC-8) requires checking out a historical SHA — workflow risk | The replay is documented as an offline verification step, not in CI. Don't commit anything from the replay checkout. Use a worktree or detached HEAD. |
 
 ---
 
-## 12. Out of Scope
+## 11. Out of Scope
 
-Per issue #946:
+Per issue #985:
 
-- Changing the persona roster (additions, removals, renames)
-- Modifying handoff *triggers* (only documenting the graph, not the conditions)
-- Touching `.github/skills/`, `.github/instructions/`, or `.github/copilot-instructions.md`
-- Cross-repo or cross-org A2A protocol integration (No-op in #902)
-- A CI check that lints the handoff graph against the prose (a sensible follow-up, but not in this PR)
+- Removing `AGENTS.md` or `ARCHITECTURE.md` from `PROTECTED_FILES`.
+- Extending the bypass to `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, or `.github/copilot-instructions.md`.
+- Extending `governance-update` to cover Rule 1.
+- Refactoring the script's overall structure (e.g., extracting rules into separate functions).
+- Adding a `--self-test` mode to the script itself.
+- Documenting the label outside `scripts/check-pr-scope.sh` docblock + `CLAUDE.md` (no separate `LABELS.md`).
+- Backfilling label-bypass tests for the existing `bulk-content` and `governance-update` rules (worthwhile follow-up, separate issue).
