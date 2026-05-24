@@ -126,7 +126,9 @@ bash scripts/validate-posts.sh --all
 
 ## Handoff Graph
 
-The directed graph below visualises the per-persona handoff target rows above. It is derived from — and must stay consistent with — the per-persona `**Handoff triggers**:` prose. Adding a new persona means adding a new node *and* declaring its targets in both places. The General Agent is terminal: it handles cross-cutting work end-to-end and does not transfer ownership.
+The directed graph below visualises the per-persona handoff target rows above. It is derived from — and must stay consistent with — the per-persona `**Handoff triggers**:` prose. Adding a new persona means adding a new node *and* declaring its targets in both the persona's property table row and the Mermaid block below. The General Agent is terminal: it handles cross-cutting work end-to-end and does not transfer ownership.
+
+The diagram is a visual aid. Screen-reader users can rely on the per-persona rows above and the prose triggers for each persona — those are the canonical source of truth.
 
 ```mermaid
 graph LR

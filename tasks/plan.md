@@ -129,11 +129,11 @@ Run the full AC battery one more time:
 | AC-1 | `grep -E '^\| \*\*Valid handoff targets\*\*' AGENTS.md \| wc -l` → 5 |
 | AC-2 | `grep -c "Valid handoff targets" AGENTS.md` → 5 |
 | AC-3 | `grep -c "## Handoff Graph" AGENTS.md` → 1 |
-| AC-4 | Cross-read Mermaid block against Checkpoint A table |
+| AC-4 | Mermaid edge count: `awk '/^&#96;&#96;&#96;mermaid/{f=1;next} /^&#96;&#96;&#96;$/{f=0} f' AGENTS.md \| grep -c -- '-->'` → 9; terminal node: `grep -c 'GA(\["General Agent (terminal)"\])' AGENTS.md` → 1. Beware the naïve `awk '/^## Handoff Graph/,/^## /'` form — the range terminates on the opening header line and returns 0. |
 | AC-5 | `grep "_(terminal" AGENTS.md` → present on General Agent |
 | AC-6 | `bundle exec jekyll build` → exit 0 |
 | AC-7 | Local dev preview OR GitHub PR diff renders Mermaid |
-| AC-8 | `grep -c "Handoff triggers" AGENTS.md` → still 4 (unchanged) |
+| AC-8 | `grep -c "^\*\*Handoff triggers\*\*:" AGENTS.md` → 4 (strict; line-starting prose paragraphs only — the section intro mentions the phrase as inline code, which a naïve `grep -c "Handoff triggers"` would over-count to 5) |
 
 **Pass criteria:** all 8 ACs green.
 
