@@ -124,6 +124,26 @@ bash scripts/validate-posts.sh --all
 
 ---
 
+## Handoff Graph
+
+The directed graph below visualises the **Valid handoff targets** rows above. It is derived from — and must stay consistent with — the per-persona `**Handoff triggers**:` prose. Adding a new persona means adding a new node *and* declaring its targets in both places. The General Agent is terminal: it handles cross-cutting work end-to-end and does not transfer ownership.
+
+```mermaid
+graph LR
+    CD[Creative Director] --> EC[Editorial Chief]
+    CD --> QA[QA Gatekeeper]
+    QA --> CD
+    QA --> EC
+    EC --> CD
+    EC --> QA
+    AR[Audience Researcher] --> CD
+    AR --> EC
+    AR --> QA
+    GA(["General Agent (terminal)"])
+```
+
+---
+
 ## Protected Files (all agents)
 
 The following files require human review and must **never** be modified by any agent:
