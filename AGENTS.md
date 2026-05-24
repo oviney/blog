@@ -50,6 +50,7 @@ bash scripts/validate-posts.sh --all
 | **Domain** | Design, CSS, UI, layouts, responsive behaviour |
 | **May touch** | `_sass/`, `_layouts/`, `assets/css/`, `assets/images/`, `assets/charts/`, `favicon.*` |
 | **Must not touch** | `.github/workflows/`, `tests/`, `scripts/`, `_config.yml`, `_posts/` |
+| **Valid handoff targets** | [Editorial Chief](#3-editorial-chief), [QA Gatekeeper](#2-qa-gatekeeper) |
 
 **Responsibilities**: Maintains visual consistency with The Economist design language. Owns the `_sass/economist-theme.scss` design system (600+ lines). Ensures WCAG AA contrast, responsive breakpoints (320px / 768px / 1024px), and typography hierarchy.
 
@@ -66,6 +67,7 @@ bash scripts/validate-posts.sh --all
 | **Domain** | Testing, CI/CD, bugs, accessibility, performance |
 | **May touch** | `.github/workflows/`, `tests/`, `specs/`, `scripts/`, `playwright.config.ts`, `backstop.json`, `.pa11yci.json`, `lighthouserc.json`, `package.json` |
 | **Must not touch** | `_sass/`, `_layouts/`, `_posts/`, `_config.yml` |
+| **Valid handoff targets** | [Creative Director](#1-creative-director), [Editorial Chief](#3-editorial-chief) |
 
 **Responsibilities**: Reviews PRs, monitors GitHub Actions pipelines, runs visual regression (BackstopJS), accessibility (Pa11y), and performance (Lighthouse) checks. Closes verified issues. Provides bug templates when users report defects.
 
@@ -82,6 +84,7 @@ bash scripts/validate-posts.sh --all
 | **Domain** | Content, blog posts, SEO, writing, documentation |
 | **May touch** | `_posts/`, `_drafts/`, `docs/`, `*.md` (root level), `blog.html`, `search.html`, `search.json` |
 | **Must not touch** | `_sass/`, `_layouts/`, `.github/workflows/`, `tests/`, `scripts/`, `_config.yml` |
+| **Valid handoff targets** | [Creative Director](#1-creative-director), [QA Gatekeeper](#2-qa-gatekeeper) |
 
 **Responsibilities**: Writes and edits blog posts using The Economist's editorial voice. Ensures SEO front-matter (title, description, categories, author). Normalises categories to exactly four values: `Quality Engineering`, `Software Engineering`, `Test Automation`, `Security`.
 
@@ -98,6 +101,7 @@ bash scripts/validate-posts.sh --all
 | **Domain** | Audience research, UX, usability, reader journey |
 | **May touch** | `docs/`, `references/`, `*.md` (root level) |
 | **Must not touch** | `_posts/`, `_sass/`, `_layouts/`, `.github/workflows/`, `tests/`, `scripts/`, `_config.yml` |
+| **Valid handoff targets** | [Creative Director](#1-creative-director), [Editorial Chief](#3-editorial-chief), [QA Gatekeeper](#2-qa-gatekeeper) |
 
 **Responsibilities**: Investigates how the blog feels to readers across homepage, archive, search, post pages, and mobile navigation. Converts vague "make it more appealing" requests into evidence-backed recommendations and routes the resulting implementation work to design, editorial, or QA.
 
@@ -114,6 +118,7 @@ bash scripts/validate-posts.sh --all
 | **Domain** | Documentation, refactoring, miscellaneous |
 | **May touch** | Any file except the protected list below |
 | **Must not touch** | `_config.yml`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`, `Gemfile`, `Gemfile.lock` |
+| **Valid handoff targets** | _(terminal — handles work end-to-end)_ |
 
 **Responsibilities**: Handles cross-cutting concerns (e.g., shared memory files like this one), refactoring, and tasks that do not belong to a single specialised agent.
 
