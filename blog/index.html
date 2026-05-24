@@ -26,7 +26,9 @@ title: Quality Engineering
         <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
       </h2>
 
-      <p class="econ-card-excerpt">{{ post.excerpt | strip_html | truncatewords: 15 }}</p>
+      <p class="econ-card-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
+
+      {% include byline.html author=post.author container_class="econ-card-author" text_class="econ-card-author-name" %}
 
       <div class="econ-card-meta">
         {% assign words = post.content | number_of_words %}
