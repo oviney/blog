@@ -53,6 +53,7 @@
     "tmp": ">=0.2.3",
     "basic-ftp": "5.3.1",
     "ws": "^8.20.1",
+    "qs": "^6.15.2",
     "puppeteer": "^24.15.0",
     "@lhci/cli": {
       "uuid": "npm:@smithy/uuid@^1.1.2"
