@@ -1,46 +1,47 @@
-# TODO — Puppeteer Chrome-Download Flake Mitigation (#958)
+# TODO — Bump @playwright/test to ^1.60.0 + Page-Level ARIA Snapshots (#947)
 
 **Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
-**Plan SHA:** `b965ddb` · 3 files (2 new + 1 modified) · 7 jobs to migrate
+**Plan SHA:** `6480f00` · 5 files (0 new + 5 modified) · 1 snapshot migration + 2 rationale comments
 
 ---
 
-## Phase 1 — Composite action
-- [x] **T1** Created `.github/actions/setup-node-with-puppeteer-cache/action.yml` + `_retry-test.sh`. YAML parses; bash syntax-checks clean.
-- [x] **T2** RED retry test passed: `_retry-test.sh fail-fail-fail` → exit 1, 2 `::warning::` + 1 `::error::` lines.
-- [x] **T3** GREEN retry test passed: `_retry-test.sh fail-fail-succeed` → exit 0, 2 `::warning::` + success-on-attempt-3 line.
+## Spec amendment to confirm before BUILD
+- [x] **A1** AC-4 amendment accepted by user 2026-05-17 — `auto-regression.yml` verified by inspection (no Playwright runtime; `issues: labeled` trigger only). SPEC §3 AC-4 updated in place.
 
-## Phase 2 — Migrate call-sites
-- [x] **T4** Replaced 7 call-sites in `test-quality.yml`. Grep counts verified (0 `setup-node@v6`, 7 composite-action references). YAML still parses.
+## Phase 1 — Version bump
+- [x] **T1** ✅ Branch `feat/playwright-1.60-aria-snapshots` created. `package.json` pinned at `^1.60.0`. `npm install` clean (`changed 3 packages, 0 vulnerabilities`). `npm ls @playwright/test` → `1.60.0`; `playwright@1.60.0`; `playwright-core@1.60.0`. Lockfile diff bounded to the 3-package subtree (matches Dependabot #959 shape). Commit `3174891`.
 
-## Phase 3 — Local verification
-- [x] **T5** AC-8 boundary clean (3 files total: 2 new under `.github/actions/`, 1 modified workflow). Retry harness re-runs green post-migration.
+## Phase 2 — Snapshot migration
+- [x] **T2** ✅ `homepage.spec.ts:192` migrated to `expect(page).toMatchAriaSnapshot()`. Snapshot reduced to `- banner / - main / - contentinfo` landmark-presence smoke check. Navigation deliberately excluded (collapses to hamburger button on mobile; nav coverage stays in `navigation.spec.ts`). Inline comment documents trade-offs. Verified on Desktop/Mobile/Tablet Chrome + Desktop Firefox (Safari blocked locally by missing libwoff1/libavif16; CI has them). Full homepage.spec.ts: 11/11 pass on Desktop Chrome. Commit `73d0d8f`.
+- [x] **T3** ✅ Two `// element-scoped: …` rationale comments added above `navigation.spec.ts:99` (article snapshot) and `:466` (mobile-nav-open snapshot). Both tests still pass. Commit `530b611`.
+
+## Phase 3 — Docs
+- [x] **T4** ✅ SKILL.md line 40 bumped to `^1.60.0` with release-feature summary; `test.abort()` availability sub-bullet added (line 41). Commit `6943275`.
+
+## Phase 4 — Local verification
+- [x] **T5** ✅ Three Playwright shards green on 4 projects (Safari skipped locally — missing libwoff1/libavif16 system libs; CI has them): Shard 1 70/70, Shard 2 44/44, Shard 3 38/38. Full Desktop Chrome sweep 105/105. AC-8 boundary clean: 5 feature files modified (SKILL.md, package.json, package-lock.json, homepage.spec.ts, navigation.spec.ts) + 6 lifecycle files (1 SPEC.md modified, 2 new tasks/*, 3 archived #958 artifacts) — none in the protected set (`_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`).
 
 ## CHECKPOINT-A — Local gate before /review
-- [x] All T1–T5 ACs satisfied. Commits A (`5924993`) + B (`901c95b`) on branch.
+- [x] ✅ All T1–T5 ACs satisfied. Working tree clean (only `specs/copilot-skills-agents-redesign-spec.md` untracked, unrelated). No protected files touched. Branch `feat/playwright-1.60-aria-snapshots` at HEAD `6943275` ready for /review.
 
-## Phase 4 — /review pass
-- [x] **T6** Code-reviewer agent verdict: **Approve**, no blockers. 2 Majors + 2 minor revisions identified.
-- [x] **T7** Applied all 4 revisions in Commit C (`5c72a7a`): M2 cache-key salts on Node version; M1 tightened sync-comment in both files (retry SHAPE not byte-identical); m1 set-uo-pipefail rationale comment; n1 RETRY-TEST PASS/FAIL banner prefix. Harness still green post-revision.
+## Phase 5 — /review pass
+- [ ] **T6** Code-reviewer agent brief: AC-3 rationale (2-of-3 element-scoped), page-level snapshot stability, AC-4 amendment, `test.abort()` documented-but-unused.
+- [ ] **T7** Apply review revisions; commit. Hard rule: if revisions push the diff beyond 5 files, escalate to spec amendment rather than expand scope silently.
 
-## Phase 5 — Ship
-- [ ] **T8** Push branch; `gh pr create` with retry-test outputs + 7-job list + AC-8 diff stat; label `agent:qa-gatekeeper`.
-- [ ] **T9** CI passes — tolerate one Chrome-flake rerun during transition (cache priming on first run).
-- [ ] **T10** `gh pr merge --admin --squash --delete-branch` once green; sync local main.
-
-## Phase 6 — Post-merge verification
-- [ ] **T11** Open a trivial follow-up PR (any small change) to trigger fresh CI; inspect logs for `Cache restored from key:` on at least one of the 7 affected jobs (AC-5 verification — only observable in real CI)
+## Phase 6 — Ship
+- [ ] **T8** `git push -u origin feat/playwright-1.60-aria-snapshots`; `gh pr create` with snapshot-diff narrative, AC-7 content (rationale + #959 supersedure + #944 unblock), `agent:qa-gatekeeper` label; **then** close Dependabot PR #959 with supersede comment.
+- [ ] **T9** CI green — zero Playwright-shaped retries; one puppeteer Chrome-cache retry tolerated per #958 pattern (and only if stack matches).
+- [ ] **T10** `gh pr merge --admin --squash --delete-branch` once green; `git switch main && git pull`; archive lifecycle artifacts under `tasks/archive/2026-05-17-playwright-1.60-947/`.
 
 ---
 
 ## Acceptance criteria checklist (mirrors SPEC §3)
 
-- [ ] **AC-1** Composite action exists with documented `node-version` (default `'20'`) and `npm-cache` (default `'npm'`) inputs
-- [ ] **AC-2** Steps order: setup-node, cache puppeteer dir, retry-wrapped npm ci
-- [ ] **AC-3** 7 jobs in `test-quality.yml` use composite action; no `setup-node@v6 + npm ci` pair remains outside it
-- [ ] **AC-4** First post-merge run logs cache miss + cache save (verified via CI logs at T11)
-- [ ] **AC-5** Subsequent run logs cache restored from key, ≥ 20s install-step time savings vs cold (T11)
-- [ ] **AC-6** `_retry-test.sh` passes both RED (3-fail) and GREEN (2-fail-succeed) cases
-- [ ] **AC-7** All 11 other test-quality.yml jobs continue passing
-- [ ] **AC-8** `git diff --stat .github/workflows/` shows only `test-quality.yml` modified
-- [ ] **AC-9** `action.yml` parses as valid composite-action YAML
+- [ ] **AC-1** `package.json` pins `@playwright/test ^1.60.0`
+- [ ] **AC-2** `package-lock.json` regenerated, `npm ls @playwright/test` reports `1.60.x`
+- [ ] **AC-3** `homepage.spec.ts:192` migrated to page-level; `navigation.spec.ts:96` + `:460` carry `// element-scoped:` rationale comments
+- [ ] **AC-4** *(amended)* `test-quality.yml` passes green on a single PR run; `auto-regression.yml` verified by inspection (no Playwright runtime)
+- [ ] **AC-5** `npx playwright test` exits `0` locally with live Jekyll server
+- [ ] **AC-6** `.github/skills/jekyll-qa/SKILL.md` line 40 → `^1.60.0` + `test.abort()` availability note
+- [ ] **AC-7** PR description records snapshot rationale, #959 closure, #944 unblock
+- [ ] **AC-8** `git diff --name-only main...HEAD` returns exactly 5 files (no protected-file diffs)
