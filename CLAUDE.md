@@ -101,6 +101,25 @@ Do **NOT** use `bulk-content` for:
   why both bypasses are needed together. Reviewers should reject PRs that combine
   the two labels without that justification.
 
+**Protected-file reminder:** PRs that intentionally modify `AGENTS.md` or
+`ARCHITECTURE.md` should carry the `protected-file-update` label so the repo
+scope guard treats the change as deliberate, issue-driven work rather than an
+accidental side-effect. The label is **per-file** — it only relaxes Rule 1 for
+`AGENTS.md` and `ARCHITECTURE.md`. Other protected files (`_config.yml`,
+`Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`)
+remain unbypassable even with the label, because their audit trail must outlive
+any single PR's intent.
+
+Valid `protected-file-update` use cases:
+- Issue-driven `AGENTS.md` updates that follow a tracked GitHub issue (e.g. #946
+  promoting persona handoff prose into structured rows + Mermaid graph)
+- Issue-driven `ARCHITECTURE.md` updates that record an architectural decision
+
+Do **NOT** use `protected-file-update` for:
+- Accidental drive-by edits to `AGENTS.md` or `ARCHITECTURE.md` — file a tracked
+  issue first, then label the PR
+- Modifications to other protected files (the label has no effect on them)
+
 ---
 
 ## Local Agent Labels
