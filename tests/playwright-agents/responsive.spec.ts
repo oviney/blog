@@ -146,7 +146,9 @@ test.describe('@visual Responsive Layout Adaptation @REQ-NAV-01 @REQ-VISUAL-01',
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const navigation = page.locator('nav, .site-nav, .main-nav, [role="navigation"]');
+    // Scoped to the primary top navigation (.site-nav) so the assertion isn't
+    // ambiguous when other <nav> landmarks (e.g. .bottom-nav) are present.
+    const navigation = page.locator('.site-nav');
     const hamburger = page.locator('.nav-toggle');
 
     // On mobile/tablet viewports the nav is hidden behind the hamburger; open it first

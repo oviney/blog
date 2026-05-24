@@ -43,6 +43,13 @@ $radius-sm: 4px;
 $radius-md: 6px;
 $bio-avatar-size: 80px;
 
+// Z-index scale
+$z-bottom-nav: 50;
+
+// Mobile bottom navigation
+$bottom-nav-height: 3.5rem;
+$bottom-nav-breakpoint: 767px;
+
 // ============================================
 // RESET & BASE STYLES
 // ============================================
@@ -3339,4 +3346,75 @@ article.topic-card h2 a,
   font-family: $font-sans;
   font-size: 0.85rem;
   color: $text-secondary;
+}
+
+// ============================================
+// MOBILE BOTTOM NAVIGATION (#953)
+// Thumb-zone shortcut for Home / Blog / Search.
+// Visible only at viewports <= $bottom-nav-breakpoint.
+// ============================================
+
+.bottom-nav {
+  display: none; // Hidden at desktop by default.
+}
+
+@media (max-width: $bottom-nav-breakpoint) {
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: $z-bottom-nav;
+    background-color: $background-white;
+    border-top: 1px solid $border-color;
+    padding-bottom: max($spacing-xs, env(safe-area-inset-bottom));
+    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  .bottom-nav__link {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 44px; // WCAG 2.5.8 target size minimum.
+    padding: $spacing-xs $spacing-xs;
+    font-family: $font-sans;
+    font-size: 0.7rem;
+    line-height: 1;
+    color: $text-secondary;
+    text-decoration: none;
+    transition: color 0.15s ease;
+
+    &:hover,
+    &:focus-visible {
+      color: $text-primary;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $economist-red;
+      outline-offset: -2px;
+    }
+
+    &.is-active {
+      color: $economist-red;
+      font-weight: 600;
+    }
+  }
+
+  .bottom-nav__icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+  }
+
+  .bottom-nav__label {
+    display: block;
+  }
+
+  // Reserve space so the fixed nav doesn't cover the last paragraph of
+  // long content pages on mobile.
+  .main-content {
+    padding-bottom: calc(#{$bottom-nav-height} + env(safe-area-inset-bottom));
+  }
 }

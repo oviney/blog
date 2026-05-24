@@ -1,157 +1,187 @@
-# SPEC — Bump @playwright/test to ^1.60.0 + Page-Level ARIA Snapshots (#947)
+# SPEC — Mobile Thumb-Zone Bottom Navigation (#953)
 
 **Status:** Draft — awaiting approval
-**Issue:** [#947](https://github.com/oviney/blog/issues/947)
-**Labels:** `agent:qa-gatekeeper`
-**Date:** 2026-05-17
+**Issue:** [#953](https://github.com/oviney/blog/issues/953)
+**Labels:** `agent:creative-director`
+**Date:** 2026-05-24
 **Lifecycle phase:** DEFINE
-**Blocker status:** [#944](https://github.com/oviney/blog/issues/944) **closed** 2026-05-17 — this issue is now unblocked.
-**Related PR:** [#959](https://github.com/oviney/blog/pull/959) — open Dependabot PR already bumps `package.json` + `package-lock.json` to 1.60.0 with CI green. We will supersede it (close in favour of this branch) so the lockfile bump, the snapshot migration, and the skill update ship as one atomic change.
+**Spawned from:** Research Sweep [#943](https://github.com/oviney/blog/issues/943) (2026-05-15)
 
 ---
 
 ## 1. Situation
 
-We pin `@playwright/test ^1.59.1` in `package.json`. Playwright 1.60.0 (released 2026-05-11) is additive over 1.59 — no breaking changes — and ships four features relevant to this repo:
+Mobile navigation on viney.ca relies exclusively on a top-left hamburger menu (`_layouts/default.html` lines 32–49). On modern tall phones the hamburger sits well outside the natural thumb-reach zone — a documented friction point for high-priority destinations (Home, Blog, Search). The existing top nav stays; this spec adds a complementary fixed bottom nav that surfaces only at mobile widths.
 
-1. **Page-level `expect(page).toMatchAriaSnapshot()`** — equivalent to asserting against `page.locator('body')`, strictly more expressive than the element-scoped form for any test that wants to capture the entire accessibility tree of a route.
-2. **`test.abort()`** — abort the current test from a fixture, hook, or route handler with an optional message. Useful for the kind of "tests must not call X" guardrails we have informally today.
-3. **HAR recording on Tracing** (`tracing.startHar()` / `stopHar()`) — available but not required by this issue.
-4. **`locator.drop()`** — file/clipboard drag-and-drop simulation. Not used today.
+The repo already ships every destination the bottom nav needs:
 
-Current ARIA-snapshot usage (3 call-sites total, audited at HEAD `6480f00`):
+- `/` — home (`index.md`)
+- `/blog/` — blog index
+- `/search/` — search page (`search.html`)
 
-| File | Line | Locator | Page-level upgrade verdict |
-|---|---|---|---|
-| `tests/playwright-agents/homepage.spec.ts` | 192 | `page.locator('main').first()` | **Migrate.** `main` is the dominant landmark on `/`; page-level snapshot adds header + footer signal at zero authoring cost. |
-| `tests/playwright-agents/navigation.spec.ts` | 96 | `page.locator('main article').first()` | **Keep element-scoped.** Snapshot is intentionally narrow to the article landmark; page-level would balloon the snapshot with site chrome and create review noise on every layout tweak. |
-| `tests/playwright-agents/navigation.spec.ts` | 460 | `page.locator('#site-navigation')` | **Keep element-scoped.** Mobile-nav-open assertion is a deliberately tight check on the nav landmark in its open state; page-level captures unrelated content and weakens the assertion's intent. |
+Design-system context (audited at HEAD `c5eabc5`):
 
-The issue body anticipates this: *"or a justification is recorded in the PR description if migration is deferred."* Two of three call-sites are better left as element-scoped, and we'll record the per-test rationale in the PR description rather than mechanically migrate.
+- Mobile breakpoint pattern in `_sass/economist-theme.scss` is **`max-width: 768px`** (used in 14+ rules; `768px` is the de facto boundary).
+- Spacing tokens: `$spacing-xs … $spacing-xl` in `_sass/economist-theme.scss`.
+- Fonts: `$font-sans`, `$font-serif` in `_sass/economist-theme.scss`.
+- Theme color: `#E3120B` (Economist red, declared in `_layouts/default.html` line 17 as `meta name="theme-color"` — promote to a `$brand-red` variable as part of this work *only if* one does not already exist; otherwise reuse).
+- Existing nav rules live at `_sass/economist-theme.scss:70` (`.page-header`), `:104` (`.site-nav`), `:157` (`.nav-toggle`).
 
-There is **no footer.spec.ts** in `tests/playwright-agents/` despite the issue mentioning "footer at minimum" — `grep -l footer tests/playwright-agents/*.spec.ts` returns no file. Footer ARIA assertions live inline in `navigation.spec.ts` but do not currently use `toMatchAriaSnapshot`. We will not introduce a new footer snapshot in this PR; that is a separate authoring decision.
+The issue body anticipates JS may not be needed — confirmed: a CSS-only media-query implementation satisfies every AC, so no new JS ships in this PR.
 
 ---
 
 ## 2. Objective
 
-Bump `@playwright/test` to `^1.60.0`, migrate exactly one ARIA snapshot to page-level, and update the QA skill so future agents know the new minor is in play. Ship one atomic PR with lockfile, snapshot baseline update (if regenerated), and skill doc together — so the version bump is verifiable end-to-end on a single CI run.
+Add a fixed bottom navigation bar that appears only at viewports `≤ 767px`, surfacing **Home / Blog / Search** with stacked icon + label, an active-state highlight for the current section, and proper iOS safe-area handling — without altering the existing top hamburger nav or touching protected files. Ship as one atomic PR routed to `agent:creative-director` (Copilot Coding Agent).
 
 ---
 
-## 3. Acceptance Criteria
+## 3. Design Decisions (confirmed 2026-05-24)
 
-- [ ] **AC-1** `package.json` pins `@playwright/test` at `^1.60.0`.
-- [ ] **AC-2** `package-lock.json` is regenerated against `^1.60.0` and committed in this PR. `npm ls @playwright/test` reports `@playwright/test@1.60.0` (or the highest `1.60.x` available at install time).
-- [ ] **AC-3** `tests/playwright-agents/homepage.spec.ts:192` is migrated to `await expect(page).toMatchAriaSnapshot(...)` with the snapshot text updated to include header + footer landmarks. The other two call-sites (`navigation.spec.ts:96`, `:460`) remain element-scoped with a one-line `// element-scoped: …` comment recording the rationale.
-- [ ] **AC-4** *(amended 2026-05-17 during PLAN — see [tasks/plan.md](tasks/plan.md) §"Spec Amendment Proposal")* `.github/workflows/test-quality.yml` passes green on a single PR run. `.github/workflows/auto-regression.yml` is verified by inspection — it triggers on `issues: labeled` only (not `pull_request`) and does not install or run Playwright at runtime; it only writes test scaffolding files that depend on the lockfile-installed version exercised by `test-quality.yml`. Zero Playwright-shaped retries tolerated; one retry tolerated only if the failure stack matches the puppeteer Chrome-cache pattern from #958.
-- [ ] **AC-5** `npx playwright test` exits 0 locally with `bundle exec jekyll serve` running on `:4000` (Playwright shards 1+2+3 individually, then the full sweep).
-- [ ] **AC-6** `.github/skills/jekyll-qa/SKILL.md` line 40 updates `@playwright/test ^1.59.1` → `@playwright/test ^1.60.0`, and a one-line note is added in the same section recording that `test.abort()` is now available for the kind of "tests must not call X" guardrails we already do informally.
-- [ ] **AC-7** PR description records: (a) why two of the three ARIA call-sites stayed element-scoped, (b) closure of Dependabot PR #959 (superseded), (c) the unblock notice (#944 closed 2026-05-17).
-- [ ] **AC-8** Scope-guard boundary: `git diff --name-only main...HEAD` returns **exactly** this set — `package.json`, `package-lock.json`, `tests/playwright-agents/homepage.spec.ts`, `tests/playwright-agents/navigation.spec.ts` (if comment-only edits land), `.github/skills/jekyll-qa/SKILL.md`. Five files maximum, zero changes to `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, or `.github/copilot-instructions.md`.
+| Decision | Choice | Rationale |
+|---|---|---|
+| Visual treatment | **Stacked SVG icon + text label** | Standard mobile bottom-nav pattern; more scannable in thumb zone than icon-only or text-only. |
+| Active state | **Yes — via Liquid `page.url` match** | Pure CSS class toggle at render time; no JS, no client-side routing logic. |
+| Scope | **Every page at mobile widths** | Rendered in `_layouts/default.html` so home, blog, post, and topic pages all get it. |
+| Visibility logic | **CSS-only media query** | No new JS file; consistent with issue's "or pure CSS media query if no JS needed" preference. |
+| iOS safe-area | **Respect `env(safe-area-inset-bottom)`** | Standard bottom-nav requirement on iPhones with home indicator. Adds bottom padding inside the nav so labels don't sit under the indicator. |
+| Z-index | **Above main content, below modal overlays** | Use a single SCSS variable (e.g. `$z-bottom-nav: 50`) introduced alongside the partial. |
+| Breakpoint | **`max-width: 767px`** (matches `min-width: 768px` desktop boundary used elsewhere) | Aligns with the codebase's de facto mobile breakpoint, not the `641px` example in the issue. |
 
 ---
 
-## 4. Commands
+## 4. Acceptance Criteria
+
+- [ ] **AC-1** At a 375×667 viewport, every page renders a fixed bottom `<nav class="bottom-nav" aria-label="Primary mobile navigation">` containing Home / Blog / Search.
+- [ ] **AC-2** At a 1024×768 viewport, `.bottom-nav` is `display: none` (asserted via Playwright computed-style check, not just visual).
+- [ ] **AC-3** Each link is icon + label stacked vertically; tap-target is **≥ 44×44 px** (WCAG 2.5.8 target size minimum). Icons are inline SVG with `aria-hidden="true"`; the link's accessible name comes from the text label.
+- [ ] **AC-4** When the current page matches a nav destination (`page.url == '/'`, starts with `/blog/`, or starts with `/search/`), that link receives `class="is-active"` and is styled with brand-red accent + `aria-current="page"`.
+- [ ] **AC-5** iOS safe-area: the nav uses `padding-bottom: max($spacing-xs, env(safe-area-inset-bottom))` so labels clear the home indicator on notched iPhones.
+- [ ] **AC-6** All colours, spacing, typography, and the new `$z-bottom-nav` variable come from `_sass/economist-theme.scss` (or `_sass/variables.scss`). **Zero hardcoded hex codes, px values, or font-family strings** in the new `.bottom-nav` rules.
+- [ ] **AC-7** `pa11y-ci` passes on `/` and `/blog/` at mobile viewport. No new violations introduced.
+- [ ] **AC-8** Lighthouse mobile score on `/` does not regress vs. the most recent baseline run on `main`. Performance category specifically must not drop more than 1 point.
+- [ ] **AC-9** A new Playwright spec at `tests/playwright-agents/bottom-nav.spec.ts` covers: (a) visible at 375×667 with all three links present and correctly labelled, (b) hidden at 1024×768, (c) `is-active` + `aria-current="page"` applied when on `/blog/`, (d) tap-target ≥ 44×44 px on each link.
+- [ ] **AC-10** `bundle exec jekyll build` exits 0.
+- [ ] **AC-11** *(amended 2026-05-24 during BUILD — see Risks §10 row "Existing nav-locator regression")* Scope-guard boundary: `git diff --name-only main...HEAD` is — `_layouts/default.html`, `_sass/economist-theme.scss`, `tests/playwright-agents/bottom-nav.spec.ts`, `tests/playwright-agents/responsive.spec.ts` (one-line locator fix), and this `SPEC.md`. Five files. Zero changes to `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`. No new JS file.
+
+---
+
+## 5. Commands
 
 ```bash
 # Inspect baseline
-grep -n "@playwright/test" package.json
-grep -rn "toMatchAriaSnapshot" tests/playwright-agents/
-grep -n "@playwright/test ^" .github/skills/jekyll-qa/SKILL.md
+grep -n "site-nav\|nav-toggle\|page-header" _layouts/default.html
+grep -nE "@media.*(min-width|max-width)" _sass/economist-theme.scss | head
+grep -nE "\$spacing-|\$font-|\$z-" _sass/economist-theme.scss | head
 
-# Bump
-npm install --save-dev @playwright/test@^1.60.0
-npm ls @playwright/test                                          # expect 1.60.x
+# Local dev loop
+bundle exec jekyll serve --config _config.yml,_config_dev.yml &
 
-# Migrate snapshot (homepage only)
-$EDITOR tests/playwright-agents/homepage.spec.ts                 # line 192 → page-level
+# Visual verification at mobile + desktop
+open "http://localhost:4000/"           # then DevTools → iPhone SE (375×667)
+open "http://localhost:4000/blog/"      # confirm active-state on /blog/
 
-# Regenerate baseline if Playwright auto-updates the inline snapshot
-npx playwright test tests/playwright-agents/homepage.spec.ts --update-snapshots
-git diff tests/playwright-agents/homepage.spec.ts                # review the snapshot drift
+# Tests
+npx playwright test tests/playwright-agents/bottom-nav.spec.ts
+npx playwright test                      # full sweep — confirm no regression
+npm run test:a11y                        # pa11y-ci on / and /blog/
 
-# Local verification
-bundle exec jekyll serve --config _config.yml,_config_dev.yml &  # background
-npx playwright test                                              # full sweep
-npx playwright test tests/playwright-agents/homepage.spec.ts
-npx playwright test tests/playwright-agents/navigation.spec.ts
-
-# Skill doc edit
-$EDITOR .github/skills/jekyll-qa/SKILL.md                        # line 40 + test.abort() note
+# Build gate
+bundle exec jekyll build
 ```
 
 ---
 
-## 5. Project Structure (touched files)
+## 6. Project Structure (touched files)
 
 ```
-package.json                                       # M — pin bump
-package-lock.json                                  # M — regenerate
-tests/playwright-agents/homepage.spec.ts           # M — line 192 → page-level snapshot + baseline drift
-tests/playwright-agents/navigation.spec.ts         # M (optional) — add per-test "element-scoped: …" rationale comments
-.github/skills/jekyll-qa/SKILL.md                  # M — line 40 version + test.abort() note
+_layouts/default.html                              # M — add <nav class="bottom-nav"> block after </main> or before </body>
+_sass/economist-theme.scss                         # M — append .bottom-nav rules; introduce $z-bottom-nav variable
+tests/playwright-agents/bottom-nav.spec.ts         # A — new spec covering AC-2, AC-3, AC-4, AC-9
 ```
 
-No new files. No deletions.
+No new SCSS partial files (the issue notes a "new `.bottom-nav` partial" but the repo's convention is one `economist-theme.scss` monolith — append, don't split). No new JS file. No new asset files (SVG icons are inline in the template).
 
 ---
 
-## 6. Code Style
+## 7. Code Style
 
-- Page-level snapshot uses the same indented-YAML block style already in the codebase (see `homepage.spec.ts:193-216` for the model). Indent with 2 spaces inside the template literal.
-- Keep `await page.waitForLoadState('networkidle')` before the snapshot — networkidle is the load gate the rest of the homepage suite uses; do not switch to `domcontentloaded` in this PR.
-- Rationale comments for the two element-scoped sites: one short line beginning `// element-scoped:` — no multi-line block comments.
+- **SCSS:** Append the `.bottom-nav` block at the bottom of `_sass/economist-theme.scss` (the file is monolithic by convention). Wrap mobile-only rules in `@media (max-width: 767px) { ... }`; the default state of `.bottom-nav` outside the query is `display: none`.
+- **Variables only:** every colour, spacing, font, and z-index value comes from a `$variable`. If a needed token does not exist (e.g. `$z-bottom-nav`), add it at the top of the file in the same `// Z-index` section as any existing z-index tokens (or create the section if none exists).
+- **HTML:** the new `<nav>` lives in `_layouts/default.html`, inserted **after** the `<footer>` close (line 89) and **before** the navigation `<script>` block (line 90). Use 2-space indentation matching the surrounding template.
+- **Liquid active-state pattern:**
+  ```liquid
+  {% assign p = page.url %}
+  <a href="{{ '/' | relative_url }}"
+     class="bottom-nav__link{% if p == '/' %} is-active{% endif %}"
+     {% if p == '/' %}aria-current="page"{% endif %}>
+  ```
+  Apply the equivalent `contains` check for `/blog/` and `/search/`.
+- **Inline SVG icons:** match the style of the existing RSS icon at `_layouts/default.html:47` (24×24 viewBox, `currentColor`, `aria-hidden="true"`). Source from Heroicons outline set (MIT licensed) — Home `home`, Blog `newspaper`, Search `magnifying-glass`. Inline the SVG; do not link external icon files.
+- **Comments:** one short `<!-- Mobile bottom nav (#953) -->` marker before the `<nav>` block. No multi-paragraph comments. No commit refs.
 
 ---
 
-## 7. Testing Strategy
+## 8. Testing Strategy
 
-1. **Local first:** run the three Playwright shards individually (`npm run test:playwright:shard1|2|3`), then the full `npx playwright test` against a live `bundle exec jekyll serve`.
-2. **Snapshot drift is expected and intentional on the migrated test only.** Review the diff manually — if the snapshot picks up dynamic content (timestamps, generated IDs), narrow the snapshot or use the existing `/.+/` placeholder pattern already used at `homepage.spec.ts:194-196`.
-3. **CI confirms the bump end-to-end:** Quality Tests workflow (Playwright shards 1+2+3) **and** the Auto-Regression workflow both green on the PR. A single retry is tolerated **only** if its failure mode matches the puppeteer Chrome-cache flake (#958) — anything Playwright-shaped is a real regression.
-4. **No new tests written in this PR.** This is a dependency bump + targeted migration, not a coverage expansion. `test.abort()` adoption is documented (AC-6) but not exercised; that is follow-up work.
+1. **Local Playwright first.** Run `tests/playwright-agents/bottom-nav.spec.ts` standalone, then the full sweep against `bundle exec jekyll serve`. Both must exit 0 before pushing.
+2. **Viewport assertions are computed-style based, not visual.** Avoid screenshot baselines for this spec — they're brittle at the breakpoint boundary and we already have visual coverage from existing Playwright shard 3. Assert `display: none` vs `display: flex` (or whatever the implementation uses) via `evaluate(el => getComputedStyle(el).display)`.
+3. **Active-state coverage:** test the `/blog/` route specifically; that's the path most likely to regress because of the `contains` prefix match (must match `/blog/` and `/blog/some-post/` but **not** `/blog-archive/` if that path is ever added).
+4. **Tap-target measurement:** use Playwright `boundingBox()` and assert `width >= 44 && height >= 44`. Done per-link, not once for the nav container.
+5. **pa11y-ci is a hard gate** — any new violation at `/` or `/blog/` at mobile viewport fails the AC. Run locally before pushing if there's any doubt.
+6. **Lighthouse regression check is a one-time manual gate** — the most recent main-branch Lighthouse run is the baseline; compare via the CI report on the PR.
+7. **No unit tests** — this is template + SCSS + one integration spec. No business logic to unit-test.
 
 ---
 
-## 8. Boundaries
+## 9. Boundaries
 
 **Always do:**
-- Close Dependabot PR #959 with a comment pointing to this PR before merge.
-- Run the local Playwright sweep against a live Jekyll server, not against a cached build, before pushing.
-- Keep the diff at ≤ 5 files. If a sixth file becomes necessary, surface the reason in the PR description and reassess the scope.
+- Use design-system variables for every value (AC-6 is non-negotiable).
+- Keep diff at ≤ 3 files (AC-11).
+- Test active-state on `/blog/` specifically.
+- Match `aria-current="page"` to the `.is-active` class — they must always agree.
+- Respect `env(safe-area-inset-bottom)` on iOS (AC-5).
 
 **Ask first:**
-- Any snapshot drift in `navigation.spec.ts` (we said we wouldn't touch its snapshots; if the upgrade forces a re-baseline, stop and confirm).
-- Adding HAR tracing to any existing test (out of scope per issue body).
-- Migrating the second or third ARIA snapshot if reviewer pushback says the element-scoped rationale is unconvincing.
+- If a needed design token doesn't exist and you're tempted to inline a value — propose the new variable and where it should live before adding it.
+- If the Lighthouse mobile baseline regresses by more than 1 performance point — investigate root cause before re-baselining.
+- If the existing top hamburger nav needs any tweak (it shouldn't — but if e.g. `body` padding-bottom collides with bottom nav at mobile, surface it).
+- If a fourth touched file becomes necessary, surface the reason in the PR description and reassess scope.
 
 **Never do:**
-- Bump to `1.60.x` where `x > 0` proactively — track the patch as a separate follow-up if 1.60.1 lands during this PR's lifetime.
 - Modify `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`.
-- Add the `bulk-content` or `governance-update` label (this PR is neither).
+- Add a new JS file or extend `_layouts/default.html`'s existing `<script>` block — CSS-only is the agreed implementation.
+- Change the top hamburger nav's markup, styles, or behaviour.
+- Add analytics tracking to bottom-nav clicks (out of scope per issue).
+- Add a "Recently viewed" or personalisation slot to the nav (Watch item in #943).
+- Add a feature flag in `_config.yml` to gate rollout (protected file). If rollout caution is needed, gate via an SCSS feature class instead.
+- Use icon-only links (worse accessibility — confirmed during design decision).
 - Use `--no-verify` or otherwise skip hooks.
-- Cherry-pick the Dependabot lockfile change without re-resolving locally — `npm install` from a clean working tree to avoid drift between lockfile and `node_modules`.
+- Use the `bulk-content` or `governance-update` label (this PR is neither).
 
 ---
 
-## 9. Risks & Mitigations
+## 10. Risks & Mitigations
 
 | Risk | Likelihood | Mitigation |
 |---|---|---|
-| Page-level snapshot includes dynamic content that drifts on every build (post timestamps, build hashes) | Medium | Use the existing `/.+/` regex placeholders; if drift persists, narrow snapshot to the regions that are stable. |
-| Migrated snapshot exposes a pre-existing a11y bug in the header/footer that wasn't visible before | Low-medium | Fix in this PR if trivial; otherwise open a separate `bug` issue and narrow the snapshot to omit the offending region, with a TODO comment referencing the new issue. |
-| Auto-regression workflow flakes on first run with new Playwright version | Low | Tolerate a single Chrome-cache retry only (per AC-4). Anything Playwright-shaped is investigated, not retried. |
-| Dependabot PR #959 auto-rebases mid-flight and creates a conflicting state | Low | Close #959 *first* as the opening move of the BUILD phase. |
+| Bottom nav overlaps last paragraph of long posts on mobile | High | Add `padding-bottom` to `.main-content` at mobile widths equal to bottom-nav height + safe-area inset. Verify on a long post like the devops-defences article. |
+| Active-state prefix match collides with a future `/blog-archive/`-style route | Low | Match `/blog/` with a trailing-slash-aware check (`p == '/blog/' or p contains '/blog/'`) not a loose `contains '/blog'`. |
+| pa11y-ci flags contrast on the active-state accent | Medium | Use `$brand-red` (or equivalent existing token) for accent and verify WCAG AA contrast against the nav background colour before pushing. |
+| Inline SVG icons inflate `default.html` page weight noticeably | Low | Three 24×24 outline SVGs ≈ 0.5 KB total; well below Lighthouse perf-budget noise floor. |
+| Lighthouse mobile drops because of layout shift introduced by the fixed nav | Low-medium | Reserve nav height via `height` + `min-height` on the element from the first paint — do not animate in. CLS budget is 0.1. |
+| Existing tests use an over-broad `nav` locator that now resolves to multiple elements | **Realised 2026-05-24** | `responsive.spec.ts:145` "Navigation menu adapts to viewport size" failed via Playwright strict-mode after the second `<nav>` landed. Fixed by scoping the locator to `.site-nav` (the test was always intended for the top hamburger nav). AC-11 amended to include the test fix + this SPEC.md as a 4th and 5th touched file. |
 
 ---
 
-## 10. Out of Scope (deferred)
+## 11. Out of Scope (deferred)
 
-- Pa11y-ci bumps (tracked in closed #944 — already shipped).
-- Lighthouse major version bump (Watch item in #902).
-- HAR tracing as a default artifact (#947 explicitly excludes).
-- `locator.drop()` adoption — no current upload-zone test in the suite.
-- Adopting `test.abort()` in actual tests — this PR documents availability only.
-- Backstop or other visual-regression tooling changes.
-- Adding a new `footer.spec.ts` — issue language implied one exists but it does not; introducing one is a separate authoring decision.
+- Top-nav hamburger redesign — leave the existing top nav untouched.
+- Adding analytics tracking to bottom-nav clicks (separate decision).
+- Personalisation / "Recently viewed" — Watch item in [#943](https://github.com/oviney/blog/issues/943).
+- Feature flag in `_config.yml` — protected file; gate via SCSS class if rollout caution is later needed.
+- Changing what destinations live in the bottom nav (Home / Blog / Search is the agreed initial set).
+- Adding hide-on-scroll behaviour — adds JS, contradicts CSS-only decision.
+- Migrating `_sass/economist-theme.scss` into smaller partials — separate refactor.
