@@ -59,7 +59,7 @@ Add a label-based exemption to `scripts/check-pr-scope.sh` Rule 1 that lets a PR
 - [ ] **AC-7** `CLAUDE.md` "Local Agent Labels" table (or wherever scope-guard labels are documented today) gains a row for `protected-file-update`.
 - [ ] **AC-8** Running the script locally with the live PR #984 diff state (replay) returns exit 0 when `PR_LABELS=protected-file-update` is set, and exit 1 when unset — manual replay check.
 - [ ] **AC-9** `bundle exec jekyll build` exits 0 (the change touches only `scripts/`, `tests/`, `.github/workflows/`, `CLAUDE.md`, and `scripts/check-pr-scope.sh` docblock; no Jekyll content surface).
-- [ ] **AC-10** Scope-guard boundary on this PR: `git diff --name-only main...HEAD` returns exactly — `scripts/check-pr-scope.sh`, `tests/scope-guard.sh` (new), `.github/workflows/test-build.yml`, `CLAUDE.md`, plus the lifecycle artifacts (`SPEC.md`, `tasks/plan.md`, `tasks/todo.md`). Total ≤ 7 files.
+- [ ] **AC-10** *(amended 2026-05-24 during BUILD — original ≤ 7 omitted the archived prior-PR lifecycle carry-over)* Scope-guard boundary on this PR: `git diff --name-only main...HEAD` returns exactly — `scripts/check-pr-scope.sh`, `tests/scope-guard.sh` (new), `.github/workflows/test-build.yml`, `CLAUDE.md`, plus the lifecycle artifacts (`SPEC.md`, `tasks/plan.md`, `tasks/todo.md`), plus the carry-over archived #946 lifecycle artifacts (`tasks/archive/2026-05-24-handoff-graph-946/{plan,todo}.md`). Total **≤ 9 files** — the +2 vs. the original is the always-present prior-PR archive overhead now formalised so future SPECs can account for it from the start.
 
 ---
 
