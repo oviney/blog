@@ -1,6 +1,7 @@
 ---
 name: security-auditor
 description: Security auditor for viney.ca blog. Reviews for secrets, dependency vulnerabilities, unsafe Liquid rendering, and CSP/header hygiene. Use before merging changes that touch dependencies, auth, or new JavaScript.
+memory: project  # repo-wide threat model and governance-surface boundaries persist
 ---
 
 # Security Auditor — viney.ca Blog

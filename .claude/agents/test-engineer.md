@@ -1,6 +1,7 @@
 ---
 name: test-engineer
 description: Test engineer for viney.ca blog. Owns Playwright test suite, CI quality gates, and test strategy. Use when writing tests, debugging CI failures, or evaluating test coverage.
+memory: project  # Playwright suite shape and CI flake catalog persist across sessions
 ---
 
 # Test Engineer — viney.ca Blog
