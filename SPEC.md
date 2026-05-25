@@ -62,7 +62,7 @@ Anchor the `bulk-content` and `governance-update` label greps in `scripts/check-
 - [ ] **AC-6** `bash tests/scope-guard.sh` exits 0 with **6/6 PASS**.
 - [ ] **AC-7** Sanity replay against `main` HEAD: `bash scripts/check-pr-scope.sh` from the merged `main` state still PASSES (no protected file on `main`; no regression).
 - [ ] **AC-8** `bundle exec jekyll build` exits 0 (no Jekyll content surface touched).
-- [ ] **AC-9** Scope-guard boundary on this PR: `git diff --name-only main...HEAD` returns exactly — `scripts/check-pr-scope.sh`, `tests/scope-guard.sh`, plus lifecycle artifacts (`SPEC.md`, `tasks/plan.md`, `tasks/todo.md`), plus the carry-over archived #985 lifecycle artifacts (`tasks/archive/2026-05-24-scope-guard-985/{plan,todo}.md`). Total **≤ 7 files** (using the post-#988 ≤9 budget pattern minus 2 since this PR doesn't touch `CLAUDE.md` or `.github/workflows/test-build.yml`).
+- [ ] **AC-9** Scope-guard boundary on this PR: `git diff --name-only main...HEAD` returns exactly — `scripts/check-pr-scope.sh`, `tests/scope-guard.sh`, plus lifecycle artifacts (`SPEC.md`, `tasks/plan.md`, `tasks/todo.md`), plus the carry-over archived #985 lifecycle artifacts (`tasks/archive/2026-05-25-scope-guard-985/{plan,todo}.md`). Total **≤ 7 files** (using the post-#988 ≤9 budget pattern minus 2 since this PR doesn't touch `CLAUDE.md` or `.github/workflows/test-build.yml`).
 - [ ] **AC-10** No regression of `bulk-content` / `governance-update` exact-match behaviour: `PR_LABELS="bulk-content"` against >15 files still passes (Rule 2 bypassed); `PR_LABELS="governance-update"` against `.github/skills/foo` still passes (Rule 3 bypassed). Verified via manual probe or two additional fixture cases — manual probe is acceptable since both labels are well-exercised by real PRs in the repo history.
 
 ---
@@ -90,7 +90,7 @@ tests/scope-guard.sh              M   Multi-file run_case + Cases E & F
 SPEC.md                           M   This file
 tasks/plan.md                     M   #987 plan
 tasks/todo.md                     M   #987 todo
-tasks/archive/2026-05-24-scope-guard-985/  A   Carry-over: archived #985 plan + todo
+tasks/archive/2026-05-25-scope-guard-985/  A   Carry-over: archived #985 plan + todo
 ```
 
 **Total scope:** 5 substantive lifecycle files + 2 archive carry-over files = **7 files**. No changes to `.github/workflows/`, `CLAUDE.md`, `AGENTS.md`, `ARCHITECTURE.md`, or any `_posts/`, `_sass/`, `_layouts/`, `_config.yml`.

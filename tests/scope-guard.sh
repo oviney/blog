@@ -5,10 +5,15 @@
 # one file, copies the production check-pr-scope.sh in, runs it with the
 # given PR_LABELS, then asserts exit code + a stdout grep.
 #
-# Cases (matches SPEC §3 AC-4 for #985):
-#   A. AGENTS.md modified, no PR_LABELS                → guard fails (exit 1)
-#   B. AGENTS.md modified, PR_LABELS=protected-file-update → guard passes (exit 0)
-#   C. Gemfile modified,  PR_LABELS=protected-file-update → guard still fails (exit 1)
+# Cases (per SPEC for #985 and #987):
+#   A. AGENTS.md modified, no PR_LABELS                       → fails (exit 1)
+#   B. AGENTS.md modified, PR_LABELS=protected-file-update    → passes (exit 0)
+#   C. Gemfile modified, PR_LABELS=protected-file-update      → fails  (exit 1, per-file allow-list)
+#   D. AGENTS.md modified, PR_LABELS=not-protected-file-update-foo (substring superset) → fails (exit 1)
+#   E. 21 files modified, PR_LABELS=not-bulk-content-foo      → fails (Rule 2 trips; pins #987 anchor)
+#   F. .github/skills/... modified, PR_LABELS=governance-update-experimental → fails (Rule 3 trips; pins #987 anchor)
+#   G. 21 files modified, PR_LABELS=bulk-content              → passes (canonical bypass preserved)
+#   H. .github/skills/... modified, PR_LABELS=governance-update → passes (canonical bypass preserved)
 #
 # Dependencies: bash, git. Same constraint as the script under test.
 
@@ -178,6 +183,21 @@ run_case "F: .github/skills/ modified, confusable governance-update substring la
   ".github/skills/scope-guard-test/SKILL.md" \
   "1" \
   "VIOLATION [governance-surface]"
+
+# Pin canonical-bypass behaviour as automated coverage (was manual-probe-only
+# per SPEC AC-10). A future refactor of has_label() can't silently break the
+# exact-match canonical bypass without one of these turning red.
+run_case "G: 21 files modified, canonical bulk-content label → Rule 2 bypassed, guard passes" \
+  "bulk-content" \
+  "$FILES_E" \
+  "0" \
+  "bulk-content label present — skipping rule 2"
+
+run_case "H: .github/skills/ modified, canonical governance-update label → Rule 3 bypassed, guard passes" \
+  "governance-update" \
+  ".github/skills/scope-guard-test/SKILL.md" \
+  "0" \
+  "governance-update label present — skipping rule 3"
 
 echo ""
 echo "Summary: $PASS passed, $FAIL failed"
