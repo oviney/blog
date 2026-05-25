@@ -1,55 +1,54 @@
-# Plan — Scope-guard label exemption for legitimate AGENTS.md / ARCHITECTURE.md changes (#985)
+# Plan — Anchor bulk-content / governance-update label greps (#987)
 
 **Spec:** [../SPEC.md](../SPEC.md)
-**Issue:** [#985](https://github.com/oviney/blog/issues/985)
-**Date:** 2026-05-24
+**Issue:** [#987](https://github.com/oviney/blog/issues/987)
+**Date:** 2026-05-25
 **Labels:** `agent:qa-gatekeeper`, `governance-update`
-**Branch:** `fix/985-scope-guard-protected-file-bypass` (to be created)
+**Branch:** `fix/987-anchor-label-greps` (to be created)
 **Lifecycle phase:** PLAN
 
 ---
 
 ## Scope summary
 
-Bash change to `scripts/check-pr-scope.sh` (per-file bypass inside Rule 1), new fixture-based test harness (`tests/scope-guard.sh`), one workflow-step wiring (`.github/workflows/test-build.yml`), and one docs row (`CLAUDE.md`). Four atomic commits. RED→GREEN sequencing — failing test harness lands first to expose the gap, then the bypass logic makes it pass.
+Two substantive file changes:
+1. `scripts/check-pr-scope.sh` — define `has_label()` helper; route Rules 1, 2, 3 label checks through it.
+2. `tests/scope-guard.sh` — extend `run_case` to accept multi-file fixtures; add Cases E + F to pin the anchored semantics for `bulk-content` and `governance-update`.
+
+Five lifecycle files (SPEC + plan + todo + 2 carry-over archive). Total **≤ 7 files**.
+
+Classical RED→GREEN order: harness refactor (semantics-preserving) → new failing cases (gap exposed) → helper extraction (gap fixed).
 
 ---
 
 ## Dependency graph
 
 ```
-Phase 0 (branch setup)
+Phase 0 (branch + lifecycle)
     │
     ▼
-Phase 1 (tests/scope-guard.sh — RED)
-    │   Case A passes (current behaviour: AGENTS.md no label → fail)
-    │   Case B FAILS (current behaviour: AGENTS.md with label → still fails — gap exposed)
-    │   Case C passes (current behaviour: Gemfile with label → fail)
+Phase 1 (extend run_case to multi-file)
+    │   Cases A–D still 4/4 PASS (semantics-preserving refactor)
     │
-    ▼   Checkpoint A: confirm Case B is the only failing case
+    ▼   Checkpoint A: refactor regression-clean
     │
-Phase 2 (check-pr-scope.sh bypass — GREEN)
-    │   Case A still passes (no-label behaviour unchanged)
-    │   Case B now passes (label bypass works)
-    │   Case C still passes (label does NOT exempt Gemfile)
+Phase 2 (add Cases E + F — RED)
+    │   Cases A–D PASS, E + F FAIL (substring antipattern exposed)
     │
-    ▼   Checkpoint B: all three cases pass; replay against #984 diff state confirms fix
+    ▼   Checkpoint B: gap confirmed real
     │
-Phase 3 (CI wiring)
-    │   .github/workflows/test-build.yml runs tests/scope-guard.sh
-    │
-    ▼
-Phase 4 (CLAUDE.md docs row)
+Phase 3 (extract has_label + migrate 3 rules — GREEN)
+    │   Cases A–F all 6/6 PASS (helper anchors all three)
     │
     ▼   Checkpoint C: full 10-AC battery
     │
-Phase 5 (ship)
+Phase 4 (ship)
 ```
 
-**Why this order, not RED→GREEN→docs→CI:**
-- Putting the test BEFORE the implementation surfaces the gap explicitly (the test was the reason for this PR in the first place).
-- CI wiring AFTER both test + script ensures CI doesn't run a failing test against an unfixed script on any pushed commit. CI runs only on branch tip; pushing all four commits together means CI sees the final green state.
-- Docs row at the end so the commit message can reference the final label name (no rework if the label name changed during build).
+**Why this order:**
+- Harness refactor first: lets Cases E + F be added cleanly in Phase 2 without touching the production script yet.
+- Cases E + F before the script change: classic TDD — write the failing test, then make it pass. Branch history clearly records the gap → fix.
+- Helper extraction last: lands the fix that turns the failing cases green. Migrating Rule 1 through the same helper at this step preserves the anchored behaviour #988 already established and prevents future drift.
 
 ---
 
@@ -59,132 +58,105 @@ Phase 5 (ship)
 
 | Task | Action |
 |---|---|
-| 0.1 | Create branch `fix/985-scope-guard-protected-file-bypass` off `main` (post-#984-merge state at `4e22be8e`) |
-| 0.2 | Confirm working tree clean (sans the pre-existing `security.md` case-collision artifact + untracked `worktrees/`) |
+| 0.1 | `git fetch origin main`; checkout main; pull (current main at `a7f5021b`, the #988 merge) |
+| 0.2 | `git switch -c fix/987-anchor-label-greps` |
+| 0.3 | Stash #987 lifecycle work (SPEC + plan + todo) before the switch if not already; pop after |
+| 0.4 | Archive #985 lifecycle artifacts to `tasks/archive/2026-05-25-scope-guard-985/` |
+| 0.5 | Commit lifecycle: `docs(#987): lifecycle artifacts (SPEC + plan + todo) for label-grep anchoring` |
 
 ---
 
-### Phase 1 — `tests/scope-guard.sh` (RED — fixture harness lands first)
-
-*One atomic commit. Implements the test before the implementation it tests.*
+### Phase 1 — Extend `run_case` to multi-file fixtures
+*One atomic commit. Semantics-preserving refactor; Cases A–D continue passing.*
 
 | Task | Action |
 |---|---|
-| 1.1 | Create `tests/scope-guard.sh` (~80 lines). Header documents the three fixture cases and the temp-git-repo pattern. |
-| 1.2 | Define `run_case <name> <pr_labels> <changed_file> <expected_exit> <expected_grep>` helper. Creates temp git repo via `mktemp -d`, `git init -q`, configures `origin` to a second temp clone (so `origin/main` resolves), commits a baseline, branches, modifies the changed file, copies the production `scripts/check-pr-scope.sh` into the temp repo, runs it with the given `PR_LABELS`, captures exit code + stdout, asserts expected exit + grep, prints pass/fail line. |
-| 1.3 | Add `trap` to clean up the temp dir on exit. |
-| 1.4 | Wire the three fixture cases per SPEC §3 AC-4 (Case A no-label-AGENTS.md, Case B with-label-AGENTS.md, Case C with-label-Gemfile). |
-| 1.5 | Final block: `if [ $FAIL -eq 0 ]; then echo "All N cases passed"; exit 0; else exit 1; fi`. |
-| 1.6 | `chmod +x tests/scope-guard.sh`. |
+| 1.1 | In `tests/scope-guard.sh`, modify `run_case` so `$3` (`file_to_modify`) is treated as a newline-separated list of paths. Iterate over each, `mkdir -p $(dirname)` if needed, `printf 'modified\n' >> "$f"`, `git add .` once after the loop. |
+| 1.2 | No change required at the four existing call sites (A, B, C, D each pass a single path which is a 1-element list under the new contract). |
+| 1.3 | Add a comment above `run_case` documenting the multi-file contract: "If `$3` contains newlines, each path is touched in turn." |
 
-**Phase 1 ACs covered:** AC-4 (test structure exists).
+**Phase 1 ACs covered:** AC-3 (multi-file `run_case` contract).
 
-**Phase 1 verification (expected RED):**
+**Phase 1 verification:**
 ```bash
 bash tests/scope-guard.sh
-# Expected: Case A PASS, Case B FAIL, Case C PASS — overall exit 1
-# The failure is the entire point — Case B is the gap we're filling next.
+# Expected: 4/4 PASS, exit 0 (Cases A–D semantics-preserved)
 ```
 
-**Commit:** `test(#985): add scope-guard fixture test (RED on Case B)`
+**Commit:** `test(#987): extend run_case to accept newline-separated multi-file fixtures`
 
 ---
 
-### Checkpoint A — Confirm the gap is real
+### Checkpoint A — Refactor regression-clean
 
-- [ ] Case A: PASS (AGENTS.md, no label → guard fails as expected)
-- [ ] Case B: **FAIL** (AGENTS.md, label → guard fails — this is the gap we're about to fix)
-- [ ] Case C: PASS (Gemfile, label → guard fails as expected — label doesn't blanket-bypass)
-
-If Case A or Case C fails, the test harness has a bug — debug before moving to Phase 2. If Case B passes, the script already has the bypass somehow — recheck the issue's premise.
+- [ ] Cases A, B, C, D all PASS post-refactor
+- [ ] No new dependencies (still bash + git only)
+- [ ] Trap cleanup unchanged
 
 ---
 
-### Phase 2 — `scripts/check-pr-scope.sh` per-file bypass (GREEN)
-
-*One atomic commit. Smallest possible change to the script.*
+### Phase 2 — Cases E and F (RED)
+*One atomic commit. Adds failing tests that expose the substring antipattern.*
 
 | Task | Action |
 |---|---|
-| 2.1 | Add `PROTECTED_FILE_UPDATE_BYPASS=("AGENTS.md" "ARCHITECTURE.md")` array immediately below `PROTECTED_FILES=( … )` (around line 52). |
-| 2.2 | Modify Rule 1 loop (lines 75–80) to a two-tier check: inside the existing `if echo "$CHANGED_FILES" | grep -qx "$protected"; then` block, check `if echo "${PR_LABELS:-}" | grep -q 'protected-file-update' && printf '%s\n' "${PROTECTED_FILE_UPDATE_BYPASS[@]}" | grep -qx "$protected"; then` → emit bypass log line + `continue`. |
-| 2.3 | Update docblock at lines 21–29: add `protected-file-update` entry alongside `bulk-content` and `governance-update`, with one PASS example (`AGENTS.md` modified + label → bypass) and one FAIL example (`Gemfile` modified + label → still fails). |
-| 2.4 | No changes to Rules 2, 3, 4 or the summary block. |
+| 2.1 | Add Case E to `tests/scope-guard.sh`: 21 unique unprotected paths (`tests-e-1.txt` through `tests-e-21.txt`), `PR_LABELS="not-bulk-content-foo"`, expected exit=1, expected grep=`VIOLATION [scope-explosion]`. |
+| 2.2 | Add Case F: single path `.github/skills/scope-guard-test/SKILL.md` (multi-segment path that triggers Rule 3), `PR_LABELS="governance-update-experimental"`, expected exit=1, expected grep=`VIOLATION [governance-surface]`. |
+| 2.3 | Verify Case E's 21-path string uses `printf '%s\n'` correctly so each line becomes a fixture file. |
 
-**Phase 2 ACs covered:** AC-1, AC-2, AC-3, AC-6.
+**Phase 2 ACs covered:** AC-4 (Cases E and F defined).
 
-**Phase 2 verification (expected GREEN):**
+**Phase 2 verification (expected RED):**
 ```bash
 bash tests/scope-guard.sh
-# Expected: All three cases PASS — overall exit 0
+# Expected: 4 PASS (A–D), 2 FAIL (E, F) — overall exit 1
+# Case E fails: `grep -q 'bulk-content'` matches "not-bulk-content-foo" → Rule 2 wrongly skipped → guard returns exit 0
+# Case F fails: `grep -q 'governance-update'` matches "governance-update-experimental" → Rule 3 wrongly skipped → guard returns exit 0
 ```
 
-**Manual replay (AC-8):**
-```bash
-# In a separate worktree, NOT this branch's working tree
-git worktree add /tmp/replay-984 4e22be8e^
-cd /tmp/replay-984
-git diff --name-only 4e22be8e^..4e22be8e   # confirm AGENTS.md in diff
-# Now run the script as if at the merge commit's pre-state with various labels
-# (replay using the new script content)
-cp <branch>/scripts/check-pr-scope.sh ./scripts/check-pr-scope.sh
-git diff main...4e22be8e --name-only > /tmp/changed.txt    # cheap stand-in
-PR_LABELS="" bash scripts/check-pr-scope.sh    # expect FAIL on AGENTS.md
-PR_LABELS="protected-file-update" bash scripts/check-pr-scope.sh   # expect PASS
-git worktree remove /tmp/replay-984
-```
-
-**Commit:** `fix(#985): add per-file protected-file-update label bypass to Rule 1`
+**Commit:** `test(#987): add Cases E and F (RED — substring antipatterns on bulk-content/governance-update)`
 
 ---
 
-### Checkpoint B — All three cases green
+### Checkpoint B — Gap confirmed real
 
-- [ ] `bash tests/scope-guard.sh` exits 0 with all three cases PASS
-- [ ] Manual replay against #984 diff state confirms the original false positive is now fixed
-- [ ] `bash scripts/check-pr-scope.sh` against the current branch (no protected files) still PASSES — baseline behaviour preserved
+- [ ] Cases A–D: PASS
+- [ ] Case E: FAIL (substring antipattern wrongly bypasses Rule 2)
+- [ ] Case F: FAIL (substring antipattern wrongly bypasses Rule 3)
+- [ ] Exit code 1 overall
+
+If A–D fail, the multi-file refactor regressed something — debug before Phase 3.
+If E/F pass, the antipattern doesn't behave as expected — recheck the issue premise.
 
 ---
 
-### Phase 3 — CI wiring (`test-build.yml`)
-
-*One atomic commit. Single workflow file change.*
+### Phase 3 — `has_label()` helper + 3-rule migration (GREEN)
+*One atomic commit. Closes the antipattern globally.*
 
 | Task | Action |
 |---|---|
-| 3.1 | In `.github/workflows/test-build.yml`, add a new step under the existing `check-agent-scope` job (lines 95–109): `- name: Run scope-guard fixture tests` + `run: bash tests/scope-guard.sh`. Place it AFTER the `Check agent scope compliance` step so the production check runs first. |
-| 3.2 | No `env:` block needed for the new step — `tests/scope-guard.sh` sets `PR_LABELS` internally per case. |
+| 3.1 | In `scripts/check-pr-scope.sh`, define `has_label()` near the top of the rule section (after `CHANGED_FILES` line ~62, before Rule 1 line ~75). Signature: `has_label() { [ -z "${1:-}" ] && return 1; printf '%s\n' "${PR_LABELS:-}" \| tr ',' '\n' \| grep -Fxq "$1"; }`. |
+| 3.2 | Migrate Rule 1's anchored grep (current line ~96, the `protected-file-update` check) to `if has_label 'protected-file-update' && …; then`. Preserve the existing `&& …` per-file allow-list and the existing bypass log line. |
+| 3.3 | Replace Rule 2's `if echo "${PR_LABELS:-}" \| grep -q 'bulk-content'; then` (line ~110) with `if has_label 'bulk-content'; then`. Existing log/skip body unchanged. |
+| 3.4 | Replace Rule 3's `if echo "${PR_LABELS:-}" \| grep -q 'governance-update'; then` (line ~124) with `if has_label 'governance-update'; then`. Existing log/skip body unchanged. |
+| 3.5 | Confirm no remaining inline `grep -q '<label-string>'` patterns in the rule bodies for the three label-driven bypasses. |
+| 3.6 | Leave the `agent:*` checks (lines ~148–161) untouched — they're prefix-string matches, not substring antipatterns. Out of scope per SPEC §11. |
 
-**Phase 3 ACs covered:** AC-5.
+**Phase 3 ACs covered:** AC-1 (helper defined), AC-2 (three rules route through it), AC-5 (Cases A–D regression-clean), AC-6 (6/6 PASS).
 
-**Phase 3 verification:**
+**Phase 3 verification (expected GREEN):**
 ```bash
-yq eval '.jobs.check-agent-scope.steps' .github/workflows/test-build.yml   # confirm new step present
-# CI verification deferred to /ship — runs on push.
+bash tests/scope-guard.sh
+# Expected: 6/6 PASS, exit 0
+# Case A still passes (no-label fail unchanged)
+# Case B still passes (protected-file-update bypass via helper)
+# Case C still passes (Gemfile + label still trips — per-file allow-list intact)
+# Case D still passes (substring label "not-protected-file-update-foo" anchored away — same as before, just via helper)
+# Case E now passes (bulk-content substring no longer bypasses → Rule 2 trips → exit 1)
+# Case F now passes (governance-update substring no longer bypasses → Rule 3 trips → exit 1)
 ```
 
-**Commit:** `ci(#985): run scope-guard fixture tests in check-agent-scope job`
-
----
-
-### Phase 4 — `CLAUDE.md` docs row
-
-*One atomic commit. Docs only.*
-
-| Task | Action |
-|---|---|
-| 4.1 | Find the "Local Agent Labels" or similar label-documentation table in `CLAUDE.md` (line 78 area mentions `governance-update`, line 83 mentions `bulk-content`). |
-| 4.2 | Add a `protected-file-update` row/paragraph alongside the existing two labels, with one-line definition + use cases ("issue-driven `AGENTS.md` or `ARCHITECTURE.md` changes; does NOT bypass `_config.yml`, `Gemfile*`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`"). |
-| 4.3 | If the existing label documentation lives in a tabular form, mirror it; if prose, mirror prose. |
-
-**Phase 4 ACs covered:** AC-7.
-
-**Phase 4 verification:**
-```bash
-grep -c "protected-file-update" CLAUDE.md   # expect ≥ 1
-```
-
-**Commit:** `docs(#985): document protected-file-update label in CLAUDE.md`
+**Commit:** `fix(#987): extract has_label() helper; anchor bulk-content and governance-update label checks`
 
 ---
 
@@ -192,34 +164,34 @@ grep -c "protected-file-update" CLAUDE.md   # expect ≥ 1
 
 | AC | Check |
 |----|---|
-| AC-1 | `grep -n "PROTECTED_FILE_UPDATE_BYPASS" scripts/check-pr-scope.sh` → present |
-| AC-2 | Case A (no-label) FAILs, Case B (with-label-AGENTS.md) PASSes — covered by test harness |
-| AC-3 | Case C (with-label-Gemfile) FAILs — covered by test harness |
-| AC-4 | `bash tests/scope-guard.sh` exits 0 with 3/3 PASS |
-| AC-5 | `.github/workflows/test-build.yml` invokes `tests/scope-guard.sh` |
-| AC-6 | `grep -c "protected-file-update" scripts/check-pr-scope.sh` ≥ 3 (array + bypass log + docblock) |
-| AC-7 | `grep -c "protected-file-update" CLAUDE.md` ≥ 1 |
-| AC-8 | Manual #984-replay PASSes with label, FAILs without (Checkpoint B) |
-| AC-9 | `bundle exec jekyll build` exits 0 |
-| AC-10 | `git diff --name-only main...HEAD` returns ≤ 7 files (lifecycle + 4 substantive) |
+| AC-1 | `grep -c "^has_label()" scripts/check-pr-scope.sh` → 1 |
+| AC-2 | `grep -cE "has_label '" scripts/check-pr-scope.sh` → 3 (Rules 1, 2, 3); no remaining inline `grep -q 'bulk-content\|governance-update\|protected-file-update'` patterns in rule bodies |
+| AC-3 | `run_case` accepts multi-file input (verified by Case E's 21-path fixture working) |
+| AC-4 | Cases E + F present in `tests/scope-guard.sh` |
+| AC-5 | Cases A–D still PASS post-refactor |
+| AC-6 | `bash tests/scope-guard.sh` exits 0 with 6/6 PASS |
+| AC-7 | `bash scripts/check-pr-scope.sh` against current branch (no protected file in diff) returns PASS |
+| AC-8 | `bundle exec jekyll build` exits 0 |
+| AC-9 | `git diff --name-only main...HEAD \| wc -l` ≤ 7 |
+| AC-10 | Manual sanity (or via fixture probe): `PR_LABELS="bulk-content"` + 16 files → Rule 2 bypassed; `PR_LABELS="governance-update"` + `.github/skills/foo` → Rule 3 bypassed. No regression of canonical labels. |
 
 **Pass criteria:** all 10 ACs green.
 
 ---
 
-### Phase 5 — Ship
+### Phase 4 — Ship
 
 *Standard `/ship` flow.*
 
 | Task | Action |
 |---|---|
-| 5.1 | Push branch `fix/985-scope-guard-protected-file-bypass`. |
-| 5.2 | Open PR with `Closes #985`. Apply `agent:qa-gatekeeper` + `governance-update` labels (the script change touches `scripts/` — QA gatekeeper's domain — and the policy change is a governance update). |
-| 5.3 | CI: `check-agent-scope` should pass (no protected file in this PR's diff); new scope-guard test step should pass on all three cases. |
-| 5.4 | Wait for CI green. Admin-merge if blocked by 1-reviewer rule. |
-| 5.5 | Post-merge: confirm Deploy Jekyll site to Pages + Production Smoke Tests pass on merge SHA. |
-| 5.6 | Comment on #985 with production verification notes. |
-| 5.7 | Update [[reference-scope-guard]] memory to note that #985 is merged and the workaround is no longer needed. |
+| 4.1 | Push branch `fix/987-anchor-label-greps` |
+| 4.2 | Open PR with `Closes #987`; apply `agent:qa-gatekeeper` + `governance-update` labels |
+| 4.3 | CI green expected (no protected files in this PR's diff; new fixture cases pass after the helper extraction) |
+| 4.4 | Admin-merge if blocked by 1-reviewer rule (per #953/#984/#988 precedent) |
+| 4.5 | Confirm Deploy Jekyll site to Pages + Production Smoke Tests pass on merge SHA |
+| 4.6 | Comment on #987 with production verification notes |
+| 4.7 | Update [[reference-scope-guard]] memory: all three label-driven bypasses now anchored; antipattern fully closed |
 
 ---
 
@@ -227,21 +199,22 @@ grep -c "protected-file-update" CLAUDE.md   # expect ≥ 1
 
 | Risk | Realised? | Plan response |
 |---|---|---|
-| `grep -q 'protected-file-update'` substring-matches a confusable label like `protected-file-update-experimental` | No (no such label exists today) | Match `bulk-content` / `governance-update` precedent of unanchored grep; document as future hardening |
-| Temp-git-repo test fixtures flaky in CI | Unknown until Phase 5 CI run | Each case ~1s; if flaky, add `set -x` tracing in the test harness |
-| Workflow-file edit (`.github/workflows/test-build.yml`) trips Rule 4 agent-scope check | No — `agent:qa-gatekeeper` is explicitly allowed `.github/workflows/` (script line 128, AGENTS.md line 67) | None needed |
-| Script change breaks the existing guard for unrelated in-flight PRs | Mitigated by Checkpoint B (no-protected-file baseline still passes) and Case A (no-label behaviour preserved) | None additional |
-| Phantom `build` check + 1-reviewer rule blocks merge | Yes — recurring | Admin-merge per #953 / #984 precedent |
+| Helper refactor breaks Rule 1 | Mitigated by Cases A–D regression-pinning | Checkpoints A and B verify before Phase 3 lands |
+| `has_label` accepts empty label arg | Mitigated by `[ -z "${1:-}" ] && return 1` defensive guard | Task 3.1 includes this |
+| Case E's 21 files trip an unrelated rule | Mitigated by deliberately non-protected paths (`tests-e-*.txt`) | Task 2.1 specifies the naming |
+| Case F's `.github/skills/...` path leaks into production | `tmp` fixture isolation + `trap cleanup` per existing pattern | None additional |
+| Migrating Rule 1 changes the bypass log line | The log line is per-file (`bypassing protection for '$protected'`) and lives outside the `has_label` call | Case B's expected_grep continues to match |
+| Reviewer asks for `agent:*` label anchoring | Those are prefix-strings, not substring antipatterns | SPEC §11 documents the rationale; cite if asked |
+| Phantom `build` + 1-reviewer block on PR | Yes — recurring | Admin-merge per precedent |
 
 ---
 
 ## Out of scope (locked, per SPEC §11)
 
-- Removing files from `PROTECTED_FILES`
-- Extending bypass to infra files
-- Extending `governance-update` to cover Rule 1
-- Refactoring script structure
-- Adding a `--self-test` mode to the script
-- A separate `LABELS.md` doc
-- Backfilling tests for existing `bulk-content` / `governance-update` rules
-- Touching `AGENTS.md` or `ARCHITECTURE.md` (they're the test subject, not the target)
+- `PROTECTED_FILES ↔ PROTECTED_FILE_UPDATE_BYPASS` drift guard
+- `agent:*` label check anchoring (lines 148–161)
+- Refactoring Rule 1's per-file allow-list check (`PROTECTED_FILE_UPDATE_BYPASS` grep)
+- Test framework dependencies (bats, shellspec)
+- CLAUDE.md changes (no user-visible behaviour change)
+- `AGENTS.md` / `ARCHITECTURE.md` changes (protected; not this PR's target)
+- Cross-repo / A2A protocol integration

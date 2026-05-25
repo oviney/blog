@@ -5,10 +5,15 @@
 # one file, copies the production check-pr-scope.sh in, runs it with the
 # given PR_LABELS, then asserts exit code + a stdout grep.
 #
-# Cases (matches SPEC §3 AC-4 for #985):
-#   A. AGENTS.md modified, no PR_LABELS                → guard fails (exit 1)
-#   B. AGENTS.md modified, PR_LABELS=protected-file-update → guard passes (exit 0)
-#   C. Gemfile modified,  PR_LABELS=protected-file-update → guard still fails (exit 1)
+# Cases (per SPEC for #985 and #987):
+#   A. AGENTS.md modified, no PR_LABELS                       → fails (exit 1)
+#   B. AGENTS.md modified, PR_LABELS=protected-file-update    → passes (exit 0)
+#   C. Gemfile modified, PR_LABELS=protected-file-update      → fails  (exit 1, per-file allow-list)
+#   D. AGENTS.md modified, PR_LABELS=not-protected-file-update-foo (substring superset) → fails (exit 1)
+#   E. 21 files modified, PR_LABELS=not-bulk-content-foo      → fails (Rule 2 trips; pins #987 anchor)
+#   F. .github/skills/... modified, PR_LABELS=governance-update-experimental → fails (Rule 3 trips; pins #987 anchor)
+#   G. 21 files modified, PR_LABELS=bulk-content              → passes (canonical bypass preserved)
+#   H. .github/skills/... modified, PR_LABELS=governance-update → passes (canonical bypass preserved)
 #
 # Dependencies: bash, git. Same constraint as the script under test.
 
@@ -31,17 +36,29 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# run_case <name> <pr_labels> <file_to_modify> <expected_exit> <expected_grep>
+# run_case <name> <pr_labels> <files_to_modify> <expected_exit> <expected_grep>
+#
+# files_to_modify is a newline-separated list of paths. Each path is touched
+# (created if not in the baseline) on the test branch so it shows up in the
+# diff vs origin/main. A single path is a valid 1-element list — Cases A–D
+# continue to work unchanged under this contract.
 run_case() {
   local name="$1"
   local labels="$2"
-  local file_to_modify="$3"
+  local files_to_modify="$3"
   local expected_exit="$4"
   local expected_grep="$5"
 
+  local file_count
+  file_count=$(printf '%s\n' "$files_to_modify" | wc -l | tr -d ' ')
+
   echo ""
   echo "Case: $name"
-  echo "  file:    $file_to_modify"
+  if [ "$file_count" = "1" ]; then
+    echo "  file:    $files_to_modify"
+  else
+    echo "  files:   $file_count paths"
+  fi
   echo "  labels:  '${labels:-<unset>}'"
   echo "  expect:  exit=$expected_exit, grep='$expected_grep'"
 
@@ -72,9 +89,17 @@ run_case() {
     git push -q origin HEAD:main
 
     git switch -c test-branch -q
-    printf 'modified\n' >> "$file_to_modify"
+    # Touch each path; create parent dirs for nested paths
+    # (e.g. .github/skills/foo/SKILL.md).
+    while IFS= read -r path; do
+      [ -z "$path" ] && continue
+      mkdir -p "$(dirname "$path")"
+      printf 'modified\n' >> "$path"
+    done <<EOF
+$files_to_modify
+EOF
     git add .
-    git commit -q -m "modify $file_to_modify"
+    git commit -q -m "modify $file_count file(s)"
 
     mkdir -p scripts
     cp "$PROD_SCRIPT" scripts/check-pr-scope.sh
@@ -136,6 +161,43 @@ run_case "D: AGENTS.md modified, confusable label (substring superset) → guard
   "AGENTS.md" \
   "1" \
   "VIOLATION [protected-file]: 'AGENTS.md'"
+
+# Pin the anchored-grep semantics for the bulk-content label (Rule 2).
+# The label is set to a confusable substring superset that the current
+# unanchored `grep -q 'bulk-content'` mistakenly matches — wrongly
+# bypassing Rule 2 against a >15-file diff. Will be GREEN once
+# Rule 2's check is migrated to has_label().
+FILES_E=$(seq -f 'tests-e-%g.txt' 1 21)
+run_case "E: 21 files modified, confusable bulk-content substring label → guard fails on scope-explosion" \
+  "not-bulk-content-foo" \
+  "$FILES_E" \
+  "1" \
+  "VIOLATION [scope-explosion]"
+
+# Pin the anchored-grep semantics for the governance-update label (Rule 3).
+# Same antipattern as Case E but on Rule 3: a confusable superset label
+# wrongly bypasses the .github/skills/ check today. Will be GREEN once
+# Rule 3's check is migrated to has_label().
+run_case "F: .github/skills/ modified, confusable governance-update substring label → guard fails on governance-surface" \
+  "governance-update-experimental" \
+  ".github/skills/scope-guard-test/SKILL.md" \
+  "1" \
+  "VIOLATION [governance-surface]"
+
+# Pin canonical-bypass behaviour as automated coverage (was manual-probe-only
+# per SPEC AC-10). A future refactor of has_label() can't silently break the
+# exact-match canonical bypass without one of these turning red.
+run_case "G: 21 files modified, canonical bulk-content label → Rule 2 bypassed, guard passes" \
+  "bulk-content" \
+  "$FILES_E" \
+  "0" \
+  "bulk-content label present — skipping rule 2"
+
+run_case "H: .github/skills/ modified, canonical governance-update label → Rule 3 bypassed, guard passes" \
+  "governance-update" \
+  ".github/skills/scope-guard-test/SKILL.md" \
+  "0" \
+  "governance-update label present — skipping rule 3"
 
 echo ""
 echo "Summary: $PASS passed, $FAIL failed"
