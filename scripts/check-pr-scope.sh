@@ -89,7 +89,11 @@ echo ""
 # ---------------------------------------------------------------------------
 for protected in "${PROTECTED_FILES[@]}"; do
   if echo "$CHANGED_FILES" | grep -qx "$protected"; then
-    if echo "${PR_LABELS:-}" | grep -q 'protected-file-update' && \
+    # Anchored exact-match against the comma-joined PR_LABELS (the format
+    # github.event.pull_request.labels.*.name | join(',') produces in CI).
+    # Substring matching would let an unrelated label like
+    # "not-protected-file-update-foo" silently bypass the protection.
+    if printf '%s\n' "${PR_LABELS:-}" | tr ',' '\n' | grep -Fxq 'protected-file-update' && \
        printf '%s\n' "${PROTECTED_FILE_UPDATE_BYPASS[@]}" | grep -qx "$protected"; then
       echo "check-pr-scope: protected-file-update label present — bypassing protection for '$protected'."
       continue

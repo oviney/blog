@@ -23,7 +23,9 @@ FAIL=0
 TEMP_DIRS=()
 
 cleanup() {
-  for d in "${TEMP_DIRS[@]}"; do
+  # `${TEMP_DIRS[@]:-}` survives set -u when the array is still empty
+  # (e.g., trap fires before the first run_case appends).
+  for d in "${TEMP_DIRS[@]:-}"; do
     [ -n "$d" ] && [ -d "$d" ] && rm -rf "$d"
   done
 }
@@ -126,6 +128,14 @@ run_case "C: Gemfile modified, protected-file-update label → guard still fails
   "Gemfile" \
   "1" \
   "VIOLATION [protected-file]: 'Gemfile'"
+
+# Pin the anchored-grep semantics so a future refactor can't silently
+# re-introduce a substring match on the label name.
+run_case "D: AGENTS.md modified, confusable label (substring superset) → guard fails" \
+  "not-protected-file-update-foo" \
+  "AGENTS.md" \
+  "1" \
+  "VIOLATION [protected-file]: 'AGENTS.md'"
 
 echo ""
 echo "Summary: $PASS passed, $FAIL failed"
