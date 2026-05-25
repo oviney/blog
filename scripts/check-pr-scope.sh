@@ -85,15 +85,22 @@ echo "check-pr-scope: checking $(echo "$CHANGED_FILES" | wc -l | tr -d ' ') chan
 echo ""
 
 # ---------------------------------------------------------------------------
+# has_label <label-name> — exact-match check against the comma-joined
+# PR_LABELS (the format github.event.pull_request.labels.*.name | join(',')
+# produces in CI). Single source of truth for all label-driven bypasses so
+# a future label can't accidentally reintroduce an unanchored grep.
+# ---------------------------------------------------------------------------
+has_label() {
+  [ -z "${1:-}" ] && return 1
+  printf '%s\n' "${PR_LABELS:-}" | tr ',' '\n' | grep -Fxq "$1"
+}
+
+# ---------------------------------------------------------------------------
 # Rule 1: Protected files
 # ---------------------------------------------------------------------------
 for protected in "${PROTECTED_FILES[@]}"; do
   if echo "$CHANGED_FILES" | grep -qx "$protected"; then
-    # Anchored exact-match against the comma-joined PR_LABELS (the format
-    # github.event.pull_request.labels.*.name | join(',') produces in CI).
-    # Substring matching would let an unrelated label like
-    # "not-protected-file-update-foo" silently bypass the protection.
-    if printf '%s\n' "${PR_LABELS:-}" | tr ',' '\n' | grep -Fxq 'protected-file-update' && \
+    if has_label 'protected-file-update' && \
        printf '%s\n' "${PROTECTED_FILE_UPDATE_BYPASS[@]}" | grep -qx "$protected"; then
       echo "check-pr-scope: protected-file-update label present — bypassing protection for '$protected'."
       continue
@@ -107,7 +114,7 @@ done
 # Rule 2: >15 files changed (scope explosion)
 # Skip if PR is a deliberate bulk-content change (label: bulk-content)
 # ---------------------------------------------------------------------------
-if echo "${PR_LABELS:-}" | grep -q 'bulk-content'; then
+if has_label 'bulk-content'; then
   echo "check-pr-scope: bulk-content label present — skipping rule 2."
 else
   FILE_COUNT=$(echo "$CHANGED_FILES" | wc -l | tr -d ' ')
@@ -121,7 +128,7 @@ fi
 # Rule 3: .github/skills/ or .github/instructions/ governance surfaces
 # Skip if PR is a deliberate governance update (label: governance-update)
 # ---------------------------------------------------------------------------
-if echo "${PR_LABELS:-}" | grep -q 'governance-update'; then
+if has_label 'governance-update'; then
   echo "check-pr-scope: governance-update label present — skipping rule 3."
 else
   GOVERNANCE_CHANGES=$(echo "$CHANGED_FILES" | grep -E '^\.github/(skills|instructions)/' || true)
