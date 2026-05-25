@@ -19,12 +19,18 @@
 #   PASS: PR with no agent label (human PR) — agent-scope check is always skipped
 #
 # Label-driven exemptions (deliberate intent, used sparingly):
-#   bulk-content       — skips Rule 2 (scope-explosion). Valid for atomic content
-#                        backfills (post backfill, byline migration, category rename)
-#                        where splitting would create a worse intermediate main state.
-#   governance-update  — skips Rule 3 (governance-surface). Deliberate updates to
-#                        .github/skills/ or .github/instructions/ governance files.
+#   bulk-content            — skips Rule 2 (scope-explosion). Valid for atomic content
+#                             backfills (post backfill, byline migration, category rename)
+#                             where splitting would create a worse intermediate main state.
+#   governance-update       — skips Rule 3 (governance-surface). Deliberate updates to
+#                             .github/skills/ or .github/instructions/ governance files.
+#   protected-file-update   — relaxes Rule 1 *per-file* for AGENTS.md and ARCHITECTURE.md
+#                             only. Other protected files (_config.yml, Gemfile,
+#                             Gemfile.lock, .github/CODEOWNERS, .github/copilot-instructions.md)
+#                             remain unbypassable even with this label.
 #   PASS: PR with bulk-content label and 30 changed files — Rule 2 skipped
+#   PASS: PR with protected-file-update label modifying AGENTS.md — Rule 1 bypassed for AGENTS.md
+#   FAIL: PR with protected-file-update label modifying Gemfile — Gemfile still trips Rule 1
 #   FAIL: PR with bulk-content label and unrelated changes (anti-pattern, but the
 #         script can't detect this — see CLAUDE.md for human review guidance)
 #
@@ -46,6 +52,15 @@ PROTECTED_FILES=(
   "Gemfile.lock"
   ".github/CODEOWNERS"
   ".github/copilot-instructions.md"
+  "AGENTS.md"
+  "ARCHITECTURE.md"
+)
+
+# Subset of PROTECTED_FILES that an issue-driven PR may modify by carrying the
+# protected-file-update label. Kept separate from PROTECTED_FILES so infra
+# files (_config.yml, Gemfile*, .github/CODEOWNERS, .github/copilot-instructions.md)
+# always trip Rule 1 — even with the label.
+PROTECTED_FILE_UPDATE_BYPASS=(
   "AGENTS.md"
   "ARCHITECTURE.md"
 )
@@ -74,6 +89,15 @@ echo ""
 # ---------------------------------------------------------------------------
 for protected in "${PROTECTED_FILES[@]}"; do
   if echo "$CHANGED_FILES" | grep -qx "$protected"; then
+    # Anchored exact-match against the comma-joined PR_LABELS (the format
+    # github.event.pull_request.labels.*.name | join(',') produces in CI).
+    # Substring matching would let an unrelated label like
+    # "not-protected-file-update-foo" silently bypass the protection.
+    if printf '%s\n' "${PR_LABELS:-}" | tr ',' '\n' | grep -Fxq 'protected-file-update' && \
+       printf '%s\n' "${PROTECTED_FILE_UPDATE_BYPASS[@]}" | grep -qx "$protected"; then
+      echo "check-pr-scope: protected-file-update label present — bypassing protection for '$protected'."
+      continue
+    fi
     echo "VIOLATION [protected-file]: '$protected' is in the protected list and must not be modified as a side-effect."
     VIOLATIONS=$((VIOLATIONS + 1))
   fi
