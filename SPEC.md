@@ -1,37 +1,38 @@
-# SPEC — Anchor bulk-content / governance-update label greps + add drift guard (#987)
+# SPEC — Add `memory:` frontmatter to local subagents (#945)
 
 **Status:** Draft — awaiting approval
-**Issue:** [#987](https://github.com/oviney/blog/issues/987)
-**Labels:** `agent:qa-gatekeeper`, `governance-update`
+**Issue:** [#945](https://github.com/oviney/blog/issues/945)
+**Labels:** `agent:qa-gatekeeper`
 **Date:** 2026-05-25
 **Lifecycle phase:** DEFINE
-**Spawned from:** PR [#988](https://github.com/oviney/blog/pull/988) (closed #985) /ship review — code-reviewer Critical scoped to `protected-file-update` only; security-auditor flagged same antipattern on `bulk-content` / `governance-update` as Info.
+**Spawned from:** Research Sweep [#902](https://github.com/oviney/blog/issues/902) (2026-05-01)
 
 ---
 
 ## 1. Situation
 
-`scripts/check-pr-scope.sh` uses unanchored substring greps for the `bulk-content` and `governance-update` labels:
+Claude Code v2.1.33+ added a `memory:` frontmatter field on subagent definitions that gives each subagent its own persistent markdown knowledge store across sessions. v2.1.117 (2026-04-22) extended this with `@mention` syntax and per-agent `mcpServers` loading. Today the six `.claude/agents/*.md` definitions in this repo restart cold every invocation — each PR review, test plan, or security audit re-derives repo context from scratch.
 
-- **line 110** — `if echo "${PR_LABELS:-}" | grep -q 'bulk-content'; then`
-- **line 124** — `if echo "${PR_LABELS:-}" | grep -q 'governance-update'; then`
+Current frontmatter shapes in `.claude/agents/`:
 
-Confusable label names (e.g. `not-bulk-content-foo`, `governance-update-experimental`) trip these bypasses. The `protected-file-update` label (added by #985 / PR #988) was originally written with the same antipattern; #988 caught and anchored it (`scripts/check-pr-scope.sh:96` post-merge) but deliberately scoped the fix to the new label per the user's "fix new grep only + Case D pin" decision during /ship review.
+| File | Current frontmatter keys |
+|---|---|
+| `code-reviewer.md` | `name`, `description` |
+| `security-auditor.md` | `name`, `description` |
+| `test-engineer.md` | `name`, `description` |
+| `playwright-test-planner.md` | `name`, `description`, `tools`, `model`, `color` |
+| `playwright-test-generator.md` | `name`, `description`, `tools`, `model`, `color` |
+| `playwright-test-healer.md` | `name`, `description`, `tools`, `model`, `color` |
 
-Security-auditor judged the remaining two unanchored greps **not currently exploitable** in this threat model:
-- Labels can only be applied by users with `triage`/`write` on `oviney/blog`.
-- Forked PRs cannot mutate labels.
-- An attacker with label-write privilege can apply the canonical label directly — the substring confusion variant adds no privilege.
+None of the six declare a `memory:` field today. Adding one enables persistent per-agent knowledge accumulation across sessions.
 
-The hole is **consistency debt**, not an active vulnerability. Closing it cleans up the antipattern globally, gives all three rule-level bypasses the same security posture, and adds regression-prevention via fixture cases that pin the anchored semantics.
-
-CI surface: `scripts/check-pr-scope.sh` runs in `.github/workflows/test-build.yml` `check-agent-scope` job (line 95–113 post-#988). The fixture harness `tests/scope-guard.sh` (added in #988) covers Rule 1 only — Rule 2 and Rule 3 currently have no automated tests.
+This session's earlier work — three scope-guard PRs and the AGENTS.md handoff graph — is exactly the kind of context these subagents would benefit from carrying forward: code-reviewer accumulating "this repo uses `has_label()` for label checks, not inline greps"; security-auditor accumulating "labels are gated by collaborator triage permission, not fork PRs"; test-engineer accumulating "the scope-guard harness lives at `tests/scope-guard.sh` with 8 fixture cases".
 
 ---
 
 ## 2. Objective
 
-Anchor the `bulk-content` and `governance-update` label greps in `scripts/check-pr-scope.sh` to match the comma-joined `PR_LABELS` format exactly, using a single `has_label()` helper that DRYs all three rule-level bypass checks. Extend `tests/scope-guard.sh` to multi-file fixtures and add two new cases (E, F) pinning the anchored semantics so a future refactor can't silently re-introduce a substring match on either label. Single source of truth for the label check; consistent security posture across all three labels.
+Add a `memory:` field to every `.claude/agents/*.md` YAML frontmatter, scoped `project` for all six (repo-wide knowledge is the dominant pattern for these personas), with a one-line inline YAML comment justifying the scope choice. No prose body changes. No new files.
 
 ---
 
@@ -39,45 +40,41 @@ Anchor the `bulk-content` and `governance-update` label greps in `scripts/check-
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| Refactor approach | **Extract `has_label()` helper, call from Rules 1, 2, 3** | Single source of truth; eliminates the antipattern by construction so a fourth label can't copy the wrong pattern. Code-reviewer in #988 explicitly suggested this. |
-| Helper signature | **`has_label <label-name>`** — returns 0 if label is in `PR_LABELS`, 1 otherwise | Plain bash function; reads naturally at call sites (`if has_label 'bulk-content'; then …`). |
-| Helper implementation | **`printf '%s\n' "${PR_LABELS:-}" \| tr ',' '\n' \| grep -Fxq "$1"`** | Same anchored pattern #985 introduced for Rule 1. `-F` (fixed string), `-x` (whole-line), `-q` (quiet). |
-| Test fixture mechanics | **Extend `run_case` to accept newline-separated multi-file paths** | Cases E (Rule 2, 16+ files) and F (Rule 3, `.github/skills/`) need multi-file or path-prefixed setups. One helper, not two. Case A–D continue to work by passing a single path (existing call sites become `\$'AGENTS.md'`, unchanged). |
-| Test cases to add | **Case E (`bulk-content` substring pin), Case F (`governance-update` substring pin)** — no separate pin for `agent:` labels | The `agent:*` checks (lines 148–161) use prefix-match strings (`agent:creative-director` cannot be confused with a different `agent:*` label because each label starts with the full agent name). They are not the same antipattern; skip. |
-| Drift guard | **Out of scope** | The user's #987 issue body explicitly lists this as out of scope ("Adding a startup sanity check that asserts `PROTECTED_FILE_UPDATE_BYPASS ⊆ PROTECTED_FILES` … worth a separate issue"). Filed only if appetite arises. |
-| Documentation | **No CLAUDE.md change required** | The behavioural contract is unchanged from the user's perspective — both labels were intended to be exact-match all along. The docblock in `scripts/check-pr-scope.sh` will not need new examples either; existing PASS/FAIL examples still hold. |
-| `protected-file-update` Rule 1 grep | **Migrate to `has_label()` helper** for consistency | Currently inlined post-#988. Routing through the helper keeps all three labels symmetric. Cases A–D must continue to pass post-refactor (regression-prevent the helper extraction). |
+| Scope per agent | **All 6 → `memory: project`** | Every persona's accumulated knowledge is repo-wide: review patterns, threat models, flake catalogs, locator conventions. Session-private context is the wrong abstraction here. |
+| Justification placement | **Inline YAML comment on the `memory:` line** | Justification sits adjacent to the value it justifies. Compact, grep-able, no prose body churn, single source of truth. |
+| Justification style | **One short phrase per agent**, describing what kind of knowledge accumulates | e.g. `memory: project  # repo-wide review patterns accumulate across sessions`. Specific to the agent's role; not boilerplate. |
+| Field placement | **Immediately after `description:`** | Natural reading order: name → description → memory scope → (optional tools/model/color). Consistent across all six files. |
+| Tools/model/color preservation | **Unchanged** | The 3 playwright-test-* agents have richer frontmatter. Only the `memory:` line is added; existing keys keep their positions. |
+| Markdown body | **Untouched** | The AC permits justification "in the file (one-line frontmatter comment or short note in the prose)". The frontmatter comment satisfies it; no prose edits needed. |
+| New files | **None** | This PR is purely frontmatter additions across 6 existing files. |
 
 ---
 
 ## 4. Acceptance Criteria
 
-- [ ] **AC-1** `scripts/check-pr-scope.sh` defines a `has_label()` shell function near the top of the rule section (after `CHANGED_FILES` definition, before Rule 1) that takes one argument (label name) and returns 0 iff that label is present in `PR_LABELS` as a comma-delimited exact-match entry.
-- [ ] **AC-2** Rule 1 (`protected-file-update` bypass), Rule 2 (`bulk-content` bypass), and Rule 3 (`governance-update` bypass) all call `has_label '<label>'` — no remaining `grep -q '<label-string>'` patterns in the rule bodies.
-- [ ] **AC-3** `tests/scope-guard.sh` `run_case` helper accepts newline-separated multi-file paths in its `<file_to_modify>` parameter. Each path is touched and staged.
-- [ ] **AC-4** New fixture cases in `tests/scope-guard.sh`:
-  - **Case E:** 21 unique unprotected files modified, `PR_LABELS="not-bulk-content-foo"` → guard fails (exit 1), output contains `VIOLATION [scope-explosion]`.
-  - **Case F:** `.github/skills/scope-guard-test/SKILL.md` created, `PR_LABELS="governance-update-experimental"` → guard fails (exit 1), output contains `VIOLATION [governance-surface]`.
-- [ ] **AC-5** Existing Cases A, B, C, D continue to pass post-refactor (Rule 1 still works via `has_label`).
-- [ ] **AC-6** `bash tests/scope-guard.sh` exits 0 with **6/6 PASS**.
-- [ ] **AC-7** Sanity replay against `main` HEAD: `bash scripts/check-pr-scope.sh` from the merged `main` state still PASSES (no protected file on `main`; no regression).
-- [ ] **AC-8** `bundle exec jekyll build` exits 0 (no Jekyll content surface touched).
-- [ ] **AC-9** Scope-guard boundary on this PR: `git diff --name-only main...HEAD` returns exactly — `scripts/check-pr-scope.sh`, `tests/scope-guard.sh`, plus lifecycle artifacts (`SPEC.md`, `tasks/plan.md`, `tasks/todo.md`), plus the carry-over archived #985 lifecycle artifacts (`tasks/archive/2026-05-25-scope-guard-985/{plan,todo}.md`). Total **≤ 7 files** (using the post-#988 ≤9 budget pattern minus 2 since this PR doesn't touch `CLAUDE.md` or `.github/workflows/test-build.yml`).
-- [ ] **AC-10** No regression of `bulk-content` / `governance-update` exact-match behaviour: `PR_LABELS="bulk-content"` against >15 files still passes (Rule 2 bypassed); `PR_LABELS="governance-update"` against `.github/skills/foo` still passes (Rule 3 bypassed). Verified via manual probe or two additional fixture cases — manual probe is acceptable since both labels are well-exercised by real PRs in the repo history.
+- [ ] **AC-1** Every `.claude/agents/*.md` file's YAML frontmatter contains a `memory:` line.
+- [ ] **AC-2** `awk '/^---$/{f=!f;next} f && /^memory:/{print FILENAME}' .claude/agents/*.md | wc -l` returns `6`.
+- [ ] **AC-3** Every `memory:` value is `project` (no `local` values; verified per Decision §3).
+- [ ] **AC-4** Every `memory:` line carries an inline `#` YAML comment justifying the scope choice — agent-specific, not boilerplate. `grep -c '^memory:.*#' .claude/agents/*.md` reports 1 match per file across all six.
+- [ ] **AC-5** No existing frontmatter key is removed or reordered. The 3 simple agents retain `name`, `description`. The 3 playwright-test agents retain `name`, `description`, `tools`, `model`, `color`. Verified by diffing each file's frontmatter against `main`.
+- [ ] **AC-6** No markdown body changes — only the YAML frontmatter inside the `---` fences. Verified by `git diff main...HEAD` showing only frontmatter region edits.
+- [ ] **AC-7** `bundle exec jekyll build` exits 0. (Trivial — `.claude/` is outside the Jekyll source — but the check is cheap and lives in the issue AC.)
+- [ ] **AC-8** No file outside `.claude/agents/`, the lifecycle directory, or the archive carry-over is modified. No governance surface (`.github/skills/`, `.github/instructions/`, `.github/copilot-instructions.md`) touched. No protected file touched.
+- [ ] **AC-9** YAML remains valid for each file. Verified by parsing the frontmatter as YAML (`yq eval '.memory' <file>` returns `project` for each).
+- [ ] **AC-10** Scope-guard boundary: `git diff --name-only main...HEAD` returns exactly — 6 `.claude/agents/*.md` + 3 lifecycle (`SPEC.md`, `tasks/plan.md`, `tasks/todo.md`) + 2 carry-over archive (`tasks/archive/2026-05-25-scope-guard-987/{plan,todo}.md`) = **11 files**. Well under the 15-file scope-explosion cap (no `bulk-content` label needed).
 
 ---
 
 ## 5. Commands
 
 ```bash
-# Local development loop
-bundle exec jekyll build                          # AC-8
-bash scripts/check-pr-scope.sh                    # baseline (expected: PASS — no protected file in our diff)
-bash tests/scope-guard.sh                         # AC-6 — expect 6/6 PASS
-
-# Sanity-check existing labels still work as intended (AC-10)
-# Run inside a temp git repo with 16 unprotected files + bulk-content label → expect Rule 2 skipped
-# Or inspect the script's stdout for the new "bulk-content label present — skipping rule 2." line.
+# Validation
+bundle exec jekyll build                                                    # AC-7
+awk '/^---$/{f=!f;next} f && /^memory:/{print FILENAME}' .claude/agents/*.md | wc -l   # AC-2 — expect 6
+grep -c '^memory:' .claude/agents/*.md                                      # AC-1/AC-3 — every file: 1
+grep -c '^memory:.*#' .claude/agents/*.md                                   # AC-4 — every file: 1
+yq eval '.memory' .claude/agents/code-reviewer.md                           # AC-9 — expect "project" (cross-check one file)
+git diff --name-only main...HEAD | wc -l                                    # AC-10 — expect 11
 ```
 
 ---
@@ -85,25 +82,40 @@ bash tests/scope-guard.sh                         # AC-6 — expect 6/6 PASS
 ## 6. Project Structure (touched files)
 
 ```
-scripts/check-pr-scope.sh         M   Define has_label(); refactor 3 label checks to use it
-tests/scope-guard.sh              M   Multi-file run_case + Cases E & F
-SPEC.md                           M   This file
-tasks/plan.md                     M   #987 plan
-tasks/todo.md                     M   #987 todo
-tasks/archive/2026-05-25-scope-guard-985/  A   Carry-over: archived #985 plan + todo
+.claude/agents/code-reviewer.md              M   + memory: project (review patterns)
+.claude/agents/security-auditor.md           M   + memory: project (threat model)
+.claude/agents/test-engineer.md              M   + memory: project (test architecture, flake catalog)
+.claude/agents/playwright-test-planner.md    M   + memory: project (page-structure inventory)
+.claude/agents/playwright-test-generator.md  M   + memory: project (locator conventions)
+.claude/agents/playwright-test-healer.md     M   + memory: project (flake patterns per spec)
+SPEC.md                                      M   This file
+tasks/plan.md                                M   #945 plan
+tasks/todo.md                                M   #945 todo
+tasks/archive/2026-05-25-scope-guard-987/    A   Carry-over: archived #987 plan + todo (2 files)
 ```
 
-**Total scope:** 5 substantive lifecycle files + 2 archive carry-over files = **7 files**. No changes to `.github/workflows/`, `CLAUDE.md`, `AGENTS.md`, `ARCHITECTURE.md`, or any `_posts/`, `_sass/`, `_layouts/`, `_config.yml`.
+**Total scope:** 6 substantive + 3 lifecycle + 2 archive carry-over = **11 files**.
 
 ---
 
 ## 7. Code Style
 
-- **Bash function style** — define `has_label()` with `local` for any internal vars; single responsibility; no side effects beyond the grep exit code.
-- **Call-site readability** — `if has_label 'bulk-content'; then` reads as plain English; preserves the existing `if … ; then` structure of each rule.
-- **No comment churn at call sites** — the helper name documents intent; don't restate "this checks for the X label" at every call. Keep the existing surrounding context comments.
-- **Test harness style** — `run_case`'s multi-file parameter remains a single string param (positional-arg compatibility); the helper splits on newlines internally. Existing 4 call sites continue to pass a single path with no quoting change required.
-- **No new dependencies** — bash + git only, matching the existing constraint.
+- **YAML frontmatter style** — single space after `memory:`, single space before `#` comment, comment value is a short noun phrase (no period). Example: `memory: project  # repo-wide review patterns accumulate across sessions`.
+- **No reflow** — preserve existing key order; insert `memory:` immediately after `description:` (which sometimes spans multiple lines via single-quotes in the playwright-test-generator file).
+- **No body edits** — every byte change is inside the `---` fences.
+- **Justification phrasing** — agent-specific, not generic. Each comment names the kind of knowledge that accumulates (e.g. "review patterns", "threat model", "flake catalog"). Not "Project scope" or "Repo-wide" — those are tautologies.
+- **No trailing whitespace** on the new line.
+
+Per-agent justification text (proposed; final wording in plan.md):
+
+| Agent | Justification comment |
+|---|---|
+| code-reviewer | `# repo-wide review patterns and PR-history pitfalls accumulate across sessions` |
+| security-auditor | `# repo-wide threat model and governance-surface boundaries persist` |
+| test-engineer | `# Playwright suite shape and CI flake catalog persist across sessions` |
+| playwright-test-planner | `# page-structure inventory and viewport conventions persist` |
+| playwright-test-generator | `# locator and spec-file conventions accumulate across sessions` |
+| playwright-test-healer | `# per-spec flake patterns and remediation recipes accumulate` |
 
 ---
 
@@ -111,34 +123,36 @@ tasks/archive/2026-05-25-scope-guard-985/  A   Carry-over: archived #985 plan + 
 
 | Layer | Check |
 |---|---|
-| Unit/script | `tests/scope-guard.sh` — 6 fixture cases covering Rule 1 (A–D, B+D pin label anchoring), Rule 2 (E pin substring antipattern fix), Rule 3 (F pin substring antipattern fix) |
-| Integration | `.github/workflows/test-build.yml` (no edits) — existing `check-agent-scope` job runs the harness; CI verifies 6/6 PASS on every PR |
-| Manual | One-shot replay of the original `bulk-content` and `governance-update` exact-match behaviour against fixture state (AC-10) |
-| Build | `bundle exec jekyll build` (AC-8) |
-| Refactor regression | Cases A–D unchanged in semantics post-helper-extraction (AC-5) |
+| Static | `awk` AC-2 returns 6; `grep` AC-1/AC-3/AC-4 each return 6 |
+| Static | YAML parses for each of the 6 files (AC-9) |
+| Diff | `git diff main...HEAD --name-only` returns 11 files; every `.claude/agents/*.md` change is confined to within the frontmatter fences (AC-5, AC-6, AC-8, AC-10) |
+| Build | `bundle exec jekyll build` exits 0 (AC-7) |
 
-No Playwright spec — no runtime UI.
+No fixture tests, no Playwright spec — this is a metadata-only change in a directory outside the Jekyll source.
+
+No CI gate addition required — the existing `check-agent-scope` job covers the `.claude/agents/` boundary indirectly via Rule 4 (`agent:qa-gatekeeper` is permitted to touch `tests/`, but `.claude/agents/` isn't in any forbidden pattern, so Rule 4 won't trip).
 
 ---
 
 ## 9. Boundaries
 
 **Always:**
-- Run `bash tests/scope-guard.sh` locally before pushing — expect 6/6 PASS.
-- Route all three rule-level label checks through `has_label()`. Don't leave any inline `grep -q '<label>'` patterns behind.
-- Match the existing `printf | tr | grep -Fxq` anchored pattern exactly — same `-Fxq` flags, same comma-split.
+- Insert `memory:` immediately after `description:` in each file.
+- Use `memory: project` for all six files (per Decision §3).
+- Add an agent-specific inline YAML `#` comment justifying the scope.
+- Run the AC battery (`awk`/`grep`/`yq`/`jekyll build`) before pushing.
 
 **Ask first about:**
-- Adding a fourth label-driven bypass (would require a separate issue and a new label-naming decision).
-- Touching the `agent:*` label checks at lines 148–161 (they use prefix-match strings, not the same antipattern; out of scope for #987).
-- Changing the helper's signature or name from `has_label`.
-- Adding the `PROTECTED_FILES ↔ PROTECTED_FILE_UPDATE_BYPASS` drift guard (out-of-scope per #987 issue body).
+- Switching any agent from `project` to `local`.
+- Adding a `memory:` field to subagents outside `.claude/agents/` (e.g. `~/.claude/agents/` user-global) — out of scope per #945.
+- Editing the markdown body of any subagent file — out of scope; this PR is frontmatter-only.
+- Adding a new subagent file as part of this PR — out of scope.
 
 **Never:**
-- Modify `AGENTS.md`, `ARCHITECTURE.md`, `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, or `.github/copilot-instructions.md`. [Protected files; the PR carries `governance-update` only, not `protected-file-update`.]
-- Change the behaviour of the existing `bulk-content` / `governance-update` exact-match path. The refactor must be semantics-preserving for the canonical label; only the substring confusion path changes.
-- Touch `.github/workflows/test-build.yml` (no new CI step needed — existing `tests/scope-guard.sh` invocation already covers Cases E/F).
-- Add `bats`, `shellspec`, or any test framework. [Boundary inherited from #985 SPEC §9.]
+- Modify any of the protected files (`_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`, `AGENTS.md`, `ARCHITECTURE.md`). [Per scope guard.]
+- Modify governance surface (`.github/skills/`, `.github/instructions/`). [No `governance-update` label needed.]
+- Reorder or remove existing frontmatter keys.
+- Change the markdown body of any `.claude/agents/*.md` file.
 
 ---
 
@@ -146,23 +160,22 @@ No Playwright spec — no runtime UI.
 
 | Risk | Mitigation |
 |---|---|
-| Helper refactor breaks Rule 1 (existing protected-file-update path). | Cases A–D in `tests/scope-guard.sh` will fail loudly if so. AC-5 explicitly guards this. |
-| `has_label` mis-implementation accepts an empty label argument and matches an empty `PR_LABELS` line. | Add a defensive `[ -z "$1" ] && return 1` guard at the top of `has_label`. Document in code style. |
-| Case E's 16-file fixture creates files that themselves trip another rule (e.g., one happens to match a protected name). | Use clearly-distinct paths: `tests-e-1.txt` through `tests-e-21.txt` under a sandbox dir. None of these match `PROTECTED_FILES` or any `agent:*` forbidden pattern. |
-| Case F creating a real `.github/skills/scope-guard-test/SKILL.md` in the fixture leaks state. | Fixture creates files inside the temp git repo, never the production repo. `mktemp -d` + `trap cleanup EXIT` (existing pattern) keeps it hermetic. |
-| Migrating Rule 1 to the helper changes the bypass log line. | Keep the log line identical (`"check-pr-scope: protected-file-update label present — bypassing protection for '$protected'."`). Only the label-check expression changes, not the message. Case B's `expected_grep` continues to match. |
-| Reviewer asks for the agent-scope checks (lines 148–161) to also use `has_label`. | Those are prefix-match string comparisons, not substring-match antipatterns. They're not in scope for #987. Document the difference in PR description if asked. |
+| YAML parse error from a stray indentation or quote in the new `memory:` line | AC-9 (YAML parses); local verification via `yq eval '.memory' <file>` per file before commit. |
+| Inline `#` comment misinterpreted as part of the value by some YAML parser | YAML 1.1/1.2 both treat `#` outside quoted strings as a comment delimiter. `memory: project  # ...` is the canonical form. Verified by precedent in many Claude Code subagent examples and by the AC-9 yq check. |
+| Claude Code v2.1.33+ requirement — older versions of Claude Code may not honour the `memory:` field | Unsupported runtimes treat unknown frontmatter keys as inert (per YAML spec); no degradation. Worst case: the field is read but ignored. Out of scope per #945. |
+| Subagent that gets `memory: project` writes sensitive PR-review content into a persistent file | Cross-cutting governance concern, not introduced by this PR. The memory feature stores markdown in a user-scope path; the user can audit/redact. Scope review of stored memory contents is Worth-Watching from #902. |
+| `bundle exec jekyll build` failing for unrelated reasons (e.g. local worktrees/ pollution as seen in earlier PRs) | Verify with worktrees moved aside, matching the local-build hygiene pattern documented in the [[reference-scope-guard]] session. |
 
 ---
 
 ## 11. Out of Scope
 
-Per issue #987:
+Per issue #945:
 
-- **Adding the `PROTECTED_FILES ↔ PROTECTED_FILE_UPDATE_BYPASS` drift guard** (config-error sanity check) — worth a separate issue if appetite arises.
-- **Anchoring the `agent:*` label checks at lines 148–161** — those use prefix-match strings, not substring-match antipatterns.
-- **Refactoring Rule 1's per-file allow-list check** (the second `printf '%s\n' "${PROTECTED_FILE_UPDATE_BYPASS[@]}" | grep -qx "$protected"` line) — that's a separate concern from label matching; keep it inline.
-- **Adding test framework dependencies** (`bats`, `shellspec`).
-- **CLAUDE.md changes** — no documented behaviour changes from the user's perspective.
-- **`AGENTS.md` / `ARCHITECTURE.md` changes** — protected files; not the target of this PR.
-- **Cross-repo / A2A protocol integration.**
+- Adding `memory:` to user-global subagents (`~/.claude/agents/*.md`) — outside this repo.
+- Deciding what subagents should *store* in memory — subagents self-curate; this issue only enables the mechanism.
+- Migrating to the Claude Managed Agents "dreaming" feature — Watch item in #902.
+- Editing the markdown body of any subagent file.
+- Adding or removing subagents.
+- Touching `AGENTS.md` or governance surfaces.
+- Adding fixture tests for the `memory:` field (no behavioural surface to test).
