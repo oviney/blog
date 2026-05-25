@@ -31,17 +31,29 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# run_case <name> <pr_labels> <file_to_modify> <expected_exit> <expected_grep>
+# run_case <name> <pr_labels> <files_to_modify> <expected_exit> <expected_grep>
+#
+# files_to_modify is a newline-separated list of paths. Each path is touched
+# (created if not in the baseline) on the test branch so it shows up in the
+# diff vs origin/main. A single path is a valid 1-element list — Cases A–D
+# continue to work unchanged under this contract.
 run_case() {
   local name="$1"
   local labels="$2"
-  local file_to_modify="$3"
+  local files_to_modify="$3"
   local expected_exit="$4"
   local expected_grep="$5"
 
+  local file_count
+  file_count=$(printf '%s\n' "$files_to_modify" | wc -l | tr -d ' ')
+
   echo ""
   echo "Case: $name"
-  echo "  file:    $file_to_modify"
+  if [ "$file_count" = "1" ]; then
+    echo "  file:    $files_to_modify"
+  else
+    echo "  files:   $file_count paths"
+  fi
   echo "  labels:  '${labels:-<unset>}'"
   echo "  expect:  exit=$expected_exit, grep='$expected_grep'"
 
@@ -72,9 +84,17 @@ run_case() {
     git push -q origin HEAD:main
 
     git switch -c test-branch -q
-    printf 'modified\n' >> "$file_to_modify"
+    # Touch each path; create parent dirs for nested paths
+    # (e.g. .github/skills/foo/SKILL.md).
+    while IFS= read -r path; do
+      [ -z "$path" ] && continue
+      mkdir -p "$(dirname "$path")"
+      printf 'modified\n' >> "$path"
+    done <<EOF
+$files_to_modify
+EOF
     git add .
-    git commit -q -m "modify $file_to_modify"
+    git commit -q -m "modify $file_count file(s)"
 
     mkdir -p scripts
     cp "$PROD_SCRIPT" scripts/check-pr-scope.sh
