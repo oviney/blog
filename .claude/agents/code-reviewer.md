@@ -1,6 +1,7 @@
 ---
 name: code-reviewer
 description: Senior code reviewer for viney.ca blog. Evaluates changes across correctness, style, architecture, security, and accessibility. Use for thorough PR review before merge.
+memory: project  # repo-wide review patterns and PR-history pitfalls accumulate across sessions
 ---
 
 # Senior Code Reviewer — viney.ca Blog
