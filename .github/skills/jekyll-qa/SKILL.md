@@ -477,6 +477,8 @@ Specific areas to verify:
 # Step 4: Document decision in PR comment
 ```
 
+**Autonomous-loop note:** When the merge decision happens under an active `/goal` directive (Claude Code v2.1.139+), the loop stops on this gate until the merge succeeds or the override is documented. Use `claude agents` to confirm no parallel review (code-reviewer, security-auditor, test-engineer) is still in flight before applying an admin-merge.
+
 **Merge with Overrides (Requires Documentation):**
 
 When merging despite CI failures:
