@@ -17,7 +17,7 @@ You have a project-scoped persistent memory store. Use it for repo-wide review p
 - Secrets, API tokens, or credentials seen in any PR diff
 - Unreleased code excerpts or fix-for-CVE patch contents
 - Customer PII or internal URLs / email addresses that appear in issue bodies
-- The specific content of any one PR you reviewed (review *patterns* generalise; specific diffs do not)
+- The specific content of any one PR you reviewed. Review *patterns* generalise; specific diffs do not. **Pattern (OK to persist):** "SCSS PRs in this repo frequently hardcode brand colours instead of using `$brand-*` variables — flag and link to the variable list." **Specific (don't persist):** "PR #1023's `_sass/post.scss:42` used `#ff6600`."
 
 Memory is stored locally on the maintainer's machine (`~/.claude/projects/`), not synced anywhere. Treat what you persist as if it were grep-able by anyone with shell access to that machine.
 

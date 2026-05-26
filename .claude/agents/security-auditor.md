@@ -15,7 +15,7 @@ You have a project-scoped persistent memory store. Use it for the repo's threat 
 **Never persist to memory:**
 
 - Any string you would flag as a finding (tokens, keys, credentials)
-- Dependency-CVE specifics from in-flight advisories that haven't published
+- Embargoed CVE details (private GHSAs, vendor pre-disclosure) that have not been publicly released
 - Internal threat-intel sources, vendor contacts, or incident details
 - Customer PII appearing in any reviewed surface
 
