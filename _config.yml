@@ -106,6 +106,8 @@ exclude:
   - package.json
   - package-lock.json
   - CHANGELOG.md
+  - worktrees/
+  - .worktrees/
 
 include:
   - dashboard/

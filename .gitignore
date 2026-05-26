@@ -80,3 +80,11 @@ healing-success-report.md
 
 # Ruby vendor directory
 vendor/
+
+# Parallel-agent worktrees (local-only — isolated agent sessions on issue
+# branches; never synced and excluded from the Jekyll build)
+worktrees/
+.worktrees/
+
+# Claude Code session-scheduler lock (local-only; per-session state)
+.claude/scheduled_tasks.lock
