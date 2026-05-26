@@ -1,33 +1,26 @@
-# TODO — Expand Memory Discipline guardrails (#997)
+# TODO — Reference Claude Code `/goal` + `claude agents` in 2 SKILL files (#952)
 
 **Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
-**Branch:** `feat/997-expand-memory-discipline`
-
----
+**Branch:** `feat/952-claude-code-skill-refs`
 
 ## Phase 0 — Setup ✓
 
-- [x] Branched off main at `d05b514e`
-- [ ] Archive #990 lifecycle to `tasks/archive/2026-05-26-memory-guardrails-990/`
+- [x] Branched off main at `6ac2e1c7`
+- [x] Archived #997 lifecycle to `tasks/archive/2026-05-26-expand-memory-997/`
 - [ ] Commit lifecycle artifacts
 
-## Phase 1 — Prose-body edits (one commit)
+## Phase 1 — SKILL edits (one commit)
 
-- [ ] 1.1 Insert §7 wording into `.claude/agents/test-engineer.md`
-- [ ] 1.2 Insert §7 wording into `.claude/agents/playwright-test-planner.md`
-- [ ] 1.3 Insert §7 wording into `.claude/agents/playwright-test-generator.md`
-- [ ] 1.4 Insert §7 wording into `.claude/agents/playwright-test-healer.md` (uses "Audit before write" closer)
-- [ ] Verify all 10 ACs
-- [ ] Commit: `feat(#997): expand Memory Discipline section to remaining 4 subagents`
-
-## Checkpoint A — Full 10-AC battery (per SPEC §4)
+- [ ] 1.1 Add 2 rows to `## Slash Commands` table in `.github/skills/using-agent-skills/SKILL.md`
+- [ ] 1.2 Add 1 paragraph after merge-decision-process block in `.github/skills/jekyll-qa/SKILL.md`
+- [ ] Verify ACs (per SPEC §4)
+- [ ] Commit: `feat(#952): reference /goal and claude agents in using-agent-skills and jekyll-qa SKILLs`
 
 ## Phase 2 — Ship
 
 - [ ] Push branch
-- [ ] Open PR with `Closes #997`, `agent:qa-gatekeeper` label
-- [ ] CI green (or admin-merge per precedent)
+- [ ] Open PR with `Closes #952`, **`agent:qa-gatekeeper` + `governance-update`** labels
+- [ ] CI green (or admin-merge)
 - [ ] Squash-merge, delete branch
 - [ ] Post-deploy verify
-- [ ] Comment on #997
-- [ ] Update [[reference-subagent-memory]] memory — all 6 agents now guarded
+- [ ] Comment on #952

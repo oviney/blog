@@ -122,3 +122,5 @@ bundle exec jekyll build   # must pass
 | `/test` | `test` + `jekyll-qa` |
 | `/review` | `review` + `code-review` |
 | `/ship` | `ship` + `git-operations` |
+| `/goal <directive>` | sets an autonomous-loop completion condition (Claude Code v2.1.139+); useful during **DEFINE** (sketch the goal), **BUILD** (auto-progress through tasks), and **SHIP** (auto-merge after CI). See `claude agents` to observe in-flight state. |
+| `claude agents` (view) | lists every active subagent session (Claude Code v2.1.139+). Inspect during long parallel fan-outs — e.g., a `/ship` review with code-reviewer + security-auditor + test-engineer concurrently. |
