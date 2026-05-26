@@ -14,6 +14,7 @@
 #   F. .github/skills/... modified, PR_LABELS=governance-update-experimental → fails (Rule 3 trips; pins #987 anchor)
 #   G. 21 files modified, PR_LABELS=bulk-content              → passes (canonical bypass preserved)
 #   H. .github/skills/... modified, PR_LABELS=governance-update → passes (canonical bypass preserved)
+#   I. Static-config invariant: PROTECTED_FILE_UPDATE_BYPASS ⊆ PROTECTED_FILES
 #
 # Dependencies: bash, git. Same constraint as the script under test.
 
@@ -198,6 +199,35 @@ run_case "H: .github/skills/ modified, canonical governance-update label → Rul
   ".github/skills/scope-guard-test/SKILL.md" \
   "0" \
   "governance-update label present — skipping rule 3"
+
+# Static-config invariant: every entry in PROTECTED_FILE_UPDATE_BYPASS must
+# also appear in PROTECTED_FILES. The two arrays live adjacent in the script
+# and the bypass is meaningless for any entry not in the protected list (the
+# Rule 1 loop only enters the per-file bypass check after the file matched
+# the protected list). A future PR that adds an entry to the bypass without
+# adding it to the protected list would silently no-op.
+echo ""
+echo "Case: I: PROTECTED_FILE_UPDATE_BYPASS ⊆ PROTECTED_FILES (static-config invariant)"
+PROD_PROTECTED=$(awk '/^PROTECTED_FILES=\(/{f=1; next} f && /^\)$/{f=0} f' "$PROD_SCRIPT" | grep -oE '"[^"]+"' | tr -d '"')
+PROD_BYPASS=$(awk '/^PROTECTED_FILE_UPDATE_BYPASS=\(/{f=1; next} f && /^\)$/{f=0} f' "$PROD_SCRIPT" | grep -oE '"[^"]+"' | tr -d '"')
+
+case_ok=1
+while IFS= read -r entry; do
+  [ -z "$entry" ] && continue
+  if ! printf '%s\n' "$PROD_PROTECTED" | grep -qx "$entry"; then
+    echo "  FAIL: bypass entry '$entry' is not in PROTECTED_FILES"
+    case_ok=0
+  fi
+done <<EOF
+$PROD_BYPASS
+EOF
+
+if [ "$case_ok" = "1" ]; then
+  echo "  PASS — all bypass entries are in the protected list ($(printf '%s\n' "$PROD_BYPASS" | grep -c .) / $(printf '%s\n' "$PROD_BYPASS" | grep -c .))"
+  PASS=$((PASS + 1))
+else
+  FAIL=$((FAIL + 1))
+fi
 
 echo ""
 echo "Summary: $PASS passed, $FAIL failed"
