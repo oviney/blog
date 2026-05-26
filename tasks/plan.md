@@ -1,72 +1,84 @@
-# Plan — Reference Claude Code `/goal` + `claude agents` in 2 SKILL files (#952)
+# Plan — Fix 21 broken Markdown links in archived task artifacts (#970)
 
 **Spec:** [../SPEC.md](../SPEC.md)
-**Issue:** [#952](https://github.com/oviney/blog/issues/952)
-**Branch:** `feat/952-claude-code-skill-refs`
+**Issue:** [#970](https://github.com/oviney/blog/issues/970)
+**Branch:** `fix/970-broken-archive-links`
 **Date:** 2026-05-26
-
----
 
 ## Scope
 
-2 additive edits to SKILL files. **Two atomic commits:** lifecycle + substantive.
+23-file PR with `bulk-content` label. Mechanical search-and-replace across 18 archive files, plus 5 lifecycle.
 
 ## Dependency graph
 
 ```
-Phase 0 (lifecycle commit + archive #997)
+Phase 0 (lifecycle commit + #952 archive)
     │
     ▼
-Phase 1 (2 SKILL file edits in one commit)
+Phase 1 (18 archive file edits, one commit)
+    │   per-pattern fixes per SPEC §3
     │
-    ▼   Checkpoint A: 9-AC battery
+    ▼   Checkpoint A: 8-AC battery
     │
-Phase 2 (ship)
+Phase 2 (ship with bulk-content label)
 ```
 
-## Phase 0 — Lifecycle commit
+## Phase 0 ✓
 
-- Branched off main at `6ac2e1c7`
-- Archived #997 lifecycle to `tasks/archive/2026-05-26-expand-memory-997/`
+- Branched off main at `4236a3a` (#1000 merge)
+- Archived #952 lifecycle to `tasks/archive/2026-05-26-skill-refs-952/`
 - Commit lifecycle artifacts
 
-## Phase 1 — SKILL edits (one commit)
+## Phase 1 — 18 archive file edits (one commit)
 
-| File | Edit |
-|---|---|
-| `.github/skills/using-agent-skills/SKILL.md` | Add 2 rows to existing `## Slash Commands` table (after `/ship` row, ~line 124) per SPEC §7 |
-| `.github/skills/jekyll-qa/SKILL.md` | Add 1 paragraph after the merge-decision-process bash block (~line 478), before "Merge with Overrides" subheading, per SPEC §7 |
+**Pattern A (15 files): Replace `[../SPEC.md](../SPEC.md)` with `_(archived)_`.** Search-and-replace via `sed -i` or per-file Edit.
 
-**Verify:**
-- `grep -E "/goal|claude agents" <both files> | wc -l` → ≥ 2 (likely 4: 2 rows in using-agent-skills + 1 paragraph mentioning both in jekyll-qa)
-- `bundle exec jekyll build` exit 0
-- No structural reorder
+Files: 2026-05-10-link-validator/plan.md, 2026-05-14-research-sweep-902/{plan,todo,902-followups-plan,902-followups}.md, 2026-05-17-bulk-content-956/{plan,todo}.md, 2026-05-17-puppeteer-chrome-cache-958/{plan,todo}.md, 2026-05-17-research-sweep-943/{plan,todo,943-followups-plan,943-followups}.md, 2026-05-17-subtitle-backfill-951/{plan,todo}.md.
 
-**Commit:** `feat(#952): reference /goal and claude agents in using-agent-skills and jekyll-qa SKILLs`
+Exact pattern to look for: any link with text `../SPEC.md` or `[Spec](../SPEC.md)` etc. The line typically reads `**Spec:** [../SPEC.md](../SPEC.md)` — verify per-file.
 
-## Checkpoint A — 9-AC battery (per SPEC §4)
+**Pattern B (2 files): Fix workflow path.**
+- 2026-05-14-research-sweep-902/902-body.md: `../../actions/workflows/research-sweep.yml` → `../../../.github/workflows/research-sweep.yml`
+- 2026-05-17-research-sweep-943/943-body.md: same fix
+
+**Pattern C (1 file): Escape test-data URLs.**
+- 2026-05-10-link-validator/plan.md: wrap `/2026/99/99/no-such-post/` in backticks (2 occurrences). If audit still trips after escape, fall back to plain text without slashes.
+
+**Pattern D (1 file): Fix 2 broken refs in `2026-05-17-research-sweep-943/SPEC.md`.**
+- `tasks/archive/2026-05-14-research-sweep-902/SPEC.md` → `../2026-05-14-research-sweep-902/SPEC.md`
+- `tasks/lessons.md` → `../../lessons.md`
+
+**Verify (after edits):**
+```bash
+grep -r '\.\./SPEC\.md' tasks/archive/ | wc -l                          # → 0
+grep -r '\.\./\.\./actions/workflows/' tasks/archive/ | wc -l           # → 0
+grep -r 'tasks/archive/2026-05-14-research-sweep-902/SPEC\.md' tasks/archive/2026-05-17-research-sweep-943/ | wc -l   # → 0
+grep -r 'tasks/lessons\.md' tasks/archive/ | wc -l                      # → 0
+bash scripts/doc-audit.sh                                                # → no internal-link findings
+mv worktrees /tmp/_w && mv .worktrees /tmp/_dw && bundle exec jekyll build; mv /tmp/_w worktrees && mv /tmp/_dw .worktrees   # → exit 0
+```
+
+**Commit:** `fix(#970): resolve 21 broken Markdown links across 18 archived task files`
+
+## Checkpoint A — 8-AC battery (per SPEC §4)
 
 ## Phase 2 — Ship
 
 - Push branch
-- Open PR with `Closes #952`, `agent:qa-gatekeeper` + **`governance-update`** labels (required — touches `.github/skills/`)
+- Open PR with `Closes #970`, labels: `agent:qa-gatekeeper` + **`bulk-content`** (required; >15 files)
 - CI green (or admin-merge per precedent)
 - Squash-merge, delete branch
-- Post-deploy verify
-- Comment on #952
+- Verify deploy + comment on #970
+- The next doc-audit run should close #970 automatically when it sees no internal-link findings
 
----
+## Risks (per SPEC §9)
 
-## Risks (from SPEC §9)
-
-| Risk | Mitigation |
-|---|---|
-| Missing `governance-update` label → scope-guard fails | Apply at PR-open time |
-| Phantom `build` + 1-reviewer block | Admin-merge per precedent |
+- Backtick escape might not actually exempt URLs from the audit — fallback: plain text
+- `bulk-content` label needs to be applied at PR-open time
+- Phantom `build` + 1-reviewer block → admin-merge
 
 ## Out of scope (per SPEC §10)
 
-- `.claude-plugin.json` packaging
-- Refactoring SKILL structure
-- OTEL / `continueOnBlock` docs
-- Expanding to other SKILL files
+- `_posts/` broken-link warnings (different audit)
+- Refactoring archive structure
+- Active lifecycle artifacts
