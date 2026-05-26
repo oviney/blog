@@ -1,6 +1,6 @@
 # TODO — Research Sweep Execution (#943)
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(archived)_ · **Plan:** [plan.md](plan.md)
 **Pinned:** §1/§3 floor `2026-05-01` · §4 floor `2026-02-15` · plan SHA `bfe8f5c` · spawn cap **4** · dedup against **#945, #946, #947**
 
 ---

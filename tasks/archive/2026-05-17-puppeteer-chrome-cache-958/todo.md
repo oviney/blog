@@ -1,6 +1,6 @@
 # TODO — Puppeteer Chrome-Download Flake Mitigation (#958)
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(archived)_ · **Plan:** [plan.md](plan.md)
 **Plan SHA:** `b965ddb` · 3 files (2 new + 1 modified) · 7 jobs to migrate
 
 ---

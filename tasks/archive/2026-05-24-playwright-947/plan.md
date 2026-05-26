@@ -1,6 +1,6 @@
 # Plan — Bump @playwright/test to ^1.60.0 + Page-Level ARIA Snapshots (#947)
 
-**Spec:** [../SPEC.md](../SPEC.md)
+**Spec:** _(archived)_
 **Issue:** [#947](https://github.com/oviney/blog/issues/947)
 **Date:** 2026-05-17
 **Lifecycle phase:** PLAN

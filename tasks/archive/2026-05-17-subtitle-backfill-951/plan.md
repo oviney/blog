@@ -1,6 +1,6 @@
 # Plan — Backfill `subtitle:` Front-Matter + Validator (#951)
 
-**Spec:** [SPEC.md](../SPEC.md)
+**Spec:** _(archived)_
 **Issue:** [#951](https://github.com/oviney/blog/issues/951)
 **Date:** 2026-05-17
 **Lifecycle phase:** PLAN

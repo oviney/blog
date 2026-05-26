@@ -1,62 +1,72 @@
-# SPEC — Reference Claude Code `/goal` + `claude agents` in 2 SKILL files (#952)
+# SPEC — Fix 21 broken internal Markdown links in archived task artifacts (#970)
 
-**Status:** Draft — auto-approved per /goal directive (well-scoped per issue body)
-**Issue:** [#952](https://github.com/oviney/blog/issues/952)
-**Labels:** `agent:qa-gatekeeper`, `governance-update` (touches `.github/skills/`)
+**Status:** Draft — auto-approved per /goal directive
+**Issue:** [#970](https://github.com/oviney/blog/issues/970) (P2:medium, doc-debt)
+**Labels:** `agent:qa-gatekeeper`, **`bulk-content`** (>15 files; atomic doc-audit cleanup)
 **Date:** 2026-05-26
-**Branch:** `feat/952-claude-code-skill-refs`
+**Branch:** `fix/970-broken-archive-links`
 
 ---
 
 ## 1. Situation
 
-Claude Code v2.1.139 (2026-05-11) added `/goal` (autonomous-loop completion conditions) and `claude agents` (inspect active subagent sessions). The repo's two operational SKILL files don't reference either:
+`scripts/doc-audit.sh` reports 21 broken internal Markdown links across 18 files under `tasks/archive/*/`. All targets are in archived lifecycle artifacts (plan.md, todo.md, body files, archived SPEC.md files) — the audit issue #970 is auto-filed.
 
-- `.github/skills/using-agent-skills/SKILL.md` — describes the spec/plan/build/test/review/ship lifecycle
-- `.github/skills/jekyll-qa/SKILL.md` — QA gatekeeper workflow
+Pattern breakdown:
 
-Adding references gives operators a concrete mechanism for the existing "verify before complete" guidance. This session itself exercised `/goal` heavily (3 invocations to date) and would have benefited from documenting it earlier.
+| Pattern | Count | Cause |
+|---|---|---|
+| `../SPEC.md` from archived plan/todo/followup | 15 | Was correct when active (`tasks/<live>/plan.md` → `tasks/../SPEC.md`); broken now under `tasks/archive/<name>/plan.md` (resolves to `tasks/SPEC.md`, missing) |
+| `../../actions/workflows/research-sweep.yml` | 2 | Missing `.github/` prefix in relative path |
+| `/2026/99/99/no-such-post/` | 2 | Deliberate test-data URL in link-validator/plan.md (intentional broken example) |
+| `tasks/archive/2026-05-14-research-sweep-902/SPEC.md` (from `943/SPEC.md`) | 1 | Wrong relative path (resolves into 943's subtree) |
+| `tasks/lessons.md` (from `943/SPEC.md`) | 1 | Wrong relative path (same root cause) |
 
 ---
 
 ## 2. Objective
 
-Add one-line references to `/goal` and `claude agents` in each of the 2 SKILL files, anchored to a specific lifecycle phase or workflow step (per issue AC). No structural changes; pure additions. PR carries `governance-update` label because `.github/skills/` is a governance surface.
+Fix all 21 broken links. The 18 archive files are frozen-in-time records; references should point to stable targets or be converted to plain text where no stable target exists. Single PR with `bulk-content` label because the audit only closes when all links resolve; per-file fixes don't independently move the needle.
 
 ---
 
-## 3. Design Decisions
+## 3. Design Decisions (auto-confirmed)
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| Scope | **`using-agent-skills/SKILL.md` + `jekyll-qa/SKILL.md`** | Per issue. |
-| `using-agent-skills/SKILL.md` placement | **Extend the existing `## Slash Commands` table** at line 115 with 2 new rows | Natural home — same table style as `/spec`, `/plan`, etc. |
-| `jekyll-qa/SKILL.md` placement | **Add a one-line note adjacent to `### 2.6. PR Merge Decision Matrix`** | This is the "verify before merge" section the issue calls out. |
-| Wording style | **Match existing table-row style** in `using-agent-skills`; **operational prose** in `jekyll-qa` | Consistent with each file's existing voice. |
-| Label | **`governance-update`** required | `.github/skills/` is a governance surface per the scope guard. |
+| `../SPEC.md` fix | **Convert to plain text** (`**Spec:** [../SPEC.md](../SPEC.md)` → `**Spec:** _(archived)_`) | Repo-root `SPEC.md` is the *current* working spec (constantly changing); pointing archived plans at a moving target is incorrect. Plain text preserves the "this was a spec'd PR" semantic without a misleading link. |
+| Workflow path fix | **`../../actions/workflows/research-sweep.yml` → `../../../.github/workflows/research-sweep.yml`** | From `tasks/archive/<dir>/`, `../../..` reaches repo root, then `.github/workflows/`. |
+| `no-such-post` fix | **Escape as inline code** (`/2026/99/99/no-such-post/` → `` `/2026/99/99/no-such-post/` ``) | Deliberate test data in link-validator plan; backtick-escaped, audit skips inline code spans (per `scripts/doc-audit.sh` heuristics — to verify). Alternative: convert to plain text. |
+| Cross-archive ref fix | **Use correct relative path** (`tasks/archive/2026-05-14-research-sweep-902/SPEC.md` → `../2026-05-14-research-sweep-902/SPEC.md`) | From `tasks/archive/2026-05-17-research-sweep-943/SPEC.md`, sibling archive dir is one level up. |
+| `tasks/lessons.md` fix | **`tasks/lessons.md` → `../../lessons.md`** | Same root cause; correct relative path. |
+| Label | **`bulk-content`** | 23 files (18 archive + 5 lifecycle) > 15-file cap. Atomic cleanup: audit only closes when all 21 fix. Per CLAUDE.md: "Atomic content backfills … where splitting would create a worse intermediate `main` state" — fits. |
+| Scope | All 18 archive files in this PR | Splitting would leave the audit issue open with N stragglers; pattern is uniform mechanical. |
 
 ---
 
 ## 4. Acceptance Criteria
 
-- [ ] **AC-1** `.github/skills/using-agent-skills/SKILL.md` references both `/goal` and `claude agents` in the `## Slash Commands` table.
-- [ ] **AC-2** `.github/skills/jekyll-qa/SKILL.md` references at least one of `/goal` or `claude agents` adjacent to the merge-decision section.
-- [ ] **AC-3** Per issue's mechanical AC: `grep -E "/goal|claude agents" .github/skills/using-agent-skills/SKILL.md .github/skills/jekyll-qa/SKILL.md | wc -l` returns ≥ 2.
-- [ ] **AC-4** Each reference is anchored to a lifecycle phase or workflow step (not free-floating bullet).
-- [ ] **AC-5** `bundle exec jekyll build` exits 0.
-- [ ] **AC-6** No structural changes to either SKILL file — only additive rows/lines.
-- [ ] **AC-7** PR carries `governance-update` label preemptively (scope guard requirement).
-- [ ] **AC-8** Scope: 2 substantive + 3 lifecycle + 2 archive = **7 files**.
-- [ ] **AC-9** No protected file touched.
+- [ ] **AC-1** All 21 broken links resolved per §3 patterns.
+- [ ] **AC-2** `bash scripts/doc-audit.sh` reports no internal-Markdown-link findings (or the issue is auto-closed by the next audit run).
+- [ ] **AC-3** Per-pattern verification:
+  - `grep -r '\.\./SPEC\.md' tasks/archive/` returns 0 matches (15 → 0)
+  - `grep -r '\.\./\.\./actions/workflows/' tasks/archive/` returns 0 matches (2 → 0)
+  - `grep -r 'tasks/archive/2026-05-14-research-sweep-902/SPEC\.md' tasks/archive/2026-05-17-research-sweep-943/` returns 0 (1 → 0)
+- [ ] **AC-4** `bundle exec jekyll build` exits 0.
+- [ ] **AC-5** PR carries `bulk-content` + `agent:qa-gatekeeper` labels.
+- [ ] **AC-6** Scope: 18 substantive (archive files) + 3 lifecycle + 2 archive carry-over (#952) = **23 files**. Above 15-file cap; `bulk-content` label exempts.
+- [ ] **AC-7** No protected file or governance surface touched (`.claude/agents/`, `.github/skills/`, `.github/instructions/`, etc.).
+- [ ] **AC-8** No archive *content* edited — only the link text. Frozen-in-time records stay frozen in everything except broken-link text.
 
 ---
 
 ## 5. Commands
 
 ```bash
-bundle exec jekyll build                                                            # AC-5
-grep -E "/goal|claude agents" .github/skills/using-agent-skills/SKILL.md .github/skills/jekyll-qa/SKILL.md | wc -l   # AC-3 ≥ 2
-git diff --name-only main...HEAD | wc -l                                            # AC-8 → 7
+bundle exec jekyll build                                          # AC-4
+grep -r '\.\./SPEC\.md' tasks/archive/ | wc -l                    # AC-3 → 0 expected
+grep -r '\.\./\.\./actions/workflows/' tasks/archive/ | wc -l     # AC-3 → 0 expected
+git diff --name-only main...HEAD | wc -l                          # AC-6 → 23
 ```
 
 ---
@@ -64,44 +74,47 @@ git diff --name-only main...HEAD | wc -l                                        
 ## 6. Project Structure
 
 ```
-.github/skills/using-agent-skills/SKILL.md  M   + 2 rows in Slash Commands table
-.github/skills/jekyll-qa/SKILL.md           M   + 1 line adjacent to PR Merge Decision Matrix
-SPEC.md                                     M
-tasks/plan.md                               M
-tasks/todo.md                               M
-tasks/archive/2026-05-26-expand-memory-997/  A   (2 files)
+tasks/archive/2026-05-10-link-validator/plan.md                          M
+tasks/archive/2026-05-14-research-sweep-902/902-body.md                  M
+tasks/archive/2026-05-14-research-sweep-902/902-followups-plan.md        M
+tasks/archive/2026-05-14-research-sweep-902/902-followups.md             M
+tasks/archive/2026-05-14-research-sweep-902/plan.md                      M
+tasks/archive/2026-05-14-research-sweep-902/todo.md                      M
+tasks/archive/2026-05-17-bulk-content-956/plan.md                        M
+tasks/archive/2026-05-17-bulk-content-956/todo.md                        M
+tasks/archive/2026-05-17-puppeteer-chrome-cache-958/plan.md              M
+tasks/archive/2026-05-17-puppeteer-chrome-cache-958/todo.md              M
+tasks/archive/2026-05-17-research-sweep-943/943-body.md                  M
+tasks/archive/2026-05-17-research-sweep-943/943-followups-plan.md        M
+tasks/archive/2026-05-17-research-sweep-943/943-followups.md             M
+tasks/archive/2026-05-17-research-sweep-943/SPEC.md                      M
+tasks/archive/2026-05-17-research-sweep-943/plan.md                      M
+tasks/archive/2026-05-17-research-sweep-943/todo.md                      M
+tasks/archive/2026-05-17-subtitle-backfill-951/plan.md                   M
+tasks/archive/2026-05-17-subtitle-backfill-951/todo.md                   M
+SPEC.md                                                                  M
+tasks/plan.md                                                            M
+tasks/todo.md                                                            M
+tasks/archive/2026-05-26-skill-refs-952/{plan,todo}.md                   A (2 files)
 ```
 
-Total: 7 files.
+**Total: 23 files.**
 
 ---
 
-## 7. Wording (final form)
+## 7. Code Style
 
-### using-agent-skills/SKILL.md — extend the `## Slash Commands` table
-
-Add two rows after `/ship`:
-
-```markdown
-| `/goal <directive>` | sets an autonomous-loop completion condition; useful during **DEFINE** (sketch the goal), **BUILD** (auto-progress through tasks), and **SHIP** (auto-merge after CI). See `claude agents` to observe in-flight state. |
-| `claude agents` (view) | lists every active subagent session. Inspect during long parallel fan-outs — e.g., a `/ship` review with code-reviewer + security-auditor + test-engineer concurrently. |
-```
-
-### jekyll-qa/SKILL.md — add note adjacent to PR Merge Decision Matrix
-
-Insert one paragraph immediately after the decision-process block (~line 478), before "Merge with Overrides":
-
-```markdown
-**Autonomous-loop note:** When the merge decision happens under an active `/goal` directive (Claude Code v2.1.139+), the loop stops on this gate until the merge succeeds or the override is documented. Use `claude agents` to confirm no parallel review (code-reviewer, security-auditor, test-engineer) is still in flight before applying an admin-merge.
-```
+- **Plain-text replacement style**: `**Spec:** _(archived)_` — italic to mark "this was a link but the target no longer applies."
+- **Inline code escape style**: backticks around the URL. `` `/2026/99/99/no-such-post/` ``
+- **Relative path fixes**: use the shortest correct relative path from each file.
+- **Don't reflow surrounding content** — only the broken link line changes.
 
 ---
 
 ## 8. Boundaries
 
-**Always:** insert per §7 wording; preserve existing table/section structure; run AC battery before commit.
-**Ask first about:** material wording changes; placement elsewhere; expanding to other SKILL files.
-**Never:** modify protected files (`_config.yml`, `Gemfile*`, `AGENTS.md`, `ARCHITECTURE.md`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`); reorder existing SKILL sections; remove existing content.
+**Never:** modify archive content beyond the broken-link lines (these are frozen records); touch any protected file or governance surface.
+**Always:** apply the per-pattern fix per §3; verify with `grep` + audit script before commit.
 
 ---
 
@@ -109,17 +122,16 @@ Insert one paragraph immediately after the decision-process block (~line 478), b
 
 | Risk | Mitigation |
 |---|---|
-| `governance-update` label not applied → scope guard fails | Apply at PR open time; the label-bypass machinery from #989 anchors the check |
-| Wording references features that aren't documented elsewhere in the repo | The features are upstream Claude Code v2.1.139+ — referencing them is the *point* of this PR |
+| Audit script regex changes: backtick-escape doesn't actually skip inline code | Verify by running `bash scripts/doc-audit.sh` post-fix; if backticks still trip the audit, convert `/2026/99/99/no-such-post/` to plain text instead |
+| `bulk-content` label not respected by scope guard | #989 anchored the `bulk-content` grep along with the other two labels; this PR tests that path |
+| Frozen-archive content drift if someone reviews the diff strictly | The fixes are minimal — only the link text changes |
 | Phantom `build` + 1-reviewer block | Admin-merge per precedent |
 
 ---
 
 ## 10. Out of Scope
 
-Per issue #952:
-- `.claude-plugin.json` packaging (Watch item from #943)
-- Refactoring existing SKILL structure
-- OTEL `agent_id` / `parent_agent_id` documentation
-- `continueOnBlock` hook documentation
-- Expanding to SKILL files other than the 2 named
+- The `_posts/` broken-link warnings shown by the pre-commit hook (different audit, different scope, separate issue if filed)
+- Refactoring archive directory naming / structure
+- Adding a CI gate that prevents future `../SPEC.md` references in archived plans
+- Touching the active (non-archived) lifecycle artifacts

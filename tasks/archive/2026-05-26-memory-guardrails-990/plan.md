@@ -1,6 +1,6 @@
 # Plan — Memory-write guardrails for code-reviewer and security-auditor (#990)
 
-**Spec:** [../SPEC.md](../SPEC.md)
+**Spec:** _(archived)_
 **Issue:** [#990](https://github.com/oviney/blog/issues/990)
 **Date:** 2026-05-25
 **Labels:** `agent:qa-gatekeeper`

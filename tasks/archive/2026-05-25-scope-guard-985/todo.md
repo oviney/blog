@@ -1,6 +1,6 @@
 # TODO — Scope-guard label exemption (#985)
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(archived)_ · **Plan:** [plan.md](plan.md)
 **Branch:** `fix/985-scope-guard-protected-file-bypass` (to create)
 
 ---

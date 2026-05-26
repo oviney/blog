@@ -5,7 +5,7 @@
 **Labels:** `enhancement` · `research`
 **Date:** 2026-05-17
 **Lifecycle phase:** DEFINE
-**Prior cycle reference:** [tasks/archive/2026-05-14-research-sweep-902/SPEC.md](tasks/archive/2026-05-14-research-sweep-902/SPEC.md) — 8 ACs, full collision/substance machinery; this SPEC reuses that structure and documents only the deltas.
+**Prior cycle reference:** [tasks/archive/2026-05-14-research-sweep-902/SPEC.md](../2026-05-14-research-sweep-902/SPEC.md) — 8 ACs, full collision/substance machinery; this SPEC reuses that structure and documents only the deltas.
 
 ---
 
@@ -14,7 +14,7 @@
 `Research Sweep — 2026-05-15` (#943) was filed by the biweekly cron workflow two days before [#948 (sweep methodology guardrails)](https://github.com/oviney/blog/pull/950) merged. Therefore #943's **body uses the old template** — no inline three-bucket schema, no `package.json overrides` pre-Action check, no substance floor, no spawn cap. The guardrails are still binding on this execution via:
 
 - The just-merged workflow source (`.github/workflows/research-sweep.yml` @ `bfe8f5c`) — future sweeps inherit them inline.
-- [`tasks/lessons.md`](tasks/lessons.md) L3 — the durable record of the methodology lesson.
+- [`tasks/lessons.md`](../../lessons.md) L3 — the durable record of the methodology lesson.
 - This SPEC.md — explicitly imports them.
 
 #943's template adds a **§4 Audience Experience / UI / UX / Usability** section that #902 didn't have, opening fresh research territory.

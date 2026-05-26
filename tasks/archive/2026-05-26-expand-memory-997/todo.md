@@ -1,6 +1,6 @@
 # TODO — Expand Memory Discipline guardrails (#997)
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(archived)_ · **Plan:** [plan.md](plan.md)
 **Branch:** `feat/997-expand-memory-discipline`
 
 ---

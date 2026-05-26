@@ -1,6 +1,6 @@
 # Plan — Make AGENTS.md handoff targets explicit + Mermaid graph (#946)
 
-**Spec:** [../SPEC.md](../SPEC.md)
+**Spec:** _(archived)_
 **Issue:** [#946](https://github.com/oviney/blog/issues/946)
 **Date:** 2026-05-24
 **Label:** `agent:qa-gatekeeper`
