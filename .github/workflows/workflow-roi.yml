@@ -1,0 +1,26 @@
+name: Workflow ROI Review
+
+on:
+  schedule:
+    # 1st of each month at 09:00 UTC
+    - cron: '0 9 1 * *'
+  workflow_dispatch:
+
+permissions:
+  actions: read    # list workflows + read run history
+  issues: write    # file or comment on the consolidated ROI issue
+  contents: read
+
+jobs:
+  workflow-roi:
+    name: Measure workflow ROI and file review issue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Run workflow-roi script
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: bash scripts/workflow-roi.sh
