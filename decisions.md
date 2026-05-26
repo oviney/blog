@@ -86,4 +86,25 @@ configuration, design conventions, or content standards.
 
 ---
 
+## ADR-009: Split-Scope Sequential Issues over Mixed-Scope PRs
+
+**Date**: May 2026
+**Status**: Active
+**Context**: When one feature requires changes that span multiple agent scopes (e.g. Creative Director template work + QA Gatekeeper Playwright follow-up), combining them in a single PR violates the scope guard's per-agent `MUST NOT TOUCH` rules. The natural workaround — opening a follow-up PR against `main` from a branch stacked on the parent — fails CI for "the wrong reason" because the stacked branch contains the parent's unmerged commits. Issue #954 / #968 was the precedent that surfaced this pattern.
+**Decision**:
+
+1. **Split scope, sequence work.** When a feature spans agent zones, file separate sequential issues (one per zone) and ship them as separate PRs. Do not combine forbidden file groups in one PR.
+2. **Stacked follow-up branches are valid for local iteration** when the follow-up genuinely depends on an unmerged parent. The follow-up branch may carry the parent's commits during development.
+3. **A stacked follow-up branch must NOT be opened as a PR against `main` until** either (a) the parent has merged, or (b) the follow-up branch is rebased onto `main` so only its own commits remain. Opening a stacked PR against `main` before this triggers CI failures (scope guard, missing context) that look like code defects but are workflow state.
+4. **Reviewers should compare a stacked branch against its parent**, not against `main`, until the rebase or parent-merge happens.
+
+**Consequences**:
+
+- Agents must classify cross-zone work as multi-issue, not single-PR, before opening the first PR. The cost of getting this wrong is a CI red herring and a rebase.
+- The `agent:*` labels and the scope guard's `FORBIDDEN_PATTERN` rules are the correctness gate; this ADR documents the workflow that keeps them honest.
+- This pattern is repo-wide; it applies any time `agent:creative-director` work touches a surface that `agent:qa-gatekeeper` also needs to touch, or any analogous pair.
+- Future issues that surface this pattern should reference this ADR rather than re-deriving the workflow.
+
+---
+
 *Add new decisions below this line, following the ADR-NNN format.*
