@@ -13,7 +13,7 @@ on:
     types: [opened, synchronize, reopened, labeled, unlabeled]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     
     steps:
