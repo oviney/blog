@@ -1,6 +1,6 @@
 # Plan — Anchor bulk-content / governance-update label greps (#987)
 
-**Spec:** [../SPEC.md](../SPEC.md)
+**Spec:** _(archived)_
 **Issue:** [#987](https://github.com/oviney/blog/issues/987)
 **Date:** 2026-05-25
 **Labels:** `agent:qa-gatekeeper`, `governance-update`

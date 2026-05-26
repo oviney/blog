@@ -1,6 +1,6 @@
 # Plan — Puppeteer Chrome-Download Flake Mitigation (#958)
 
-**Spec:** [SPEC.md](../SPEC.md)
+**Spec:** _(archived)_
 **Issue:** [#958](https://github.com/oviney/blog/issues/958)
 **Date:** 2026-05-17
 **Lifecycle phase:** PLAN

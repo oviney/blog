@@ -1,6 +1,6 @@
 # TODO — Reference Claude Code `/goal` + `claude agents` in 2 SKILL files (#952)
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(archived)_ · **Plan:** [plan.md](plan.md)
 **Branch:** `feat/952-claude-code-skill-refs`
 
 ## Phase 0 — Setup ✓

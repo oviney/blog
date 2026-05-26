@@ -1,6 +1,6 @@
 # Plan — Add `memory:` frontmatter to local subagents (#945)
 
-**Spec:** [../SPEC.md](../SPEC.md)
+**Spec:** _(archived)_
 **Issue:** [#945](https://github.com/oviney/blog/issues/945)
 **Date:** 2026-05-25
 **Labels:** `agent:qa-gatekeeper`

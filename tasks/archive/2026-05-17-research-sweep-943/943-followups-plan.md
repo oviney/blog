@@ -1,6 +1,6 @@
 # Follow-ups Plan — Research Sweep #943 (pre-creation)
 
-**Spec:** [../SPEC.md](../SPEC.md) §6, §10 · **Plan:** [plan.md](plan.md) T4-dedup, T4-collision
+**Spec:** _(archived)_ §6, §10 · **Plan:** [plan.md](plan.md) T4-dedup, T4-collision
 **Status:** Populated by T4; awaiting CHECKPOINT-A user review before T7.
 **Pinned:** §1/§3 floor `2026-05-01` · §4 floor `2026-02-15` · plan SHA `bfe8f5c` · synthesis SHA `530a728`
 **Dedup target:** #945, #946, #947 (open from #902)

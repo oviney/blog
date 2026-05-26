@@ -1,6 +1,6 @@
 # Plan — Issues #904 / #905: Internal Link Validator Quality
 
-**Spec:** [SPEC.md](../SPEC.md)  
+**Spec:** _(archived)_  
 **Date:** 2026-05-11
 
 ---
@@ -87,7 +87,7 @@ Every non-post page (`/blog/`, `/about/`, `/search/`, etc.) lacks a year segment
 
 **Verify (RED → GREEN):**
 - Baseline: run `node scripts/content-review.js` — all 24 at 100/100 (no regressions)
-- Manual test: temporarily add `[bad link](/2026/99/99/no-such-post/)` to a post body → should appear as a broken link issue but not drop score if ≥ 1 canonical link still present
+- Manual test: temporarily add a markdown link pointing to the deliberately non-existent slug `/2026/99/99/no-such-post/` to a post body → should appear as a broken link issue but not drop score if ≥ 1 canonical link still present
 - Restore after test
 
 ---
@@ -150,7 +150,7 @@ Add a new check section (before the closing `if [[ $post_errors -eq 0 ]]` line) 
 
 **Verify (RED → GREEN):**
 - `bash scripts/validate-posts.sh --all` → PASSED (24/24 — no regressions)
-- Manual test: temporarily add `[bad](/2026/99/99/no-such-post/)` to a post → should ERROR; restore
+- Manual test: temporarily add a markdown link pointing to the deliberately non-existent slug `/2026/99/99/no-such-post/` to a post → should ERROR; restore
 
 ---
 

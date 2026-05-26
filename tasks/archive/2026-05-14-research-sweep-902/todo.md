@@ -1,6 +1,6 @@
 # TODO — Research Sweep Execution (#902)
 
-**Spec:** [SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(archived)_ · **Plan:** [plan.md](plan.md)
 **Pinned:** date floor `2026-04-15` (prior sweep #816) · plan SHA `dafab0e`
 
 ---

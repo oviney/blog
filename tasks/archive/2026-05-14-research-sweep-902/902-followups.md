@@ -1,6 +1,6 @@
 # Follow-ups Ledger — Research Sweep #902 (post-creation)
 
-**Spec:** [../SPEC.md](../SPEC.md) §6, §11 · **Plan:** [plan.md](plan.md) T7, T8
+**Spec:** _(archived)_ §6, §11 · **Plan:** [plan.md](plan.md) T7, T8
 **Pre-creation plan:** [902-followups-plan.md](902-followups-plan.md)
 **Status:** All 4 issues spawned and verified. CHECKPOINT-B clean.
 **Pinned:** date floor `2026-04-15` (#816) · plan SHA `dafab0e` · synthesis SHA `624007a` · spawn SHA `9544be6`

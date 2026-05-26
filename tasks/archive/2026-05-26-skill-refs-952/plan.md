@@ -1,6 +1,6 @@
 # Plan — Reference Claude Code `/goal` + `claude agents` in 2 SKILL files (#952)
 
-**Spec:** [../SPEC.md](../SPEC.md)
+**Spec:** _(archived)_
 **Issue:** [#952](https://github.com/oviney/blog/issues/952)
 **Branch:** `feat/952-claude-code-skill-refs`
 **Date:** 2026-05-26

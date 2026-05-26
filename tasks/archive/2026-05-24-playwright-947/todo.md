@@ -1,6 +1,6 @@
 # TODO — Bump @playwright/test to ^1.60.0 + Page-Level ARIA Snapshots (#947)
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(archived)_ · **Plan:** [plan.md](plan.md)
 **Plan SHA:** `6480f00` · 5 files (0 new + 5 modified) · 1 snapshot migration + 2 rationale comments
 
 ---

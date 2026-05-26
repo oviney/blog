@@ -1,6 +1,6 @@
 # TODO — Anchor bulk-content / governance-update label greps (#987)
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(archived)_ · **Plan:** [plan.md](plan.md)
 **Branch:** `fix/987-anchor-label-greps` (to create)
 
 ---

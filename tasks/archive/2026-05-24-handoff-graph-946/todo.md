@@ -1,6 +1,6 @@
 # TODO — Make AGENTS.md handoff targets explicit + Mermaid graph (#946)
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(archived)_ · **Plan:** [plan.md](plan.md)
 **Branch:** `docs/946-agents-handoff-graph` (to create)
 
 ---

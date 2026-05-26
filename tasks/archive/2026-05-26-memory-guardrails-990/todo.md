@@ -1,6 +1,6 @@
 # TODO — Memory-write guardrails for code-reviewer and security-auditor (#990)
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(archived)_ · **Plan:** [plan.md](plan.md)
 **Branch:** `feat/990-memory-discipline-guardrails` (to create)
 
 ---

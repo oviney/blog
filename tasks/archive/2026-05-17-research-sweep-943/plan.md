@@ -1,6 +1,6 @@
 # Plan — Research Sweep Execution (#943)
 
-**Spec:** [SPEC.md](../SPEC.md)
+**Spec:** _(archived)_
 **Issue:** [#943](https://github.com/oviney/blog/issues/943)
 **Date:** 2026-05-17
 **Lifecycle phase:** PLAN

@@ -1,6 +1,6 @@
 # TODO — Backfill `subtitle:` Front-Matter + Validator (#951)
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(archived)_ · **Plan:** [plan.md](plan.md)
 **Plan SHA:** `f56c219` · 24 posts (8 with `summary:`, 16 without)
 
 ---

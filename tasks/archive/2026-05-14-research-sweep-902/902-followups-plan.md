@@ -1,6 +1,6 @@
 # Follow-ups Plan — Research Sweep #902 (pre-creation)
 
-**Spec:** [../SPEC.md](../SPEC.md) §6, §8 · **Plan:** [plan.md](plan.md) T4
+**Spec:** _(archived)_ §6, §8 · **Plan:** [plan.md](plan.md) T4
 **Status:** Populated by T4; awaiting CHECKPOINT-A user review before T7 spawns issues.
 **Pinned:** date floor `2026-04-15` (#816) · plan SHA `dafab0e` · synthesis SHA `624007a`
 

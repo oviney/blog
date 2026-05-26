@@ -1,6 +1,6 @@
 # TODO — Add `memory:` frontmatter to local subagents (#945)
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(archived)_ · **Plan:** [plan.md](plan.md)
 **Branch:** `feat/945-subagent-memory-frontmatter` (to create)
 
 ---

@@ -1,6 +1,6 @@
 # Plan — `bulk-content` Scope-Guard Exemption Label (#956)
 
-**Spec:** [SPEC.md](../SPEC.md)
+**Spec:** _(archived)_
 **Issue:** [#956](https://github.com/oviney/blog/issues/956)
 **Date:** 2026-05-17
 **Lifecycle phase:** PLAN

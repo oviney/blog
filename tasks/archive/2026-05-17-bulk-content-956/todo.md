@@ -1,6 +1,6 @@
 # TODO — `bulk-content` Scope-Guard Exemption Label (#956)
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(archived)_ · **Plan:** [plan.md](plan.md)
 **Plan SHA:** `ec008ac` · 3 files to touch (`.github/labels.yml`, `scripts/check-pr-scope.sh`, `CLAUDE.md`)
 
 ---

@@ -1,6 +1,6 @@
 # Plan — Scope-guard label exemption for legitimate AGENTS.md / ARCHITECTURE.md changes (#985)
 
-**Spec:** [../SPEC.md](../SPEC.md)
+**Spec:** _(archived)_
 **Issue:** [#985](https://github.com/oviney/blog/issues/985)
 **Date:** 2026-05-24
 **Labels:** `agent:qa-gatekeeper`, `governance-update`

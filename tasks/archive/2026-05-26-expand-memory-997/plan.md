@@ -1,6 +1,6 @@
 # Plan — Expand Memory Discipline guardrails (#997)
 
-**Spec:** [../SPEC.md](../SPEC.md)
+**Spec:** _(archived)_
 **Issue:** [#997](https://github.com/oviney/blog/issues/997)
 **Date:** 2026-05-26
 **Branch:** `feat/997-expand-memory-discipline`
