@@ -29,26 +29,20 @@ jobs:
       - name: Build Jekyll site
         run: bundle exec jekyll build --verbose
       
-      - name: Validate HTML
+      - name: Validate HTML and internal links
         run: |
+          # htmlproofer validates against the built _site/, resolving every
+          # internal link to its actual generated path. This catches real
+          # broken links (where Jekyll's URL rewriting produces no matching
+          # _site/ file) — including cases where post front-matter `date:`
+          # overrides shift the URL away from the filename's date prefix.
           gem install html-proofer
           htmlproofer ./_site \
             --disable-external \
             --allow-hash-href \
             --ignore-urls "/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/,/^mailto:/" \
             --ignore-status-codes "999"
-      
-      - name: Check for broken internal links
-        run: |
-          echo "Checking for broken internal links in markdown files..."
-          BROKEN=$(find _posts -name "*.md" -o -name "*.markdown" | xargs grep -n "](/" | grep -v "http" | grep -v "assets" | wc -l || echo "0")
-          if [ "$BROKEN" -gt 0 ]; then
-            echo "⚠️ Found $BROKEN potential broken internal links"
-            find _posts -name "*.md" -o -name "*.markdown" | xargs grep -n "](/" | grep -v "http" | grep -v "assets" || true
-          else
-            echo "✅ No broken internal links found"
-          fi
-      
+
       - name: Validate YAML front matter
         run: |
           echo "Validating YAML front matter..."
