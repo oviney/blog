@@ -126,8 +126,8 @@ test.describe('@content @links April AI posts: cross-post links resolve @REQ-CON
       ],
     },
     {
-      // filename is 2026-01-18-* but front matter date is 2026-04-05;
-      // Jekyll serves this at /2026/04/05/ — pre-existing mismatch tracked in #916
+      // Filename date and front matter date both 2026-04-05; Jekyll serves
+      // this at /2026/04/05/ (was a filename/front-matter mismatch, fixed in #916).
       name: 'Code Generators',
       postUrl: '/2026/04/05/ai-assisted-development-the-new-industrial-revolut/',
       links: [
