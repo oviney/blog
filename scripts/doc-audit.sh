@@ -221,6 +221,8 @@ done < <(find . \
   -not -path './node_modules/*' \
   -not -path './vendor/*' \
   -not -path './_site/*' \
+  -not -path './worktrees/*' \
+  -not -path './.worktrees/*' \
   -name '*.md' \
   | sort)
 
@@ -416,6 +418,8 @@ done < <(find . \
   -not -path './node_modules/*' \
   -not -path './vendor/*' \
   -not -path './_site/*' \
+  -not -path './worktrees/*' \
+  -not -path './.worktrees/*' \
   -name '*.md' \
   | sort)
 
@@ -461,6 +465,8 @@ done < <(find . \
   -not -path './node_modules/*' \
   -not -path './vendor/*' \
   -not -path './_site/*' \
+  -not -path './worktrees/*' \
+  -not -path './.worktrees/*' \
   -name '*.md' \
   | sort)
 
