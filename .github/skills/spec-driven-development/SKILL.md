@@ -163,6 +163,17 @@ Break the plan into discrete, implementable tasks:
   - Files: [Which files will be touched]
 ```
 
+**Writing reliable `Verify:` commands for Markdown structures.** When a
+verification step counts items in a Markdown list, prefer
+`grep -A <N> "<header>" <file> | grep -c "^- "` over an `awk` range. An `awk`
+range such as `awk '/^\*\*Header:\*\*/,/^$/'` terminates on the *first* blank
+line — so when a blank line separates a bold header from its bullet list (common
+in agent prose), the range closes before any bullet is matched and the count
+returns `0` instead of the real total. The `grep -A` form reads a fixed window of
+lines past the header and is unaffected by the intervening blank line. Example
+that correctly counts the bullets under a bold header:
+`grep -A 6 "Never persist to memory" .claude/agents/code-reviewer.md | grep -c "^- "`.
+
 ### Phase 4: Implement
 
 Execute tasks one at a time following the repo's `build` and `test` workflows,
