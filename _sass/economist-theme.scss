@@ -1848,6 +1848,23 @@ table {
   line-height: 1.5;
 }
 
+.econ-topic-browse {
+  margin: 0 0 $spacing-lg 0;
+
+  .econ-topic-browse-label {
+    font-family: $font-sans;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: $text-secondary;
+    margin-right: $spacing-xs;
+  }
+
+  .econ-topic-browse-sep {
+    color: $border-color;
+    margin: 0 $spacing-xs;
+  }
+}
+
 .econ-article-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
