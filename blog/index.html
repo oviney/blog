@@ -9,6 +9,13 @@ title: Quality Engineering
     <p class="econ-topic-tagline">Explore our coverage of software quality, test automation, and engineering leadership</p>
   </header>
 
+  <nav class="econ-topic-browse home-intro-links" aria-label="Browse by topic">
+    <span class="econ-topic-browse-label">Browse by topic:</span>
+    <a href="{{ '/security/' | relative_url }}">Security</a>
+    <a href="{{ '/software-engineering/' | relative_url }}">Software Engineering</a>
+    <a href="{{ '/test-automation/' | relative_url }}">Test Automation</a>
+  </nav>
+
   <div class="econ-article-grid">
     {% for post in paginator.posts %}
     <article class="econ-article-card">
