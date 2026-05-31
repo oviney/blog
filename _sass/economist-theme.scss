@@ -1849,6 +1849,10 @@ table {
 }
 
 .econ-topic-browse {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: $spacing-xs $spacing-md;
   margin: 0 0 $spacing-lg 0;
 
   .econ-topic-browse-label {
@@ -1856,12 +1860,6 @@ table {
     font-size: 0.9375rem;
     font-weight: 600;
     color: $text-secondary;
-    margin-right: $spacing-xs;
-  }
-
-  .econ-topic-browse-sep {
-    color: $border-color;
-    margin: 0 $spacing-xs;
   }
 }
 
