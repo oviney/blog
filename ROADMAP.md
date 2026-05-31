@@ -10,7 +10,7 @@ and engineering leaders.
 
 | Metric | Current | Target | Timeframe |
 |--------|---------|--------|-----------|
-| Published posts | 23 | 30 | End of 2026 |
+| Published posts | 24 | 30 | End of 2026 |
 | Post cadence | Ad-hoc | 2 per month | Ongoing |
 
 **Topic priorities** (current distribution is improving, but still uneven):
@@ -18,7 +18,9 @@ and engineering leaders.
 - **Security** (3 posts) — still the thinnest category; make this the next 2-post priority so the archive is less lopsided
 - **Software Engineering** (5 posts) — second priority; add 1–2 strong essays to close the gap with the two testing-heavy categories
 - **Test Automation** (7 posts) — maintain a steady cadence, but avoid letting it crowd out the smaller categories
-- **Quality Engineering** (8 posts) — best-covered topic today; publish selectively when there is a distinct data point or strong contrarian angle
+- **Quality Engineering** (9 posts) — best-covered topic today; publish selectively when there is a distinct data point or strong contrarian angle
+
+_Post counts above are generated from `_posts/` front matter — regenerate with `bash scripts/content-inventory.sh` (run `--check` to detect drift)._
 
 The [economist-agents](https://github.com/oviney/economist-agents) pipeline can
 generate 2–3 drafts per week; the bottleneck is human review, not production.
