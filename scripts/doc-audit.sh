@@ -140,6 +140,11 @@ file_issue() {
     echo "  [skip] already open: $title"
     return
   fi
+  if [[ -n "${DRY_RUN:-}" ]]; then
+    echo "  [dry-run] would file: $title"
+    FINDINGS=$(( FINDINGS + 1 ))
+    return
+  fi
   gh issue create \
     --repo "$REPO" \
     --title "$title" \
@@ -390,28 +395,74 @@ fi
 echo ""
 echo "=== Check 3: Back-tick file paths in docs ==="
 
-# Look for `path/to/file` patterns that look like repo file paths
-# (contain a `/`, don't start with http, and end in a known extension or no extension)
+# Look for `path/to/file` back-tick spans that *claim* a repo file exists, and
+# verify they resolve. Two precision rules keep this low-noise:
+#   - Resolve relative spans from the doc's OWN directory, then fall back to the
+#     repo root — so `../foo/SKILL.md` and `scripts/x.sh` both validate correctly.
+#   - Only check spans that are explicitly anchored (`/`, `./`, `../`) or rooted
+#     at a real top-level repo entry. Bare `name/file` shorthand, code syntax
+#     (`try/catch`, `@scope/pkg`), home-dir refs (`~/...`), line refs
+#     (`file.rb:42`), and placeholders (`<slug>`, `YYYY-MM-DD`, `feat/GH-N-...`)
+#     are not navigable path claims and are skipped.
+# Ephemeral lifecycle logs under tasks/ and the skill _template/ are excluded:
+# they mention point-in-time paths that are not navigational, and Check 1 already
+# validates their real Markdown links.
 missing_paths=()
 
+# Normalize "$base/$p" (or repo-root for leading-/) into a repo-relative path,
+# collapsing ./ and ../ segments via string ops (no realpath dependency).
+normalize_doc_path() {
+  local base="$1" p="$2" resolved norm part
+  if [[ "$p" == /* ]]; then resolved="${p#/}"; else resolved="${base}/${p}"; fi
+  norm=""
+  local IFS='/'
+  read -ra parts <<< "$resolved"
+  for part in "${parts[@]}"; do
+    case "$part" in
+      ''|.) ;;
+      ..) norm="${norm%/*}" ;;
+      *)  norm="${norm}/${part}" ;;
+    esac
+  done
+  echo "${norm#/}"
+}
+
 while IFS= read -r md_file; do
+  dir="$(dirname "$md_file")"; dir="${dir#./}"; [[ "$dir" == "." ]] && dir=""
   while IFS= read -r raw_path; do
     # Trim surrounding back-ticks
     p="${raw_path//\`/}"
-    # Skip: URLs, anchors, globs, shell vars, patterns with spaces
-    [[ "$p" == http* ]] && continue
-    [[ "$p" == *' '* ]] && continue
-    [[ "$p" == *'*'* ]] && continue
-    [[ "$p" == *'$'* ]] && continue
-    [[ "$p" == *'<'* ]] && continue
-    [[ "$p" == *'>'* ]] && continue
-    # Must look like a path (contains /)
-    [[ "$p" != */* ]] && continue
-    # Must have a recognisable extension or end without extension (directory)
-    if [[ ! -e "$p" ]]; then
-      missing_paths+=("${md_file}: missing path → ${p}")
-      echo "  [missing] ${md_file}: ${p}"
+    # Skip spans that are not navigable repo-path claims
+    [[ "$p" == http* ]] && continue            # URLs
+    [[ "$p" == *' '* ]] && continue             # prose, not a path
+    [[ "$p" == *'*'* ]] && continue             # globs
+    [[ "$p" == *'$'* ]] && continue             # shell variables
+    [[ "$p" == *'<'* || "$p" == *'>'* ]] && continue  # <placeholder> spans
+    [[ "$p" == \~* ]] && continue               # home-dir refs (~/.claude/...)
+    [[ "$p" == @* ]] && continue                # package specifiers (@scope/pkg)
+    [[ "$p" == *...* ]] && continue             # ellipsis placeholders (feat/GH-N-...)
+    [[ "$p" == *:* ]] && continue               # line/column refs (file.scss:42)
+    [[ "$p" =~ (YYYY|MM-DD|/MM/|/DD/|SPRINT_X|GH-N|/N-|XXXX) ]] && continue  # date/id placeholders
+    [[ "$p" =~ ^(\.[a-z0-9]{1,4}/)+\.[a-z0-9]{1,4}$ ]] && continue  # bare extension lists (.js/.ts/.sh)
+    [[ "$p" != */* ]] && continue               # must contain a /
+    # Only check explicitly-anchored paths or those rooted at a real top-level entry
+    first="${p%%/*}"
+    if [[ "$p" != /* && "$p" != ./* && "$p" != ../* && ! -e "$first" ]]; then
+      continue
     fi
+    last="${p##*/}"
+    resolved_root="$(normalize_doc_path "" "$p")"
+    resolved_file="$(normalize_doc_path "$dir" "$p")"
+    # A pathish span with no extension is only a claim if it resolves to a real dir
+    if [[ "$last" != *.* && ! -d "$resolved_root" && ! -d "$resolved_file" ]]; then
+      continue
+    fi
+    # OK if it resolves from the doc's own dir OR from the repo root
+    if [[ -e "$resolved_file" || -e "$resolved_root" ]]; then
+      continue
+    fi
+    missing_paths+=("${md_file}: missing path → ${p}")
+    echo "  [missing] ${md_file}: ${p}"
   done < <(grep -oE '\`[^`]+/[^`]+\`' "$md_file" 2>/dev/null || true)
 done < <(find . \
   -not -path './.git/*' \
@@ -420,6 +471,8 @@ done < <(find . \
   -not -path './_site/*' \
   -not -path './worktrees/*' \
   -not -path './.worktrees/*' \
+  -not -path './tasks/*' \
+  -not -path './.github/skills/_template/*' \
   -name '*.md' \
   | sort)
 
