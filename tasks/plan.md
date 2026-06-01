@@ -1,6 +1,6 @@
 # Plan — Fix 21 broken Markdown links in archived task artifacts (#970)
 
-**Spec:** [../SPEC.md](../SPEC.md)
+**Spec:** _(removed — #970 closed)_
 **Issue:** [#970](https://github.com/oviney/blog/issues/970)
 **Branch:** `fix/970-broken-archive-links`
 **Date:** 2026-05-26
@@ -31,11 +31,11 @@ Phase 2 (ship with bulk-content label)
 
 ## Phase 1 — 18 archive file edits (one commit)
 
-**Pattern A (15 files): Replace `[../SPEC.md](../SPEC.md)` with `_(archived)_`.** Search-and-replace via `sed -i` or per-file Edit.
+**Pattern A (15 files): Replace the `../SPEC.md` link with `_(archived)_`.** Search-and-replace via `sed -i` or per-file Edit.
 
 Files: 2026-05-10-link-validator/plan.md, 2026-05-14-research-sweep-902/{plan,todo,902-followups-plan,902-followups}.md, 2026-05-17-bulk-content-956/{plan,todo}.md, 2026-05-17-puppeteer-chrome-cache-958/{plan,todo}.md, 2026-05-17-research-sweep-943/{plan,todo,943-followups-plan,943-followups}.md, 2026-05-17-subtitle-backfill-951/{plan,todo}.md.
 
-Exact pattern to look for: any link with text `../SPEC.md` or `[Spec](../SPEC.md)` etc. The line typically reads `**Spec:** [../SPEC.md](../SPEC.md)` — verify per-file.
+Exact pattern to look for: any Markdown link pointing at `../SPEC.md` (e.g. a `Spec:` link). The line typically reads `**Spec:** ../SPEC.md` — verify per-file.
 
 **Pattern B (2 files): Fix workflow path.**
 - 2026-05-14-research-sweep-902/902-body.md: `../../actions/workflows/research-sweep.yml` → `../../../.github/workflows/research-sweep.yml`

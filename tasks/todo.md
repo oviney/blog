@@ -1,6 +1,6 @@
 # TODO — Fix 21 broken Markdown links in archived task artifacts (#970)
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** _(removed — #970 closed)_ · **Plan:** [plan.md](plan.md)
 **Branch:** `fix/970-broken-archive-links`
 
 ## Phase 0 — Setup ✓
