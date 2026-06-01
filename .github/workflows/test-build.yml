@@ -104,3 +104,6 @@ jobs:
 
       - name: Run scope-guard fixture tests
         run: bash tests/scope-guard.sh
+
+      - name: Check agent memory-discipline guardrails
+        run: bash scripts/check-agent-memory-discipline.sh
