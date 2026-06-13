@@ -86,6 +86,23 @@ jobs:
       - name: Validate post front matter and image paths
         run: bash scripts/validate-posts.sh --all
 
+      - name: Validate post editorial quality (errors block, warnings advisory)
+        run: |
+          # validate-post-quality.sh exit codes: 0 = clean, 1 = ERROR, 2 = warnings only.
+          # Gate on ERRORs only; warnings are surfaced but never block the merge.
+          set +e
+          bash scripts/validate-post-quality.sh --all
+          code=$?
+          set -e
+          if [ "$code" -eq 1 ]; then
+            echo "::error::Post editorial quality check found blocking errors (see log above)."
+            exit 1
+          fi
+          if [ "$code" -eq 2 ]; then
+            echo "::warning::Post editorial quality passed with non-blocking warnings (see log above)."
+          fi
+          exit 0
+
   check-agent-scope:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.event_name == 'push'
