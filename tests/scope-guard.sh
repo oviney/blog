@@ -163,11 +163,11 @@ run_case "D: AGENTS.md modified, confusable label (substring superset) → guard
   "1" \
   "VIOLATION [protected-file]: 'AGENTS.md'"
 
-# Pin the anchored-grep semantics for the bulk-content label (Rule 2).
-# The label is set to a confusable substring superset that the current
-# unanchored `grep -q 'bulk-content'` mistakenly matches — wrongly
-# bypassing Rule 2 against a >15-file diff. Will be GREEN once
-# Rule 2's check is migrated to has_label().
+# Pin the anchored has_label() semantics for the bulk-content label (Rule 2).
+# A confusable substring superset ('not-bulk-content-foo') must NOT bypass
+# Rule 2: an unanchored `grep -q 'bulk-content'` would wrongly match it and
+# skip the >15-file check. Rule 2 was migrated to has_label() in #989; this
+# case is a regression guard against reintroducing an unanchored match.
 FILES_E=$(seq -f 'tests-e-%g.txt' 1 21)
 run_case "E: 21 files modified, confusable bulk-content substring label → guard fails on scope-explosion" \
   "not-bulk-content-foo" \
@@ -175,10 +175,10 @@ run_case "E: 21 files modified, confusable bulk-content substring label → guar
   "1" \
   "VIOLATION [scope-explosion]"
 
-# Pin the anchored-grep semantics for the governance-update label (Rule 3).
+# Pin the anchored has_label() semantics for the governance-update label (Rule 3).
 # Same antipattern as Case E but on Rule 3: a confusable superset label
-# wrongly bypasses the .github/skills/ check today. Will be GREEN once
-# Rule 3's check is migrated to has_label().
+# ('governance-update-experimental') must NOT bypass the .github/skills/ check.
+# Rule 3 was migrated to has_label() in #989; this case is a regression guard.
 run_case "F: .github/skills/ modified, confusable governance-update substring label → guard fails on governance-surface" \
   "governance-update-experimental" \
   ".github/skills/scope-guard-test/SKILL.md" \
