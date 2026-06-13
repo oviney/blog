@@ -11,6 +11,16 @@ import { test, expect } from '@playwright/test';
 
 test.describe('@content @links SEO JSON-LD Structured Data @REQ-CONTENT-01', () => {
 
+  test('robots.txt advertises the production sitemap without localhost references', async ({ request }) => {
+    const response = await request.get('/robots.txt');
+
+    expect(response.ok()).toBe(true);
+
+    const robotsTxt = await response.text();
+    expect(robotsTxt).toContain('Sitemap: https://www.viney.ca/sitemap.xml');
+    expect(robotsTxt).not.toContain('localhost');
+  });
+
   test('BreadcrumbList JSON-LD is present on the homepage', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
