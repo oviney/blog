@@ -88,3 +88,7 @@ worktrees/
 
 # Claude Code session-scheduler lock (local-only; per-session state)
 .claude/scheduled_tasks.lock
+
+# Agent-PR rubric scorecards (scripts/eval-agent-pr.sh output; ephemeral,
+# regenerated per run in CI and locally — never committed)
+.agent-evals/

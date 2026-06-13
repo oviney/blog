@@ -208,6 +208,20 @@ jobs:
             labels: [`risk:${tier}`],
           });
 
+    - name: Run quality rubric
+      id: rubric
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Score the PR against the shared rubric (scripts/eval-agent-pr.sh).
+        # The script exits 1 when any hard threshold trips; we capture that
+        # without aborting the job so the scorecard still posts. Actual gating
+        # happens in "Enforce rubric gate" on the three blocking dimensions.
+        set +e
+        bash scripts/eval-agent-pr.sh "${{ github.event.pull_request.number }}" "${{ github.repository }}"
+        echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+        set -e
+
     - name: Post eval report
       uses: actions/github-script@v9
       with:
@@ -260,6 +274,29 @@ jobs:
             body += `### ✅ Evaluation Passed\nAll checks passed. Ready for human review.\n`;
           } else {
             body += `### ⚠️ Evaluation Passed with Warnings\nNo failures, but review the warnings above.\n`;
+          }
+
+          // Quality rubric (scripts/eval-agent-pr.sh). Blocking dimensions are
+          // marked 🔒; atomic-commits and CI-status are advisory only.
+          const fs = require('fs');
+          try {
+            const r = JSON.parse(
+              fs.readFileSync(`.agent-evals/${context.issue.number}.json`, 'utf8')
+            ).rubric;
+            const row = (label, dim, blocking) => {
+              const icon = dim.pass ? '✅' : (blocking ? '❌' : '⚠️');
+              return `| ${label}${blocking ? ' 🔒' : ''} | ${icon} | ${dim.note} |\n`;
+            };
+            body += `\n### Quality Rubric\n`;
+            body += `🔒 = blocks merge on failure. Others are advisory.\n\n`;
+            body += `| Dimension | Status | Detail |\n|-----------|--------|--------|\n`;
+            body += row('Scope adherence', r.scope_adherence, true);
+            body += row('Test coverage',   r.test_coverage,   true);
+            body += row('Review churn',    r.review_churn,    true);
+            body += row('Atomic commits',  r.atomic_commits,  false);
+            body += row('CI status',       r.ci_status,       false);
+          } catch (e) {
+            body += `\n### Quality Rubric\n⚠️ Could not read rubric output: ${e.message}\n`;
           }
 
           await github.rest.issues.createComment({
@@ -321,3 +358,31 @@ jobs:
         echo "Build: ${{ steps.build.outputs.status }}"
         echo "Scope: ${{ steps.scope.outputs.status }} - ${{ steps.scope.outputs.violations }}"
         exit 1
+
+    - name: Enforce rubric gate
+      # Hard-fail on the three approved blocking dimensions. The atomic-commit
+      # (subject-line heuristic) and CI-status (circular — this workflow is itself
+      # one of the PR's checks) dimensions are advisory: shown in the scorecard,
+      # not gated. If the rubric produced no output we skip rather than block.
+      run: |
+        JSON=".agent-evals/${{ github.event.pull_request.number }}.json"
+        if [ ! -f "$JSON" ]; then
+          echo "⚠️ rubric output missing ($JSON) — skipping gate"
+          exit 0
+        fi
+        fail=0
+        for dim in scope_adherence test_coverage review_churn; do
+          pass=$(jq -r ".rubric.${dim}.pass" "$JSON")
+          note=$(jq -r ".rubric.${dim}.note" "$JSON")
+          if [ "$pass" != "true" ]; then
+            echo "❌ rubric gate: ${dim} — ${note}"
+            fail=1
+          else
+            echo "✅ rubric gate: ${dim} — ${note}"
+          fi
+        done
+        if [ "$fail" -ne 0 ]; then
+          echo ""
+          echo "Agent PR blocked by quality rubric. See the scorecard comment for detail."
+          exit 1
+        fi
