@@ -6,6 +6,11 @@ A personal engineering blog offering professional commentary on software quality
 test automation, and AI — written in The Economist's voice — for senior engineers
 and engineering leaders.
 
+The [Blog Growth and Design Backlog](docs/GROWTH_DESIGN_BACKLOG.md) records the
+June 2026 live-site audit and proposed work on reader growth, customer conversion,
+design, SEO, accessibility, and performance. Items that conflict with this
+roadmap's current scope require an explicit owner decision before implementation.
+
 ## Content Goals
 
 | Metric | Current | Target | Timeframe |
