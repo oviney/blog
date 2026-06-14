@@ -594,6 +594,7 @@ blockquote {
 
   img[src*="/charts/"] {
     max-width: 500px !important; // Override any other styles
+    height: auto; // Preserve aspect ratio against intrinsic width/height attrs (BLOG-017b)
     margin: $spacing-md auto; // Center with reduced margins
     border-radius: $radius-sm;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
