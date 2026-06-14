@@ -2,6 +2,7 @@
 layout: default
 title: Test Automation
 permalink: /test-automation/
+description: Strategies, frameworks, and practices for building test automation that delivers lasting value.
 ---
 
 <div class="topic-page">
