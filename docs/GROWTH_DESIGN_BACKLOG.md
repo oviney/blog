@@ -533,6 +533,32 @@ and `height` attributes.
 
 **Dependencies:** None
 
+### BLOG-017b: Intrinsic dimensions for in-content (Markdown) chart images
+
+**Priority:** P1
+**Area:** Performance / Layout stability
+**Estimated scope:** S
+
+BLOG-017 reserved layout space for front-matter hero/card/featured images via
+`_includes/responsive-image.html`. The 22 in-content chart images authored as
+Markdown (`![alt](/assets/charts/*)`) bypass that include — Kramdown renders
+them as bare `<img>` tags with no dimensions, so they still cause layout shift.
+
+**Acceptance criteria:**
+
+- [ ] In-content chart images render with intrinsic width and height from the
+      existing `_data/image_dimensions.yml` map.
+- [ ] No source Markdown is edited; tags already carrying dimensions are left
+      unchanged (idempotent).
+- [ ] Images absent from the map degrade gracefully.
+
+**Verification:**
+
+- [ ] `bundle exec jekyll build` exits 0 and built `<img>` tags for
+      `/assets/charts/*` carry width/height.
+
+**Dependencies:** BLOG-017
+
 ### BLOG-018: Optimize large raster assets
 
 **Priority:** P1
