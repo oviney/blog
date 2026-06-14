@@ -22,6 +22,20 @@ class FailureAnalyzer {
   }
 
   async runFailureAnalysis() {
+    // Prefer an already-produced results file (e.g. the CI artifact downloaded
+    // into the monitor job). Re-running the suite here would hang against a
+    // dead localhost:4000 when no Jekyll server is up and blow the job timeout
+    // (GH-1059). Only re-run when no results file is present (local use).
+    const resultsPath = path.join(process.cwd(), 'test-results', 'results.json');
+    if (fs.existsSync(resultsPath)) {
+      console.log(`📄 Using existing Playwright results at ${resultsPath} (skipping re-run)`);
+      try {
+        return JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+      } catch (error) {
+        console.warn(`⚠️ Could not parse ${resultsPath}, falling back to a live run: ${error.message}`);
+      }
+    }
+
     console.log('🧪 Running Playwright tests to capture failures...');
 
     try {
