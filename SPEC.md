@@ -1,137 +1,90 @@
-# SPEC — Fix 21 broken internal Markdown links in archived task artifacts (#970)
+# SPEC — BLOG-017: Intrinsic image dimensions + responsive sizing
 
-**Status:** Draft — auto-approved per /goal directive
-**Issue:** [#970](https://github.com/oviney/blog/issues/970) (P2:medium, doc-debt)
-**Labels:** `agent:qa-gatekeeper`, **`bulk-content`** (>15 files; atomic doc-audit cleanup)
-**Date:** 2026-05-26
-**Branch:** `fix/970-broken-archive-links`
+**Stream:** GROWTH_DESIGN_BACKLOG · **Priority:** P1 · **Scope:** M · **Dependencies:** None
+**Date:** 2026-06-14 · **Label:** `agent:creative-director`
 
 ---
 
-## 1. Situation
+## 1. Objective
 
-`scripts/doc-audit.sh` reports 21 broken internal Markdown links across 18 files under `tasks/archive/*/`. All targets are in archived lifecycle artifacts (plan.md, todo.md, body files, archived SPEC.md files) — the audit issue #970 is auto-filed.
+Eliminate layout shift (CLS) caused by images that render with no reserved
+space. Today `_includes/responsive-image.html` emits `<img>` markup with **no
+intrinsic `width`/`height`**, so the browser cannot reserve a correctly-sized
+layout box before the image loads. Every featured/card/hero image on the
+homepage, topic pages, and articles is affected (the 2026-06-13 audit found all
+18 inspected images lacked intrinsic dimensions).
 
-Pattern breakdown:
+Target users: all viney.ca readers (desktop + mobile). Success metric: improved
+Core Web Vitals — CLS approaching 0 on image-bearing pages, no LCP regression.
 
-| Pattern | Count | Cause |
-|---|---|---|
-| `../SPEC.md` from archived plan/todo/followup | 15 | Was correct when active (`tasks/<live>/plan.md` → `tasks/../SPEC.md`); broken now under `tasks/archive/<name>/plan.md` (resolves to `tasks/SPEC.md`, missing) |
-| `../../actions/workflows/research-sweep.yml` | 2 | Missing `.github/` prefix in relative path |
-| `/2026/99/99/no-such-post/` | 2 | Deliberate test-data URL in link-validator/plan.md (intentional broken example) |
-| `tasks/archive/2026-05-14-research-sweep-902/SPEC.md` (from `943/SPEC.md`) | 1 | Wrong relative path (resolves into 943's subtree) |
-| `tasks/lessons.md` (from `943/SPEC.md`) | 1 | Wrong relative path (same root cause) |
+## 2. Approach
 
----
+Jekyll cannot read pixel dimensions natively, and `Gemfile`/`_config.yml` are
+protected (no new plugin). Post images have **inconsistent** intrinsic sizes
+(1792×1024, 1024×1024, 1200×675, 1455×943, 2460×1667, …), so dimensions must be
+derived per-image rather than hardcoded.
 
-## 2. Objective
+1. `scripts/generate-image-dimensions.sh` uses `sips` to scan `assets/images/`
+   and write a committed `_data/image_dimensions.yml` mapping each image path
+   (the value used in front matter, e.g. `/assets/images/foo.png`) to its
+   intrinsic `width` and `height`.
+2. `_includes/responsive-image.html` looks up `site.data.image_dimensions` by
+   `src` and emits `width="…" height="…"` when known. Unknown images degrade
+   gracefully to current behaviour (no attributes).
+3. The eager hero (`page.image`, rendered without `loading="lazy"`) also emits
+   `fetchpriority="high"` for LCP. Card/featured images keep `loading="lazy"`.
+4. CSS guarantees `height: auto` on these images so responsive scaling keeps the
+   intrinsic aspect ratio (prevents distortion while the attributes reserve
+   correctly-proportioned space).
 
-Fix all 21 broken links. The 18 archive files are frozen-in-time records; references should point to stable targets or be converted to plain text where no stable target exists. Single PR with `bulk-content` label because the audit only closes when all links resolve; per-file fixes don't independently move the needle.
+## 3. Acceptance criteria
 
----
+- [ ] **AC-1** Generated `<img>` markup includes intrinsic `width` and `height`
+      for every image present in `_data/image_dimensions.yml`.
+- [ ] **AC-2** Below-the-fold card/featured images remain `loading="lazy"`.
+- [ ] **AC-3** The article hero image emits `fetchpriority="high"` and is not
+      lazy-loaded.
+- [ ] **AC-4** CSS `height: auto` is retained on these images so aspect ratios
+      do not cause layout shift or distortion.
+- [ ] **AC-5** WebP `<source>` + PNG fallback `<picture>` behaviour preserved.
+- [ ] **AC-6** `bundle exec jekyll build` exits 0.
+- [ ] **AC-7** No protected file touched (`_config.yml`, `Gemfile`,
+      `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`).
 
-## 3. Design Decisions (auto-confirmed)
-
-| Decision | Choice | Rationale |
-|---|---|---|
-| `../SPEC.md` fix | **Convert to plain text** (`**Spec:** [../SPEC.md](../SPEC.md)` → `**Spec:** _(archived)_`) | Repo-root `SPEC.md` is the *current* working spec (constantly changing); pointing archived plans at a moving target is incorrect. Plain text preserves the "this was a spec'd PR" semantic without a misleading link. |
-| Workflow path fix | **`../../actions/workflows/research-sweep.yml` → `../../../.github/workflows/research-sweep.yml`** | From `tasks/archive/<dir>/`, `../../..` reaches repo root, then `.github/workflows/`. |
-| `no-such-post` fix | **Escape as inline code** (`/2026/99/99/no-such-post/` → `` `/2026/99/99/no-such-post/` ``) | Deliberate test data in link-validator plan; backtick-escaped, audit skips inline code spans (per `scripts/doc-audit.sh` heuristics — to verify). Alternative: convert to plain text. |
-| Cross-archive ref fix | **Use correct relative path** (`tasks/archive/2026-05-14-research-sweep-902/SPEC.md` → `../2026-05-14-research-sweep-902/SPEC.md`) | From `tasks/archive/2026-05-17-research-sweep-943/SPEC.md`, sibling archive dir is one level up. |
-| `tasks/lessons.md` fix | **`tasks/lessons.md` → `../../lessons.md`** | Same root cause; correct relative path. |
-| Label | **`bulk-content`** | 23 files (18 archive + 5 lifecycle) > 15-file cap. Atomic cleanup: audit only closes when all 21 fix. Per CLAUDE.md: "Atomic content backfills … where splitting would create a worse intermediate `main` state" — fits. |
-| Scope | All 18 archive files in this PR | Splitting would leave the audit issue open with N stragglers; pattern is uniform mechanical. |
-
----
-
-## 4. Acceptance Criteria
-
-- [ ] **AC-1** All 21 broken links resolved per §3 patterns.
-- [ ] **AC-2** `bash scripts/doc-audit.sh` reports no internal-Markdown-link findings (or the issue is auto-closed by the next audit run).
-- [ ] **AC-3** Per-pattern verification:
-  - `grep -r '\.\./SPEC\.md' tasks/archive/` returns 0 matches (15 → 0)
-  - `grep -r '\.\./\.\./actions/workflows/' tasks/archive/` returns 0 matches (2 → 0)
-  - `grep -r 'tasks/archive/2026-05-14-research-sweep-902/SPEC\.md' tasks/archive/2026-05-17-research-sweep-943/` returns 0 (1 → 0)
-- [ ] **AC-4** `bundle exec jekyll build` exits 0.
-- [ ] **AC-5** PR carries `bulk-content` + `agent:qa-gatekeeper` labels.
-- [ ] **AC-6** Scope: 18 substantive (archive files) + 3 lifecycle + 2 archive carry-over (#952) = **23 files**. Above 15-file cap; `bulk-content` label exempts.
-- [ ] **AC-7** No protected file or governance surface touched (`.claude/agents/`, `.github/skills/`, `.github/instructions/`, etc.).
-- [ ] **AC-8** No archive *content* edited — only the link text. Frozen-in-time records stay frozen in everything except broken-link text.
-
----
-
-## 5. Commands
+## 4. Commands
 
 ```bash
-bundle exec jekyll build                                          # AC-4
-grep -r '\.\./SPEC\.md' tasks/archive/ | wc -l                    # AC-3 → 0 expected
-grep -r '\.\./\.\./actions/workflows/' tasks/archive/ | wc -l     # AC-3 → 0 expected
-git diff --name-only main...HEAD | wc -l                          # AC-6 → 23
+bash scripts/generate-image-dimensions.sh   # regenerate the dimensions map
+bundle exec jekyll build                     # AC-6
 ```
 
----
-
-## 6. Project Structure
+## 5. Project structure
 
 ```
-tasks/archive/2026-05-10-link-validator/plan.md                          M
-tasks/archive/2026-05-14-research-sweep-902/902-body.md                  M
-tasks/archive/2026-05-14-research-sweep-902/902-followups-plan.md        M
-tasks/archive/2026-05-14-research-sweep-902/902-followups.md             M
-tasks/archive/2026-05-14-research-sweep-902/plan.md                      M
-tasks/archive/2026-05-14-research-sweep-902/todo.md                      M
-tasks/archive/2026-05-17-bulk-content-956/plan.md                        M
-tasks/archive/2026-05-17-bulk-content-956/todo.md                        M
-tasks/archive/2026-05-17-puppeteer-chrome-cache-958/plan.md              M
-tasks/archive/2026-05-17-puppeteer-chrome-cache-958/todo.md              M
-tasks/archive/2026-05-17-research-sweep-943/943-body.md                  M
-tasks/archive/2026-05-17-research-sweep-943/943-followups-plan.md        M
-tasks/archive/2026-05-17-research-sweep-943/943-followups.md             M
-tasks/archive/2026-05-17-research-sweep-943/SPEC.md                      M
-tasks/archive/2026-05-17-research-sweep-943/plan.md                      M
-tasks/archive/2026-05-17-research-sweep-943/todo.md                      M
-tasks/archive/2026-05-17-subtitle-backfill-951/plan.md                   M
-tasks/archive/2026-05-17-subtitle-backfill-951/todo.md                   M
-SPEC.md                                                                  M
-tasks/plan.md                                                            M
-tasks/todo.md                                                            M
-tasks/archive/2026-05-26-skill-refs-952/{plan,todo}.md                   A (2 files)
+scripts/generate-image-dimensions.sh   A  — sips-based generator
+_data/image_dimensions.yml             A  — committed generated map
+_includes/responsive-image.html        M  — emit width/height/fetchpriority
+_sass/economist-theme.scss (or img CSS) M  — ensure height:auto (if not present)
 ```
 
-**Total: 23 files.**
+## 6. Out of scope (this slice)
 
----
+- Multi-width `srcset`/`sizes` responsive variants — needs N resized renditions
+  of 28 source images; deferred to a follow-up so this slice stays atomic. AC
+  wording is "where beneficial"; intrinsic dimensions are the CLS fix.
+- Raster asset re-compression — that is BLOG-018.
+- **Markdown-authored in-content charts** (`![](/assets/charts/*)`, 22 images):
+  Kramdown renders these directly, bypassing the include, so they receive no
+  dimensions from this fix. They are below-the-fold and their sizes are already
+  in `_data/image_dimensions.yml`. Covering them needs a `_plugins/` render hook
+  or per-post content edits — tracked as **BLOG-017b follow-up** to keep this
+  slice atomic. Result: 146/168 built images (87%) now carry intrinsic
+  dimensions, including every above-the-fold hero/card/LCP image.
 
-## 7. Code Style
+## 7. Boundaries
 
-- **Plain-text replacement style**: `**Spec:** _(archived)_` — italic to mark "this was a link but the target no longer applies."
-- **Inline code escape style**: backticks around the URL. `` `/2026/99/99/no-such-post/` ``
-- **Relative path fixes**: use the shortest correct relative path from each file.
-- **Don't reflow surrounding content** — only the broken link line changes.
-
----
-
-## 8. Boundaries
-
-**Never:** modify archive content beyond the broken-link lines (these are frozen records); touch any protected file or governance surface.
-**Always:** apply the per-pattern fix per §3; verify with `grep` + audit script before commit.
-
----
-
-## 9. Risks
-
-| Risk | Mitigation |
-|---|---|
-| Audit script regex changes: backtick-escape doesn't actually skip inline code | Verify by running `bash scripts/doc-audit.sh` post-fix; if backticks still trip the audit, convert `/2026/99/99/no-such-post/` to plain text instead |
-| `bulk-content` label not respected by scope guard | #989 anchored the `bulk-content` grep along with the other two labels; this PR tests that path |
-| Frozen-archive content drift if someone reviews the diff strictly | The fixes are minimal — only the link text changes |
-| Phantom `build` + 1-reviewer block | Admin-merge per precedent |
-
----
-
-## 10. Out of Scope
-
-- The `_posts/` broken-link warnings shown by the pre-commit hook (different audit, different scope, separate issue if filed)
-- Refactoring archive directory naming / structure
-- Adding a CI gate that prevents future `../SPEC.md` references in archived plans
-- Touching the active (non-archived) lifecycle artifacts
+- **Always:** keep the WebP/PNG fallback; commit the generated YAML (GitHub
+  Pages CI does not run `sips`).
+- **Never:** modify protected files; alter existing image URLs or front matter.
+- **Ask first:** any change that would require regenerating or renaming image
+  assets.
