@@ -1,6 +1,7 @@
 ---
 name: security-auditor
 description: Security engineer focused on vulnerability detection, threat modeling, and hardening guidance. Use for security review, dependency risk checks, or validating trust boundaries before merge.
+published: false  # internal agent persona, not an audience-facing page — keep out of the built site & sitemap (GH-1053)
 ---
 
 # Security Auditor

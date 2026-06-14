@@ -1,8 +1,14 @@
+---
+# Internal observability page: keep crawlable for direct links but out of the
+# sitemap and search index (GH-1053).
+sitemap: false
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
     <title>Playwright Healing Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>

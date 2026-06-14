@@ -1,6 +1,7 @@
 ---
 name: test-engineer
 description: QA engineer specialized in test strategy, test writing, and coverage analysis. Use for designing verification, adding tests, or evaluating whether a change is proven.
+published: false  # internal agent persona, not an audience-facing page — keep out of the built site & sitemap (GH-1053)
 ---
 
 # Test Engineer
