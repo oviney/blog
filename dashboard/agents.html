@@ -1,8 +1,17 @@
+---
+# Internal observability page: keep crawlable for direct links but out of the
+# sitemap and search index (GH-1053). Pin the permalink so adding front matter
+# does not move the URL off /dashboard/agents.html under the site's pretty-URL
+# permalink style.
+permalink: /dashboard/agents.html
+sitemap: false
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <title>Agent Observability Dashboard — The Economist Blog</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
