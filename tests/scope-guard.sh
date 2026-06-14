@@ -15,6 +15,8 @@
 #   G. 21 files modified, PR_LABELS=bulk-content              → passes (canonical bypass preserved)
 #   H. .github/skills/... modified, PR_LABELS=governance-update → passes (canonical bypass preserved)
 #   I. Static-config invariant: PROTECTED_FILE_UPDATE_BYPASS ⊆ PROTECTED_FILES
+#   J. _sass/ modified, PR_LABELS=agent:qa-gatekeeper → fails (Rule 4 forbidden-zone; canonical agent label)
+#   K. _sass/ modified, PR_LABELS=agent:qa-gatekeeper-trainee (substring superset) → passes (Rule 4 anchored; not an agent label)
 #
 # Dependencies: bash, git. Same constraint as the script under test.
 
@@ -199,6 +201,25 @@ run_case "H: .github/skills/ modified, canonical governance-update label → Rul
   ".github/skills/scope-guard-test/SKILL.md" \
   "0" \
   "governance-update label present — skipping rule 3"
+
+# Rule 4 (agent-scope) anchoring. A _sass/ file is in the forbidden zone for
+# agent:qa-gatekeeper but trips no other rule, so it cleanly isolates Rule 4.
+# Case J pins the canonical exact label still routing into the forbidden-zone
+# ruleset; Case K pins the anchor — a confusable superset ('…-trainee') must
+# NOT be treated as the agent label (an unanchored `grep -q` would mis-route it
+# and wrongly enforce the forbidden zone). Migrated to has_label() alongside
+# Rules 1–3.
+run_case "J: _sass/ modified, canonical agent:qa-gatekeeper label → guard fails on agent-scope" \
+  "agent:qa-gatekeeper" \
+  "_sass/scope-guard-test.scss" \
+  "1" \
+  "VIOLATION [agent-scope/agent:qa-gatekeeper]"
+
+run_case "K: _sass/ modified, confusable agent:qa-gatekeeper-trainee substring label → not an agent label, guard passes" \
+  "agent:qa-gatekeeper-trainee" \
+  "_sass/scope-guard-test.scss" \
+  "0" \
+  "no agent label found in PR_LABELS"
 
 # Static-config invariant: every entry in PROTECTED_FILE_UPDATE_BYPASS must
 # also appear in PROTECTED_FILES. The two arrays live adjacent in the script
