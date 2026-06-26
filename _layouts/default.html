@@ -22,6 +22,20 @@
     page's SEO metadata (GH-1054). Per-page titles/descriptions come from front
     matter and are rendered by seo-tag.
   {%- endcomment -%}
+  {%- comment -%}
+    Web fonts loaded at the document level (not via a CSS @import inside
+    styles.css) so the browser discovers them at first byte and fetches them in
+    parallel with the stylesheet — a CSS @import serialises font discovery behind
+    styles.css and delays text rendering (BLOG-019 / GH-1084). preconnect warms
+    the gstatic connection; display=swap keeps text readable during load; the
+    $font-serif/$font-sans stacks provide the fallbacks. Individual font files
+    are intentionally not preloaded — Google rotates their versioned gstatic
+    URLs, so a hardcoded preload would rot; preconnect is the safe optimisation.
+  {%- endcomment -%}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap">
+
   <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
 
   <!-- Favicon -->
