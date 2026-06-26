@@ -714,12 +714,18 @@ professional Person profile.
 Some article URLs contain awkward or truncated slugs. Existing indexed URLs
 should remain stable, while future URLs should be concise and intentional.
 
+**Status (2026-06-25): Shipped.** Policy documented in
+[`docs/URL_SLUG_POLICY.md`](URL_SLUG_POLICY.md); `scripts/validate-post-quality.sh`
+now errors on slugs > 60 chars and warns at ≥ 55 chars or on double hyphens.
+Existing slugs are grandfathered (no `jekyll-redirect-from`; `Gemfile` protected),
+so no live URL changes.
+
 **Acceptance criteria:**
 
-- [ ] Document a maximum practical slug length and naming convention.
-- [ ] New posts use concise, complete, keyword-relevant slugs.
-- [ ] Existing URLs are not changed without permanent redirects.
-- [ ] The publishing workflow detects accidental truncation.
+- [x] Document a maximum practical slug length and naming convention.
+- [x] New posts use concise, complete, keyword-relevant slugs.
+- [x] Existing URLs are not changed without permanent redirects.
+- [x] The publishing workflow detects accidental truncation.
 
 **Verification:**
 
