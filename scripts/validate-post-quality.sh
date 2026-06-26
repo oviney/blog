@@ -303,6 +303,34 @@ for post in $POSTS; do
     fi
   fi
 
+  # ------------------------------------------------------------------
+  # 15. URL slug policy — length + truncation signals
+  #     [ERROR > 60 chars, WARNING >= 55 chars or double-hyphen]
+  #     The slug is the post filename minus the YYYY-MM-DD- date prefix and
+  #     extension (permalink is /:year/:month/:day/:title/). Existing indexed
+  #     URLs are immutable — there is no jekyll-redirect-from — so this gate
+  #     guards NEW slugs against the truncation that produced the legacy
+  #     60-char slugs. See docs/URL_SLUG_POLICY.md.
+  # ------------------------------------------------------------------
+  slug="$(basename "$post")"
+  slug="${slug%.*}"                                              # strip extension
+  slug="${slug#[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-}"     # strip date prefix
+  slug_len=${#slug}
+  if [[ $slug_len -gt 60 ]]; then
+    echo "❌  $rel — slug is ${slug_len} chars (hard cap 60); shorten to a concise, complete phrase (docs/URL_SLUG_POLICY.md)"
+    ERRORS=$((ERRORS + 1))
+    post_errors=$((post_errors + 1))
+  elif [[ $slug_len -ge 55 ]]; then
+    echo "⚠️   $rel — slug is ${slug_len} chars (truncation-prone, soft cap 55); verify it is a complete phrase, not cut mid-word"
+    WARNINGS=$((WARNINGS + 1))
+    post_warnings=$((post_warnings + 1))
+  fi
+  if [[ "$slug" == *--* ]]; then
+    echo "⚠️   $rel — slug contains a double hyphen ('--'); use single hyphens between words"
+    WARNINGS=$((WARNINGS + 1))
+    post_warnings=$((post_warnings + 1))
+  fi
+
   # Print pass marker for clean posts
   if [[ $post_errors -eq 0 && $post_warnings -eq 0 ]]; then
     echo "✅  $rel"
