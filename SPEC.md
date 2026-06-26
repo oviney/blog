@@ -1,54 +1,49 @@
-# SPEC — BLOG-024: Durable URL slug policy + truncation gate
+# SPEC — BLOG-019: Replace render-blocking Google Fonts CSS `@import`
 
 **Stream:** GROWTH_DESIGN_BACKLOG · **Priority:** P2 · **Scope:** S · **Dependencies:** None
-**Date:** 2026-06-25 · **Label:** `agent:qa-gatekeeper`
+**Date:** 2026-06-26 · **Label:** `agent:creative-director` · **Issue:** #1084
 
 ---
 
 ## 1. Objective
 
-Some early article slugs were truncated mid-word by an upstream tool (e.g.
-`…-and-sustai`, `…-maintenance-savi`, `…-industrial-revolut`). Those URLs are
-indexed and immutable. Establish a documented slug convention and a build-time
-check that **detects accidental truncation in new posts** without changing any
-existing URL.
+`assets/css/styles.scss` discovers the web fonts (Merriweather + Inter) via a CSS
+`@import`, so the browser cannot fetch them until `styles.css` has downloaded and
+parsed — font discovery is serialised behind the stylesheet, delaying text
+rendering. Move discovery to the document level with no typography change.
 
 ## 2. Approach
 
-The site permalink is `/:year/:month/:day/:title/`; the slug is the post filename
-minus the `YYYY-MM-DD-` prefix and extension. `jekyll-redirect-from` is absent and
-`Gemfile` is protected, so existing slugs cannot be renamed — they are
-grandfathered.
-
-1. Document the policy in `docs/URL_SLUG_POLICY.md`: lowercase-hyphen, complete
-   words, target ≤50 / soft cap 55 / hard cap 60 chars, no double hyphens,
-   existing-URLs-immutable rule.
-2. Extend `scripts/validate-post-quality.sh` (which already has a 0/1/2
-   ERROR/WARNING model wired into CI) with a slug check:
-   - **ERROR** if slug length > 60 (hard cap — no existing post exceeds 60, so
-     CI is not retroactively broken; new over-long slugs are blocked).
-   - **WARNING** if slug length ≥ 55 (truncation-prone) or contains `--`.
-3. No protected files; no existing post renamed; warnings are non-blocking
-   (both workflows gate only on exit 1).
+1. Remove the `@import url('…fonts.googleapis.com/css2?…')` from
+   `assets/css/styles.scss`.
+2. In `_layouts/default.html` `<head>`, before `styles.css`, add:
+   - `<link rel="preconnect" href="https://fonts.googleapis.com">`
+   - `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>`
+   - `<link rel="stylesheet" href="…css2?family=Merriweather:…&family=Inter:…&display=swap">`
+3. Same families/weights as before → no typography change (BLOG-015 not a
+   dependency). `$font-serif`/`$font-sans` fallback stacks are unchanged.
+4. Individual font files are intentionally not preloaded (Google rotates its
+   versioned gstatic URLs; preconnect is the safe warm-up). Full self-hosting is
+   noted as a future privacy enhancement.
 
 ## 3. Acceptance criteria
 
-- [x] **AC-1** Maximum practical slug length + naming convention documented
-      (`docs/URL_SLUG_POLICY.md`).
-- [x] **AC-2** Guidance present so new posts use concise, complete,
-      keyword-relevant slugs.
-- [x] **AC-3** Existing URLs unchanged (no `_posts/` renames; legacy slugs
-      grandfathered as non-blocking warnings).
-- [x] **AC-4** The publishing workflow detects accidental truncation: slug > 60
-      → build error; ≥ 55 or `--` → advisory warning.
-- [x] **AC-5** Build-time validation added and CI-wired (the gate already runs in
-      `test-build.yml` and `test-quality.yml`); verified exit 2 on current posts
-      (0 errors, 5 warnings) so `main` CI stays green.
-- [x] **AC-6** No protected file touched (`_config.yml`, `Gemfile`,
-      `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`).
+- [x] **AC-1** Font `@import` removed from the compiled stylesheet
+      (`_site/assets/css/styles.css` has no `@import`/`fonts.googleapis`).
+- [x] **AC-2** Fonts loaded via optimised document-level links (preconnect +
+      `<link>` in `<head>`, ahead of `styles.css`).
+- [x] **AC-3** `font-display: swap` retained (readable text during load).
+- [x] **AC-4** No over-preloading: preconnect only; no brittle per-file preload.
+- [x] **AC-5** Fallback stacks retained ($font-serif / $font-sans unchanged);
+      computed fonts still resolve to the Merriweather/Inter stacks; all six
+      weights load; CLS = 0 (no swap regression).
+- [x] **AC-6** No protected file touched; `bundle exec jekyll build` exits 0.
 
 ## 4. Commands
 
 ```bash
-bash scripts/validate-post-quality.sh    # AC-4/AC-5 — expect exit 2 (warnings only)
+bundle exec jekyll build
+grep -c 'fonts.googleapis\|@import' _site/assets/css/styles.css   # expect 0
+# Real-browser: document.fonts shows Inter 400/600/700 + Merriweather 400/400i/700
+# loaded; computed font-family = Merriweather stack; CLS = 0.
 ```

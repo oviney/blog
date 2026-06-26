@@ -590,13 +590,19 @@ assets for appropriate dimensions and compression.
 
 Fonts are currently discovered through a CSS `@import`, which delays loading.
 
+**Status (2026-06-26): Shipped.** The CSS `@import` was removed from
+`assets/css/styles.scss`; Merriweather + Inter now load via `preconnect` +
+document-level `<link>` in `_layouts/default.html` `<head>`, ahead of
+`styles.css`. Same families/weights, `display=swap` retained, fallback stacks
+unchanged. Self-hosting (fuller privacy win) deferred as a future enhancement.
+
 **Acceptance criteria:**
 
-- [ ] Remove the font `@import` from the compiled stylesheet.
-- [ ] Self-host fonts or load them through optimized document-level links.
-- [ ] Use `font-display` behavior that preserves readable text.
-- [ ] Preload only fonts proven to be critical.
-- [ ] Retain appropriate fallback font stacks.
+- [x] Remove the font `@import` from the compiled stylesheet.
+- [x] Self-host fonts or load them through optimized document-level links.
+- [x] Use `font-display` behavior that preserves readable text.
+- [x] Preload only fonts proven to be critical.
+- [x] Retain appropriate fallback font stacks.
 
 **Verification:**
 
