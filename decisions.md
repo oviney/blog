@@ -86,4 +86,14 @@ configuration, design conventions, or content standards.
 
 ---
 
+## ADR-009: Split-Scope Work Uses Sequential Issues, Not Mixed-Scope PRs
+
+**Date**: May 2026
+**Status**: Active
+**Context**: When one feature crosses agent ownership boundaries — e.g. issue #954 needed a Creative Director-owned template change plus a QA Gatekeeper-owned Playwright follow-up — combining both into a single PR mixes forbidden file groups and trips the scope gates in `scripts/check-pr-scope.sh`. Splitting #954 (template) and #968 (test) was correct, but #968 was intentionally stacked on top of the unmerged #954 branch, so it was not merge-ready against `main` until #954 landed or #968 was rebased. That nuance was enforced by scope rules and review but never written down, so agents kept rediscovering it as if it were a code defect.
+**Decision**: Split-scope work uses sequential issues and branches, one per ownership scope — never a single mixed-scope PR. A follow-up branch may be stacked on its unmerged parent for local iteration, but before merge it must either wait for the parent to land or be rebased onto `main`, and it must be reviewed and scope-checked relative to the branch it actually targets.
+**Consequences**: Agents must not combine forbidden file groups to "save a PR." A stacked follow-up failing CI or scope checks against `main` is a workflow state (wrong base), not a code defect — rebase or wait for the parent rather than debugging the diff. PR descriptions for stacked branches should name the parent branch/issue they depend on.
+
+---
+
 *Add new decisions below this line, following the ADR-NNN format.*
