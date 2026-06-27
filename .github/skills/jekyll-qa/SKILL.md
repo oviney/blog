@@ -518,29 +518,6 @@ When merging despite CI failures:
 **Merging to main.**
 ```
 
-**Real-World Case Study (Issue #33):**
-```markdown
-## ✅ Approved for Merge (CI Override) - Issue #33
-
-**Override Reason:** Pa11y false positive on color contrast
-
-**Evidence:**
-- Colors externally verified as AAA compliant
-- External tools confirmed contrast ratios meet WCAG standards
-- Pa11y CI environment rendering issue documented
-
-**Other CI Status:**
-- ✅ Jekyll Build: Passing
-- ⚠️ Pa11y: Override (false positive - AAA verified externally)
-- ✅ Visual Regression: Approved (intentional Economist design changes)
-- ✅ All acceptance criteria met
-
-**Decision:** Merged using PR Merge Decision Matrix (Section 2.6)
-**Sign-off:** Flow Orchestrator with Creative Director approval
-**Commit:** 60b6aac
-**Date:** January 5, 2026
-```
-
 **Merge Without Overrides:**
 ```markdown
 ## ✅ Approved for Merge
