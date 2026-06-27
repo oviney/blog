@@ -2,6 +2,7 @@
 layout: default
 title: Security
 permalink: /security/
+description: Reporting and analysis on security debt, enterprise defence, and the operational trade-offs that shape resilient systems.
 ---
 
 <div class="topic-page">

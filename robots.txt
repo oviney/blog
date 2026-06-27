@@ -11,7 +11,7 @@ Disallow: /.github/
 Disallow: /docs/
 
 # Sitemap location
-Sitemap: http://localhost:4000/sitemap.xml
+Sitemap: https://www.viney.ca/sitemap.xml
 
 # Crawl delay (optional, helps with server load)
 Crawl-delay: 1

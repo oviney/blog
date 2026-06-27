@@ -163,6 +163,17 @@ Break the plan into discrete, implementable tasks:
   - Files: [Which files will be touched]
 ```
 
+**Writing verification commands for markdown structures.** When a `Verify:`
+step counts items in a markdown list, prefer `grep -A N "<header>" | grep -c "^- "`
+over an awk range like `awk '/^<header>/,/^$/'`. A markdown list is usually
+separated from its bold header by a blank line, and the awk range terminates on
+that first `/^$/` *before* it ever reaches a bullet — so it silently returns `0`
+instead of the real count. Example: to count the bullets under a
+`**Never persist to memory:**` header, use
+`grep -A 6 "Never persist to memory" file.md | grep -c "^- "` (returns the true
+count), not the awk range (returns `0`). Pick the `-A N` window large enough to
+span the list.
+
 ### Phase 4: Implement
 
 Execute tasks one at a time following the repo's `build` and `test` workflows,

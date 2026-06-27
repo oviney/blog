@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Quality Engineering Insights
+description: Two decades of software and quality engineering distilled into practical insights on test strategy, automation ROI, and engineering leadership.
 ---
 
 <div class="homepage">

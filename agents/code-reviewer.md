@@ -1,6 +1,7 @@
 ---
 name: code-reviewer
 description: Senior code reviewer for viney.ca blog. Evaluates changes across correctness, style, architecture, security, and accessibility. Use for thorough PR review before merge.
+published: false  # internal agent persona, not an audience-facing page — keep out of the built site & sitemap (GH-1053)
 ---
 
 # Senior Code Reviewer

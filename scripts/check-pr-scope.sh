@@ -152,13 +152,17 @@ else
   AGENT_LABEL=""
   FORBIDDEN_PATTERN=""
 
-  if echo "$PR_LABELS" | grep -q "agent:creative-director"; then
+  # Exact-match via has_label() (same anchoring as Rules 1–3). Agent labels are
+  # a fixed enum, but an unanchored grep would mis-route a confusable superset
+  # label (e.g. 'agent:qa-gatekeeper-trainee') into a forbidden-zone ruleset.
+  # Precedence (creative-director > qa-gatekeeper > editorial) is preserved.
+  if has_label "agent:creative-director"; then
     AGENT_LABEL="agent:creative-director"
     FORBIDDEN_PATTERN="^\.github/workflows/|^tests/|^scripts/|^_posts/|^_config\.yml$"
-  elif echo "$PR_LABELS" | grep -q "agent:qa-gatekeeper"; then
+  elif has_label "agent:qa-gatekeeper"; then
     AGENT_LABEL="agent:qa-gatekeeper"
     FORBIDDEN_PATTERN="^_sass/|^_layouts/|^_posts/|^_config\.yml$"
-  elif echo "$PR_LABELS" | grep -qE "agent:editorial-chief|agent:editorial-manager"; then
+  elif has_label "agent:editorial-chief" || has_label "agent:editorial-manager"; then
     AGENT_LABEL="agent:editorial-chief"
     FORBIDDEN_PATTERN="^_sass/|^_layouts/|^\.github/workflows/|^tests/|^scripts/|^_config\.yml$"
   fi

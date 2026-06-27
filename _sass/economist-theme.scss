@@ -594,6 +594,7 @@ blockquote {
 
   img[src*="/charts/"] {
     max-width: 500px !important; // Override any other styles
+    height: auto; // Preserve aspect ratio against intrinsic width/height attrs (BLOG-017b)
     margin: $spacing-md auto; // Center with reduced margins
     border-radius: $radius-sm;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -1337,9 +1338,10 @@ table {
     display: flex;
   }
 
-  // Hide nav by default on mobile; shown when .nav-open is set on body.
-  // Only applies when JS is active (.js-nav-enabled) — progressive enhancement:
-  // without JS the nav remains visible so users can always reach navigation.
+  // Hide nav by default on mobile; shown when .nav-open is set on the document
+  // element. Only applies when JS is active (.js-nav-enabled, set in <head>
+  // before first paint — GH-1071) — progressive enhancement: without JS the nav
+  // remains visible so users can always reach navigation.
   .js-nav-enabled .site-nav {
     display: none;
     border-bottom: 1px solid $border-color;

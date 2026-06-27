@@ -2,6 +2,7 @@
 layout: page
 title: About
 permalink: /about/
+description: Ouray Viney — Quality Engineering leader with 20+ years in software testing and automation, writing on test strategy, automation ROI, and quality metrics.
 ---
 
 # About

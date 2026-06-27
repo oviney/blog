@@ -89,23 +89,35 @@ class HealingMonitor {
       };
     }
 
-    // Run BackstopJS visual tests (keep existing logic)
-    console.log('🖼️ Running BackstopJS visual tests...');
-    try {
-      execSync('npm run test:visual', { encoding: 'utf8' });
-      results.suites.visual = {
-        passed: 15,
-        failed: 0,
-        successRate: 100,
-        status: 'pass'
-      };
-    } catch (error) {
+    // Run BackstopJS visual tests (skip in CI). BackstopJS needs a running
+    // Jekyll server and browser binaries, neither of which exist in the
+    // monitor job — running it there hangs until the job timeout (GH-1059).
+    if (process.env.CI) {
+      console.log('⏭️ Skipping BackstopJS visual tests in CI monitor job (no server/browsers)');
       results.suites.visual = {
         passed: 0,
-        failed: 15,
+        failed: 0,
         successRate: 0,
-        status: 'fail'
+        status: 'skipped'
       };
+    } else {
+      console.log('🖼️ Running BackstopJS visual tests...');
+      try {
+        execSync('npm run test:visual', { encoding: 'utf8' });
+        results.suites.visual = {
+          passed: 15,
+          failed: 0,
+          successRate: 100,
+          status: 'pass'
+        };
+      } catch (error) {
+        results.suites.visual = {
+          passed: 0,
+          failed: 15,
+          successRate: 0,
+          status: 'fail'
+        };
+      }
     }
 
     // Calculate overall metrics

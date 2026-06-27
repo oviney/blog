@@ -2,6 +2,7 @@
 layout: default
 title: Software Engineering
 permalink: /software-engineering/
+description: Systematic methods, architectural decisions, and engineering practices that distinguish sustainable software from ad-hoc coding.
 ---
 
 <div class="topic-page">

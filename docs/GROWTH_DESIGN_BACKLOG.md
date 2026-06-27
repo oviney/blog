@@ -533,6 +533,32 @@ and `height` attributes.
 
 **Dependencies:** None
 
+### BLOG-017b: Intrinsic dimensions for in-content (Markdown) chart images
+
+**Priority:** P1
+**Area:** Performance / Layout stability
+**Estimated scope:** S
+
+BLOG-017 reserved layout space for front-matter hero/card/featured images via
+`_includes/responsive-image.html`. The 22 in-content chart images authored as
+Markdown (`![alt](/assets/charts/*)`) bypass that include — Kramdown renders
+them as bare `<img>` tags with no dimensions, so they still cause layout shift.
+
+**Acceptance criteria:**
+
+- [ ] In-content chart images render with intrinsic width and height from the
+      existing `_data/image_dimensions.yml` map.
+- [ ] No source Markdown is edited; tags already carrying dimensions are left
+      unchanged (idempotent).
+- [ ] Images absent from the map degrade gracefully.
+
+**Verification:**
+
+- [ ] `bundle exec jekyll build` exits 0 and built `<img>` tags for
+      `/assets/charts/*` carry width/height.
+
+**Dependencies:** BLOG-017
+
 ### BLOG-018: Optimize large raster assets
 
 **Priority:** P1
@@ -564,13 +590,19 @@ assets for appropriate dimensions and compression.
 
 Fonts are currently discovered through a CSS `@import`, which delays loading.
 
+**Status (2026-06-26): Shipped.** The CSS `@import` was removed from
+`assets/css/styles.scss`; Merriweather + Inter now load via `preconnect` +
+document-level `<link>` in `_layouts/default.html` `<head>`, ahead of
+`styles.css`. Same families/weights, `display=swap` retained, fallback stacks
+unchanged. Self-hosting (fuller privacy win) deferred as a future enhancement.
+
 **Acceptance criteria:**
 
-- [ ] Remove the font `@import` from the compiled stylesheet.
-- [ ] Self-host fonts or load them through optimized document-level links.
-- [ ] Use `font-display` behavior that preserves readable text.
-- [ ] Preload only fonts proven to be critical.
-- [ ] Retain appropriate fallback font stacks.
+- [x] Remove the font `@import` from the compiled stylesheet.
+- [x] Self-host fonts or load them through optimized document-level links.
+- [x] Use `font-display` behavior that preserves readable text.
+- [x] Preload only fonts proven to be critical.
+- [x] Retain appropriate fallback font stacks.
 
 **Verification:**
 
@@ -688,12 +720,18 @@ professional Person profile.
 Some article URLs contain awkward or truncated slugs. Existing indexed URLs
 should remain stable, while future URLs should be concise and intentional.
 
+**Status (2026-06-25): Shipped.** Policy documented in
+[`docs/URL_SLUG_POLICY.md`](URL_SLUG_POLICY.md); `scripts/validate-post-quality.sh`
+now errors on slugs > 60 chars and warns at ≥ 55 chars or on double hyphens.
+Existing slugs are grandfathered (no `jekyll-redirect-from`; `Gemfile` protected),
+so no live URL changes.
+
 **Acceptance criteria:**
 
-- [ ] Document a maximum practical slug length and naming convention.
-- [ ] New posts use concise, complete, keyword-relevant slugs.
-- [ ] Existing URLs are not changed without permanent redirects.
-- [ ] The publishing workflow detects accidental truncation.
+- [x] Document a maximum practical slug length and naming convention.
+- [x] New posts use concise, complete, keyword-relevant slugs.
+- [x] Existing URLs are not changed without permanent redirects.
+- [x] The publishing workflow detects accidental truncation.
 
 **Verification:**
 

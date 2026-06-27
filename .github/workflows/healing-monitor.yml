@@ -11,12 +11,10 @@ on:
       - 'scripts/healing-monitor.js'
       - 'scripts/alert-system.js'
       - '.github/workflows/healing-monitor.yml'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'tests/playwright-agents/**'
-      - 'scripts/healing-monitor.js'
-      - 'scripts/alert-system.js'
+  # NOTE: intentionally NOT triggered on pull_request. This is an observability
+  # job (it computes a healing success-rate metric and updates the dashboard),
+  # not a quality gate, so it must not red-flag PRs. Correctness on PRs is
+  # already covered by the required Playwright jobs. See GH-1059.
   workflow_dispatch:
     inputs:
       force_analysis:
@@ -55,7 +53,7 @@ jobs:
 
     steps:
     - name: 📥 Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
 
@@ -217,7 +215,7 @@ jobs:
 
     steps:
     - name: 📥 Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
 
@@ -562,7 +560,7 @@ jobs:
 
     steps:
     - name: 📥 Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
 
