@@ -1,7 +1,7 @@
 ---
 name: jekyll-qa
 description: 'QA and CI/CD pipeline management. Use when reviewing PRs, diagnosing CI failures, running Playwright tests, checking accessibility, or verifying production deploys.'
-version: 2.1.0
+version: 2.2.0
 triggers:
   - PR created for bug fix or feature
   - Need to review code changes
@@ -43,7 +43,23 @@ Optional: Steps to Reproduce, Reference/Screenshots, Affected URL
 - `lighthouse ^12.8.2`
 - `package.json` override `lodash: ^4.18.1` — predates pa11y-ci 4.1.1 and may still be load-bearing for other transitive deps; do not remove without auditing the dep graph (see #944 closing notes)
 
-## S0. Diagnose CI Failures (FIRST STEP)
+## Visual Verification Gate (FIRST GATE — before trusting CI)
+
+**CI green is not proof a page looks right.** Pa11y checks accessibility, Lighthouse checks performance, and BackstopJS only catches *diffs against a stored baseline* — none of them verify that a layout is visually correct. A bug on an untested page or viewport, or one baked into an approved baseline, passes every check. Visual defects reach production precisely when the gate trusts CI instead of looking at the rendered page.
+
+**Before approving or merging any change that touches SCSS, `_layouts/`, `_includes/`, or page templates, you MUST view the rendered page yourself:**
+
+1. Serve locally: `bundle exec jekyll serve --config _config.yml,_config_dev.yml`
+2. Render and inspect each affected page at **320, 768, 1024, and 1440px**. In a Claude session use the browser MCP tools (`mcp__claude-in-chrome__*` or `mcp__playwright-test__browser_*`) and capture a screenshot at each width; otherwise use DevTools device mode.
+3. Judge against **design intent**, not just the baseline: horizontal scroll/overflow, broken or collapsed spacing, overlapping or clipped elements, broken images, misaligned cards, wrong font rendering.
+4. Spot-check **non-target pages** (home, a post, an archive page) — a fix on one page routinely breaks a shared component elsewhere.
+5. Compare against production (https://www.viney.ca) to confirm you are fixing, not regressing.
+
+**Never sign off "✅ tested at breakpoints" unless you actually rendered and looked at each one.** If you cannot render the page, say so and **block** approval — never approve on CI alone.
+
+**A visual fix is incomplete until you add the guard that would have caught it:** a Playwright responsive assertion in `tests/playwright-agents/` and/or a refreshed BackstopJS baseline for the affected page/viewport. Otherwise the bug returns the next time someone touches that SCSS.
+
+## S0. Diagnose CI Failures (when CI is red)
 
 **When CI tests are failing, ALWAYS investigate before making changes.**
 
@@ -500,29 +516,6 @@ When merging despite CI failures:
 **Sign-off:** @QA-Gatekeeper with @Creative-Director design approval
 
 **Merging to main.**
-```
-
-**Real-World Case Study (Issue #33):**
-```markdown
-## ✅ Approved for Merge (CI Override) - Issue #33
-
-**Override Reason:** Pa11y false positive on color contrast
-
-**Evidence:**
-- Colors externally verified as AAA compliant
-- External tools confirmed contrast ratios meet WCAG standards
-- Pa11y CI environment rendering issue documented
-
-**Other CI Status:**
-- ✅ Jekyll Build: Passing
-- ⚠️ Pa11y: Override (false positive - AAA verified externally)
-- ✅ Visual Regression: Approved (intentional Economist design changes)
-- ✅ All acceptance criteria met
-
-**Decision:** Merged using PR Merge Decision Matrix (Section 2.6)
-**Sign-off:** Flow Orchestrator with Creative Director approval
-**Commit:** 60b6aac
-**Date:** January 5, 2026
 ```
 
 **Merge Without Overrides:**
@@ -1249,6 +1242,7 @@ gh pr list --repo oviney/blog --state open \
 
 ## Version History
 
+- **2.2.0** (2026-06-27): Promoted eyes-on-render to a hard **Visual Verification Gate** at the top of the skill (previously only a buried "Pitfall" and a conditional §2.5 step) — CI green is not proof a page renders correctly; BackstopJS only catches diffs from a baseline. Wired in the browser MCP tools for in-session rendering. Removed the stale Issue #33 "Real-World Case Study" block (hardcoded commit/date) to reduce context bloat.
 - **2.1.0** (2026-04-26): Added automated post-deploy smoke-suite enforcement via `production-smoke-tests.yml` and `scripts/production-smoke-tests.sh`; clarified that §§ 6.2–6.6 remain follow-on automation work
 - **2.0.0** (2026-04-10): Major upgrade — production quality engineering disciplines:
   - Added § 6: Production Test Strategy (smoke tests, link check, content integrity, image integrity, performance baseline, Pa11y baseline)
