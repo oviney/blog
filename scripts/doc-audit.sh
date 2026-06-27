@@ -38,6 +38,22 @@ ensure_label() {
     --repo "$REPO" 2>/dev/null || true
 }
 
+normalize_path() {
+  # Resolve ./ and ../ segments in a path using string ops (no realpath, so it
+  # works for paths that do not exist on disk). Echoes a repo-relative path.
+  local resolved="$1" out="" part
+  local IFS='/'
+  read -ra parts <<< "$resolved"
+  for part in "${parts[@]}"; do
+    case "$part" in
+      ""|.) ;;
+      ..) out="${out%/*}" ;;
+      *)  out="${out}/${part}" ;;
+    esac
+  done
+  echo "${out#/}"
+}
+
 resolve_site_route() {
   local link_path="${1#/}"
   link_path="${link_path%/}"
@@ -390,27 +406,84 @@ fi
 echo ""
 echo "=== Check 3: Back-tick file paths in docs ==="
 
-# Look for `path/to/file` patterns that look like repo file paths
-# (contain a `/`, don't start with http, and end in a known extension or no extension)
+# A back-tick token that looks like a repo-internal file path (`dir/file.ext`)
+# should resolve to something on disk. The naive "any token with a slash that
+# does not exist" heuristic produced a flood of false positives (relative links
+# it never resolved, branch names, org/repo refs, GitHub Action shorthands,
+# npm scoped packages, prose like `try/catch`, and archived task scratch). A
+# token is only treated as a candidate repo path when ALL of these hold:
+#   * it is not a URL, glob, shell var, regex, anchor, scoped package (`@scope/x`),
+#     home path (`~/...`), git path (`.git/...`), or placeholder (`...`, `{x}`,
+#     `YYYY`, `SPRINT_X`, `_X_`);
+#   * after stripping a trailing `:line`/`:start-end` suffix and resolving `./`
+#     and `../` relative to the markdown file (and a leading `/` relative to the
+#     repo root, mirroring Check 1), its FIRST path segment is an existing
+#     top-level repo entry — i.e. it points *into* the repo rather than being
+#     prose that merely contains a slash (`oviney/blog`, `actions/cache`,
+#     `feat/123-foo`, `economist-theme/SKILL.md`).
+# Documented illustrative / immutable-historical example paths that are
+# intentionally non-existent are listed in EXAMPLE_PATHS and skipped.
+
+# Resolved repo-relative paths that are intentionally non-existent. Keep this
+# list short and justified — each entry needs a reason.
+EXAMPLE_PATHS=(
+  "assets/images/slug-matching-post.png"   # naming-convention example in editorial docs
+  "assets/charts/slug-matching-post.png"   # naming-convention example in editorial docs
+  "docs/skills"                            # historical reference in the 2026-04-06 incident RCA
+)
+
 missing_paths=()
 
 while IFS= read -r md_file; do
+  md_dir=$(dirname "$md_file")
   while IFS= read -r raw_path; do
     # Trim surrounding back-ticks
     p="${raw_path//\`/}"
-    # Skip: URLs, anchors, globs, shell vars, patterns with spaces
+    # Skip URLs, globs, shell vars, regex, anchors, scoped pkgs, home/git paths
     [[ "$p" == http* ]] && continue
     [[ "$p" == *' '* ]] && continue
     [[ "$p" == *'*'* ]] && continue
     [[ "$p" == *'$'* ]] && continue
-    [[ "$p" == *'<'* ]] && continue
-    [[ "$p" == *'>'* ]] && continue
+    [[ "$p" == *'<'* || "$p" == *'>'* ]] && continue
+    [[ "$p" == *'{'* || "$p" == *'}'* ]] && continue
+    [[ "$p" == *'['* || "$p" == *']'* ]] && continue
+    [[ "$p" == *'('* || "$p" == *')'* ]] && continue
+    [[ "$p" == *'\'* ]] && continue
+    [[ "$p" == *"'"* ]] && continue
+    [[ "$p" == *'#'* ]] && continue
+    [[ "$p" == *'@'* ]] && continue
+    [[ "$p" == '~'* ]] && continue
+    [[ "$p" == .git/* ]] && continue
+    [[ "$p" == *'...'* || "$p" == *'…'* ]] && continue
+    [[ "$p" == *YYYY* || "$p" == *_X_* || "$p" == *SPRINT_X* ]] && continue
     # Must look like a path (contains /)
     [[ "$p" != */* ]] && continue
-    # Must have a recognisable extension or end without extension (directory)
-    if [[ ! -e "$p" ]]; then
+    # Strip a trailing :line or :start-end reference (e.g. file.rb:42, file.sh:73-79)
+    pp="$p"
+    if [[ "$pp" =~ ^(.+):[0-9]+(-[0-9]+)?$ ]]; then
+      pp="${BASH_REMATCH[1]}"
+    fi
+    # Resolve to a repo-relative candidate path
+    if [[ "$pp" == /* ]]; then
+      candidate="$(normalize_path "${pp#/}")"
+    elif [[ "$pp" == ./* || "$pp" == ../* ]]; then
+      candidate="$(normalize_path "${md_dir}/${pp}")"
+    else
+      candidate="$(normalize_path "$pp")"
+    fi
+    [[ -z "$candidate" ]] && continue
+    # Only treat as a repo path when its first segment is a real top-level entry
+    first_segment="${candidate%%/*}"
+    [[ ! -e "$first_segment" ]] && continue
+    # Skip documented illustrative / historical example paths
+    skip_example=false
+    for ex in "${EXAMPLE_PATHS[@]}"; do
+      if [[ "$candidate" == "$ex" ]]; then skip_example=true; break; fi
+    done
+    [[ "$skip_example" == true ]] && continue
+    if [[ ! -e "$candidate" ]]; then
       missing_paths+=("${md_file}: missing path → ${p}")
-      echo "  [missing] ${md_file}: ${p}"
+      echo "  [missing] ${md_file}: ${p} → ${candidate}"
     fi
   done < <(grep -oE '\`[^`]+/[^`]+\`' "$md_file" 2>/dev/null || true)
 done < <(find . \
@@ -420,6 +493,8 @@ done < <(find . \
   -not -path './_site/*' \
   -not -path './worktrees/*' \
   -not -path './.worktrees/*' \
+  -not -path './tasks/archive/*' \
+  -not -path './.claude/*' \
   -name '*.md' \
   | sort)
 
