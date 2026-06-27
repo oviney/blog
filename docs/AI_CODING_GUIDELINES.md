@@ -21,8 +21,8 @@ This file provides guidance for AI coding assistants (like GitHub Copilot, Claud
 
 When writing, editing, refactoring, or reviewing code:
 - Always follow `docs/conventions/software-design.md`
-- Look for standard implementation patterns in `docs/conventions/standard-patterns.md`
-- Avoid patterns listed in `docs/conventions/anti-patterns.md`
+- Look for standard implementation patterns in the "Standard Patterns" section of `docs/conventions/software-design.md`
+- Avoid patterns listed in the "Anti-Patterns to Avoid" section of `docs/conventions/software-design.md`
 - Respect the codebase structure defined in `docs/conventions/codebase-structure.md`
 - Follow testing conventions in `docs/conventions/testing.md`
 
