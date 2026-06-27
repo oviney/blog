@@ -45,7 +45,7 @@ description: Two decades of software and quality engineering distilled into prac
       {% endif %}
 
       <!-- Deliberately longer than discovery cards so the homepage hero stays distinct. -->
-      <p class="hero-post-excerpt">{{ hero_post.excerpt | strip_html | truncatewords: 40 }}</p>
+      <p class="hero-post-excerpt">{{ hero_post.description | default: hero_post.excerpt | strip_html | truncatewords: 40 }}</p>
 
       <div class="hero-post-meta">
         <time datetime="{{ hero_post.date | date_to_xmlschema }}">
@@ -128,7 +128,7 @@ description: Two decades of software and quality engineering distilled into prac
           <h3 class="topic-card-title">
             <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
           </h3>
-          <p class="topic-card-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
+          <p class="topic-card-excerpt">{{ post.description | default: post.excerpt | strip_html | truncatewords: 20 }}</p>
           {% include byline.html author=post.author container_class="topic-card-author" text_class="topic-card-author-name" %}
           <div class="topic-card-meta">
             <span class="topic-meta-item">{{ post.date | date: "%B %-d, %Y" }}</span>

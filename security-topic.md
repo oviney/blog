@@ -40,7 +40,7 @@ description: Reporting and analysis on security debt, enterprise defence, and th
             <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
           </h2>
 
-          <p class="topic-card-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
+          <p class="topic-card-excerpt">{{ post.description | default: post.excerpt | strip_html | truncatewords: 20 }}</p>
           {% include byline.html author=post.author container_class="topic-card-author" text_class="topic-card-author-name" %}
 
           <div class="topic-card-meta">
