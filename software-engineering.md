@@ -19,7 +19,7 @@ description: Systematic methods, architectural decisions, and engineering practi
       <article class="topic-card">
         {% if post.image %}
         <a href="{{ post.url | relative_url }}" class="topic-card-image">
-          <img src="{{ post.image | relative_url }}" alt="{{ post.title }}">
+          {% include responsive-image.html src=post.image alt=post.title loading="lazy" %}
         </a>
         {% else %}
         <a href="{{ post.url | relative_url }}" class="topic-card-image topic-card-image-placeholder" aria-label="{{ post.title }}">
