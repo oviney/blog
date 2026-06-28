@@ -195,7 +195,8 @@ body {
 .footer-rss-link,
 .author-bio-links a,
 .newsletter-button,
-.newsletter-rss-fallback {
+.newsletter-rss-fallback,
+.toc-title {
   &:focus-visible {
     outline: 3px solid $economist-red;
     outline-offset: 3px;

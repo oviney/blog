@@ -16,7 +16,7 @@ async function expectMinimumTouchTarget(locator, minimum = 44) {
   expect(box!.height).toBeGreaterThanOrEqual(minimum);
 }
 
-async function expectVisibleFocusIndicator(locator, page) {
+async function expectVisibleFocusIndicator(locator, page, { viaKeyboard = false, checkUnobscured = true } = {}) {
   await locator.scrollIntoViewIfNeeded();
   const before = await locator.evaluate((el) => {
     const styles = window.getComputedStyle(el);
@@ -29,6 +29,19 @@ async function expectVisibleFocusIndicator(locator, page) {
   });
 
   await locator.focus();
+  if (viaKeyboard) {
+    // Some elements/projects only match :focus-visible on real keyboard focus,
+    // not on programmatic .focus() (e.g. <summary>, and touch-emulating Mobile
+    // Chrome). Step away and Tab back so the keyboard-focus heuristic engages.
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Tab');
+    // macOS WebKit does not Tab-focus <button>s, so the dance can drop focus.
+    // WebKit applies :focus-visible to programmatic focus anyway, so re-focus.
+    const stillFocused = await locator.evaluate((el) => el === document.activeElement);
+    if (!stillFocused) {
+      await locator.focus();
+    }
+  }
   await expect(locator).toBeFocused();
 
   const after = await locator.evaluate((el) => {
@@ -51,15 +64,20 @@ async function expectVisibleFocusIndicator(locator, page) {
   const box = await locator.boundingBox();
   expect(box).not.toBeNull();
 
-  const isUnobscured = await locator.evaluate((el, point) => {
-    const top = document.elementFromPoint(point.x, point.y);
-    return !!top && (top === el || el.contains(top) || top.contains(el));
-  }, {
-    x: box!.x + box!.width / 2,
-    y: box!.y + box!.height / 2,
-  });
+  // The unobscured check is meaningful for real controls in the real layout
+  // (e.g. a sticky header overlapping a share button). It is skipped for
+  // synthesised elements whose placement the test controls itself.
+  if (checkUnobscured) {
+    const isUnobscured = await locator.evaluate((el, point) => {
+      const top = document.elementFromPoint(point.x, point.y);
+      return !!top && (top === el || el.contains(top) || top.contains(el));
+    }, {
+      x: box!.x + box!.width / 2,
+      y: box!.y + box!.height / 2,
+    });
 
-  expect(isUnobscured).toBeTruthy();
+    expect(isUnobscured).toBeTruthy();
+  }
 
   await page.keyboard.press('Escape').catch(() => {});
 }
@@ -337,6 +355,52 @@ test.describe('@navigation @REQ-A11Y-02 WCAG 2.2 focus and target checks', () =>
     for (const control of controls) {
       await expectMinimumTouchTarget(control);
     }
+  });
+
+  test('ToC summary toggle shows visible focus and meets target size', async ({ page }) => {
+    await page.goto(POST_URL);
+    await page.waitForLoadState('networkidle');
+
+    const summary = page.locator('#toc summary.toc-title');
+    await expect(summary).toBeVisible();
+
+    // <summary> only gets :focus-visible on keyboard focus.
+    await expectVisibleFocusIndicator(summary, page, { viaKeyboard: true });
+    // WCAG 2.5.8 minimum target size is 24×24 CSS px.
+    await expectMinimumTouchTarget(summary, 24);
+  });
+
+  test('in-content copy-code button shows visible focus and meets target size', async ({ page }) => {
+    await page.goto(POST_URL);
+    await page.waitForLoadState('networkidle');
+
+    // No published post currently contains a code block, and copy-code buttons
+    // are injected by the post layout only for `.article-content pre` elements.
+    // Synthesise the exact DOM the layout produces (see _layouts/post.html) so
+    // the .copy-code-btn focus + target-size contract is always exercised.
+    await page.evaluate(() => {
+      const container = document.querySelector('.article-content') || document.body;
+      const pre = document.createElement('pre');
+      pre.id = 'synthetic-code-block';
+      pre.style.position = 'relative';
+      pre.textContent = 'const answer = 42;';
+      const btn = document.createElement('button');
+      btn.className = 'copy-code-btn';
+      btn.setAttribute('aria-label', 'Copy code to clipboard');
+      btn.textContent = 'Copy';
+      pre.appendChild(btn);
+      container.appendChild(pre);
+    });
+
+    const copyBtn = page.locator('#synthetic-code-block .copy-code-btn');
+    await expect(copyBtn).toBeAttached();
+
+    // Keyboard focus so :focus-visible engages on touch-emulating projects
+    // (Mobile Chrome) too. The button is synthesised here, so the real-layout
+    // unobscured hit-test does not apply.
+    await expectVisibleFocusIndicator(copyBtn, page, { viaKeyboard: true, checkUnobscured: false });
+    // WCAG 2.5.8 minimum target size is 24×24 CSS px.
+    await expectMinimumTouchTarget(copyBtn, 24);
   });
 });
 
