@@ -499,14 +499,15 @@ blockquote {
     display: block;
   }
 
-  // Image credit caption (Economist style: "ILLUSTRATION: ROB FARMER")
+  // Image credit caption — renders in the authored sentence case so full
+  // captions stay readable (short credits can still be authored in caps).
   .image-credit {
     font-family: $font-sans;
     font-size: 0.6875rem;
     color: $text-tertiary;
     margin-top: $spacing-xs;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    text-transform: none;
+    letter-spacing: 0.02em;
     font-style: normal;
     font-weight: 400;
   }
