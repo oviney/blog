@@ -17,6 +17,16 @@ const EXCLUDED_SITEMAP_PATHS = [
   '/agents/test-engineer/',
 ];
 
+// Internal agent-persona definitions live in the repo-root `agents/` dir and
+// carry `published: false`. They must never build into reachable site pages —
+// a 200 here means the front-matter guard was removed and the internal agent
+// prompts leaked back into the published site (GH-1053 root cause).
+const INTERNAL_AGENT_PATHS = [
+  '/agents/code-reviewer/',
+  '/agents/security-auditor/',
+  '/agents/test-engineer/',
+];
+
 const RETAINED_SITEMAP_PATHS = [
   '/',
   '/about/',
@@ -49,6 +59,15 @@ test.describe('@seo @links Sitemap utility-page exclusions @REQ-CONTENT-01', () 
 
     for (const path of RETAINED_SITEMAP_PATHS) {
       expect(paths, `sitemap should still advertise ${path}`).toContain(path);
+    }
+  });
+
+  test('internal agent-persona pages are not served as built site pages', async ({ page }) => {
+    for (const path of INTERNAL_AGENT_PATHS) {
+      const response = await page.goto(path);
+      // published:false means Jekyll never builds these — the route must not
+      // resolve to a 200/styled page. A 200 here is the leak regression.
+      expect(response?.ok(), `${path} must not be served as a built page`).toBe(false);
     }
   });
 

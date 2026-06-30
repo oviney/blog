@@ -168,6 +168,20 @@ test.describe('@content @links SEO JSON-LD Structured Data @REQ-CONTENT-01', () 
     expect(articleDescription.length).toBeLessThanOrEqual(160);
   });
 
+  test('head has exactly one title, canonical, and meta description (no seo-tag/manual duplicates) @REQ-CONTENT-01', async ({ page }) => {
+    // Guard against GH-1054 regression: _layouts/default.html must NOT hand-roll
+    // <title>, <meta name="description">, or <link rel="canonical"> — those are
+    // owned solely by jekyll-seo-tag ({% seo %}). Re-adding the manual tags would
+    // emit two of each on every page. Asserted WITHOUT .first() so a duplicate
+    // fails the toHaveCount(1) check.
+    await page.goto('/2026/04/05/building-a-test-strategy-that-works/');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.locator('head title')).toHaveCount(1);
+    await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
+    await expect(page.locator('meta[name="description"]')).toHaveCount(1);
+  });
+
   test('Meta description tag is present on post pages', async ({ page }) => {
     await page.goto('/2026/04/05/building-a-test-strategy-that-works/');
     await page.waitForLoadState('networkidle');
