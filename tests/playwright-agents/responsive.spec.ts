@@ -541,6 +541,46 @@ test.describe('@visual Image Responsiveness @REQ-VISUAL-01', () => {
 
 });
 
+test.describe('@visual Inline Chart Overflow @REQ-VISUAL-01', () => {
+
+  // Guard for P2: inline /charts/ images must shrink below their 500px desktop
+  // cap on narrow phones so the page never gains horizontal scroll. Fails on
+  // origin/main (fixed max-width: 500px) and passes once the chart rule uses
+  // max-width: min(500px, 100%).
+  const chartPost = '/2026/01/19/the-surprising-economics-of-test-automation-roi/';
+  const narrowViewports = [
+    { width: 320, height: 568 },
+    { width: 390, height: 844 },
+  ];
+
+  for (const viewport of narrowViewports) {
+    test(`charts do not cause horizontal overflow at ${viewport.width}px`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      await page.goto(chartPost);
+      await page.waitForLoadState('networkidle');
+
+      // No horizontal page scroll (allow 1px rounding tolerance).
+      const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+      }));
+      expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1);
+
+      // Every inline chart image must fit within the viewport width.
+      const charts = page.locator('.article-content img[src*="/charts/"]');
+      const chartCount = await charts.count();
+      expect(chartCount).toBeGreaterThan(0);
+
+      for (let i = 0; i < chartCount; i++) {
+        const box = await charts.nth(i).boundingBox();
+        expect(box).not.toBeNull();
+        expect(box!.width).toBeLessThanOrEqual(viewport.width + 1);
+      }
+    });
+  }
+
+});
+
 test.describe('@accessibility Interactive Elements Touch Targets @REQ-A11Y-02 @REQ-NAV-01', () => {
 
   test.use({ viewport: viewports.mobile });

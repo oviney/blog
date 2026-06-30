@@ -579,7 +579,7 @@ blockquote {
     // Reduce margins and limit size for chart images
     &[src*="/charts/"] {
       margin: $spacing-md 0;
-      max-width: 500px; // Reasonable chart size for content
+      max-width: min(500px, 100%); // Cap at 500px on desktop, shrink on small screens (no page overflow)
       border-radius: $radius-sm;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       margin-left: auto;
@@ -603,7 +603,7 @@ blockquote {
   }
 
   img[src*="/charts/"] {
-    max-width: 500px !important; // Override any other styles
+    max-width: min(500px, 100%) !important; // Cap at 500px on desktop, shrink on small screens (no page overflow)
     height: auto; // Preserve aspect ratio against intrinsic width/height attrs (BLOG-017b)
     margin: $spacing-md auto; // Center with reduced margins
     border-radius: $radius-sm;
