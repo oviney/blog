@@ -41,7 +41,7 @@ layout: default
     {% assign _hero_alt = page.image_alt | default: page.title %}
     {% include responsive-image.html src=page.image alt=_hero_alt %}
     {% if page.image_caption %}
-    <figcaption class="image-credit">{{ page.image_caption | upcase }}</figcaption>
+    <figcaption class="image-credit">{{ page.image_caption }}</figcaption>
     {% else %}
     <figcaption class="image-credit">ILLUSTRATION</figcaption>
     {% endif %}
