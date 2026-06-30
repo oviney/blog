@@ -81,10 +81,10 @@ sitemap: false
       var article = document.createElement('article');
       article.className = 'search-result';
       article.innerHTML =
-        '<span class="search-result-category">' + (post.categories[0] || '') + '</span>' +
-        '<h3 class="search-result-title"><a href="' + post.url + '">' + post.title + '</a></h3>' +
-        '<p class="search-result-excerpt">' + post.content + '</p>' +
-        '<span class="search-result-date">' + post.date + '</span>';
+        '<span class="search-result-category">' + escapeHtml(post.categories[0] || '') + '</span>' +
+        '<h3 class="search-result-title"><a href="' + escapeHtml(post.url) + '">' + escapeHtml(post.title) + '</a></h3>' +
+        '<p class="search-result-excerpt">' + escapeHtml(post.content) + '</p>' +
+        '<span class="search-result-date">' + escapeHtml(post.date) + '</span>';
       resultsContainer.appendChild(article);
     });
   }
