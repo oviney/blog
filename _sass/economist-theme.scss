@@ -195,7 +195,8 @@ body {
 .footer-rss-link,
 .author-bio-links a,
 .newsletter-button,
-.newsletter-rss-fallback {
+.newsletter-rss-fallback,
+.toc-title {
   &:focus-visible {
     outline: 3px solid $economist-red;
     outline-offset: 3px;
@@ -211,6 +212,15 @@ body {
 
   // For article pages, allow wider content
   &:has(.economist-article) {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  // For category/topic listing pages, escape the 900px article reading cap so
+  // the 3-column .topic-grid gets its intended ~1040px width (the wrappers
+  // supply their own max-width and side padding).
+  &:has(.topic-page),
+  &:has(.econ-topic-page) {
     max-width: 100%;
     padding: 0;
   }
@@ -499,14 +509,15 @@ blockquote {
     display: block;
   }
 
-  // Image credit caption (Economist style: "ILLUSTRATION: ROB FARMER")
+  // Image credit caption — renders in the authored sentence case so full
+  // captions stay readable (short credits can still be authored in caps).
   .image-credit {
     font-family: $font-sans;
     font-size: 0.6875rem;
     color: $text-tertiary;
     margin-top: $spacing-xs;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    text-transform: none;
+    letter-spacing: 0.02em;
     font-style: normal;
     font-weight: 400;
   }
@@ -569,7 +580,7 @@ blockquote {
     // Reduce margins and limit size for chart images
     &[src*="/charts/"] {
       margin: $spacing-md 0;
-      max-width: 500px; // Reasonable chart size for content
+      max-width: min(500px, 100%); // Cap at 500px on desktop, shrink on small screens (no page overflow)
       border-radius: $radius-sm;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       margin-left: auto;
@@ -593,7 +604,7 @@ blockquote {
   }
 
   img[src*="/charts/"] {
-    max-width: 500px !important; // Override any other styles
+    max-width: min(500px, 100%) !important; // Cap at 500px on desktop, shrink on small screens (no page overflow)
     height: auto; // Preserve aspect ratio against intrinsic width/height attrs (BLOG-017b)
     margin: $spacing-md auto; // Center with reduced margins
     border-radius: $radius-sm;
@@ -2005,8 +2016,8 @@ table {
 
 .topic-page {
   max-width: 1040px;
-  margin: 0;
-  padding: $spacing-xl 148px $spacing-xl 148px;
+  margin: 0 auto;
+  padding: $spacing-xl $spacing-lg;
 }
 
 .topic-header {

@@ -652,3 +652,32 @@ test.describe('@content @navigation Related Posts and Content Discovery @REQ-CON
   });
 
 });
+
+test.describe('@content Hero image caption casing @REQ-CONTENT-CAPTION-CASE', () => {
+
+  // Guard for the all-caps hero caption defect (P2): the authored sentence-case
+  // caption must NOT be forced to ALL CAPS — neither by a Liquid `| upcase`
+  // filter in _layouts/post.html nor by a `text-transform: uppercase` rule on
+  // the .image-credit figcaption in _sass/economist-theme.scss.
+  test('hero figcaption renders in authored sentence case, not ALL CAPS', async ({ page }) => {
+    await page.goto('/2026/01/02/self-healing-tests-myth-vs-reality/');
+
+    const caption = page.locator('.article-hero-image figcaption.image-credit').first();
+    await expect(caption).toBeVisible();
+
+    const text = (await caption.textContent() || '').trim();
+    expect(text.length).toBeGreaterThan(0);
+
+    // The caption contains lowercase-capable letters, so a sentence-case string
+    // must differ from its own uppercased form. Catches the `| upcase` filter.
+    expect(text).not.toEqual(text.toUpperCase());
+
+    // The CSS must not visually re-uppercase the caption. Catches a
+    // text-transform: uppercase rule that would defeat the layout fix.
+    const transform = await caption.evaluate(
+      (el) => getComputedStyle(el).textTransform
+    );
+    expect(transform).not.toBe('uppercase');
+  });
+
+});

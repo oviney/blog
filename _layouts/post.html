@@ -41,7 +41,7 @@ layout: default
     {% assign _hero_alt = page.image_alt | default: page.title %}
     {% include responsive-image.html src=page.image alt=_hero_alt %}
     {% if page.image_caption %}
-    <figcaption class="image-credit">{{ page.image_caption | upcase }}</figcaption>
+    <figcaption class="image-credit">{{ page.image_caption }}</figcaption>
     {% else %}
     <figcaption class="image-credit">ILLUSTRATION</figcaption>
     {% endif %}
@@ -159,7 +159,7 @@ layout: default
       <h3 class="related-title">
         <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
       </h3>
-      <p class="related-excerpt">{{ post.excerpt | strip_html | truncate: 100, "…" }}</p>
+      <p class="related-excerpt">{{ post.description | default: post.excerpt | strip_html | truncate: 100, "…" }}</p>
       <time class="related-meta" datetime="{{ post.date | date_to_xmlschema }}">
         {{ post.date | date: "%b %-d, %Y" }}
       </time>
@@ -198,7 +198,7 @@ layout: default
       {% endif %}
       <div class="featured-content">
         <h3><a href="{{ featured.url | relative_url }}">{{ featured.title }}</a></h3>
-        <p class="featured-excerpt">{{ featured.excerpt | strip_html | truncatewords: 25 }}</p>
+        <p class="featured-excerpt">{{ featured.description | default: featured.excerpt | strip_html | truncatewords: 25 }}</p>
       </div>
     </article>
 
@@ -213,7 +213,7 @@ layout: default
         {% endif %}
         <div class="item-content">
           <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
-          <p class="item-excerpt">{{ post.excerpt | strip_html | truncatewords: 15 }}</p>
+          <p class="item-excerpt">{{ post.description | default: post.excerpt | strip_html | truncatewords: 15 }}</p>
         </div>
       </article>
       {% endfor %}
