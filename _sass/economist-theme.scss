@@ -215,6 +215,15 @@ body {
     max-width: 100%;
     padding: 0;
   }
+
+  // For category/topic listing pages, escape the 900px article reading cap so
+  // the 3-column .topic-grid gets its intended ~1040px width (the wrappers
+  // supply their own max-width and side padding).
+  &:has(.topic-page),
+  &:has(.econ-topic-page) {
+    max-width: 100%;
+    padding: 0;
+  }
 }
 
 .page-wide {
@@ -2006,8 +2015,8 @@ table {
 
 .topic-page {
   max-width: 1040px;
-  margin: 0;
-  padding: $spacing-xl 148px $spacing-xl 148px;
+  margin: 0 auto;
+  padding: $spacing-xl $spacing-lg;
 }
 
 .topic-header {

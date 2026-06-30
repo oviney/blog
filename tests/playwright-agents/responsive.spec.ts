@@ -276,6 +276,35 @@ test.describe('@visual Responsive Layout Adaptation @REQ-NAV-01 @REQ-VISUAL-01',
 
 });
 
+test.describe('@visual Category Listing Grid Width @REQ-VISUAL-01', () => {
+
+  // Guard for the regression where category/topic listing pages inherited the
+  // 900px article reading cap (plus a 148px fixed side padding), crushing the
+  // 3-column .topic-grid into a ~556px centered column on wide desktops.
+  test('Category page grid uses the full listing width at desktop', async ({ page }) => {
+    await page.setViewportSize(viewports.desktop);
+    await page.goto('/security/');
+    await page.waitForLoadState('networkidle');
+
+    const wrapper = page.locator('.topic-page, .econ-topic-page').first();
+    await expect(wrapper).toBeVisible();
+
+    const wrapperBox = await wrapper.boundingBox();
+    expect(wrapperBox).not.toBeNull();
+    // The listing wrapper must escape the 900px article cap (target ~1040px).
+    expect(wrapperBox!.width).toBeGreaterThanOrEqual(1000);
+
+    const firstCard = page.locator('.topic-card').first();
+    await expect(firstCard).toBeVisible();
+
+    const cardBox = await firstCard.boundingBox();
+    expect(cardBox).not.toBeNull();
+    // Each of the 3 columns needs >= 280px for the card design to hold.
+    expect(cardBox!.width).toBeGreaterThanOrEqual(280);
+  });
+
+});
+
 test.describe('@visual Typography Responsiveness @REQ-VISUAL-01', () => {
 
   test('Font sizes scale appropriately across viewports', async ({ page }) => {
