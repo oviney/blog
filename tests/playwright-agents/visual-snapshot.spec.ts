@@ -32,6 +32,15 @@ const PAGES: { name: string; path: string }[] = [
 ];
 
 test.describe('@visual Visual regression snapshots @REQ-VISUAL-SNAP', () => {
+  // Baselines are committed as `-linux` PNGs. Comparing them on macOS/Windows
+  // would fail on anti-aliasing noise, not real regressions — so this gate only
+  // runs on Linux (every CI runner here is ubuntu-latest). Off-Linux it skips
+  // rather than reporting false failures on a developer's laptop.
+  test.skip(
+    process.platform !== 'linux',
+    'visual baselines are -linux only; run in CI (ubuntu) or via test:visual:snap:update',
+  );
+
   for (const { name, path } of PAGES) {
     test(`${name} matches its committed baseline`, async ({ page }) => {
       await page.goto(path);
