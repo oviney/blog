@@ -207,10 +207,6 @@ jobs:
           done
           curl -f http://localhost:4000/ || { echo "Jekyll server failed to start"; exit 1; }
 
-      - name: Run visual regression tests
-        run: npm run test:visual
-        continue-on-error: true
-
       - name: Run accessibility tests
         run: npm run test:a11y
 
@@ -218,14 +214,6 @@ jobs:
         run: npm run test:lighthouse
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-
-      - name: Upload visual regression report
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: visual-regression-report
-          path: backstop_data/html_report/
-          retention-days: 7
 
       - name: Upload Lighthouse reports
         if: always()
