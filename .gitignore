@@ -26,6 +26,9 @@ playwright-report/
 *.png
 !assets/charts/*.png
 !assets/images/*.png
+# Committed visual-regression baselines (generated on ubuntu-latest; see
+# tests/playwright-agents/visual-snapshot.spec.ts).
+!tests/playwright-agents/**/*-snapshots/*.png
 **/screenshots/
 **/videos/
 playwright-healing-report.md
