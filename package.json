@@ -11,6 +11,8 @@
     "test:visual:reference": "npx backstop reference",
     "test:visual": "npx backstop test",
     "test:visual:approve": "npx backstop approve",
+    "test:visual:snap": "npx playwright test visual-snapshot.spec.ts --project='Mobile Chrome' --project='Tablet Chrome' --project='Desktop Chrome'",
+    "test:visual:snap:update": "npx playwright test visual-snapshot.spec.ts --project='Mobile Chrome' --project='Tablet Chrome' --project='Desktop Chrome' --update-snapshots",
     "test:a11y": "pa11y-ci",
     "test:lighthouse": "lhci autorun",
     "test:playwright": "npx playwright test",

@@ -15,6 +15,11 @@ on:
         required: false
         default: 'false'
         type: boolean
+      update_snapshots:
+        description: 'Refresh visual-regression baselines (-linux PNGs) and upload them as an artifact'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   # ---------------------------------------------------------------------------
@@ -76,6 +81,69 @@ jobs:
           echo "| Skip Playwright | \`${SKIP_PLAYWRIGHT}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Grep | \`${PLAYWRIGHT_GREP:-none}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Reason | ${SELECTION_REASON} |" >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------
+  # Blocking pixel gate: Playwright toHaveScreenshot on the core page types.
+  # Runs on EVERY pull_request/push (independent of change-based selection) so a
+  # required status check never deadlocks waiting on a skipped job. Unlike every
+  # other Playwright job in this workflow it carries NO `continue-on-error`, so a
+  # pixel diff reds the check and blocks the merge. Seed/refresh baselines via
+  # `workflow_dispatch` with update_snapshots=true, then commit the artifact.
+  # ---------------------------------------------------------------------------
+  visual-regression:
+    name: 🖼️ Visual Regression
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Setup Node + cache + install deps
+        uses: ./.github/actions/setup-node-with-puppeteer-cache
+
+      - name: Build Jekyll site
+        run: bundle exec jekyll build
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Start Jekyll server
+        run: |
+          bundle exec jekyll serve --port 4000 --detach
+          for i in $(seq 1 30); do
+            if curl -s http://localhost:4000/ > /dev/null; then break; fi
+            sleep 1
+          done
+          curl -f http://localhost:4000/ || exit 1
+
+      - name: Compare visual snapshots
+        if: ${{ !inputs.update_snapshots }}
+        run: npm run test:visual:snap
+
+      - name: Refresh visual baselines (seed mode)
+        if: ${{ inputs.update_snapshots }}
+        run: npm run test:visual:snap:update
+
+      - name: Upload refreshed baselines (seed mode)
+        if: ${{ inputs.update_snapshots }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-snapshots
+          path: tests/playwright-agents/visual-snapshot.spec.ts-snapshots/
+          retention-days: 7
+
+      - name: Upload visual diff on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-regression-diff
+          path: test-results/
+          retention-days: 7
 
   # ---------------------------------------------------------------------------
   # Step 2: Content Validation (post quality checks)
