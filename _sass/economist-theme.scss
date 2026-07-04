@@ -3445,4 +3445,16 @@ article.topic-card h2 a,
   .main-content {
     padding-bottom: calc(#{$bottom-nav-height} + env(safe-area-inset-bottom));
   }
+
+  // WCAG 2.4.11 (Focus Not Obscured): the fixed bottom nav overlaps the lower
+  // ~63px of the viewport, and the fixed reading-progress bar sits at the top.
+  // When a keyboard user Tabs to a share/copy-link control the browser scrolls
+  // it minimally into view, which can leave it resting beneath the fixed nav.
+  // scroll-margin reserves clearance on both edges so focused share controls
+  // are never obscured by fixed chrome (see issue #1101).
+  .action-btn,
+  .share-btn {
+    scroll-margin-bottom: calc(#{$bottom-nav-height} + #{$spacing-md} + env(safe-area-inset-bottom));
+    scroll-margin-top: $spacing-md;
+  }
 }
