@@ -45,13 +45,73 @@ sitemap: false
   var suggestionButtons = document.querySelectorAll('[data-search-query]');
   var posts = [];
 
+  // Chars of context kept on each side of a matched term in a windowed snippet.
+  var SNIPPET_RADIUS = 90;
+  // Consistent cap for the subtitle/description fallback shown when the query
+  // does not appear in any searchable text (e.g. a category-only match).
+  var FALLBACK_LENGTH = 200;
+
   function escapeHtml(value) {
-    return value
+    return String(value == null ? '' : value)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  // Escape `text`, wrapping every case-insensitive occurrence of `query` in a
+  // <mark>. Both the surrounding text and the matched span are escaped
+  // independently, so no user-controlled markup ever reaches innerHTML — only
+  // the literal <mark> tags this function emits are trusted.
+  function escapeAndHighlight(text, query) {
+    var lower = text.toLowerCase();
+    var out = '';
+    var cursor = 0;
+    var idx;
+    while ((idx = lower.indexOf(query, cursor)) !== -1) {
+      out += escapeHtml(text.slice(cursor, idx)) +
+        '<mark class="search-result-mark">' +
+        escapeHtml(text.slice(idx, idx + query.length)) +
+        '</mark>';
+      cursor = idx + query.length;
+    }
+    return out + escapeHtml(text.slice(cursor));
+  }
+
+  // Return an escaped, highlighted snippet windowed around the first match of
+  // `query` in `text`, or null when the query is absent from `text`.
+  function windowedSnippet(text, query) {
+    if (!text) {
+      return null;
+    }
+    var idx = text.toLowerCase().indexOf(query);
+    if (idx === -1) {
+      return null;
+    }
+    var start = Math.max(0, idx - SNIPPET_RADIUS);
+    var end = Math.min(text.length, idx + query.length + SNIPPET_RADIUS);
+    var prefix = start > 0 ? '…' : '';
+    var suffix = end < text.length ? '…' : '';
+    return prefix + escapeAndHighlight(text.slice(start, end), query) + suffix;
+  }
+
+  // Escaped, length-capped fallback used when the query is not present in any
+  // searchable text (title/category matches). Prefers the authored subtitle,
+  // then the description, then the truncated content dump.
+  function fallbackSnippet(post) {
+    var text = post.subtitle || post.description || post.content || '';
+    if (text.length > FALLBACK_LENGTH) {
+      text = text.slice(0, FALLBACK_LENGTH).replace(/\s+\S*$/, '') + '…';
+    }
+    return escapeHtml(text);
+  }
+
+  function buildSnippet(post, query) {
+    return windowedSnippet(post.content, query) ||
+      windowedSnippet(post.subtitle, query) ||
+      windowedSnippet(post.description, query) ||
+      fallbackSnippet(post);
   }
 
   function renderResults(query) {
@@ -83,7 +143,7 @@ sitemap: false
       article.innerHTML =
         '<span class="search-result-category">' + escapeHtml(post.categories[0] || '') + '</span>' +
         '<h3 class="search-result-title"><a href="' + escapeHtml(post.url) + '">' + escapeHtml(post.title) + '</a></h3>' +
-        '<p class="search-result-excerpt">' + escapeHtml(post.content) + '</p>' +
+        '<p class="search-result-excerpt">' + buildSnippet(post, query) + '</p>' +
         '<span class="search-result-date">' + escapeHtml(post.date) + '</span>';
       resultsContainer.appendChild(article);
     });
