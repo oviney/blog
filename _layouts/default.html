@@ -53,6 +53,30 @@
   {% seo %}
 </head>
 <body>
+  {%- comment -%}
+    Shared nav active-state + newsletter-coverage matcher (visual-audit #15/#16).
+    "Blog" is the parent section for all editorial content, so it carries the
+    active cue on /blog/ (incl. paginated /blog/pageN/), on individual posts
+    (layout: post → permalinks like /YYYY/MM/DD/title/), and on the three
+    category pages. Home/About/Search light their own item. The elsif chain
+    guarantees exactly one top-level item is ever active. `show_newsletter` is
+    the CTA allowlist — home, posts, blog index, category, and about — and is
+    intentionally false on /search/, /404/, and every other page type.
+  {%- endcomment -%}
+  {% assign nav_url = page.url %}
+  {% assign nav_home = false %}
+  {% assign nav_blog = false %}
+  {% assign nav_about = false %}
+  {% assign nav_search = false %}
+  {% if nav_url == '/' %}{% assign nav_home = true %}
+  {% elsif nav_url == '/about/' %}{% assign nav_about = true %}
+  {% elsif nav_url contains '/search/' %}{% assign nav_search = true %}
+  {% elsif page.layout == 'post' %}{% assign nav_blog = true %}
+  {% elsif nav_url contains '/blog/' %}{% assign nav_blog = true %}
+  {% elsif nav_url == '/security/' or nav_url == '/software-engineering/' or nav_url == '/test-automation/' %}{% assign nav_blog = true %}
+  {% endif %}
+  {% assign show_newsletter = false %}
+  {% if nav_home or nav_blog or nav_about %}{% assign show_newsletter = true %}{% endif %}
   <header class="page-header">
     <div class="site-title" role="heading" aria-level="{% if page.url == '/' %}1{% else %}2{% endif %}">
       <a href="{{ '/' | relative_url }}">{{ display_site_title }}</a>
@@ -66,19 +90,20 @@
 
   <nav class="site-nav" id="site-navigation">
     <ul>
-      <li><a href="{{ '/' | relative_url }}">Home</a></li>
-      <li><a href="{{ '/blog/' | relative_url }}">Blog</a></li>
+      <li><a href="{{ '/' | relative_url }}"{% if nav_home %} class="is-active" aria-current="page"{% endif %}>Home</a></li>
+      <li><a href="{{ '/blog/' | relative_url }}"{% if nav_blog %} class="is-active" aria-current="page"{% endif %}>Blog</a></li>
       <li><a href="{{ '/security/' | relative_url }}">Security</a></li>
       <li><a href="{{ '/software-engineering/' | relative_url }}">Software Engineering</a></li>
       <li><a href="{{ '/test-automation/' | relative_url }}">Test Automation</a></li>
-      <li><a href="{{ '/about/' | relative_url }}">About</a></li>
-      <li><a href="{{ '/search/' | relative_url }}">Search</a></li>
+      <li><a href="{{ '/about/' | relative_url }}"{% if nav_about %} class="is-active" aria-current="page"{% endif %}>About</a></li>
+      <li><a href="{{ '/search/' | relative_url }}"{% if nav_search %} class="is-active" aria-current="page"{% endif %}>Search</a></li>
       <li><a href="{{ '/feed.xml' | relative_url }}" class="nav-rss-link" title="RSS Feed"><svg class="rss-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><circle cx="6.18" cy="17.82" r="2.18"/><path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56z"/><path d="M4 10.1v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/></svg> RSS</a></li>
     </ul>
   </nav>
 
   <main class="main-content">
     {{ content }}
+    {% if show_newsletter %}{% include newsletter.html %}{% endif %}
   </main>
 
   <footer class="site-footer">
@@ -117,22 +142,18 @@
     </div>
   </footer>
 
-  <!-- Mobile bottom nav (#953) -->
-  {% assign p = page.url %}
-  {% assign blog_active = false %}
-  {% if p == '/blog/' or p == '/blog' %}{% assign blog_active = true %}{% elsif p contains '/blog/' %}{% assign blog_active = true %}{% endif %}
-  {% assign search_active = false %}
-  {% if p == '/search/' or p == '/search' %}{% assign search_active = true %}{% elsif p contains '/search/' %}{% assign search_active = true %}{% endif %}
+  <!-- Mobile bottom nav (#953). Active state reuses the shared matcher above so
+       Blog also lights up on posts and category pages (visual-audit #15). -->
   <nav class="bottom-nav" aria-label="Primary mobile navigation">
-    <a href="{{ '/' | relative_url }}" class="bottom-nav__link{% if p == '/' %} is-active{% endif %}"{% if p == '/' %} aria-current="page"{% endif %}>
+    <a href="{{ '/' | relative_url }}" class="bottom-nav__link{% if nav_home %} is-active{% endif %}"{% if nav_home %} aria-current="page"{% endif %}>
       <svg class="bottom-nav__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
       <span class="bottom-nav__label">Home</span>
     </a>
-    <a href="{{ '/blog/' | relative_url }}" class="bottom-nav__link{% if blog_active %} is-active{% endif %}"{% if blog_active %} aria-current="page"{% endif %}>
+    <a href="{{ '/blog/' | relative_url }}" class="bottom-nav__link{% if nav_blog %} is-active{% endif %}"{% if nav_blog %} aria-current="page"{% endif %}>
       <svg class="bottom-nav__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3V12H6V7.5Z"/></svg>
       <span class="bottom-nav__label">Blog</span>
     </a>
-    <a href="{{ '/search/' | relative_url }}" class="bottom-nav__link{% if search_active %} is-active{% endif %}"{% if search_active %} aria-current="page"{% endif %}>
+    <a href="{{ '/search/' | relative_url }}" class="bottom-nav__link{% if nav_search %} is-active{% endif %}"{% if nav_search %} aria-current="page"{% endif %}>
       <svg class="bottom-nav__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
       <span class="bottom-nav__label">Search</span>
     </a>
