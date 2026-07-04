@@ -7,7 +7,7 @@ test.describe('@content Byline regression coverage @REQ-CONTENT-01 @REQ-CONTENT-
     await page.goto('/blog/');
     await page.waitForLoadState('networkidle');
 
-    const firstCard = page.locator('.econ-article-card').first();
+    const firstCard = page.locator('.topic-card').first();
     await expect(firstCard).toBeVisible();
 
     const cardByline = firstCard.getByText(/^By\s+\S/).first();

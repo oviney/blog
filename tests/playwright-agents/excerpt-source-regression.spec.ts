@@ -8,7 +8,7 @@ test.use({ baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4000' }
 // `description` so no card lede reads "Source: …".
 const surfaces: { name: string; path: string; selector: string }[] = [
   { name: 'homepage', path: '/', selector: '.hero-post-excerpt, .topic-card-excerpt' },
-  { name: 'blog index', path: '/blog/', selector: '.econ-card-excerpt' },
+  { name: 'blog index', path: '/blog/', selector: '.topic-card-excerpt' },
   { name: 'security topic', path: '/security/', selector: '.topic-card-excerpt' },
 ];
 

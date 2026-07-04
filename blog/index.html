@@ -17,32 +17,9 @@ description: Coverage of software quality, test automation, and engineering lead
     <a href="{{ '/test-automation/' | relative_url }}">Test Automation</a>
   </nav>
 
-  <div class="econ-article-grid">
+  <div class="topic-grid">
     {% for post in paginator.posts %}
-    <article class="econ-article-card">
-      {% if post.image and post.image != "/assets/images/blog-default.svg" %}
-      <a href="{{ post.url | relative_url }}" class="econ-card-image-link">
-        {% include responsive-image.html src=post.image alt=post.title loading="lazy" class="econ-card-image" %}
-      </a>
-      {% endif %}
-
-      {% if post.categories %}
-      <span class="econ-card-category">{{ post.categories | first }}</span>
-      {% endif %}
-
-      <h2 class="econ-card-title">
-        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-      </h2>
-
-      <p class="econ-card-excerpt">{{ post.description | default: post.excerpt | strip_html | truncatewords: 20 }}</p>
-
-      {% include byline.html author=post.author container_class="econ-card-author" text_class="econ-card-author-name" %}
-
-      <div class="econ-card-meta">
-        {% assign words = post.content | number_of_words %}
-        <span>{{ words | divided_by: 200 | plus: 1 }} min read</span>
-      </div>
-    </article>
+    {% include post-card.html post=post %}
     {% endfor %}
   </div>
 
