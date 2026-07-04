@@ -305,6 +305,60 @@ test.describe('@visual Category Listing Grid Width @REQ-VISUAL-01', () => {
 
 });
 
+test.describe('@visual Gap E — Listing width matches design token @REQ-VISUAL-01', () => {
+
+  // Gap E (docs/agents/visual-audit-findings.md): Playwright ran at 320/768/1920
+  // but never asserted a listing container's computed width against its intended
+  // `max-width` design token, so dead width ceilings (the ~852px / ~556px
+  // regressions in defects #1 and #3) passed unnoticed. The CSS was fixed by
+  // #1097 (the `.main-content:has(.topic-page), :has(.econ-topic-page)` width
+  // unlock + `max-width: 1040px` on the wrappers). These assertions lock that
+  // contract so the token can never silently drift again.
+  //
+  // `.topic-page` (category pages) and `.econ-topic-page` (/blog/) both declare
+  // `max-width: 1040px`. At a 1920px viewport the centered wrapper's boundingBox
+  // width must land within a tolerance band around that token — tight enough to
+  // catch the crushed-column regressions, loose enough to absorb sub-pixel
+  // rounding and any wrapper padding.
+  const WIDTH_TOKEN = 1040;
+  const WIDTH_TOLERANCE = 50; // accept [990, 1090]
+
+  const listingPages = [
+    { path: '/security/', name: 'Security' },
+    { path: '/software-engineering/', name: 'Software Engineering' },
+    { path: '/test-automation/', name: 'Test Automation' },
+    { path: '/blog/', name: 'Blog index' },
+  ];
+
+  for (const { path, name } of listingPages) {
+    test(`${name} (${path}) wrapper width ≈ ${WIDTH_TOKEN}px at 1920px`, async ({ page }) => {
+      await page.setViewportSize(viewports.desktop);
+      await page.goto(path);
+      await page.waitForLoadState('networkidle');
+
+      const wrapper = page.locator('.topic-page, .econ-topic-page').first();
+      await expect(wrapper).toBeVisible();
+
+      const wrapperBox = await wrapper.boundingBox();
+      expect(wrapperBox).not.toBeNull();
+      // Assert the computed width against the 1040px design token, not just a
+      // floor — a dead ceiling that renders ~852px would still clear a bare
+      // lower bound, which is exactly how Gap E slipped through.
+      expect(Math.abs(wrapperBox!.width - WIDTH_TOKEN)).toBeLessThanOrEqual(WIDTH_TOLERANCE);
+
+      // Listing cards (`.topic-card` on category pages, `.econ-article-card` on
+      // /blog/) must keep the >= ~280px per-column width the 3-up grid needs.
+      const firstCard = page.locator('.topic-card, .econ-article-card').first();
+      await expect(firstCard).toBeVisible();
+
+      const cardBox = await firstCard.boundingBox();
+      expect(cardBox).not.toBeNull();
+      expect(cardBox!.width).toBeGreaterThanOrEqual(280);
+    });
+  }
+
+});
+
 test.describe('@visual Typography Responsiveness @REQ-VISUAL-01', () => {
 
   test('Font sizes scale appropriately across viewports', async ({ page }) => {
