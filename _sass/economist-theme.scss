@@ -1648,6 +1648,14 @@ table {
   margin: 0 0 $spacing-xs 0;
 }
 
+.search-result-mark {
+  background: rgba($economist-red, 0.12);
+  color: $text-primary;
+  font-weight: 700;
+  padding: 0 0.1em;
+  border-radius: 2px;
+}
+
 .search-result-date {
   font-family: $font-sans;
   font-size: 0.8125rem;
