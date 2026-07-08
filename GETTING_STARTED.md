@@ -53,20 +53,18 @@ bundle exec jekyll serve
 npm test
 
 # Run individual test suites
-npm run test:visual          # Visual regression (BackstopJS)
+npm run test:visual:snap     # Visual regression (Playwright toHaveScreenshot)
 npm run test:a11y            # Accessibility (pa11y-ci, WCAG 2.1 AA)
 npm run test:lighthouse      # Performance/SEO (Lighthouse CI)
 npm run test:playwright      # Playwright end-to-end tests
 npm run test:security        # Security audit (npm audit)
 ```
 
-### First-time visual baseline
+### Visual baselines
 
-Before running visual regression tests for the first time, generate reference screenshots:
+Visual regression uses Playwright's `toHaveScreenshot` (`tests/playwright-agents/visual-snapshot.spec.ts`), compared against committed `*-Chrome-linux.png` baselines under `tests/playwright-agents/visual-snapshot.spec.ts-snapshots/`. The blocking "🖼️ Visual Regression" CI job runs `npm run test:visual:snap` on every push and PR.
 
-```bash
-npm run test:visual:reference
-```
+Because baselines are pinned to the Linux CI renderer, seed or refresh them via CI rather than locally: trigger the **Quality Tests** workflow (`.github/workflows/test-quality.yml`) with `workflow_dispatch` and `update_snapshots=true`, download the `visual-snapshots` artifact, and commit it under the snapshots directory. To preview a diff locally you can run `npm run test:visual:snap` (or `npm run test:visual:snap:update` to regenerate your local screenshots).
 
 ## Pre-commit Hook
 
