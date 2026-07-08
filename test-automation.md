@@ -16,41 +16,7 @@ description: Strategies, frameworks, and practices for building test automation 
   {% if ta_posts.size > 0 %}
   <div class="topic-grid">
     {% for post in ta_posts %}
-      <article class="topic-card">
-        {% if post.image %}
-        <a href="{{ post.url | relative_url }}" class="topic-card-image">
-          {% include responsive-image.html src=post.image alt=post.title loading="lazy" %}
-        </a>
-        {% else %}
-        <a href="{{ post.url | relative_url }}" class="topic-card-image topic-card-image-placeholder" aria-label="{{ post.title }}">
-          <div class="placeholder-content" aria-hidden="true">
-            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-          </div>
-        </a>
-        {% endif %}
-
-        <div class="topic-card-content">
-          {% if post.categories %}
-          <div class="topic-category">{{ post.categories | first }}</div>
-          {% endif %}
-
-          <h2 class="topic-card-title">
-            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-          </h2>
-
-          <p class="topic-card-excerpt">{{ post.description | default: post.excerpt | strip_html | truncatewords: 20 }}</p>
-          {% include byline.html author=post.author container_class="topic-card-author" text_class="topic-card-author-name" %}
-
-          <div class="topic-card-meta">
-            {% assign words = post.content | number_of_words %}
-            <span class="topic-meta-item">{{ words | divided_by: 200 | plus: 1 }} min read</span>
-          </div>
-        </div>
-      </article>
+      {% include post-card.html post=post %}
     {% endfor %}
   </div>
   {% else %}

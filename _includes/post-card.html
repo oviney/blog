@@ -1,0 +1,58 @@
+{% comment %}
+  Canonical listing post-card partial.
+
+  The single source of truth for the article card used on every post-listing
+  surface (home, blog index, and the category pages). Extracting it collapses
+  the three divergent inline card implementations (defect P2 #9) so every
+  listing renders one consistent 16:9 crop, category-label treatment, and flex
+  framing. The card image is routed through responsive-image.html for the WebP
+  source and CLS-safe intrinsic dimensions.
+
+  Usage:
+    {% include post-card.html post=post %}
+    {% include post-card.html post=post heading="h3" %}
+
+  Parameters:
+    post    — the post object to render (required)
+    heading — heading tag for the card title: "h2" (default) or "h3". Use
+              "h3" when the cards sit under a section <h2> (e.g. the homepage
+              "From the Blog" grid) so the document outline stays valid.
+{% endcomment %}{% assign card_post = include.post %}{% assign card_heading = include.heading | default: 'h2' %}
+<article class="topic-card">
+  {% if card_post.image %}
+  <a href="{{ card_post.url | relative_url }}" class="topic-card-image">
+    {% include responsive-image.html src=card_post.image alt=card_post.title loading="lazy" %}
+  </a>
+  {% else %}
+  <a href="{{ card_post.url | relative_url }}" class="topic-card-image topic-card-image-placeholder" aria-label="{{ card_post.title }}">
+    <div class="placeholder-content" aria-hidden="true">
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+      </svg>
+    </div>
+  </a>
+  {% endif %}
+
+  <div class="topic-card-content">
+    {% if card_post.categories %}
+    <div class="topic-category">{{ card_post.categories | first }}</div>
+    {% endif %}
+
+    <{{ card_heading }} class="topic-card-title">
+      <a href="{{ card_post.url | relative_url }}">{{ card_post.title }}</a>
+    </{{ card_heading }}>
+
+    <p class="topic-card-excerpt">{{ card_post.description | default: card_post.excerpt | strip_html | truncatewords: 20 }}</p>
+
+    {% include byline.html author=card_post.author container_class="topic-card-author" text_class="topic-card-author-name" %}
+
+    <div class="topic-card-meta">
+      <span class="topic-meta-item">{{ card_post.date | date: "%B %-d, %Y" }}</span>
+      {% assign words = card_post.content | number_of_words %}
+      <span class="topic-meta-item">{{ words | divided_by: 200 | plus: 1 }} min read</span>
+    </div>
+  </div>
+</article>

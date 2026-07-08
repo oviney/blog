@@ -115,26 +115,7 @@ description: Two decades of software and quality engineering distilled into prac
     <h2 class="home-recent-heading" id="recent-posts-heading">From the Blog</h2>
     <div class="topic-grid">
       {% for post in remaining_posts limit: 3 %}
-      <article class="topic-card">
-        {% if post.image %}
-        <a href="{{ post.url | relative_url }}" class="topic-card-image">
-          {% include responsive-image.html src=post.image alt=post.title loading="lazy" %}
-        </a>
-        {% endif %}
-        <div class="topic-card-content">
-          {% if post.categories %}
-          <div class="topic-category">{{ post.categories | first }}</div>
-          {% endif %}
-          <h3 class="topic-card-title">
-            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-          </h3>
-          <p class="topic-card-excerpt">{{ post.description | default: post.excerpt | strip_html | truncatewords: 20 }}</p>
-          {% include byline.html author=post.author container_class="topic-card-author" text_class="topic-card-author-name" %}
-          <div class="topic-card-meta">
-            <span class="topic-meta-item">{{ post.date | date: "%B %-d, %Y" }}</span>
-          </div>
-        </div>
-      </article>
+      {% include post-card.html post=post heading="h3" %}
       {% endfor %}
     </div>
     <p class="view-all"><a href="/blog/">View all posts &rarr;</a></p>
