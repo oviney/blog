@@ -141,6 +141,13 @@ body {
         &:hover {
           border-bottom-color: $economist-red;
         }
+
+        // "You are here" cue for the current section (visual-audit #15).
+        &.is-active {
+          color: $economist-red;
+          font-weight: 700;
+          border-bottom-color: $economist-red;
+        }
       }
     }
   }

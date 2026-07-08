@@ -139,7 +139,8 @@ description: Two decades of software and quality engineering distilled into prac
     </div>
   </section>
 
-  <!-- 5. NEWSLETTER SIGNUP -->
-  {% include newsletter.html %}
+  <!-- 5. NEWSLETTER SIGNUP: rendered by _layouts/default.html for the whole CTA
+       allowlist (home, posts, blog index, category, about). No inline include
+       here to avoid a double render (visual-audit #16). -->
 
 </div>

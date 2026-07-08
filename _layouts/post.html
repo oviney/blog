@@ -235,7 +235,12 @@ layout: default
   </div>
 </section>
 
-{% include newsletter.html %}
+{%- comment -%}
+  The newsletter signup is rendered once by _layouts/default.html for every page
+  on the CTA allowlist (home, posts, blog index, category, about). It is no
+  longer included inline here to avoid a double render on post pages
+  (visual-audit #16).
+{%- endcomment -%}
 
 {% if site.giscus %}
 <section class="post-comments">
