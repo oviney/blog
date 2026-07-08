@@ -118,6 +118,45 @@ jobs:
             }
 
             // ─────────────────────────────────────────────────────────────────
+            // Extract GENUINE issue references from a PR body.
+            //
+            // A bare "#N" mid-sentence is almost always a defect-catalog
+            // reference (e.g. "fixes defect #8") — NOT a GitHub issue — so we
+            // must NOT treat it as one. Counting bare tokens caused the
+            // duplicate-detector to wrongly close unrelated PRs that happened to
+            // cite the same defect number.
+            //
+            // We only count a reference when it is unambiguously a GitHub issue:
+            //   1. A GitHub closing keyword immediately followed by "#N"
+            //      (Closes/Fixes/Resolves and their conjugations, case-insensitive)
+            //   2. A full GitHub issue/PR URL for this repo
+            //      (https://github.com/oviney/blog/issues/N or /pull/N)
+            // ─────────────────────────────────────────────────────────────────
+            function extractIssueRefs(body) {
+              const text = body ?? '';
+              const nums = new Set();
+
+              // 1. Closing keywords: close/closes/closed, fix/fixes/fixed,
+              //    resolve/resolves/resolved — optionally followed by a colon —
+              //    then "#N". "defect #8" has no keyword, so it is ignored.
+              const keywordRe = /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\b:?\s+#(\d+)/gi;
+              for (const m of text.matchAll(keywordRe)) {
+                nums.add(parseInt(m[1], 10));
+              }
+
+              // 2. Full GitHub issue/PR URLs for THIS repo only.
+              const urlRe = new RegExp(
+                `https?://github\\.com/${context.repo.owner}/${context.repo.repo}/(?:issues|pull)/(\\d+)`,
+                'gi'
+              );
+              for (const m of text.matchAll(urlRe)) {
+                nums.add(parseInt(m[1], 10));
+              }
+
+              return [...nums];
+            }
+
+            // ─────────────────────────────────────────────────────────────────
             // 1. PR LIFECYCLE MANAGEMENT
             // ─────────────────────────────────────────────────────────────────
 
@@ -138,11 +177,12 @@ jobs:
                 activeCopilotDraftPRs++;
               }
 
-              // ── Build issue reference map (same-repo refs only) ─────────────
-              // Match bare #NNN references that are NOT preceded by a repo slug
-              // (e.g. "Closes #42" matches, "oviney/other-repo#42" does not).
-              const bodyIssueNums = [...(pr.body ?? '').matchAll(/(?<![/\w])#(\d+)/g)]
-                .map(m => parseInt(m[1], 10));
+              // ── Build issue reference map (genuine refs only) ───────────────
+              // Only count real GitHub issue references — closing keywords
+              // ("Closes #42") or full same-repo issue/PR URLs. A bare "#N"
+              // mid-sentence is a defect-catalog reference, not an issue ref,
+              // and must NOT drive duplicate detection or issue re-opening.
+              const bodyIssueNums = extractIssueRefs(pr.body);
               for (const n of bodyIssueNums) {
                 if (!issueRefMap[n]) issueRefMap[n] = [];
                 issueRefMap[n].push(pr);
