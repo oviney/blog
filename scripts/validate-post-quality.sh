@@ -143,6 +143,24 @@ for post in $POSTS; do
     post_errors=$((post_errors + 1))
   fi
 
+  # ------------------------------------------------------------------
+  # 3b. image_caption length — credit budget (~40 chars)  [WARNING]
+  #
+  # _layouts/post.html renders `figcaption.image-credit` from image_caption
+  # (upcased). A hero credit should read like a short attribution, not a
+  # full letter-spaced ALL-CAPS sentence that wraps over several mobile lines
+  # (visual-audit defect #11). Soft-flag anything past a ~40-char credit
+  # budget so long descriptive captions get trimmed toward a real credit.
+  # ------------------------------------------------------------------
+  if [[ -n "$caption_clean" ]]; then
+    caption_len=${#caption_clean}
+    if [[ $caption_len -gt 40 ]]; then
+      echo "⚠️   $rel — image_caption is ${caption_len} chars (credit budget ~40); trim to a short attribution"
+      WARNINGS=$((WARNINGS + 1))
+      post_warnings=$((post_warnings + 1))
+    fi
+  fi
+
   if [[ -n "${image_abs:-}" && -f "${image_abs:-}" && "$image_abs" == *.svg ]]; then
     if grep -qi '<text[[:space:]>]' "$image_abs"; then
       echo "❌  $rel — SVG hero contains embedded text"
@@ -168,6 +186,27 @@ for post in $POSTS; do
       ERRORS=$((ERRORS + 1))
       post_errors=$((post_errors + 1))
     fi
+  fi
+
+  # ------------------------------------------------------------------
+  # 4b. Chart-"Source:" opener without a description override  [ERROR]
+  #
+  # Root cause of visual-audit defect #4/#5: a post body that opens with a
+  # markdown image immediately followed by an italic `*Source: …*` credit,
+  # before any prose paragraph. When such a post has no front-matter
+  # `description`, Jekyll's AUTO excerpt begins with "Source:", so every
+  # teaser card for it reads "Source: …" instead of a lede. A `description`
+  # overrides the auto-excerpt and neutralises the defect — so reject the
+  # opener only when there is nothing to override it.
+  # ------------------------------------------------------------------
+  first_body_line=$(body_content "$post" | grep -m1 '[^[:space:]]' || true)
+  second_body_line=$(body_content "$post" | grep '[^[:space:]]' | sed -n '2p' || true)
+  if [[ "$first_body_line" == '!['* ]] \
+     && echo "$second_body_line" | grep -Eqi '^\*[[:space:]]*source:' \
+     && [[ -z "$desc_clean" ]]; then
+    echo "❌  $rel — body opens with an image + '*Source:*' credit and has no description to override the auto-excerpt (teaser would lead with \"Source:\")"
+    ERRORS=$((ERRORS + 1))
+    post_errors=$((post_errors + 1))
   fi
 
   # ------------------------------------------------------------------
