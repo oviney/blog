@@ -7,10 +7,14 @@ import { test, expect } from '@playwright/test';
  * job (which ran `continue-on-error: true`). A pixel diff on any covered page
  * type reds a required CI check so the regression cannot merge.
  *
- * Coverage is parity with the retired BackstopJS scenarios (home, blog index,
- * two posts, about) across the three Chromium viewports declared in
- * playwright.config.ts. Additional page types (category, /agents/, /search/,
- * /404/) are deliberately out of scope here and tracked as the Gap-B follow-up.
+ * Coverage started at parity with the retired BackstopJS scenarios (home, blog
+ * index, two posts, about) across the three Chromium viewports declared in
+ * playwright.config.ts, and now closes Gap B from
+ * docs/agents/visual-audit-findings.md by adding the previously-unbaselined page
+ * types: the three category pages (/security/, /software-engineering/,
+ * /test-automation/), /search/, and the 404 page (served at /404/). The
+ * published:false /agents/* pages are intentionally excluded — they are not
+ * built and therefore have no rendered URL to baseline.
  *
  * Baselines are committed as `-linux` Chromium PNGs generated in the CI
  * environment (`npm run test:visual:snap:update` on ubuntu-latest). They must
@@ -29,6 +33,14 @@ const PAGES: { name: string; path: string }[] = [
   { name: 'post-testing-times', path: '/2025/12/31/testing-times/' },
   { name: 'post-self-healing-tests', path: '/2026/01/01/self-healing-tests-myth-vs-reality/' },
   { name: 'about', path: '/about/' },
+  // Gap-B page types — category landing pages, search, and the 404 page. The
+  // 404 page is built to /404/index.html (pretty permalinks), so it is served
+  // at /404/, not /404.html (which correctly returns a real 404).
+  { name: 'category-security', path: '/security/' },
+  { name: 'category-software-engineering', path: '/software-engineering/' },
+  { name: 'category-test-automation', path: '/test-automation/' },
+  { name: 'search', path: '/search/' },
+  { name: 'not-found', path: '/404/' },
 ];
 
 test.describe('@visual Visual regression snapshots @REQ-VISUAL-SNAP', () => {
