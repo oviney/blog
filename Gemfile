@@ -8,7 +8,7 @@ source "https://rubygems.org"
 # This will help ensure the proper Jekyll version is running.
 # Happy Jekylling!
 gem "jekyll", "~> 4.4.1"
-gem "json", "~> 2.20.0"
+gem "json", "~> 2.21.1"
 
 # Minimal Mistakes theme and required plugins
 group :jekyll_plugins do
