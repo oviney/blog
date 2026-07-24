@@ -59,12 +59,16 @@ as candidates for extraction into a separate repository.
 
 ## Tech Debt
 
-1. **Sass `@import` → `@use`/`@forward`** — Dart Sass has deprecated `@import`;
-   migrate `_sass/economist-theme.scss` before Dart Sass 3.0 drops support.
-   *(Source: `docs/DEVELOPMENT_WORKFLOW.md`)*
-2. **Manual content inventory reporting** — published-post counts and category
-   mix are still updated by hand in roadmap documents, which makes drift likely.
-   Add a lightweight way to regenerate these metrics when planning changes land.
+No open tech-debt items. The two previously tracked items are both resolved
+(cleared July 2026):
+
+1. ~~**Sass `@import` → `@use`/`@forward`**~~ — **Done.** `_sass/economist-theme.scss`
+   now uses `@use` (e.g. `@use 'sass:color'`) with zero `@import`, so the build
+   emits no Dart Sass `@import` deprecation warnings.
+2. ~~**Manual content inventory reporting**~~ — **Done.** `scripts/content-inventory.sh`
+   regenerates published-post counts and category mix from `_posts/` front matter;
+   `bash scripts/content-inventory.sh --check` flags drift against these roadmap
+   metrics.
 
 ## Out of Scope
 
@@ -76,4 +80,4 @@ as candidates for extraction into a separate repository.
 
 ---
 
-*Last updated: May 2026*
+*Last updated: July 2026*
