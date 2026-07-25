@@ -9,6 +9,7 @@ Disallow: /node_modules/
 Disallow: /.git/
 Disallow: /.github/
 Disallow: /docs/
+Disallow: /review/
 
 # Sitemap location
 Sitemap: https://www.viney.ca/sitemap.xml
