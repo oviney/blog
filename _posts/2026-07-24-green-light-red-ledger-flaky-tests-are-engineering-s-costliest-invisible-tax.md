@@ -8,6 +8,7 @@ description: "Flaky tests cost Atlassian 150,000 developer-hours a year and skew
 image: /assets/images/green-light-red-ledger-flaky-tests-are-engineering-s-costliest-invisible-tax-hero.svg
 image_alt: "An engineer raises a triumphant fist while pressing a green tick button, as a severed pipeline pours red coins into a floor drain behind them"
 image_caption: "Illustration: the build is green; the budget is draining"
+tags: [flaky-tests, continuous-integration, test-automation, developer-productivity]
 ---
 
 <!-- HERO IMAGE — generate an image from the prompt below, then replace this whole comment with it (see output/posts/<slug>.image_prompt.md):
