@@ -49,14 +49,11 @@ npm install
 # Build the site (primary build truth)
 bundle exec jekyll build
 
-# Create baseline screenshots (first time only)
-npm run test:visual:reference
-
 # Start Jekyll before browser-based QA
 bundle exec jekyll serve --config _config.yml,_config_dev.yml
 
-# Run visual regression tests
-npm run test:visual
+# Run visual regression tests (Playwright toHaveScreenshot vs committed baselines)
+npm run test:visual:snap
 
 # Run accessibility audit
 npm run test:a11y
@@ -101,7 +98,7 @@ GitHub Actions automatically builds and deploys changes to GitHub Pages.
 **Quality Gates:**
 - ✅ Pre-commit: Jekyll build validation (local)
 - ✅ CI: Jekyll build test + HTML validation
-- ✅ CI: Visual regression testing (BackstopJS)
+- ✅ CI: Visual regression testing (Playwright `toHaveScreenshot` — blocking "🖼️ Visual Regression" job)
 - ✅ CI: Accessibility testing (pa11y-ci WCAG 2.1 AA)
 - ✅ CI: Performance testing (Lighthouse CI - Performance, SEO, Best Practices)
 - ✅ CI: Security audit (npm audit)
