@@ -1,7 +1,7 @@
 ---
-layout: review
+layout: post
 title: "Green Light, Red Ledger: Flaky Tests Are Engineering's Costliest Invisible Tax"
-date: 2026-07-21
+date: 2026-07-24
 author: Ouray Viney
 categories: [Quality Engineering, Test Automation, Software Engineering]
 description: "Flaky tests cost Atlassian 150,000 developer-hours a year and skew 84% of Google's CI signal. The real budget drain is larger than most leaders admit."
