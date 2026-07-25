@@ -30,6 +30,13 @@ import { test, expect } from '@playwright/test';
 // post-card partial extracted in #1123 (home, blog index, category pages).
 const LISTING_GRID = '.topic-grid';
 
+// Cross-links a post page builds from whatever else is published (_layouts/post.html
+// renders `related_posts limit: 3` and `more_from_posts offset: 1 limit: 5`).
+// The slot count is fixed but the entries are not, so a longer headline wraps to
+// an extra line and moves everything below it — enough to change the full-page
+// height and fail the gate on a size mismatch.
+const POST_CROSS_LINKS = ['.related-list', '.more-from-section'];
+
 // `listing: true` marks a page whose body is a post grid. Those pages re-render
 // on every published article, so they are captured differently — see the
 // `toHaveScreenshot` call below.
@@ -37,7 +44,10 @@ const PAGES: { name: string; path: string; listing?: boolean }[] = [
   { name: 'homepage', path: '/', listing: true },
   { name: 'blog-index', path: '/blog/', listing: true },
   { name: 'post-testing-times', path: '/2025/12/31/testing-times/' },
-  { name: 'post-self-healing-tests', path: '/2026/01/01/self-healing-tests-myth-vs-reality/' },
+  // Permalink is /2026/01/02/ — the post is dated 2026-01-02. This pointed at
+  // /2026/01/01/ from #1119 until #1160, so the scenario silently baselined the
+  // 404 page (a telltale 1920x1080 capture) instead of the article.
+  { name: 'post-self-healing-tests', path: '/2026/01/02/self-healing-tests-myth-vs-reality/' },
   { name: 'about', path: '/about/' },
 ];
 
@@ -53,11 +63,32 @@ test.describe('@visual Visual regression snapshots @REQ-VISUAL-SNAP', () => {
 
   for (const { name, path, listing } of PAGES) {
     test(`${name} matches its committed baseline`, async ({ page }) => {
-      await page.goto(path);
+      const response = await page.goto(path);
+
+      // A mistyped permalink still renders something, so without this the gate
+      // happily baselines the 404 page and reports green forever. That is not
+      // hypothetical: post-self-healing-tests pointed at the wrong date from
+      // #1119 until #1160 and was screenshotting 404 the whole time.
+      expect(response?.status(), `${path} should be served, not 404`).toBe(200);
+
       // Settle web fonts and lazy imagery before capturing so the baseline is
       // deterministic across runs.
       await page.waitForLoadState('networkidle');
       await page.evaluate(() => document.fonts.ready);
+
+      // Drop the post-to-post cross-links before measuring. They sit below the
+      // article, so removing them keeps everything this gate exists to check —
+      // masthead, hero, body typography, share controls, newsletter CTA, footer
+      // — while making the page height depend only on the article itself. A
+      // mask would not do: it paints after layout, so the height would still
+      // move. Their links are exercised by content-edge-cases.spec.ts, though
+      // only permissively (the assertions are conditional on the section being
+      // present), so this does thin their coverage rather than duplicate it.
+      if (!listing) {
+        await page.addStyleTag({
+          content: `${POST_CROSS_LINKS.join(', ')} { display: none !important; }`,
+        });
+      }
 
       await expect(page).toHaveScreenshot(`${name}.png`, {
         // Listing pages are captured at viewport height with the post grid
