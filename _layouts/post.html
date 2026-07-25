@@ -53,6 +53,15 @@ layout: default
     <time datetime="{{ page.date | date_to_xmlschema }}">
       {{ page.date | date: "%b %-dth %Y" | replace: '1th', '1st' | replace: '2th', '2nd' | replace: '3th', '3rd' | replace: '11st', '11th' | replace: '12nd', '12th' | replace: '13rd', '13th' }}
     </time>
+    {% if page.last_modified_at %}
+    <span class="meta-separator">|</span>
+    <span class="article-revised">
+      Updated
+      <time datetime="{{ page.last_modified_at | date_to_xmlschema }}">
+        {{ page.last_modified_at | date: "%b %-dth %Y" | replace: '1th', '1st' | replace: '2th', '2nd' | replace: '3th', '3rd' | replace: '11st', '11th' | replace: '12nd', '12th' | replace: '13rd', '13th' }}
+      </time>
+    </span>
+    {% endif %}
     <span class="meta-separator">|</span>
     <span class="read-time">
       {% assign words = page.content | number_of_words %}
