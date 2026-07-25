@@ -64,7 +64,9 @@ npm run test:security        # Security audit (npm audit)
 
 Visual regression uses Playwright's `toHaveScreenshot` (`tests/playwright-agents/visual-snapshot.spec.ts`), compared against committed `*-Chrome-linux.png` baselines under `tests/playwright-agents/visual-snapshot.spec.ts-snapshots/`. The blocking "🖼️ Visual Regression" CI job runs `npm run test:visual:snap` on every push and PR.
 
-Because baselines are pinned to the Linux CI renderer, seed or refresh them via CI rather than locally: trigger the **Quality Tests** workflow (`.github/workflows/test-quality.yml`) with `workflow_dispatch` and `update_snapshots=true`, download the `visual-snapshots` artifact, and commit it under the snapshots directory. To preview a diff locally you can run `npm run test:visual:snap` (or `npm run test:visual:snap:update` to regenerate your local screenshots).
+Because baselines are pinned to the Linux CI renderer, seed or refresh them via CI rather than locally: trigger the **Quality Tests** workflow (`.github/workflows/test-quality.yml`) with `workflow_dispatch` and `update_snapshots=true` **on your branch**. The job renders the pages and commits the refreshed PNGs straight back to that branch — there is no artifact to download or commit by hand. (A `visual-snapshots` artifact is still uploaded, but only for inspection.) Seeding on `main` is refused, so baselines get reviewed on a branch before they become the reference every later PR is judged against.
+
+Do not regenerate baselines on macOS or Windows. They are committed as `-linux` PNGs, and cross-platform anti-aliasing differences would make the gate permanently flaky — the failure mode that made BackstopJS non-blocking in the first place. `npm run test:visual:snap` compares against the committed baselines locally and is safe to run anywhere; it self-skips off Linux.
 
 ## Pre-commit Hook
 
