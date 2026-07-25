@@ -71,6 +71,12 @@ author:
       icon: "fab fa-fw fa-linkedin"
       url: "https://linkedin.com/in/ourayviney"
 
+# Unlisted review drafts (B-013) — kept out of listings, feed, and sitemap
+collections:
+  review:
+    output: true
+    permalink: /review/:name/
+
 # Defaults for posts
 defaults:
   - scope:
@@ -85,6 +91,18 @@ defaults:
       related: true
       toc: true
       toc_sticky: true
+  - scope:
+      path: ""
+      type: "review"
+    values:
+      layout: review
+      noindex: true
+      sitemap: false
+      author_profile: false
+      read_time: false
+      comments: false
+      share: false
+      related: false
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list

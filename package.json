@@ -24,7 +24,7 @@
     "test:agents:plan": "npx playwright plan --output=specs/",
     "test:agents:generate": "npx playwright generate --from-specs=specs/",
     "test:agents:heal": "npx playwright heal --interactive",
-    "test:security": "npm audit --audit-level=moderate",
+    "test:security": "node scripts/check-npm-audit.js",
     "pretest": "echo 'Ensure Jekyll is running on port 4000 before running tests'",
     "monitor:healing": "node scripts/healing-monitor.js",
     "analyze:healing-trends": "node scripts/analyze-healing-trends.js",
