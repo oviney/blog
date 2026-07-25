@@ -1,0 +1,12 @@
+{
+  "$comment": "Advisories consciously accepted by the 🔒 Security Audit gate. Every entry needs a reason and a reviewBy date; check-npm-audit.js fails once an entry expires or stops matching a live advisory, so exceptions cannot rot silently.",
+  "allow": [
+    {
+      "id": 1124334,
+      "package": "brace-expansion",
+      "title": "DoS via unbounded expansion length causing an out-of-memory process crash",
+      "reason": "Reaches us only through pa11y-ci 4.1.1 -> globby 6 -> glob 7 -> minimatch 3. The advisory is patched solely in brace-expansion 5.0.8, which exports { expand } instead of the bare function minimatch 3 calls, so forcing it breaks the accessibility gate at runtime. npm's own remedy downgrades pa11y-ci to 1.2.0, a three-major regression. This repo ships no runtime npm code (package.json dependencies is empty) and pa11y-ci only ever globs our own committed config, so no untrusted pattern reaches the parser.",
+      "reviewBy": "2026-10-31"
+    }
+  ]
+}
