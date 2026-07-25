@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="heroTitle heroDesc">
+  <title id="heroTitle">A green build drains the engineering budget</title>
+  <desc id="heroDesc">An engineer stands triumphant with one fist raised, pressing a large green tick button, while behind them a severed navy pipeline pours a stream of red coins into a dark floor drain.</desc>
+
+  <rect width="1600" height="900" fill="#f3efe4"/>
+
+  <!-- ══════ the pipeline, running down across the frame ══════ -->
+  <g transform="rotate(13.6 0 158)">
+    <!-- upstream run -->
+    <rect x="0" y="158" width="1146" height="104" fill="#0f3a5f"/>
+    <rect x="0" y="158" width="1146" height="22" fill="#17557f"/>
+    <!-- flange joints -->
+    <g fill="#0b2b46">
+      <rect x="228" y="142" width="34" height="136"/>
+      <rect x="700" y="142" width="34" height="136"/>
+    </g>
+    <!-- torn mouth: metal peeled outward -->
+    <polygon points="1146,158 1146,262 1188,244 1170,210 1196,178" fill="#0b2b46"/>
+    <polygon points="1146,158 1182,132 1200,166 1170,182" fill="#0b2b46"/>
+    <polygon points="1146,262 1178,290 1150,306 1134,276" fill="#0b2b46"/>
+    <!-- downstream orphan segment, past the break -->
+    <rect x="1296" y="158" width="420" height="104" fill="#0f3a5f"/>
+    <rect x="1296" y="158" width="420" height="22" fill="#17557f"/>
+    <polygon points="1296,158 1296,262 1256,240 1276,206 1252,176" fill="#0b2b46"/>
+    <!-- pressure gauge, still reading fine while the budget leaves -->
+    <g>
+      <rect x="456" y="118" width="18" height="44" fill="#0b2b46"/>
+      <circle cx="465" cy="98" r="34" fill="#0b2b46"/>
+      <circle cx="465" cy="98" r="24" fill="#f3efe4"/>
+      <rect x="461" y="80" width="8" height="22" rx="4" fill="#0b2b46" transform="rotate(38 465 98)"/>
+    </g>
+  </g>
+
+  <!-- ══════ floor ══════ -->
+  <rect x="0" y="800" width="1600" height="14" fill="#ded6c8"/>
+  <rect x="0" y="814" width="1600" height="86" fill="#111111"/>
+  <g fill="#2a2a2a">
+    <polygon points="30,814 108,814 56,900 -22,900"/>
+    <polygon points="230,814 308,814 256,900 178,900"/>
+    <polygon points="430,814 508,814 456,900 378,900"/>
+    <polygon points="630,814 708,814 656,900 578,900"/>
+    <polygon points="830,814 908,814 856,900 778,900"/>
+    <polygon points="1030,814 1108,814 1056,900 978,900"/>
+    <polygon points="1230,814 1308,814 1256,900 1178,900"/>
+    <polygon points="1430,814 1508,814 1456,900 1378,900"/>
+  </g>
+
+  <!-- the drain it all disappears into -->
+  <polygon points="1006,812 1420,812 1338,762 1088,762" fill="#000000"/>
+  <g stroke="#3d3d3d" stroke-width="7">
+    <line x1="1064" y1="800" x2="1362" y2="800"/>
+    <line x1="1086" y1="787" x2="1340" y2="787"/>
+    <line x1="1108" y1="775" x2="1318" y2="775"/>
+    <line x1="1130" y1="766" x2="1296" y2="766"/>
+  </g>
+
+  <!-- settled coins heaping at the drain -->
+  <g fill="#c10f09" stroke="#f3efe4" stroke-width="3">
+    <ellipse cx="1188" cy="792" rx="76" ry="17"/>
+    <ellipse cx="1146" cy="778" rx="58" ry="14"/>
+    <ellipse cx="1222" cy="772" rx="44" ry="12"/>
+    <ellipse cx="1174" cy="762" rx="34" ry="11"/>
+  </g>
+
+  <!-- ══════ money pouring out of the break ══════ -->
+  <g fill="#e3120b" stroke="#f3efe4" stroke-width="3">
+    <ellipse cx="1128" cy="498" rx="30" ry="12" transform="rotate(-12 1128 498)"/>
+    <ellipse cx="1168" cy="546" rx="27" ry="11" transform="rotate(18 1168 546)"/>
+    <ellipse cx="1112" cy="566" rx="25" ry="10" transform="rotate(-24 1112 566)"/>
+    <ellipse cx="1186" cy="612" rx="29" ry="12" transform="rotate(28 1186 612)"/>
+    <ellipse cx="1124" cy="636" rx="26" ry="11" transform="rotate(-16 1124 636)"/>
+    <ellipse cx="1198" cy="676" rx="24" ry="10" transform="rotate(34 1198 676)"/>
+    <ellipse cx="1140" cy="700" rx="28" ry="11" transform="rotate(-8 1140 700)"/>
+    <ellipse cx="1206" cy="734" rx="23" ry="10" transform="rotate(22 1206 734)"/>
+    <ellipse cx="1150" cy="758" rx="26" ry="11" transform="rotate(-20 1150 758)"/>
+  </g>
+
+  <!-- ══════ the green button: the false all-clear ══════ -->
+  <rect x="568" y="646" width="130" height="168" fill="#111111"/>
+  <rect x="542" y="626" width="182" height="28" rx="10" fill="#111111"/>
+  <circle cx="633" cy="556" r="88" fill="#111111"/>
+  <circle cx="633" cy="547" r="76" fill="#1c8f4a"/>
+  <polygon points="593,548 620,578 672,516 687,533 620,608 578,562" fill="#f3efe4"/>
+
+  <!-- ══════ the engineer, triumphant ══════ -->
+  <g fill="#111111">
+    <!-- boots -->
+    <rect x="286" y="792" width="66" height="24" rx="8"/>
+    <rect x="368" y="792" width="66" height="24" rx="8"/>
+    <!-- legs, planted apart -->
+    <polygon points="302,798 344,798 358,652 324,652"/>
+    <polygon points="376,798 418,798 398,652 364,652"/>
+    <!-- torso, one clean mass tapering to the hips -->
+    <path d="M296 534 q0 -30 30 -30 h72 q30 0 30 30 l-8 118 q-2 22 -24 22 h-68 q-22 0 -24 -22 z"/>
+    <!-- neck -->
+    <rect x="344" y="486" width="30" height="34"/>
+    <!-- head -->
+    <circle cx="359" cy="470" r="42"/>
+    <!-- hard hat: dome + brim -->
+    <path d="M313 458 a46 46 0 0 1 92 0 z"/>
+    <rect x="303" y="452" width="112" height="16" rx="8"/>
+    <rect x="349" y="410" width="20" height="16" rx="6"/>
+    <!-- raised fist, well clear of the head -->
+    <rect x="300" y="392" width="32" height="160" rx="16" transform="rotate(-24 316 552)"/>
+    <circle cx="248" cy="404" r="26"/>
+    <!-- arm extended to the button -->
+    <rect x="392" y="546" width="180" height="32" rx="16"/>
+    <circle cx="574" cy="562" r="27"/>
+  </g>
+</svg>
