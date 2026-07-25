@@ -1,10 +1,15 @@
 ---
-layout: review
+layout: post
 title: "Green Light, Red Ledger: Flaky Tests Are Engineering's Costliest Invisible Tax"
-date: 2026-07-21
+date: 2026-07-24
 author: Ouray Viney
-categories: [Quality Engineering, Test Automation, Software Engineering]
+categories: ["Quality Engineering", "Test Automation", "Software Engineering"]
 description: "Flaky tests cost Atlassian 150,000 developer-hours a year and skew 84% of Google's CI signal. The real budget drain is larger than most leaders admit."
+image: /assets/images/green-light-red-ledger-flaky-tests-are-engineering-s-costliest-invisible-tax-hero.svg
+image_alt: "An engineer raises a triumphant fist while pressing a green tick button, as a severed pipeline pours red coins into a floor drain behind them"
+image_caption: "The build is green; the budget drains"
+tags: [flaky-tests, continuous-integration, test-automation, developer-productivity]
+subtitle: "What a green build hides: the payroll cost of tests that lie"
 ---
 
 <!-- HERO IMAGE — generate an image from the prompt below, then replace this whole comment with it (see output/posts/<slug>.image_prompt.md):
