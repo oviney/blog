@@ -87,12 +87,22 @@ jobs:
   # Runs on EVERY pull_request/push (independent of change-based selection) so a
   # required status check never deadlocks waiting on a skipped job. Unlike every
   # other Playwright job in this workflow it carries NO `continue-on-error`, so a
-  # pixel diff reds the check and blocks the merge. Seed/refresh baselines via
-  # `workflow_dispatch` with update_snapshots=true, then commit the artifact.
+  # pixel diff reds the check and blocks the merge. Seed/refresh baselines by
+  # dispatching this workflow on the target branch with update_snapshots=true —
+  # the job commits the refreshed PNGs straight back to that branch.
+  #
+  # Seeding deliberately commits rather than leaving the operator to download the
+  # artifact by hand: the original baselines were captured on a branch that
+  # predated the newsletter-CTA change, hand-committed, and then squash-merged
+  # onto a main that already had it, so the gate was red from its first run.
+  # Committing from the same checkout that rendered the pixels keeps the baseline
+  # and the markup that produced it in lockstep.
   # ---------------------------------------------------------------------------
   visual-regression:
     name: 🖼️ Visual Regression
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # seed mode commits refreshed baselines to the branch
 
     steps:
       - uses: actions/checkout@v7
@@ -136,6 +146,33 @@ jobs:
           name: visual-snapshots
           path: tests/playwright-agents/visual-snapshot.spec.ts-snapshots/
           retention-days: 7
+
+      # Commit the pixels we just rendered back to the dispatched branch. main is
+      # refused outright: it is protected, so a push would fail anyway, and
+      # baselines belong on a branch that can be reviewed before they become the
+      # reference every later PR is judged against.
+      - name: Commit refreshed baselines (seed mode)
+        if: ${{ inputs.update_snapshots }}
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            echo "::error::Refusing to seed baselines directly on main."
+            echo "Dispatch this workflow on a branch, review the baseline diff, then merge."
+            exit 1
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add tests/playwright-agents/visual-snapshot.spec.ts-snapshots/
+
+          if git diff --cached --quiet; then
+            echo "Baselines already match this branch's render — nothing to commit."
+            exit 0
+          fi
+
+          git commit -m "test(visual): refresh -linux baselines via seed dispatch
+
+          Rendered by ${GITHUB_WORKFLOW} run ${GITHUB_RUN_ID} on ${GITHUB_SHA}."
+          git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Upload visual diff on failure
         if: failure()
