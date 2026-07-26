@@ -63,7 +63,7 @@
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.61.1",
-    "lighthouse": "^12.8.2",
+    "lighthouse": "^13.4.1",
     "pa11y-ci": "^4.1.0"
   }
 }
