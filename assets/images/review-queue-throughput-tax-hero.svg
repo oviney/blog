@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <title>Merge Pending: Code Review Queues Drain Engineering Sprints</title>
+  <desc>A developer types furiously at a desk while a towering pile of unreviewed pull-request cards looms from floor to ceiling, dwarfing an empty sprint board as a ticking clock counts down.</desc>
+
+  <rect width="1600" height="900" fill="#f3efe4"/>
+  <rect x="0" y="790" width="1600" height="110" fill="#0b2b46"/>
+
+  <circle cx="120" cy="100" r="86" fill="#0b2b46"/>
+  <circle cx="120" cy="100" r="74" fill="#f3efe4"/>
+  <line x1="120" y1="100" x2="120" y2="42" stroke="#0b2b46" stroke-width="10" stroke-linecap="round"/>
+  <line x1="120" y1="100" x2="166" y2="70" stroke="#e3120b" stroke-width="7" stroke-linecap="round"/>
+  <line x1="120" y1="26" x2="120" y2="38" stroke="#0b2b46" stroke-width="5" stroke-linecap="round"/>
+  <line x1="120" y1="162" x2="120" y2="174" stroke="#0b2b46" stroke-width="5" stroke-linecap="round"/>
+  <line x1="46" y1="100" x2="58" y2="100" stroke="#0b2b46" stroke-width="5" stroke-linecap="round"/>
+  <line x1="182" y1="100" x2="194" y2="100" stroke="#0b2b46" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="120" cy="100" r="8" fill="#e3120b"/>
+
+  <polygon points="0,700 660,700 700,745 0,745" fill="#17557f"/>
+  <rect x="0" y="745" width="680" height="50" fill="#0b2b46"/>
+
+  <rect x="158" y="534" width="132" height="172" rx="22" fill="#111111"/>
+  <circle cx="224" cy="492" r="56" fill="#111111"/>
+  <path d="M168 640 Q298 638 412 666" stroke="#111111" stroke-width="46" fill="none" stroke-linecap="round"/>
+  <path d="M288 652 Q400 652 494 674" stroke="#111111" stroke-width="40" fill="none" stroke-linecap="round"/>
+
+  <rect x="370" y="684" width="246" height="20" rx="5" fill="#2a2a2a"/>
+
+  <rect x="514" y="576" width="18" height="128" fill="#2a2a2a"/>
+  <rect x="400" y="416" width="252" height="166" rx="8" fill="#1a1a1a"/>
+  <rect x="413" y="428" width="226" height="142" rx="4" fill="#17557f"/>
+  <rect x="425" y="444" width="144" height="9" rx="3" fill="#e3120b"/>
+  <rect x="425" y="462" width="184" height="9" rx="3" fill="#f3efe4" opacity="0.3"/>
+
+  <ellipse cx="832" cy="776" rx="196" ry="22" fill="#0b2b46" opacity="0.45"/>
+
+  <g transform="rotate(4 799 664)">
+    <rect x="608" y="586" width="382" height="156" rx="8" fill="#f3efe4" stroke="#0b2b46" stroke-width="5"/>
+    <rect x="636" y="614" width="214" height="10" rx="3" fill="#0b2b46" opacity="0.3"/>
+    <rect x="636" y="633" width="154" height="10" rx="3" fill="#e3120b" opacity="0.45"/>
+  </g>
+
+  <rect x="602" y="444" width="382" height="156" rx="8" fill="#f3efe4" stroke="#0b2b46" stroke-width="5" transform="rotate(-3 793 522)"/>
+  <rect x="610" y="302" width="382" height="156" rx="8" fill="#f3efe4" stroke="#0b2b46" stroke-width="5" transform="rotate(2.5 801 380)"/>
+  <rect x="604" y="160" width="382" height="156" rx="8" fill="#f3efe4" stroke="#0b2b46" stroke-width="5" transform="rotate(-2 795 238)"/>
+
+  <g transform="rotate(3 799 96)">
+    <rect x="608" y="18" width="382" height="156" rx="8" fill="#e3120b" stroke="#0b2b46" stroke-width="5"/>
+    <rect x="636" y="46" width="214" height="10" rx="3" fill="#f3efe4" opacity="0.55"/>
+    <rect x="636" y="65" width="154" height="10" rx="3" fill="#f3efe4" opacity="0.55"/>
+  </g>
+
+  <rect x="1062" y="200" width="488" height="560" rx="12" fill="#17557f"/>
+  <rect x="1062" y="200" width="488" height="58" rx="12" fill="#0b2b46"/>
+  <rect x="1224" y="258" width="6" height="502" fill="#0b2b46" opacity="0.38"/>
+  <rect x="1386" y="258" width="6" height="502" fill="#0b2b46" opacity="0.38"/>
+  <rect x="1074" y="272" width="136" height="58" rx="6" fill="#f3efe4" opacity="0.88"/>
+  <rect x="1086" y="288" width="90" height="9" rx="2" fill="#e3120b"/>
+
+  <rect x="500" y="492" width="214" height="130" rx="7" fill="#e3120b" stroke="#f3efe4" stroke-width="5" transform="rotate(-24 607 557)"/>
+</svg>
