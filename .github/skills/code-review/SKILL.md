@@ -1,7 +1,7 @@
 ---
 name: code-review
 description: '5-axis code review framework for all agents. Use when reviewing PRs, evaluating code quality, or providing structured review feedback.'
-version: 1.0.0
+version: 1.1.0
 triggers:
   - Reviewing a pull request
   - Evaluating code quality
@@ -30,11 +30,13 @@ Does the code do what it claims to do?
 - [ ] No regressions introduced to existing behaviour
 - [ ] Error handling is present and appropriate
 - [ ] Build passes (`bundle exec jekyll build`)
+- [ ] Merge-blocking gates are green — 🖼️ Visual Regression, 🔒 Security Audit, 📝 Content Validation, and the Playwright shards all block merge
 
 **Common issues in this repo:**
 - Liquid template errors from malformed YAML front matter
 - Broken internal links after renaming or moving files
 - Missing image assets referenced in post front matter
+- A red 🖼️ Visual Regression check treated as a flake. Since #1119 the pixel gate is blocking and usually correct: either the change altered rendering (re-seed baselines in CI via `test-quality.yml` `workflow_dispatch` with `update_snapshots=true`) or it caught a real regression. Read the diff artefact before dismissing it.
 
 ### Axis 2 — Readability
 
@@ -57,9 +59,20 @@ Does the change fit the system's structure?
 
 - [ ] Change is in the correct file/directory for its domain
 - [ ] No scope creep — only files related to the issue are modified
-- [ ] Protected files are not touched (`_config.yml`, `Gemfile`, `.github/CODEOWNERS`)
+- [ ] Protected files are not touched — the full list is `_config.yml`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`, `Gemfile`, `Gemfile.lock`
+- [ ] Any deliberate-intent label is justified in the PR description, not just applied (see table below)
 - [ ] Agent scope rules are respected (see `AGENTS.md`)
 - [ ] No new dependencies without explicit justification
+
+**Label bypasses — verify intent, because the scope guard cannot.** `scripts/check-pr-scope.sh` honours three labels that relax its rules. The guard has no way to detect misuse, so confirming the bypass is warranted is a reviewer responsibility:
+
+| Label | Relaxes | Reject when |
+|-------|---------|-------------|
+| `governance-update` | Deliberate `.github/skills/` or `.github/instructions/` changes | Applied to an incidental drive-by edit |
+| `bulk-content` | Rule 2, the 15-file scope-explosion cap | Used to avoid splitting unrelated changes, or on any refactor — refactors should be incremental |
+| `protected-file-update` | Rule 1, **for `AGENTS.md` and `ARCHITECTURE.md` only** | Applied to any other protected file (it has no effect there), or without a tracked issue behind it |
+
+Combining `bulk-content` with `governance-update` is allowed but **requires explicit justification in the PR description** naming why both bypasses are needed together. Reject the PR if that justification is missing.
 
 **Common issues in this repo:**
 - Editing files outside the assigned agent's scope
@@ -177,4 +190,5 @@ Use this template when writing a review:
 
 ## Version History
 
+- **1.1.0** (2026-07-31): Completed the protected-file list (was missing `Gemfile.lock` and `.github/copilot-instructions.md`); documented the three scope-guard label bypasses and the reviewer's duty to verify intent; added the blocking CI gates to the Correctness axis
 - **1.0.0** (2026-04-12): Initial skill creation — 5-axis review framework adapted from addyosmani/agent-skills

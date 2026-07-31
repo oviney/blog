@@ -1,7 +1,7 @@
 ---
 name: economist-theme
 description: 'Design system for The Economist visual style. Use when modifying CSS, SCSS, layouts, responsive design, typography, or UI components.'
-version: 1.2.0
+version: 1.3.0
 triggers:
   - Adding new styles or components
   - Modifying existing SCSS
@@ -12,7 +12,7 @@ triggers:
 
 ## Context
 
-This blog uses a custom theme inspired by The Economist's visual identity. The design system is implemented in `_sass/economist-theme.scss` (600+ lines) and follows The Economist's editorial standards:
+This blog uses a custom theme inspired by The Economist's visual identity. The design system is implemented in `_sass/economist-theme.scss` and follows The Economist's editorial standards:
 
 **Core Principles**:
 - Clean, readable typography with generous whitespace
@@ -145,6 +145,15 @@ $spacing-unit: 16px;
 4. Test responsive: resize browser to 320px, 768px, 1024px
 5. Check browser console for errors
 6. Verify no visual regressions on other pages
+
+**The pixel gate is blocking — plan for it.** Since #1119, `tests/playwright-agents/visual-snapshot.spec.ts` asserts `toHaveScreenshot` against committed baselines at Mobile (320), Tablet (768) and Desktop (1920) Chromium, and the 🖼️ Visual Regression check **fails the merge** on any diff. BackstopJS was retired in the same PR; `backstop.json` no longer exists.
+
+Consequences for any SCSS change that alters rendering:
+
+- Expect the gate to go red. That is the gate working, not a flake — read the diff artefact before assuming otherwise.
+- Baselines are committed per-platform as `*-linux.png`. They must be re-seeded **in CI**, not locally: run the `test-quality.yml` workflow via `workflow_dispatch` with `update_snapshots=true` on your branch. A macOS-generated baseline will not match the Linux runner, and the specs self-skip off Linux by design.
+- Re-seed **after** rebasing onto the latest `main`. A newer bundled Chromium or newly published content shifts page height, so seeding before a rebase only forces a second re-seed.
+- Baseline commits are bulky. Keep them in their own commit, separate from the SCSS fix, so the diff stays reviewable.
 
 ## Common Pitfalls
 
@@ -354,7 +363,7 @@ assets/images/blog-default.svg
 
 ## Related Files
 
-- [`_sass/economist-theme.scss`](../../../_sass/economist-theme.scss) - Main theme file (600+ lines)
+- [`_sass/economist-theme.scss`](../../../_sass/economist-theme.scss) - Main theme file
 - [`_layouts/default.html`](../../../_layouts/default.html) - Base layout
 - [`_layouts/post.html`](../../../_layouts/post.html) - Article layout
 - [`docs/CURRENT_STATE.md`](../../../docs/CURRENT_STATE.md) - Theme implementation history
@@ -374,5 +383,7 @@ assets/images/blog-default.svg
 
 ## Version History
 
+- **1.3.0** (2026-07-31): Documented the blocking `toHaveScreenshot` pixel gate and its CI-only baseline re-seed procedure (BackstopJS retired in #1119); dropped the stale "600+ lines" claim about the theme file, which had grown to ~3,500 lines
+- **1.2.0** (2026-04-26): Version bumped in front matter without a history entry — recorded here retrospectively; original change not documented
 - **1.1.0** (2026-01-05): Added Economist date format patterns (ordinal suffixes), image fallback strategy, default blog-default.svg asset documentation
 - **1.0.0** (2026-01-05): Initial skill creation from README.md and AI_CODING_GUIDELINES.md
