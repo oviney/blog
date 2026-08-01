@@ -16,6 +16,13 @@ import { test, expect } from '@playwright/test';
  * published:false /agents/* pages are intentionally excluded — they are not
  * built and therefore have no rendered URL to baseline.
  *
+ * The gate must stay green across a publish, or it reds on every article and
+ * gets ignored — which is how it sat broken from #1119 until #1160. Two
+ * mechanisms keep it decoupled from publication: `listing` pins grid pages to
+ * the viewport and masks the grid, and `volatile` hides the per-page blocks
+ * that a publish rewrites. The homepage needs both — its hero renders outside
+ * the grid, so the mask does not reach it.
+ *
  * Baselines are committed as `-linux` Chromium PNGs generated in the CI
  * environment. They must NOT be regenerated on macOS/Windows: cross-platform
  * anti-aliasing differences would make the gate permanently flaky — the exact
@@ -34,12 +41,33 @@ import { test, expect } from '@playwright/test';
 // post-card partial extracted in #1123 (home, blog index, category pages).
 const LISTING_GRID = '.topic-grid';
 
+// Volatile content — blocks a page composes from whatever happens to be
+// published, so publishing an article rewrites them and moves the pixels below.
+// Every page names its own in `volatile` below, and they are `display: none`-ed
+// before capture. `display: none`, never `mask`: a mask paints after layout, so
+// a taller or shorter block still shifts everything beneath it and fails on a
+// size mismatch before the mask is ever consulted.
+
 // Cross-links a post page builds from whatever else is published (_layouts/post.html
 // renders `related_posts limit: 3` and `more_from_posts offset: 1 limit: 5`).
 // The slot count is fixed but the entries are not, so a longer headline wraps to
 // an extra line and moves everything below it — enough to change the full-page
 // height and fail the gate on a size mismatch.
 const POST_CROSS_LINKS = ['.related-list', '.more-from-section'];
+
+// The homepage hero (index.md:22) renders the newest — or `featured: true` —
+// post's image, category, title, subtitle, 40-word excerpt, date and read time
+// OUTSIDE `.topic-grid`, so the `listing` mask below does not reach it. Every
+// publish that takes over the hero rewrites that block, which is why the
+// homepage stayed coupled to publication after #1186 decoupled the category
+// pages: measured at 17,118px / ratio 0.03 against the 0.02 threshold on
+// [Tablet Chrome].
+//
+// Hiding it trades away pixel coverage of the hero's type scale, spacing, image
+// aspect and colour — a deliberate, accepted trade (SPEC.md §2). The structure
+// is still covered: homepage.spec.ts:21-37 asserts the hero is visible, its
+// title links, its excerpt renders and its CTA works, re-asserted at :174-180.
+const HOMEPAGE_HERO = ['.hero-post'];
 
 // `listing: true` marks a page whose body is a `.topic-grid` of post cards.
 // Those pages re-render on every published article, so they are captured
@@ -50,14 +78,23 @@ const POST_CROSS_LINKS = ['.related-list', '.more-from-section'];
 // publish into their category, which is exactly the coupling the flag exists
 // to break — the gate billed a baseline re-seed as the price of shipping an
 // article.
-const PAGES: { name: string; path: string; listing?: boolean }[] = [
-  { name: 'homepage', path: '/', listing: true },
+//
+// `listing: true` is necessary but not sufficient on the homepage: it is the
+// only listing page that renders volatile content OUTSIDE the grid, so it also
+// names `.hero-post` in `volatile`. The other listing pages have nothing above
+// the grid that a publish can move.
+const PAGES: { name: string; path: string; listing?: boolean; volatile?: string[] }[] = [
+  { name: 'homepage', path: '/', listing: true, volatile: HOMEPAGE_HERO },
   { name: 'blog-index', path: '/blog/', listing: true },
-  { name: 'post-testing-times', path: '/2025/12/31/testing-times/' },
+  { name: 'post-testing-times', path: '/2025/12/31/testing-times/', volatile: POST_CROSS_LINKS },
   // Permalink is /2026/01/02/ — the post is dated 2026-01-02. This pointed at
   // /2026/01/01/ from #1119 until #1160, so the scenario silently baselined the
   // 404 page (a telltale 1920x1080 capture) instead of the article.
-  { name: 'post-self-healing-tests', path: '/2026/01/02/self-healing-tests-myth-vs-reality/' },
+  {
+    name: 'post-self-healing-tests',
+    path: '/2026/01/02/self-healing-tests-myth-vs-reality/',
+    volatile: POST_CROSS_LINKS,
+  },
   { name: 'about', path: '/about/' },
   // Gap-B page types — category landing pages, search, and the 404 page. The
   // 404 page is built to /404/index.html (pretty permalinks), so it is served
@@ -85,7 +122,7 @@ test.describe('@visual Visual regression snapshots @REQ-VISUAL-SNAP', () => {
     'visual baselines are -linux only; run in CI (ubuntu) or via test:visual:snap:update',
   );
 
-  for (const { name, path, listing } of PAGES) {
+  for (const { name, path, listing, volatile } of PAGES) {
     test(`${name} matches its committed baseline`, async ({ page }) => {
       const response = await page.goto(path);
 
@@ -100,17 +137,22 @@ test.describe('@visual Visual regression snapshots @REQ-VISUAL-SNAP', () => {
       await page.waitForLoadState('networkidle');
       await page.evaluate(() => document.fonts.ready);
 
-      // Drop the post-to-post cross-links before measuring. They sit below the
-      // article, so removing them keeps everything this gate exists to check —
-      // masthead, hero, body typography, share controls, newsletter CTA, footer
-      // — while making the page height depend only on the article itself. A
-      // mask would not do: it paints after layout, so the height would still
-      // move. Their links are exercised by content-edge-cases.spec.ts, though
-      // only permissively (the assertions are conditional on the section being
-      // present), so this does thin their coverage rather than duplicate it.
-      if (!listing) {
+      // Drop this page's volatile blocks before measuring, so what remains
+      // depends only on the page itself and not on what happens to be published.
+      //
+      // On post pages that is the cross-links, which sit below the article — so
+      // removing them keeps everything this gate exists to check (masthead,
+      // hero, body typography, share controls, newsletter CTA, footer) while
+      // making the page height depend only on the article. Their links are
+      // exercised by content-edge-cases.spec.ts, though only permissively (the
+      // assertions are conditional on the section being present), so this does
+      // thin their coverage rather than duplicate it.
+      //
+      // On the homepage it is the hero, which sits ABOVE the masked grid and so
+      // shifts it — see HOMEPAGE_HERO for the trade and what still covers it.
+      if (volatile?.length) {
         await page.addStyleTag({
-          content: `${POST_CROSS_LINKS.join(', ')} { display: none !important; }`,
+          content: `${volatile.join(', ')} { display: none !important; }`,
         });
       }
 
