@@ -17,7 +17,7 @@ npm test
 ## Individual Test Components
 
 ```bash
-npm run test:visual      # BackstopJS visual regression
+npm run test:visual:snap # Playwright visual regression (toHaveScreenshot)
 npm run test:a11y        # pa11y-ci accessibility
 npm run test:lighthouse  # Lighthouse CI performance
 npm run test:playwright  # Playwright behavioral testing
@@ -49,7 +49,7 @@ These are infrastructure improvements, not test failures. Performance scores of 
 
 | Component | Status | Score | Notes |
 |-----------|--------|-------|-------|
-| **Visual Regression** | ✅ | 15/15 (100%) | BackstopJS across 3 viewports |
+| **Visual Regression** | ✅ | 15/15 (100%) | Playwright `toHaveScreenshot` across 3 viewports |
 | **Behavioral Testing** | ✅ | 111/111 (100%) | Playwright with nuclear healing |
 | **Accessibility** | ✅ | 2/2 (100%) | pa11y-ci WCAG2AA compliance |
 | **Performance** | ⚠️ | 83-90% | Lighthouse CI with minor SEO issues |

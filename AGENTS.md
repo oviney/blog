@@ -130,6 +130,8 @@ The directed graph below visualises the per-persona handoff target rows above. I
 
 The diagram is a visual aid. Screen-reader users can rely on the per-persona rows above and the prose triggers for each persona — those are the canonical source of truth.
 
+The graph shows **who** hands off to whom; the [Handoff Packet](#handoff-packet) convention below defines **what** rides along with every transfer so the receiving persona starts with full context instead of reconstructing it.
+
 ```mermaid
 graph LR
     CD[Creative Director] --> EC[Editorial Chief]
@@ -143,6 +145,23 @@ graph LR
     AR --> QA
     GA(["General Agent (terminal)"])
 ```
+
+### Handoff Packet
+
+The Handoff Graph above declares the routes; a **Handoff Packet** declares the payload. Whenever one persona transfers ownership at a phase boundary (a `**Handoff triggers**:` condition fires), it must hand the next persona a structured packet so state is carried forward rather than lost. The receiving persona should be able to start work from the packet alone, without re-deriving context from the diff or chat history.
+
+Every cross-persona handoff must include at least these fields:
+
+| Field | What it captures |
+|-------|------------------|
+| **Context** | One-line summary of the intent — what problem is being solved and why the handoff is happening now. |
+| **Work done** | Files touched and their outcomes (what changed, what passed, what was deliberately left alone). |
+| **Artifacts / PRs** | Links to the branch, PR, issue, failing CI job, or screenshot the next owner needs. Use `GH-<number>` or full URLs — never a bare `#<number>` (an orchestration bot misreads it as an issue ref). |
+| **Open questions** | The specific blocker, decision, or ambiguity that requires the receiving persona's expertise. |
+| **Next owner** | The target persona, consistent with this persona's `**Handoff triggers**:` row and the Mermaid graph above. |
+| **Acceptance checks** | The conditions that let the next owner confirm the handoff is resolved (e.g. `bundle exec jekyll build` passes, a specific test is green, contrast meets WCAG AA). |
+
+The **Context**, **Work done**, and **Open questions** fields are the irreducible minimum — a packet missing any of them should be returned to the sender. The General Agent is terminal (see above) and does not emit Handoff Packets; it resolves cross-cutting work end-to-end.
 
 ---
 
