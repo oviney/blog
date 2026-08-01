@@ -93,15 +93,31 @@ export default defineConfig({
       },
     },
 
-    /* Cross-browser testing */
-    {
-      name: 'Desktop Firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'Desktop Safari',
-      use: { ...devices['Desktop Safari'] },
-    },
+    /* Cross-browser testing.
+     *
+     * Opt-in via PLAYWRIGHT_ALL_BROWSERS=1. CI installs chromium only
+     * (`npx playwright install chromium`), so declaring these unconditionally
+     * meant every Firefox and WebKit test failed with "Executable doesn't
+     * exist" — 376 of the suite's 940 tests. `continue-on-error: true` on the
+     * shards swallowed it, so the projects looked like cross-browser coverage
+     * while never having run once.
+     *
+     * Enabling them requires installing the browsers too:
+     *   npx playwright install firefox webkit --with-deps
+     *   PLAYWRIGHT_ALL_BROWSERS=1 npx playwright test
+     */
+    ...(process.env.PLAYWRIGHT_ALL_BROWSERS === '1'
+      ? [
+          {
+            name: 'Desktop Firefox',
+            use: { ...devices['Desktop Firefox'] },
+          },
+          {
+            name: 'Desktop Safari',
+            use: { ...devices['Desktop Safari'] },
+          },
+        ]
+      : []),
   ],
 
   /* Run your local Jekyll server before starting the tests */

@@ -29,17 +29,39 @@ log() { echo "  [select-tests] $*" >&2; }
 # Determine changed files
 # ---------------------------------------------------------------------------
 
-# In CI the checkout depth may be 1; fetch enough history if needed.
-if ! git rev-parse HEAD~1 >/dev/null 2>&1; then
-  log "Shallow clone detected – fetching additional history"
-  git fetch --depth=2 origin 2>/dev/null || true
-fi
+# Diff against the merge base with the target branch, NOT HEAD~1.
+#
+# HEAD~1 only ever exposes the most recent commit. On any PR with more than one
+# commit that silently hides earlier changes from selection — a PR whose first
+# commit edits _layouts/ and whose second edits a doc would be classified
+# "docs-only" and skip Playwright entirely. BASE_REF lets the workflow pass the
+# PR's base; we fall back through origin/main to HEAD~1 so local runs still work.
+BASE_REF="${BASE_REF:-origin/main}"
 
 CHANGED_FILES=""
-if git rev-parse HEAD~1 >/dev/null 2>&1; then
+DIFF_BASE=""
+
+if git rev-parse --verify "$BASE_REF" >/dev/null 2>&1; then
+  # merge-base keeps us honest when the branch is behind: we want what THIS
+  # branch changed, not everything that landed on main in the meantime.
+  DIFF_BASE=$(git merge-base "$BASE_REF" HEAD 2>/dev/null || true)
+fi
+
+if [[ -n "$DIFF_BASE" ]]; then
+  log "Diffing against merge-base with ${BASE_REF} (${DIFF_BASE:0:8})"
+  CHANGED_FILES=$(git diff --name-only "$DIFF_BASE" HEAD 2>/dev/null || true)
+elif git rev-parse HEAD~1 >/dev/null 2>&1; then
+  log "No usable ${BASE_REF} – falling back to HEAD~1 (may under-select)"
   CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || true)
 else
   log "Cannot determine changed files – treating as full suite"
+  CHANGED_FILES="UNKNOWN"
+fi
+
+# An empty diff is ambiguous (no changes, or a broken base). Never interpret it
+# as "nothing to test" — fail safe to the full suite.
+if [[ -z "$CHANGED_FILES" ]]; then
+  log "Empty diff – treating as full suite"
   CHANGED_FILES="UNKNOWN"
 fi
 
