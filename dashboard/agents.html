@@ -136,7 +136,13 @@ sitemap: false
       letter-spacing: .5px;
       margin-bottom: 16px;
     }
-    .chart-wrap { position: relative; height: 220px; }
+    /* Chart.js sizes the canvas from its parent, but with no width constraint
+       of its own the canvas could still render wider than the card and push the
+       page sideways at 320px (canvas#chart-content-dist measured right=344px
+       against a 320px viewport). min-width:0 on .chart-card alone was not
+       enough — the wrapper and canvas need their own ceiling. */
+    .chart-wrap { position: relative; height: 220px; width: 100%; min-width: 0; }
+    .chart-wrap canvas { display: block; max-width: 100%; }
     /* ── Tables ─────────────────────────────────────────────── */
     /* Let wide data tables scroll inside their own box instead of pushing the
        whole page sideways on phones (Gap C, defect P3 #13). */
