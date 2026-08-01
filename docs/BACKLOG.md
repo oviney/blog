@@ -41,17 +41,18 @@ duplicate the queue.
 > policy) and **P5** (memory-guard rephrasing-hardening) were **cut** as low-value —
 > match complexity to scale. The lone survivor (Rule 4 anchor) shipped in #1064.
 
-> **Epic — Visual-quality gate hardening** — **Gaps A, C, D, E shipped; Gap B in review.**
+> **Epic — Visual-quality gate hardening** — **CLOSED 2026-08-01. All five gaps shipped.**
 > Driven by [`docs/agents/visual-quality-review.goal.md`](agents/visual-quality-review.goal.md)
 > and the 20-defect Phase-0 catalog in [`docs/agents/visual-audit-findings.md`](agents/visual-audit-findings.md).
 > This epic was never tracked here — it ran entirely through GitHub Issues/PRs
-> while this file read "Active queue drained." Recorded now so the local queue
-> reflects reality. Gap B (#1138) is the last open gap.
+> while this file read "Active queue drained." Gap B, the last one open, merged
+> in #1138. What the epic left behind is baseline *stability*, not coverage:
+> #1186 decoupled the category pages from publication, and the homepage row
+> below is the remaining instance.
 
 | Pri | Task | Scope / label | Status | Ref |
 |----|------|---------------|--------|-----|
-| P2 | Decouple category visual baselines from post publication — full-page `toHaveScreenshot` on `/security/`, `/software-engineering/`, `/test-automation/` re-baselines on **every** publish, so the gate bills a rebaseline as the price of shipping content. Clip to header + first grid row, or mask the card grid. | `agent:qa-gatekeeper` | Not started — surfaced by the #1138 failure | — |
-| P2 | Fix the orchestrator's duplicate-PR closer. `.github/workflows/orchestrator.yml:144` maps PRs to issues with `/(?<![/\w])#(\d+)/g`, matching **any** bare `#NNN` in a body, not just closing keywords. Two open PRs that merely mention the same issue are treated as duplicates and the lower-commit one is auto-closed. Closed #1171, #1172 and #1174 in one session. Restrict to closing keywords (`clos(e|es|ed)`, `fix(es|ed)`, `resolve(s|d)`). | `governance-update` | Not started | — |
+| P2 | Decouple the **homepage** baseline from post publication. `index.md:22` renders `.hero-post` — the newest post's image, category, title, subtitle, 40-word excerpt, date and read-time — **outside** `.topic-grid`, so `listing: true` masks the grid below it and leaves the hero exposed. Any post that becomes the newest one rewrites that block and shifts everything under it. Measured at 17,118px / ratio 0.03 against the 0.02 threshold on Tablet. Same defect class as the category rows just closed in #1186, on the page that publishes most often — so shipping an article still reds the gate. Every fix (mask `.hero-post`, `display: none` it the way the post cross-links are handled, or drop the homepage from the pixel gate) trades away real homepage coverage: **owner call on which**. | `agent:qa-gatekeeper` | Not started — surfaced by the #1186 decoupling probe | — |
 | P3 | De-duplicate Jekyll builds in CI. A PR builds the site ~4 times across `test-build`, `content-validation` and `test-quality` jobs. Build once, upload `_site` as an artifact, download in dependents. | `agent:qa-gatekeeper` | Not started | — |
 | P3 | Decide the fate of cross-browser coverage. Firefox and WebKit projects are now opt-in behind `PLAYWRIGHT_ALL_BROWSERS=1` because CI only ever installed chromium — 376 tests had never once run. Either install those browsers on the nightly schedule and enable the flag, or delete the projects. | `agent:qa-gatekeeper` | Not started | — |
 | P3 | ADR: adopt / defer / hybrid on `.github/agents/*.agent.md` native custom agents vs `agent:*` label routing. Decision only — avoid two competing routing systems. | `governance-update` | Not started | [#1110](https://github.com/oviney/blog/issues/1110) |
@@ -62,18 +63,7 @@ duplicate the queue.
 
 ## In review (awaiting human gate)
 
-| Task | PR | Gate |
-|------|----|------|
-| Remediate the `brace-expansion` advisory; drop the allowlist exception | [#1170](https://github.com/oviney/blog/pull/1170) | Merge — **land first**, it unreds the 🔒 Security Audit check on every other open PR |
-| Bump `@playwright/test` 1.61.1 → 1.62.0 | [#1162](https://github.com/oviney/blog/pull/1162) | Merge — rebase onto #1170 first |
-| Close Gap B — visual coverage for uncovered page types | [#1138](https://github.com/oviney/blog/pull/1138) | Merge — needs a rebase onto #1170 + #1162, then a baseline re-seed (see note below) |
-| Refresh agent observability dashboard data | [#1167](https://github.com/oviney/blog/pull/1167) | Merge — automated data refresh, no checks configured |
-
-> **Gap B (#1138) sequencing.** Its two red category baselines are stale by 23px
-> because the flaky-tests post published into those categories on 2026-07-24,
-> after the baselines were seeded. Re-seed **after** #1162 lands — Playwright
-> 1.62 ships a newer bundled Chromium, so seeding first would only force a
-> second re-seed.
+*(empty — the four PRs listed here have all merged; see **Recently shipped**.)*
 
 ---
 
@@ -81,6 +71,9 @@ duplicate the queue.
 
 | Task | Resolution | Date |
 |------|------------|------|
+| Decouple the category visual baselines from post publication | [#1186](https://github.com/oviney/blog/pull/1186) merged — the three category pages carry `listing: true`, the flag home and `/blog/` already had, so the capture is viewport-pinned with `.topic-grid` masked. Masking alone would not have done it: a mask paints after layout, so a taller grid still fails on a size mismatch first. Nine baselines re-seeded in CI, nothing else moved. Proven with a throwaway post published into Security (3 → 4 cards): all nine category snapshots held. `/search/` stays full-page — no `.topic-grid`, results render client-side. | 2026-08-01 |
+| Orchestrator auto-closed PRs that merely mentioned the same issue | [#1183](https://github.com/oviney/blog/pull/1183) merged — issue refs now come from GitHub's closing keywords (`/\b(?:close[sd]?\|fix(?:e[sd])?\|resolve[sd]?)\b[\s:]+#(\d+)\b/gi`) instead of any bare `#NNN`. Fixes all three consumers of `issueRefMap`, not just duplicate detection: the stall handler re-opens a closed PR's "source" issues and the dispatch guard treats an issue as already-worked, and both mean "the issue this PR exists to close". Two-sided proof on throwaway PRs 1184/1185 — prose mentions produced no duplicate close, `Closes #1110` on the same pair did. It is again safe to write issue numbers normally in PR bodies. | 2026-08-01 |
+| Security advisory + Playwright bump + Gap B + dashboard refresh (the four PRs parked in **In review**) | [#1170](https://github.com/oviney/blog/pull/1170), [#1162](https://github.com/oviney/blog/pull/1162), [#1167](https://github.com/oviney/blog/pull/1167) and [#1138](https://github.com/oviney/blog/pull/1138) all merged in the planned order. Gap B closed the visual epic. | 2026-08-01 |
 | Refresh the two >90-day-stale skill files | [#1175](https://github.com/oviney/blog/pull/1175) merged — both carried real drift, not just an expired clock: code-review listed 3 of 5 protected files, economist-theme's visual-testing section predated the blocking pixel gate. Issues #1140/#1142/#1166 closed. | 2026-07-31 |
 | CI: make the visual and Playwright gates actually block | Branch protection `required_status_checks` now lists `build`, `🔒 Security Audit`, `🖼️ Visual Regression` and the three `🎭 Playwright Shard N/3` checks (was only the first two). Names read off a completed run rather than typed. Push-only checks (`deploy`, `Orchestrator Run`, `Post-deploy smoke suite`) deliberately excluded — requiring those would deadlock every PR. | 2026-08-01 |
 | CI: Playwright gate dropped 66% of the suite and passed regardless | [#1176](https://github.com/oviney/blog/pull/1176) merged — shards shared a change-derived grep instead of hardcoded ones (322→full selected set), `continue-on-error` removed so failures block, dead `playwright-partial` job deleted, shard results merged properly, Firefox/WebKit made opt-in after never once running | 2026-08-01 |
