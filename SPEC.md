@@ -27,7 +27,7 @@ pixels) are different` against the 0.02 `maxDiffPixelRatio` threshold, on
 category snapshots — passed. The same branch was green without the probe post,
 so the coupling is pre-existing and was not induced by #1186.
 
-## 2. Owner decision required before building
+## 2. Coverage trade — DECIDED 2026-08-01: accept
 
 The fix trades away **pixel** coverage of the hero: its type scale, spacing,
 image aspect and colour. Structural coverage survives — `homepage.spec.ts:21-37`
@@ -35,11 +35,19 @@ already asserts `.hero-post` is visible, the title links, the excerpt renders,
 and the CTA has a working `href` and click-through (re-asserted at
 `homepage.spec.ts:174-180`).
 
-**Recommendation: accept the trade.** A gate that reds on every publish is worse
-than one that skips the hero's pixels, and the hero's behaviour stays covered.
+**Accepted.** A gate that reds on every publish gets ignored or bypassed, and
+this repo has already lived that: the visual gate sat broken from #1119 until
+#1160. Alarm fatigue is the demonstrated failure mode, not a hypothetical one.
 
-If the trade is refused, close the backlog row as **won't fix** and treat the
-re-seed as part of shipping a post. Do not leave the row open unresolved.
+**Accepted residual risk:** a CSS regression touching *only* `.hero-post-*` rules
+would no longer be caught by pixels. Theme-wide regressions still surface —
+`about` and both post scenarios remain full-page captures.
+
+Rationale and the two rejected mitigations are in
+[`tasks/plan.md`](tasks/plan.md) §Decisions (D1). Two further observations
+raised alongside this spec (skippable required shards, `action_required` on the
+seed commit) are resolved there too, as D2 and D3. **No decision is outstanding
+— this spec is ready to build.**
 
 ## 3. Approach
 
@@ -126,11 +134,19 @@ Both prior P2 rows cleared. Three PRs merged, `main` at `4864a8c`, queue empty.
 **Writing `#NNN` in PR bodies is safe again** — the prose workaround #1183 was
 filed against is retired.
 
-**Two unfiled observations**, raised but not actioned:
+**Two observations raised alongside this spec, both since resolved as no-action**
+— see [`tasks/plan.md`](tasks/plan.md) §Decisions D2 and D3:
 
-1. Change-based test selection can skip all three *required* Playwright shards.
-   GitHub counts a skipped required check as satisfied, so #1183 merged without
-   any shard running. Defensible for a workflow-only diff; worth a row only if
-   it ever masks a real regression.
-2. The bot's baseline seed commit needs a manual `actions/runs/<id>/approve`
-   before checks start. Friction, not a defect.
+1. Change-based selection can skip all three *required* Playwright shards, and
+   GitHub counts a skipped required check as satisfied. No action: that is the
+   intent of change-based selection, the dangerous misclassification was fixed in
+   #1176, and `🖼️ Visual Regression` runs unconditionally as a safety net.
+2. The bot's baseline seed commit needs a manual `actions/runs/<id>/approve`.
+   No action: the fix costs a long-lived PAT and a recursion risk to save one CLI
+   call on a rare operation.
+
+**One item found while planning** — `AGENTS.md:159` still tells agents never to
+write a bare `#<number>` because "an orchestration bot misreads it as an issue
+ref". #1183 retired that bot behaviour, so the line now teaches a workaround
+that no longer applies. Corrected as Phase 0 of [`tasks/todo.md`](tasks/todo.md);
+needs the `protected-file-update` label.
