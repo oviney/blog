@@ -41,9 +41,15 @@ const LISTING_GRID = '.topic-grid';
 // height and fail the gate on a size mismatch.
 const POST_CROSS_LINKS = ['.related-list', '.more-from-section'];
 
-// `listing: true` marks a page whose body is a post grid. Those pages re-render
-// on every published article, so they are captured differently — see the
-// `toHaveScreenshot` call below.
+// `listing: true` marks a page whose body is a `.topic-grid` of post cards.
+// Those pages re-render on every published article, so they are captured
+// differently — see the `toHaveScreenshot` call below.
+//
+// It must be set on EVERY grid page, not just the obvious two. The three
+// category pages were added full-page in #1138 and re-baselined on every
+// publish into their category, which is exactly the coupling the flag exists
+// to break — the gate billed a baseline re-seed as the price of shipping an
+// article.
 const PAGES: { name: string; path: string; listing?: boolean }[] = [
   { name: 'homepage', path: '/', listing: true },
   { name: 'blog-index', path: '/blog/', listing: true },
@@ -56,9 +62,15 @@ const PAGES: { name: string; path: string; listing?: boolean }[] = [
   // Gap-B page types — category landing pages, search, and the 404 page. The
   // 404 page is built to /404/index.html (pretty permalinks), so it is served
   // at /404/, not /404.html (which correctly returns a real 404).
-  { name: 'category-security', path: '/security/' },
-  { name: 'category-software-engineering', path: '/software-engineering/' },
-  { name: 'category-test-automation', path: '/test-automation/' },
+  //
+  // The category pages render `.topic-grid` from `site.posts` filtered by
+  // category, so they are listing pages in exactly the same sense as home and
+  // /blog/ — one publish into a category re-flows its grid.
+  { name: 'category-security', path: '/security/', listing: true },
+  { name: 'category-software-engineering', path: '/software-engineering/', listing: true },
+  { name: 'category-test-automation', path: '/test-automation/', listing: true },
+  // /search/ has no `.topic-grid`: results are rendered client-side into a
+  // separate container and the unqueried page is static, so it stays full-page.
   { name: 'search', path: '/search/' },
   { name: 'not-found', path: '/404/' },
 ];
