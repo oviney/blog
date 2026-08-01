@@ -179,7 +179,11 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
     await expect(page.locator('.article-title')).toHaveCount(1);
     await expect(page.locator('.article-chart img')).toBeVisible();
     await expect(page.locator('.article-hero-image img')).toHaveAttribute('src', /understanding-qa-qc-quality-engineering-hero\.svg/);
-    await expect(page.locator('.article-hero-image .image-credit')).toContainText('ILLUSTRATION: WHEN QUALITY OWNERSHIP TANGLES');
+    // #1103 dropped the `| upcase` filter so hero captions render in the case
+    // the author wrote (the audit flagged all-caps captions as a P2 defect).
+    // Assert case-insensitively so this pins the caption text, not its casing.
+    await expect(page.locator('.article-hero-image .image-credit'))
+      .toContainText(/illustration: when quality ownership tangles/i);
 
     const articleHeadings = page.locator('article.economist-article h1');
     await expect(articleHeadings).toHaveCount(1);
@@ -397,14 +401,29 @@ test.describe('@navigation Post-page Taxonomy & Recommendations @REQ-NAV-01', ()
       if (href) hrefs.push(href);
     }
 
+    // Posts may carry several categories (the flaky-tests post is both Software
+    // Engineering and Quality Engineering), but the article page renders only
+    // the primary one. Asserting the rendered label equals the rail's category
+    // therefore fails on any legitimately multi-category post.
+    //
+    // The real invariant is membership: every post in the "More from Software
+    // Engineering" rail must appear on the Software Engineering category page.
+    // Check that instead — it survives multi-category posts and still catches a
+    // rail leaking genuinely unrelated content.
+    await page.goto('/software-engineering/');
+    await page.waitForLoadState('networkidle');
+    const categoryHrefs = await page
+      .locator('.topic-card a[href], article h3 a[href]')
+      .evaluateAll((links) =>
+        links.map((a) => new URL((a as HTMLAnchorElement).href).pathname)
+      );
+
     for (const href of hrefs) {
-      await page.goto(href);
-      await page.waitForLoadState('networkidle');
-      const sectionLink = page.locator('.article-section-line .section-link');
-      if (await sectionLink.count() > 0) {
-        const catText = (await sectionLink.first().textContent())?.trim();
-        expect(catText, `linked post at ${href} should be Software Engineering`).toBe('Software Engineering');
-      }
+      const path = new URL(href, 'http://localhost:4000').pathname;
+      expect(
+        categoryHrefs,
+        `post ${path} appears in the "More from Software Engineering" rail but not on /software-engineering/`
+      ).toContain(path);
     }
   });
 
@@ -419,7 +438,10 @@ test.describe('@navigation Mobile Navigation Specific Tests @REQ-NAV-01 @REQ-NAV
     await page.waitForLoadState('networkidle');
 
     // JS should have added js-nav-enabled class (progressive enhancement)
-    const hasJsClass = await page.evaluate(() => document.body.classList.contains('js-nav-enabled'));
+    // `js-nav-enabled` is set on the document element (see _layouts/default.html),
+    // not on <body> — the `.js-nav-enabled.nav-open` selector depends on both
+    // classes living on the same element.
+    const hasJsClass = await page.evaluate(() => document.documentElement.classList.contains('js-nav-enabled'));
     expect(hasJsClass).toBe(true);
 
     // Hamburger toggle button should be visible

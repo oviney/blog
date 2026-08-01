@@ -17,7 +17,11 @@ test.use({ baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4000' }
 // each surface uses. Home mixes a hero excerpt with topic cards.
 const LISTING_SURFACES: { name: string; path: string; excerptSelector: string }[] = [
   { name: 'homepage', path: '/', excerptSelector: '.hero-post-excerpt, .topic-card-excerpt' },
-  { name: 'blog index', path: '/blog/', excerptSelector: '.econ-card-excerpt' },
+  // #1123 extracted the canonical post-card include, so /blog/ renders
+  // .topic-card-excerpt like every other listing surface. The old
+  // .econ-card-excerpt selector matched nothing, and the test failed on its own
+  // "expected at least one teaser card" guard rather than on teaser content.
+  { name: 'blog index', path: '/blog/', excerptSelector: '.topic-card-excerpt' },
   { name: 'security topic', path: '/security/', excerptSelector: '.topic-card-excerpt' },
   { name: 'software-engineering topic', path: '/software-engineering/', excerptSelector: '.topic-card-excerpt' },
   { name: 'test-automation topic', path: '/test-automation/', excerptSelector: '.topic-card-excerpt' },
