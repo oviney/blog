@@ -156,7 +156,7 @@ Every cross-persona handoff must include at least these fields:
 |-------|------------------|
 | **Context** | One-line summary of the intent — what problem is being solved and why the handoff is happening now. |
 | **Work done** | Files touched and their outcomes (what changed, what passed, what was deliberately left alone). |
-| **Artifacts / PRs** | Links to the branch, PR, issue, failing CI job, or screenshot the next owner needs. Use `GH-<number>` or full URLs — never a bare `#<number>` (an orchestration bot misreads it as an issue ref). |
+| **Artifacts / PRs** | Links to the branch, PR, issue, failing CI job, or screenshot the next owner needs. `GH-<number>`, a bare `#<number>`, and full URLs are all safe — the orchestrator reads issue refs only from closing keywords (GH-1183). |
 | **Open questions** | The specific blocker, decision, or ambiguity that requires the receiving persona's expertise. |
 | **Next owner** | The target persona, consistent with this persona's `**Handoff triggers**:` row and the Mermaid graph above. |
 | **Acceptance checks** | The conditions that let the next owner confirm the handoff is resolved (e.g. `bundle exec jekyll build` passes, a specific test is green, contrast meets WCAG AA). |
