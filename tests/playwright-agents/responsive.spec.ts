@@ -198,54 +198,8 @@ test.describe('@accessibility Touch target sizing @REQ-A11Y-02 @REQ-NAV-01', () 
 
 });
 
-test.describe('@visual Horizontal overflow @REQ-VISUAL-01', () => {
-
-  // Generalises the inline-chart guard below to the whole site at the narrowest
-  // supported viewport. This is the class of the only real product regression
-  // this suite has ever caught (72c1666 — a Chart.js canvas on the agents
-  // dashboard measured 344px against a 320px viewport), so it is asserted for
-  // every page type rather than for one post.
-  const pages = [
-    { path: '/', name: 'homepage' },
-    { path: '/blog/', name: 'blog index' },
-    { path: '/security/', name: 'category page' },
-    { path: '/about/', name: 'about' },
-    { path: '/2025/12/31/testing-times/', name: 'post' },
-  ];
-
-  for (const { path, name } of pages) {
-    test(`${name} (${path}) does not scroll horizontally at 320px`, async ({ page }) => {
-      await page.setViewportSize(viewports.mobile);
-      await page.goto(path);
-      await page.waitForLoadState('networkidle');
-
-      const { scrollWidth, clientWidth, offender } = await page.evaluate(() => {
-        const doc = document.documentElement;
-        // Name the widest offending element so a failure is actionable rather
-        // than just "the page is too wide".
-        let worst = '';
-        let worstRight = doc.clientWidth;
-        for (const el of Array.from(document.body.querySelectorAll('*'))) {
-          const right = el.getBoundingClientRect().right;
-          if (right > worstRight) {
-            worstRight = right;
-            const cls =
-              typeof el.className === 'string' && el.className.trim()
-                ? '.' + el.className.trim().split(/\s+/).join('.')
-                : '';
-            worst = `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${cls} (right=${Math.round(right)}px)`;
-          }
-        }
-        return { scrollWidth: doc.scrollWidth, clientWidth: doc.clientWidth, offender: worst };
-      });
-
-      // 1px tolerance for sub-pixel rounding.
-      expect(scrollWidth, `widest offender: ${offender || 'none identified'}`)
-        .toBeLessThanOrEqual(clientWidth + 1);
-    });
-  }
-
-});
+// The site-wide 320px horizontal-overflow guard moved to page-contract.spec.ts
+// so it runs on every PR rather than only in the nightly suite.
 
 test.describe('@visual Category Listing Grid Width @REQ-VISUAL-01', () => {
 
