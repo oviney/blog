@@ -1,263 +1,218 @@
-# SPEC — Restructure the PR test gate around signal, not volume
+# SPEC — The two CI rows the PR-gate epic left behind
 
-**Stream:** `docs/BACKLOG.md` P1 · **Priority:** P1 · **Scope:** L (4 PRs) · **Dependencies:** none
-**Date:** 2026-08-02 · **Labels:** `agent:qa-gatekeeper`, `governance-update` (Stream C only) · **Issue:** none — local backlog item
-**Status:** A ✅ #1193 · B ⚠️ **partial** #1194 · C ✅ #1195 · D not started
+**Stream:** `docs/BACKLOG.md` P3 ×2 · **Priority:** P3 · **Scope:** S · **Dependencies:** none (the P1 epic closed in #1201)
+**Date:** 2026-08-02 · **Label:** `agent:qa-gatekeeper` · **Issue:** none — local backlog items
+**Status:** not started — **read §2 first, it recommends closing one row without writing code**
 
 ---
 
 ## 1. Objective
 
-The PR Playwright gate costs **13.3 billable job-minutes and ~5 minutes of
-wall-clock per PR**, fires twice per merged change (`pull_request` + `push: main`),
-and rebuilds Jekyll four times per run. In seven months it has caught **one** real
-product regression. Over the same period **32 of 62 commits touching `tests/`
-(52%) were repair, heal, unblock, or stabilise work** — more than half of all test
-effort maintains the tests rather than covering the product.
+The PR-gate restructure (#1194, #1195, #1197, #1200) closed as a four-stream epic
+and left two P3 rows open. This spec exists so the next session does not
+re-derive them, and to record that **one of the two should probably be closed as
+done rather than built**.
 
-The gate is not merely expensive; parts of it are incapable of failing. This spec
-restores trust by deleting what cannot fail, fixing the instruction file that
-generates it, and cutting the blocking path to checks that earn their wall-clock.
-
-**Success criteria**
-
-| | Now | Target |
-|---|---|---|
-| Billable job-min per PR (`test-quality`) | 13.3 | ≤ 5 |
-| PR wall-clock | ~5 min | ≤ 3 min |
-| Jekyll builds per PR run | 4 | 1 |
-| Assertions that cannot fail | ≥ 1 proven, ~90 lines of permissive scaffolding | 0 |
-| Conditional `test.skip()` on a missing element | 8 | 0 |
-| Blocking Playwright jobs | 3 shards + visual | 1 contract + visual |
+Neither row blocks anything. Both are cheap to get wrong in the direction of
+over-engineering, which is the specific failure this repo has already paid for.
 
 ---
 
-## 2. Evidence
+## 2. Row 1 — De-duplicate Jekyll builds. RECOMMENDATION: close as done.
 
-**The one bug.** `72c1666` — the agents dashboard scrolled sideways at 320px
-because a Chart.js canvas had no width ceiling. Found only because the shards were
-made blocking on 2026-08-01. The same commit surfaced five failures total: **four
-were stale tests asserting behaviour that had been deliberately changed.**
+**The row's premise is stale.** It says a PR builds the site "~4 times across
+`test-build`, `content-validation` and `test-quality` jobs". Measured on
+post-#1197 `main`, a PR builds it **twice**:
 
-**Today's failures are 5:0 rot.** Every failure on `redesign/home-2026` is
-`homepage.spec.ts` asserting the *previous* homepage — "Hero section displays
-latest post", "Focus Areas section shows 3 cards", "Author bio section is
-visible". The redesign intentionally replaced all of it with a lead-story and
-topic-index layout. Zero bugs; eight tests × three viewports of churn.
+| Workflow | Job | Builds? | Why |
+|----------|-----|---------|-----|
+| `test-build.yml` | `build` | **yes** | htmlproofer runs against `_site/`, so the job needs a build regardless |
+| `test-quality.yml` | `build-site` | **yes** | uploads `site-build-quality` for the contract and pixel jobs |
+| `test-build.yml` | `validate-editorial` | no | `validate-posts.sh` reads `_posts/`, not `_site/` |
+| `test-build.yml` | `check-agent-scope` | no | operates on the diff |
+| `content-validation.yml` | `validate-posts` | no | never built; also only fires on `_posts/**` |
 
-**Assertions that cannot fail.** `responsive.spec.ts:757`:
+#1197 already took the count from 4 to 2. The row's remaining scope is "make it 1".
 
-```js
-// Nuclear healing: Accept if we successfully checked any link pairs
-expect(validSpacingCount).toBeGreaterThanOrEqual(0);
-```
+**The remaining duplicate costs ~25s.** The `build` job runs 24-30s *in total*
+across five sampled PR runs, and that includes Ruby setup, htmlproofer and
+front-matter validation — the build itself is a fraction. Because GitHub bills
+per job-minute, removing the duplicate build saves **zero billable minutes**: the
+job still has to exist for htmlproofer.
 
-A count is never negative. The surrounding `catch` blocks *increment the valid
-counter on error* — `// Accept element if we can't measure - defensive approach` —
-so a wholly broken page passes. 90 lines of `nuclear healing` / `ultra-permissive`
-/ `Accept anyway` scaffolding span `responsive.spec.ts` (857 lines) and
-`content-edge-cases.spec.ts` (682 lines): **36% of the suite by volume**,
-inflating the pass count while proving close to nothing.
+**Why the obvious fix is not worth it.** The two builds live in *different
+workflows*, and GitHub cannot share an artifact between workflows running
+concurrently — `workflow_run` fires after completion, not during. Removing the
+duplicate therefore means merging `test-build.yml`'s `build` job into
+`test-quality.yml`, which:
 
-**Skips report as passes.** `navigation.spec.ts` has 8 skips shaped
-`if (await blogLink.count() === 0) test.skip(...)`. If navigation breaks and the
-Blog link vanishes, the test goes green.
+- moves or renames the `build` required status check, requiring another
+  branch-protection change — the operation that deadlocks the repo if mistimed
+  (see #1197);
+- collapses two workflows with different trigger sets into one;
+- saves ~25s on a job that runs in parallel with slower ones, so the PR's
+  critical path does not move at all.
 
-**The root cause is written down.** `.github/instructions/tests.instructions.md`
-§"Defensive Patterns" instructs every agent that touches `tests/**`:
+That is three workflows' worth of risk to save one script's worth of time. The
+repo's own standing principle — *one script beats three workflows, match
+complexity to scale* — says no.
 
-> - Use `try/catch` around interactions that may fail on certain pages
-> - Log skipped steps with `console.log('reason for skip')` rather than throwing
+**Recommendation: close the row**, recording that #1197 did the part that paid
+(4 → 2 builds, 13.3 → 7 job-min) and that the last duplicate is load-bearing for
+htmlproofer. If it is ever revisited, do it as a deliberate
+consolidate-the-workflows change with its own spec, not as a performance tweak.
 
-That is the generator. Deleting the tests without fixing this file rebuilds them.
-
-**Historic credibility.** `continue-on-error: true` sat on the shard steps until
-2026-08-01, so the required checks passed regardless of results. Separately,
-Firefox and WebKit projects were declared while CI installed chromium only — 376
-of 940 tests errored and were swallowed. The suite advertised cross-browser
-coverage it had never once had.
-
----
-
-## 3. Decisions
-
-**D1 — Retain the 🖼️ Visual Regression gate on PRs. REVERSED from the review.**
-The review recommended dropping homepage pixel gating. On inspection that is
-wrong. Today's homepage baseline failure is a *correct* result: the design
-genuinely changed, and reseeding is the right response. The failure mode worth
-fixing was baselines moving on every *publish*, and #1186 + #1191 already fixed
-it — no page's baseline now moves when an article ships. The job is also the
-cheapest in the workflow (140s). It stays.
-
-**D2 — Delete rather than repair `responsive.spec.ts` and
-`content-edge-cases.spec.ts`.** Their permissive scaffolding is load-bearing:
-extracting the real invariants is a rewrite, not an edit. The invariants worth
-keeping (§4, Stream B) are re-expressed in the new contract suite. Tests that
-cannot fail are worse than absent ones — they buy false confidence and consume
-maintenance.
-
-**D3 — One contract suite, both blocking and cheap.** A ~15-test
-`page-contract.spec.ts` on Mobile (320) + Desktop (1920) replaces three sharded
-jobs. It must still catch the class of the one real bug ever found: horizontal
-overflow at 320px.
-
-**D4 — The full 138-test suite moves to nightly, non-blocking, auto-filing an
-issue on failure.** It keeps its value as a broad net without taxing every PR.
-
-**D5 — `agent-eval.yml` is left alone.** Measured at 0.0 billable job-minutes; it
-is not part of the problem.
+If the owner disagrees and wants it built anyway, the acceptance criteria are
+in §4.
 
 ---
 
-## 4. Scope — four PRs, in this order
+## 3. Row 2 — Decide the fate of cross-browser coverage
 
-### Stream A — finish `redesign/home-2026` (unblocks product work) — ✅ SHIPPED in #1193 (2026-08-02)
+`playwright.config.ts:98-115` declares Desktop Firefox and Desktop Safari behind
+`PLAYWRIGHT_ALL_BROWSERS=1`. They are opt-in because CI installs chromium only,
+so **376 of the suite's 940 test executions had never run once** while
+`continue-on-error: true` on the shards swallowed the "Executable doesn't exist"
+failures. The suite advertised cross-browser coverage it never had.
 
-Rewrite `tests/playwright-agents/homepage.spec.ts` against the shipped structure
-in `index.md`: `.h26-lede` intro, `.h26-facts`, `.h26-lead` lead story with a
-linked `.h26-lead-title` and working `.h26-lead-cta`, `.h26-rail` "More from the
-blog", `.h26-topics` topic index, `.h26-author`. Assert **behaviour and
-invariants** — the lead story links to a real post, every rail item resolves, the
-topic index covers the site's categories — not card counts or section prose.
-Reseed the three homepage baselines by dispatching `test-quality.yml` on the
-branch with `update_snapshots=true`. Ships on the existing branch: a redesign PR
-owns its own tests.
+This is a **decision**, not an implementation. Two honest options:
 
-**Outcome — done as specified, plus three defects this spec did not anticipate.**
-The "5:0 rot" reading in §2 was right about `homepage.spec.ts` but **incomplete**:
-the branch was red for four reasons, not one, and only the first was rot.
+**Option A — enable on the nightly path only.** Add
+`npx playwright install firefox webkit --with-deps` and
+`PLAYWRIGHT_ALL_BROWSERS=1` to `🌙 Nightly Full Suite` in `test-quality.yml`.
+Non-blocking by construction, and the repo is public so Actions minutes are free.
 
-1. *(rot, as predicted)* 24 stale `homepage.spec.ts` assertions — rewritten.
-2. *(real defect)* The theme's **unscoped** drop-cap,
-   `article > p:first-of-type::first-letter` (`economist-theme.scss:1416`),
-   matched the redesign's new `<article>` wrappers, rendering a 10.4px kicker's
-   first letter at **48px** at ≤768px. Caught by rendering the page, not by any
-   spec. Fixed with a scoped reset + a guard verified to fail without it.
-3. *(real defect)* `$h26-faint` at **3.71:1** failed pa11y WCAG2AA on 14
-   elements — the a11y gate was doing its job.
-4. *(silent coverage loss)* The homepage `volatile`/`listing` config in
-   `visual-snapshot.spec.ts` still named `.hero-post` and `.topic-grid`, both
-   deleted by the redesign. The mask matched nothing, quietly re-coupling the
-   baseline to publication and undoing #1186/#1191. Also: the two `"Source:"`
-   teaser guards failed on their own "expected at least one teaser card"
-   precondition, meaning the homepage was **unguarded**, not merely red.
+- *Real cost:* these tests have **never executed**, so the first run will almost
+  certainly produce a burst of failures — engine-specific rendering, focus
+  behaviour, `boundingBox` rounding. That burst becomes triage work, arriving as
+  one auto-filed issue at 02:00 UTC.
+- *Real benefit:* the site is static Jekyll with little JavaScript, so the
+  plausible cross-browser defects are CSS-layout ones — exactly what the existing
+  overflow and design-token assertions would catch in another engine.
 
-**Carry this into Streams B–D.** Items 2–4 are the failure mode this spec is
-built to reduce, so they are worth stating plainly: the gate's *pixel* and *a11y*
-jobs caught two real defects here, and a stale selector list silently removed
-coverage without failing anything. D3's contract suite must not assume that
-"tests failed" means "tests are rot" — on this branch that inference was wrong
-3 times out of 4. In particular, **D1's decision to retain the visual gate is
-reinforced**: it was the only check that would have caught #4.
+**Option B — delete the projects.** Remove the `PLAYWRIGHT_ALL_BROWSERS` block
+and its comment. Honest, zero maintenance, and stops the config implying coverage
+that does not exist.
 
-### Stream B — purge assertions that cannot fail (`agent:qa-gatekeeper`) — ⚠️ PARTIAL in #1194 (2026-08-02)
+**Recommendation: Option A with a tripwire.** Enable on nightly, then triage the
+first run *once*. If the failures are engine noise rather than real defects,
+delete the projects (Option B) and record why. If any real defect surfaces, keep
+them. Decide within one nightly cycle — do not leave a red nightly standing,
+because a permanently-failing non-blocking job is how this repo got here in the
+first place.
 
-Delete `responsive.spec.ts` and `content-edge-cases.spec.ts`. Remove the 8
-conditional `test.skip()` calls in `navigation.spec.ts` — assert the element if it
-must exist; delete the test if it is optional. Real invariants preserved into
-Stream D's contract suite: touch targets ≥ 44×44px, no horizontal overflow at
-320px, post pages render without layout breaks, external `_blank` links carry
-`rel="noopener|noreferrer"`.
+The tripwire matters more than the choice. Either outcome is fine; drifting
+without deciding is not.
 
-**Shipped — about half. Verified 2026-08-02 against `main` @ `19822b3`:**
+---
 
-| Item | State |
-|---|---|
-| `responsive.spec.ts` | ✅ Pruned — 9 tests deleted, 671→148 lines changed. **Repaired, not deleted** — a deliberate deviation from D2. |
-| `navigation.spec.ts` conditional skips | ✅ `grep -c "test.skip("` = **0** (was 8) |
-| `toBeGreaterThanOrEqual(0)` suite-wide | ✅ **0** occurrences |
-| `content-edge-cases.spec.ts` | ❌ **Untouched.** Still 26,652 bytes and still carries `nuclear healing` / `Nuclear healing` / `ultra-permissive` scaffolding plus 12 `catch` blocks. |
+## 4. Acceptance criteria
 
-**Remaining work for B:** `content-edge-cases.spec.ts` only. It is now the sole
-carrier of the permissive-scaffolding pattern in the suite — every other marker
-named in §2 is gone.
+**Row 1 — only if built against the §2 recommendation**
 
-**D2 partially reversed in practice.** D2 argued deletion over repair because
-"extracting the real invariants is a rewrite, not an edit." #1194 repaired
-`responsive.spec.ts` instead and the result satisfies §6's two measurable
-criteria, so the repair path is evidently viable. Decide explicitly for
-`content-edge-cases.spec.ts` — prune it the same way, or delete it — rather than
-inheriting D2 unexamined.
+- [ ] A PR builds the site exactly once, proven by counting `jekyll build` steps
+      in one PR's runs, not by reading the YAML.
+- [ ] `build` still reports under that exact name, or branch protection is
+      updated in the same window as the merge.
+- [ ] htmlproofer still runs against a real `_site/`.
+- [ ] Billable job-minutes measured before and after, stated in the PR body.
+      **If the delta is zero, close the row instead of merging.**
 
-### Stream C — fix the generator (`governance-update`) — ✅ SHIPPED in #1195 (2026-08-02)
+**Row 2**
 
-Rewrite §"Defensive Patterns" in `.github/instructions/tests.instructions.md`:
-`try/catch` may not convert a failure into a pass; `test.skip()` may not be
-conditioned on the absence of an element under test; every test must have at least
-one assertion that can fail. Update §"Assertions" so `toBeGreaterThanOrEqual(0)`
-and equivalents are named as forbidden.
-
-### Stream D — restructure the gate (`agent:qa-gatekeeper`)
-
-- Add `tests/playwright-agents/page-contract.spec.ts` (~15 tests, Mobile +
-  Desktop): every page type returns 200 and renders its `h1`; no console errors;
-  no horizontal overflow at 320px; nav opens and closes; internal links resolve;
-  touch targets ≥ 44px.
-- `test-quality.yml` PR path: build Jekyll **once**, upload `_site`, and run one
-  contract job plus 🖼️ Visual Regression against the artifact. Delete the three
-  shard jobs, `select-tests.sh` invocation, and `quality-report` from the PR path.
-- Nightly (`schedule`) path: full 138-test suite across three viewports, pa11y,
-  Lighthouse — non-blocking, opens an issue on failure.
-- Update branch protection: required contexts become `build`, `🔒 Security Audit`,
-  `🖼️ Visual Regression`, `🎭 Page Contract`. Removes the three shard contexts.
-- Retire `scripts/select-tests.sh` and the `@REQ-*` grep routing, or reduce it to
-  the nightly path. Note it currently never selects `@REQ-VISUAL-SNAP`,
-  `@REQ-PAGE-CHROME`, `@REQ-CONTENT-03/04`, `@REQ-CONTENT-CAPTION-CASE` — those
-  tests silently do not run on any targeted run today.
+- [ ] A written decision — A or B — recorded in `docs/BACKLOG.md` with its reason.
+- [ ] If A: `🌙 Nightly Full Suite` installs firefox and webkit and sets
+      `PLAYWRIGHT_ALL_BROWSERS=1`; the first nightly is triaged within one cycle
+      and the outcome recorded.
+- [ ] If B: the projects and their comment are gone from `playwright.config.ts`,
+      and `docs/TEST_TRACEABILITY.md` states the suite is chromium-only.
+- [ ] Either way, no config remains that implies coverage the suite does not have.
 
 ---
 
 ## 5. Commands
 
 ```bash
-bundle exec jekyll build                          # must stay green throughout
-npx playwright test tests/playwright-agents/page-contract.spec.ts
-npx playwright test --project="Mobile Chrome"     # 320px overflow checks
-npm run test:visual:snap                          # visual gate, local
-bash scripts/validate-posts.sh --all
-gh workflow run test-quality.yml --ref <branch> -f update_snapshots=true   # reseed
+bundle exec jekyll build                              # validate before any PR
+npm run test:contract                                 # the blocking gate, ~20s
+npx playwright install firefox webkit --with-deps     # Option A only
+PLAYWRIGHT_ALL_BROWSERS=1 npx playwright test         # Option A, run locally first
+
+# Count real builds in a PR's runs — do not infer this from the YAML.
+gh run view <run-id> --json jobs --jq '.jobs[].name'
 ```
 
 ---
 
 ## 6. Testing strategy
 
-Each stream is verified against a **local dev server**, not by reading the diff:
+Both rows are CI changes, so the pipeline is the test:
 
-- **A** — full `homepage.spec.ts` green on all three projects; visual gate green
-  after reseed.
-- **B** — suite green after deletion; `grep -c "toBeGreaterThanOrEqual(0)"` = 0;
-  `grep -c "test.skip("` in `navigation.spec.ts` = 0.
-- **C** — no test changes; instruction file only.
-- **D** — measure the new PR run: job-minutes, wall-clock, Jekyll build count
-  reported in the PR body against the §1 table. Deliberately break the page (e.g.
-  reintroduce the 320px canvas overflow) and confirm the contract suite reds.
-
-**Regression guard for D:** the contract suite must fail on a reintroduced
-dashboard-canvas overflow. If it does not, the restructure has lost the only bug
-this gate ever caught and must be revised before merge.
+- Verify against a **measured run**, not a diff. State billable job-minutes and
+  wall-clock in the PR body against the post-#1197 baseline of **7 job-min /
+  2m26s / 1 Jekyll build in `test-quality.yml`**.
+- For Row 2 Option A, run the two new engines **locally first**. Do not discover
+  376 first-time failures inside a scheduled job.
+- Any new or rewritten assertion must be mutation-tested — break the thing it
+  guards, watch it go red with the offender named, restore, watch it go green.
+  See `.github/instructions/tests.instructions.md` §"Every test must be able to
+  fail".
 
 ---
 
 ## 7. Boundaries
 
-**Always** — run `bundle exec jekyll build` before every PR; keep each PR atomic
-and independently reviewable; verify against a running dev server; label Stream C
-`governance-update`.
+**Always** — measure before claiming an improvement; keep each PR atomic; update
+`docs/TEST_TRACEABILITY.md` in the same PR that changes what runs.
 
-**Ask first** — any change to branch-protection required contexts beyond the four
-named in Stream D; deleting a spec file not named in Stream B; anything that
-reduces the visual gate's coverage.
+**Ask first** — any change to branch-protection required contexts; any change
+that renames or moves the `build` or `🎭 Page Contract` checks.
 
 **Never** — modify `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`,
-`.github/copilot-instructions.md`; push directly to `main`; weaken an assertion to
-make a test pass; seed visual baselines on `main`.
+`.github/copilot-instructions.md`; push directly to `main`; weaken an assertion
+to make a test pass; leave a permanently-red non-blocking job standing.
 
 ---
 
 ## 8. Out of scope
 
-Cross-browser coverage (existing P3 backlog row — Firefox/WebKit remain opt-in);
-the hero type-scale tokenisation P3; de-duplicating Jekyll builds in `test-build.yml`
-and `content-validation.yml` (the existing P3 row is *partly* absorbed by Stream D,
-which fixes `test-quality.yml` only); `REQ-SEARCH-01`'s missing spec.
+The other two open P3 rows have their own owners and are already described in
+`docs/BACKLOG.md`: removing the legacy homepage CSS orphaned by #1193
+(`agent:creative-director` — 35 dead rule openers, keep `.home-intro-links`), and
+the custom-agents-vs-label-routing ADR (`governance-update`, #1110).
+
+---
+
+## Appendix — what the PR-gate epic established
+
+Carried here so a cold session does not re-derive it.
+
+| | Before | After (#1197) |
+|---|---|---|
+| Billable job-min per PR | 13.3 | **7** |
+| Wall-clock | ~5 min | **2m26s** |
+| Jekyll builds in `test-quality.yml` | 4 | **1** |
+
+The ≤5 job-min target was **missed**. Actual compute is ~5 min; the rest is
+GitHub's per-job minute rounding across five short jobs. Recorded as missed
+rather than quietly rescoped.
+
+**Required status checks are now** `build`, `🔒 Security Audit`,
+`🖼️ Visual Regression`, `🎭 Page Contract`. The three `🎭 Playwright Shard N/3`
+contexts were retired. **Changing what a workflow emits requires updating branch
+protection in the same window, or every later PR deadlocks on a check that never
+reports.** Verified once via throwaway PR #1199.
+
+**A correction worth keeping.** The original review characterised the
+`redesign/home-2026` failures as "5:0 rot" — all stale tests, no real bugs. That
+was wrong: it was 1 stale test plus 3 real defects (theme drop-cap leak,
+furniture contrast), fixed in `50001e9`. *"Red gate ⇒ stale tests"* is not a safe
+inference from test names alone.
+
+**The generator is fixed, and that is the durable part.**
+`.github/instructions/tests.instructions.md` used to instruct every agent
+touching `tests/**` to wrap interactions in `try/catch` and log skips "rather
+than throwing". It now carries an "Every test must be able to fail" rule. A
+suite-wide sweep after #1200 returns **0** files with `nuclear` /
+`ultra-permissive`, **0** with `toBeGreaterThanOrEqual(0)`, and **0** with
+conditional `test.skip(true, …)`. Keep it that way.
