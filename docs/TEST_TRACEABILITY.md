@@ -1,8 +1,7 @@
 # Test–Requirement Traceability Matrix
 
 This document maps every requirement to the Playwright spec files that cover it,
-explains the change-based test selection rules, and defines the sharding strategy
-used when a full suite run is triggered.
+explains which of them gate a pull request and which run nightly.
 
 ---
 
@@ -66,41 +65,50 @@ used when a full suite run is triggered.
 
 ---
 
-## Change-Based Test Selection Rules
+## What gates a pull request
 
-The `scripts/select-tests.sh` script inspects `git diff --name-only HEAD~1` and
-outputs a `TEST_GROUPS` environment variable consumed by the CI workflow.
+Two blocking Playwright jobs, both judging a single `_site` artifact built once
+by the `🏗️ Build Site` job:
 
-| Changed Paths | Test Groups Triggered |
-|---------------|-----------------------|
-| `_sass/**`, `assets/css/**` | REQ-VISUAL-01, REQ-A11Y-01, REQ-NAV-01 |
-| `_layouts/**`, `_includes/**` | ALL (layout changes are high-risk) |
-| `_posts/**`, `_drafts/**` | REQ-CONTENT-01, REQ-CONTENT-02, REQ-LINKS-01 |
-| `assets/js/**` | REQ-NAV-02, REQ-SEARCH-01, REQ-A11Y-02 |
-| `.github/workflows/**` | No Playwright — CI-only change |
-| `package.json`, `package-lock.json` | REQ-SEC-01 + full suite (dependency risk) |
-| `_config*.yml` | ALL (config changes are high-risk) |
+| Job | Runs | Blocking |
+|-----|------|----------|
+| `🎭 Page Contract` | `page-contract.spec.ts` on Mobile + Desktop | yes |
+| `🖼️ Visual Regression` | `visual-snapshot.spec.ts` on all three viewports | yes |
+| `🔒 Security Audit` | `npm audit` + Puppeteer support floor | yes |
+| `📝 Content Validation` | `validate-post-quality.sh` | no (warnings advisory) |
 
-**Full suite triggers:**
-- Changes to `_layouts/`, `_includes/`, `_config*.yml`, `package.json`
-- Manual `workflow_dispatch` with `full_suite: true`
-- Nightly scheduled run (cron)
+The page contract is the whole PR gate for behaviour. For every page type it
+asserts: a 200 response and exactly one `h1`; no first-party console error, page
+error, failed request or 4xx/5xx response; no horizontal scroll at 320px; mobile
+navigation that opens, closes and holds real destinations; and primary nav hrefs
+that all resolve.
 
----
+It is deliberately small and held to a wall-clock budget rather than a coverage
+target. Adding a test to it should be a considered decision — if the assertion
+does not describe a contract *every* page must honour, it belongs in the nightly
+suite.
 
-## Sharding Strategy (Full-Suite Runs)
+## What runs nightly
 
-When a full run is triggered, Playwright is sharded across 3 parallel jobs:
+`🌙 Nightly Full Suite` runs at 02:00 UTC, and on dispatch with
+`full_suite=true`. It runs the full Playwright suite across all three viewports,
+plus pa11y (REQ-A11Y-01) and Lighthouse CI (REQ-PERF-01). It does not gate PRs;
+on failure it opens or comments on a single `Nightly quality suite failing`
+issue, and triage decides whether a finding becomes a fix, a new contract test,
+or an accepted risk.
 
-| Shard | Grep Filter | Requirements Covered |
-|-------|-------------|---------------------|
-| Shard 1 | `@REQ-NAV-01\|@REQ-NAV-02` | Navigation + mobile viewport tests |
-| Shard 2 | `@REQ-CONTENT-01\|@REQ-CONTENT-02\|@REQ-LINKS-01` | Content + links tests |
-| Shard 3 | `@REQ-A11Y-02\|@REQ-VISUAL-01\|@REQ-PERF-01` | Accessibility + visual + performance |
+## Retired: change-based selection and sharding
 
-Lighthouse CI runs as a separate parallel job alongside the three Playwright shards.
+Until #1197 the PR path ran three sharded Playwright jobs whose test set was
+chosen by `scripts/select-tests.sh` from the changed paths. Both are gone from
+the PR path.
 
-**Target wall-clock time:** ≤ 6 min for full suite (down from ~19 min).
+The selection script routed `@REQ-*` grep expressions that never selected
+`@REQ-VISUAL-SNAP`, `@REQ-PAGE-CHROME`, `@REQ-CONTENT-03`, `@REQ-CONTENT-04` or
+`@REQ-CONTENT-CAPTION-CASE`, so those tests silently did not run on any targeted
+run. The contract suite is small enough to always run in full, which removes the
+need to choose. The script remains in the tree for reference; no workflow path
+calls it.
 
 ---
 
