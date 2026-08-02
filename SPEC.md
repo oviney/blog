@@ -2,7 +2,7 @@
 
 **Stream:** `docs/BACKLOG.md` P1 · **Priority:** P1 · **Scope:** L (4 PRs) · **Dependencies:** none
 **Date:** 2026-08-02 · **Labels:** `agent:qa-gatekeeper`, `governance-update` (Stream C only) · **Issue:** none — local backlog item
-**Status:** Stream A ✅ shipped (#1193) · Streams B, C, D not started
+**Status:** A ✅ #1193 · B ⚠️ **partial** #1194 · C ✅ #1195 · D not started
 
 ---
 
@@ -150,7 +150,7 @@ coverage without failing anything. D3's contract suite must not assume that
 3 times out of 4. In particular, **D1's decision to retain the visual gate is
 reinforced**: it was the only check that would have caught #4.
 
-### Stream B — purge assertions that cannot fail (`agent:qa-gatekeeper`)
+### Stream B — purge assertions that cannot fail (`agent:qa-gatekeeper`) — ⚠️ PARTIAL in #1194 (2026-08-02)
 
 Delete `responsive.spec.ts` and `content-edge-cases.spec.ts`. Remove the 8
 conditional `test.skip()` calls in `navigation.spec.ts` — assert the element if it
@@ -159,7 +159,27 @@ Stream D's contract suite: touch targets ≥ 44×44px, no horizontal overflow at
 320px, post pages render without layout breaks, external `_blank` links carry
 `rel="noopener|noreferrer"`.
 
-### Stream C — fix the generator (`governance-update`)
+**Shipped — about half. Verified 2026-08-02 against `main` @ `19822b3`:**
+
+| Item | State |
+|---|---|
+| `responsive.spec.ts` | ✅ Pruned — 9 tests deleted, 671→148 lines changed. **Repaired, not deleted** — a deliberate deviation from D2. |
+| `navigation.spec.ts` conditional skips | ✅ `grep -c "test.skip("` = **0** (was 8) |
+| `toBeGreaterThanOrEqual(0)` suite-wide | ✅ **0** occurrences |
+| `content-edge-cases.spec.ts` | ❌ **Untouched.** Still 26,652 bytes and still carries `nuclear healing` / `Nuclear healing` / `ultra-permissive` scaffolding plus 12 `catch` blocks. |
+
+**Remaining work for B:** `content-edge-cases.spec.ts` only. It is now the sole
+carrier of the permissive-scaffolding pattern in the suite — every other marker
+named in §2 is gone.
+
+**D2 partially reversed in practice.** D2 argued deletion over repair because
+"extracting the real invariants is a rewrite, not an edit." #1194 repaired
+`responsive.spec.ts` instead and the result satisfies §6's two measurable
+criteria, so the repair path is evidently viable. Decide explicitly for
+`content-edge-cases.spec.ts` — prune it the same way, or delete it — rather than
+inheriting D2 unexamined.
+
+### Stream C — fix the generator (`governance-update`) — ✅ SHIPPED in #1195 (2026-08-02)
 
 Rewrite §"Defensive Patterns" in `.github/instructions/tests.instructions.md`:
 `try/catch` may not convert a failure into a pass; `test.skip()` may not be
