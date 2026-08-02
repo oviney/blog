@@ -29,7 +29,7 @@ used when a full suite run is triggered.
 | Spec File | Requirement IDs |
 |-----------|----------------|
 | `tests/playwright-agents/navigation.spec.ts` | REQ-NAV-01, REQ-NAV-02 |
-| `tests/playwright-agents/responsive.spec.ts` | REQ-NAV-01, REQ-CONTENT-01, REQ-CONTENT-02, REQ-VISUAL-01, REQ-NAV-02, REQ-A11Y-02, REQ-PERF-01 |
+| `tests/playwright-agents/responsive.spec.ts` | REQ-NAV-01, REQ-VISUAL-01, REQ-A11Y-02 |
 | `tests/playwright-agents/homepage.spec.ts` | REQ-CONTENT-01, REQ-CONTENT-02, REQ-LINKS-01, REQ-NAV-01 |
 | `tests/playwright-agents/content-edge-cases.spec.ts` | REQ-CONTENT-02, REQ-LINKS-01, REQ-VISUAL-01 |
 | `tests/playwright-agents/interactive-elements.spec.ts` | REQ-NAV-02, REQ-A11Y-02, REQ-CONTENT-02 |
@@ -53,14 +53,14 @@ used when a full suite run is triggered.
 | Requirement ID | Spec Files |
 |---------------|-----------|
 | REQ-NAV-01 | navigation.spec.ts, responsive.spec.ts, homepage.spec.ts |
-| REQ-NAV-02 | navigation.spec.ts, responsive.spec.ts, interactive-elements.spec.ts |
-| REQ-CONTENT-01 | homepage.spec.ts, responsive.spec.ts, seo-jsonld.spec.ts, analytics.spec.ts |
-| REQ-CONTENT-02 | homepage.spec.ts, responsive.spec.ts, content-edge-cases.spec.ts, interactive-elements.spec.ts, seo-jsonld.spec.ts |
+| REQ-NAV-02 | navigation.spec.ts, interactive-elements.spec.ts |
+| REQ-CONTENT-01 | homepage.spec.ts, seo-jsonld.spec.ts, analytics.spec.ts |
+| REQ-CONTENT-02 | homepage.spec.ts, content-edge-cases.spec.ts, interactive-elements.spec.ts, seo-jsonld.spec.ts |
 | REQ-SEARCH-01 | *(no dedicated spec — see coverage gaps above)* |
 | REQ-A11Y-01 | Pa11y CI |
 | REQ-A11Y-02 | responsive.spec.ts, interactive-elements.spec.ts |
-| REQ-PERF-01 | Lighthouse CI, responsive.spec.ts |
-| REQ-VISUAL-01 | BackstopJS, responsive.spec.ts, content-edge-cases.spec.ts |
+| REQ-PERF-01 | Lighthouse CI |
+| REQ-VISUAL-01 | responsive.spec.ts, content-edge-cases.spec.ts, visual-snapshot.spec.ts |
 | REQ-LINKS-01 | homepage.spec.ts, content-edge-cases.spec.ts |
 | REQ-SEC-01 | npm audit |
 

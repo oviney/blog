@@ -15,11 +15,10 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
     const nav = page.locator('#site-navigation');
     await expect(nav).toBeVisible();
 
+    // The Blog link is a fixed part of the primary nav. If it is missing that is
+    // a navigation regression, not a reason to skip.
     const blogLink = nav.getByRole('link', { name: 'Blog' });
-    if (await blogLink.count() === 0) {
-      test.skip(true, 'Blog link not found in #site-navigation');
-      return;
-    }
+    await expect(blogLink).toBeVisible();
 
     await blogLink.click();
     await page.waitForLoadState('networkidle');
@@ -49,12 +48,9 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
 
     const categoryLink = page.locator('#site-navigation')
       .getByRole('link', { name: /software engineering|test automation/i });
-    const categoryCount = await categoryLink.count();
-
-    if (categoryCount === 0) {
-      test.skip(true, 'No category links found in navigation');
-      return;
-    }
+    // The site publishes into these categories and links them from the primary
+    // nav; their absence is a regression.
+    await expect(categoryLink.first()).toBeVisible();
 
     await categoryLink.first().click();
     await page.waitForLoadState('networkidle');
@@ -73,12 +69,9 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
     await page.goto(TESTING_TIMES);
     await page.waitForLoadState('networkidle');
 
+    // TESTING_TIMES has more than two same-category siblings, so the section must
+    // render. A missing section means the related-posts query broke.
     const relatedSection = page.locator('section.related-reading');
-    if (await relatedSection.count() === 0) {
-      test.skip(true, 'related-reading section not rendered — fewer than 2 related posts found');
-      return;
-    }
-
     await expect(relatedSection).toBeVisible();
 
     // Category label semantics are verified in the Post-page Taxonomy describe block.
@@ -111,17 +104,14 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
   test('Main navigation accessibility and keyboard support', async ({ page }) => {
     await page.goto('/');
 
-    let successfulTabs = 0;
-    try {
+    // Keyboard input is always available under Playwright; the previous
+    // try/catch turned a genuine focus-management failure into a green skip.
+    // Every Tab must land focus on something, not just one of five.
+    await page.keyboard.press('Tab');
+    for (let i = 0; i < 5; i++) {
       await page.keyboard.press('Tab');
-      for (let i = 0; i < 5; i++) {
-        await page.keyboard.press('Tab');
-        if (await page.locator(':focus').count() > 0) successfulTabs++;
-      }
-    } catch {
-      test.skip(true, 'keyboard events unavailable in this environment');
+      await expect(page.locator(':focus'), `Tab ${i + 2} landed on nothing`).toHaveCount(1);
     }
-    expect(successfulTabs).toBeGreaterThanOrEqual(1);
 
     // Enter key on a focused link must navigate away from the current page
     try {
@@ -296,11 +286,6 @@ test.describe('@navigation Post-page Taxonomy & Recommendations @REQ-NAV-01', ()
     await page.waitForLoadState('networkidle');
 
     const relatedSection = page.locator('section.related-reading');
-    if (await relatedSection.count() === 0) {
-      test.skip(true, 'related-reading section not rendered — fewer than 2 related posts');
-      return;
-    }
-
     await expect(relatedSection).toBeVisible();
 
     const originCategory = (await page.locator('.article-section-line .section-link').first().textContent())?.trim();
@@ -327,11 +312,8 @@ test.describe('@navigation Post-page Taxonomy & Recommendations @REQ-NAV-01', ()
     await page.goto(TESTING_TIMES);
     await page.waitForLoadState('networkidle');
 
+    // The site has many posts per category, so this section always renders.
     const moreFromSection = page.locator('section.more-from-section');
-    if (await moreFromSection.count() === 0) {
-      test.skip(true, 'more-from-section not rendered — site has only one post');
-      return;
-    }
     await expect(moreFromSection).toBeVisible();
 
     const heading = moreFromSection.locator('h2');
@@ -382,10 +364,6 @@ test.describe('@navigation Post-page Taxonomy & Recommendations @REQ-NAV-01', ()
     await page.waitForLoadState('networkidle');
 
     const moreFromSection = page.locator('section.more-from-section');
-    if (await moreFromSection.count() === 0) {
-      test.skip(true, 'more-from-section not rendered — site has only one post');
-      return;
-    }
     await expect(moreFromSection).toBeVisible();
     await expect(moreFromSection.locator('h2')).toContainText('Software Engineering');
 
@@ -516,12 +494,10 @@ test.describe('@navigation Mobile Navigation Specific Tests @REQ-NAV-01 @REQ-NAV
     await toggle.click();
     await expect(nav).toBeVisible();
 
-    // Skip if the Blog link is not present; return stops further execution
+    // The Blog link must be reachable from the opened mobile menu — that is the
+    // whole point of this test.
     const blogLink = nav.getByRole('link', { name: /blog/i }).first();
-    if (await blogLink.count() === 0) {
-      test.skip(true, 'Blog link is not present in the mobile navigation on this page.');
-      return;
-    }
+    await expect(blogLink).toBeVisible();
 
     const blogHref = await blogLink.getAttribute('href');
     if (blogHref) {
