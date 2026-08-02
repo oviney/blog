@@ -1,5 +1,5 @@
 ---
-layout: review
+layout: post
 title: "Migration Fever: The Tests You Skip Are the Delays You Buy"
 date: 2026-08-02
 author: Ouray Viney
