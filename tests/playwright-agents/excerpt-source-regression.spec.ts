@@ -7,7 +7,11 @@ test.use({ baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4000' }
 // "Source:". Teaser cards must prefer the human-written front-matter
 // `description` so no card lede reads "Source: …".
 const surfaces: { name: string; path: string; selector: string }[] = [
-  { name: 'homepage', path: '/', selector: '.hero-post-excerpt, .topic-card-excerpt' },
+  // The 2026 redesign replaced the homepage's hero + `.topic-grid` cards with a
+  // lead story and a rail, so its teaser excerpts are `.h26-lead-excerpt` and
+  // `.h26-rail-excerpt`. Both still resolve `description | default: excerpt`,
+  // which is exactly what this guard exists to check.
+  { name: 'homepage', path: '/', selector: '.h26-lead-excerpt, .h26-rail-excerpt' },
   { name: 'blog index', path: '/blog/', selector: '.topic-card-excerpt' },
   { name: 'security topic', path: '/security/', selector: '.topic-card-excerpt' },
 ];

@@ -16,7 +16,10 @@ test.use({ baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4000' }
 // Listing surfaces that render post-teaser cards, with the excerpt selector
 // each surface uses. Home mixes a hero excerpt with topic cards.
 const LISTING_SURFACES: { name: string; path: string; excerptSelector: string }[] = [
-  { name: 'homepage', path: '/', excerptSelector: '.hero-post-excerpt, .topic-card-excerpt' },
+  // The 2026 redesign replaced the homepage hero + `.topic-grid` with a lead
+  // story and a rail; its teaser excerpts are now `.h26-lead-excerpt` and
+  // `.h26-rail-excerpt`.
+  { name: 'homepage', path: '/', excerptSelector: '.h26-lead-excerpt, .h26-rail-excerpt' },
   // #1123 extracted the canonical post-card include, so /blog/ renders
   // .topic-card-excerpt like every other listing surface. The old
   // .econ-card-excerpt selector matched nothing, and the test failed on its own
