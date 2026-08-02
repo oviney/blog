@@ -55,19 +55,24 @@ const LISTING_GRID = '.topic-grid';
 // height and fail the gate on a size mismatch.
 const POST_CROSS_LINKS = ['.related-list', '.more-from-section'];
 
-// The homepage hero (index.md:22) renders the newest — or `featured: true` —
-// post's image, category, title, subtitle, 40-word excerpt, date and read time
-// OUTSIDE `.topic-grid`, so the `listing` mask below does not reach it. Every
-// publish that takes over the hero rewrites that block, which is why the
-// homepage stayed coupled to publication after #1186 decoupled the category
-// pages: measured at 17,118px / ratio 0.03 against the 0.02 threshold on
-// [Tablet Chrome].
+// The 2026 redesign replaced the homepage hero + `.topic-grid` with `.h26-news`
+// — a lead story (image, category, title, subtitle, 40-word excerpt, date, read
+// time) beside a 3-item "More from the blog" rail. Both are composed from
+// whatever happens to be published, so every publish rewrites the block and
+// moves everything beneath it.
 //
-// Hiding it trades away pixel coverage of the hero's type scale, spacing, image
-// aspect and colour — a deliberate, accepted trade (SPEC.md §2). The structure
-// is still covered: homepage.spec.ts:21-37 asserts the hero is visible, its
-// title links, its excerpt renders and its CTA works, re-asserted at :174-180.
-const HOMEPAGE_HERO = ['.hero-post'];
+// Hiding the whole `.h26-news` block is what keeps the homepage baseline
+// decoupled from publication (#1186 / #1191). It trades away pixel coverage of
+// the lead's type scale, spacing, image aspect and colour — the same deliberate
+// trade the old hero made (SPEC.md §2). The structure is still covered:
+// homepage.spec.ts asserts the lead's title, excerpt, CTA, meta and navigation,
+// and the rail's item count, links and archive link.
+//
+// What remains in the capture is publication-stable: the positioning band, the
+// credibility strip, the topic index, the author block, the newsletter CTA and
+// the footer. The only publish-sensitive pixels left are the archive/topic
+// count digits, which are far below the 0.02 maxDiffPixelRatio threshold.
+const HOMEPAGE_VOLATILE = ['.h26-news'];
 
 // `listing: true` marks a page whose body is a `.topic-grid` of post cards.
 // Those pages re-render on every published article, so they are captured
@@ -79,12 +84,14 @@ const HOMEPAGE_HERO = ['.hero-post'];
 // to break — the gate billed a baseline re-seed as the price of shipping an
 // article.
 //
-// `listing: true` is necessary but not sufficient on the homepage: it is the
-// only listing page that renders volatile content OUTSIDE the grid, so it also
-// names `.hero-post` in `volatile`. The other listing pages have nothing above
-// the grid that a publish can move.
+// The homepage is no longer a `listing` page: the 2026 redesign removed its
+// `.topic-grid` entirely, so the grid mask would match nothing and the
+// viewport-height pin would give up the whole page below the fold for no gain.
+// Hiding `.h26-news` removes all of its publication-volatile content, which
+// makes a stable full-page capture possible — strictly more coverage than the
+// masked viewport crop it replaces.
 const PAGES: { name: string; path: string; listing?: boolean; volatile?: string[] }[] = [
-  { name: 'homepage', path: '/', listing: true, volatile: HOMEPAGE_HERO },
+  { name: 'homepage', path: '/', volatile: HOMEPAGE_VOLATILE },
   { name: 'blog-index', path: '/blog/', listing: true },
   { name: 'post-testing-times', path: '/2025/12/31/testing-times/', volatile: POST_CROSS_LINKS },
   // Permalink is /2026/01/02/ — the post is dated 2026-01-02. This pointed at
