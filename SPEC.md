@@ -1,152 +1,243 @@
-# SPEC — Decouple the homepage visual baseline from post publication
+# SPEC — Restructure the PR test gate around signal, not volume
 
-**Stream:** `docs/BACKLOG.md` P2 (top Active row) · **Priority:** P2 · **Scope:** S · **Dependencies:** None
-**Date:** 2026-08-01 · **Label:** `agent:qa-gatekeeper` · **Issue:** none — local backlog item
+**Stream:** `docs/BACKLOG.md` P1 · **Priority:** P1 · **Scope:** L (4 PRs) · **Dependencies:** none
+**Date:** 2026-08-02 · **Labels:** `agent:qa-gatekeeper`, `governance-update` (Stream C only) · **Issue:** none — local backlog item
+**Status:** Stream A ✅ shipped (#1193) · Streams B, C, D not started
 
 ---
 
 ## 1. Objective
 
-Publishing an article still reds the blocking 🖼️ Visual Regression check on the
-homepage, so shipping content bills a baseline re-seed as its price. #1186 fixed
-this for `/security/`, `/software-engineering/` and `/test-automation/`; the
-homepage is the last coupled page, and the one that moves on **every** publish.
+The PR Playwright gate costs **13.3 billable job-minutes and ~5 minutes of
+wall-clock per PR**, fires twice per merged change (`pull_request` + `push: main`),
+and rebuilds Jekyll four times per run. In seven months it has caught **one** real
+product regression. Over the same period **32 of 62 commits touching `tests/`
+(52%) were repair, heal, unblock, or stabilise work** — more than half of all test
+effort maintains the tests rather than covering the product.
 
-`index.md:22` renders `.hero-post` — the newest (or `featured: true`) post's
-image, category, title, subtitle, 40-word excerpt, date and read-time —
-**outside** `.topic-grid`. `listing: true` in
-`tests/playwright-agents/visual-snapshot.spec.ts` pins the capture to the
-viewport and masks the grid, so the homepage is protected *below* the hero and
-exposed *above* it. Any post that becomes the newest one rewrites that block and
-shifts everything under it.
+The gate is not merely expensive; parts of it are incapable of failing. This spec
+restores trust by deleting what cannot fail, fixing the instruction file that
+generates it, and cutting the blocking path to checks that earn their wall-clock.
 
-**Measured, not assumed:** a throwaway post published into Security on branch
-`probe/visual-decoupling` produced `17,118 pixels (ratio 0.03 of all image
-pixels) are different` against the 0.02 `maxDiffPixelRatio` threshold, on
-`[Tablet Chrome] homepage`. The other 29 visual tests — including all nine
-category snapshots — passed. The same branch was green without the probe post,
-so the coupling is pre-existing and was not induced by #1186.
+**Success criteria**
 
-## 2. Coverage trade — DECIDED 2026-08-01: accept
+| | Now | Target |
+|---|---|---|
+| Billable job-min per PR (`test-quality`) | 13.3 | ≤ 5 |
+| PR wall-clock | ~5 min | ≤ 3 min |
+| Jekyll builds per PR run | 4 | 1 |
+| Assertions that cannot fail | ≥ 1 proven, ~90 lines of permissive scaffolding | 0 |
+| Conditional `test.skip()` on a missing element | 8 | 0 |
+| Blocking Playwright jobs | 3 shards + visual | 1 contract + visual |
 
-The fix trades away **pixel** coverage of the hero: its type scale, spacing,
-image aspect and colour. Structural coverage survives — `homepage.spec.ts:21-37`
-already asserts `.hero-post` is visible, the title links, the excerpt renders,
-and the CTA has a working `href` and click-through (re-asserted at
-`homepage.spec.ts:174-180`).
+---
 
-**Accepted.** A gate that reds on every publish gets ignored or bypassed, and
-this repo has already lived that: the visual gate sat broken from #1119 until
-#1160. Alarm fatigue is the demonstrated failure mode, not a hypothetical one.
+## 2. Evidence
 
-**Accepted residual risk:** a CSS regression touching *only* `.hero-post-*` rules
-would no longer be caught by pixels. Theme-wide regressions still surface —
-`about` and both post scenarios remain full-page captures.
+**The one bug.** `72c1666` — the agents dashboard scrolled sideways at 320px
+because a Chart.js canvas had no width ceiling. Found only because the shards were
+made blocking on 2026-08-01. The same commit surfaced five failures total: **four
+were stale tests asserting behaviour that had been deliberately changed.**
 
-Rationale and the two rejected mitigations are in
-[`tasks/plan.md`](tasks/plan.md) §Decisions (D1). Two further observations
-raised alongside this spec (skippable required shards, `action_required` on the
-seed commit) are resolved there too, as D2 and D3. **No decision is outstanding
-— this spec is ready to build.**
+**Today's failures are 5:0 rot.** Every failure on `redesign/home-2026` is
+`homepage.spec.ts` asserting the *previous* homepage — "Hero section displays
+latest post", "Focus Areas section shows 3 cards", "Author bio section is
+visible". The redesign intentionally replaced all of it with a lead-story and
+topic-index layout. Zero bugs; eight tests × three viewports of churn.
 
-## 3. Approach
+**Assertions that cannot fail.** `responsive.spec.ts:757`:
 
-1. In `tests/playwright-agents/visual-snapshot.spec.ts`, generalise the existing
-   volatile-content idiom. `POST_CROSS_LINKS` is already `display: none`-ed
-   before capture on post pages; replace it with a per-page list of volatile
-   selectors so the homepage can name `.hero-post` alongside it.
-2. `display: none`, **not** `mask`. A mask paints after layout, so a taller or
-   shorter hero still shifts the grid beneath it and diffs. Same reasoning
-   already recorded in the file for `POST_CROSS_LINKS` and the listing grids.
-3. Re-seed only the three homepage baselines (see §5).
-4. Update the file's header comment and the `listing` comment so the next reader
-   sees why the homepage is handled differently from the other listing pages.
+```js
+// Nuclear healing: Accept if we successfully checked any link pairs
+expect(validSpacingCount).toBeGreaterThanOrEqual(0);
+```
 
-**Rejected:** masking `.hero-post` (paints after layout — does not stop the
-shift); pinning the hero's height with `addStyleTag` (fabricates a layout the
-site does not have, so the baseline would assert a page that never ships);
-dropping the homepage from the pixel gate entirely (also loses masthead and
-navigation coverage). A fixture-content visual build would retire this whole
-defect class and buy back the card interiors and footers currently masked, but
-Jekyll does not swap post sources cleanly via config — revisit only if the
-coupling bites a fourth time.
+A count is never negative. The surrounding `catch` blocks *increment the valid
+counter on error* — `// Accept element if we can't measure - defensive approach` —
+so a wholly broken page passes. 90 lines of `nuclear healing` / `ultra-permissive`
+/ `Accept anyway` scaffolding span `responsive.spec.ts` (857 lines) and
+`content-edge-cases.spec.ts` (682 lines): **36% of the suite by volume**,
+inflating the pass count while proving close to nothing.
 
-## 4. Acceptance criteria
+**Skips report as passes.** `navigation.spec.ts` has 8 skips shaped
+`if (await blogLink.count() === 0) test.skip(...)`. If navigation breaks and the
+Blog link vanishes, the test goes green.
 
-- [ ] **AC-1** Publishing a post that becomes the newest article does **not**
-      move the homepage baseline. Prove it the way #1186 was proven: a throwaway
-      post on a scratch branch, `test-quality.yml` dispatched, 🖼️ Visual
-      Regression green. Delete the branch afterwards.
-- [ ] **AC-2** Exactly three baselines change
-      (`homepage-{Mobile,Tablet,Desktop}-Chrome-linux.png`). Any other PNG in the
-      diff means the change reached further than intended.
-- [ ] **AC-3** `homepage.spec.ts` passes unmodified — structural hero coverage is
-      not touched by this work.
-- [ ] **AC-4** All six required checks green: `build`, `🔒 Security Audit`,
-      `🖼️ Visual Regression`, `🎭 Playwright Shard 1/3`, `2/3`, `3/3`.
-- [ ] **AC-5** No protected file touched; `bundle exec jekyll build` exits 0.
+**The root cause is written down.** `.github/instructions/tests.instructions.md`
+§"Defensive Patterns" instructs every agent that touches `tests/**`:
+
+> - Use `try/catch` around interactions that may fail on certain pages
+> - Log skipped steps with `console.log('reason for skip')` rather than throwing
+
+That is the generator. Deleting the tests without fixing this file rebuilds them.
+
+**Historic credibility.** `continue-on-error: true` sat on the shard steps until
+2026-08-01, so the required checks passed regardless of results. Separately,
+Firefox and WebKit projects were declared while CI installed chromium only — 376
+of 940 tests errored and were swallowed. The suite advertised cross-browser
+coverage it had never once had.
+
+---
+
+## 3. Decisions
+
+**D1 — Retain the 🖼️ Visual Regression gate on PRs. REVERSED from the review.**
+The review recommended dropping homepage pixel gating. On inspection that is
+wrong. Today's homepage baseline failure is a *correct* result: the design
+genuinely changed, and reseeding is the right response. The failure mode worth
+fixing was baselines moving on every *publish*, and #1186 + #1191 already fixed
+it — no page's baseline now moves when an article ships. The job is also the
+cheapest in the workflow (140s). It stays.
+
+**D2 — Delete rather than repair `responsive.spec.ts` and
+`content-edge-cases.spec.ts`.** Their permissive scaffolding is load-bearing:
+extracting the real invariants is a rewrite, not an edit. The invariants worth
+keeping (§4, Stream B) are re-expressed in the new contract suite. Tests that
+cannot fail are worse than absent ones — they buy false confidence and consume
+maintenance.
+
+**D3 — One contract suite, both blocking and cheap.** A ~15-test
+`page-contract.spec.ts` on Mobile (320) + Desktop (1920) replaces three sharded
+jobs. It must still catch the class of the one real bug ever found: horizontal
+overflow at 320px.
+
+**D4 — The full 138-test suite moves to nightly, non-blocking, auto-filing an
+issue on failure.** It keeps its value as a broad net without taxing every PR.
+
+**D5 — `agent-eval.yml` is left alone.** Measured at 0.0 billable job-minutes; it
+is not part of the problem.
+
+---
+
+## 4. Scope — four PRs, in this order
+
+### Stream A — finish `redesign/home-2026` (unblocks product work) — ✅ SHIPPED in #1193 (2026-08-02)
+
+Rewrite `tests/playwright-agents/homepage.spec.ts` against the shipped structure
+in `index.md`: `.h26-lede` intro, `.h26-facts`, `.h26-lead` lead story with a
+linked `.h26-lead-title` and working `.h26-lead-cta`, `.h26-rail` "More from the
+blog", `.h26-topics` topic index, `.h26-author`. Assert **behaviour and
+invariants** — the lead story links to a real post, every rail item resolves, the
+topic index covers the site's categories — not card counts or section prose.
+Reseed the three homepage baselines by dispatching `test-quality.yml` on the
+branch with `update_snapshots=true`. Ships on the existing branch: a redesign PR
+owns its own tests.
+
+**Outcome — done as specified, plus three defects this spec did not anticipate.**
+The "5:0 rot" reading in §2 was right about `homepage.spec.ts` but **incomplete**:
+the branch was red for four reasons, not one, and only the first was rot.
+
+1. *(rot, as predicted)* 24 stale `homepage.spec.ts` assertions — rewritten.
+2. *(real defect)* The theme's **unscoped** drop-cap,
+   `article > p:first-of-type::first-letter` (`economist-theme.scss:1416`),
+   matched the redesign's new `<article>` wrappers, rendering a 10.4px kicker's
+   first letter at **48px** at ≤768px. Caught by rendering the page, not by any
+   spec. Fixed with a scoped reset + a guard verified to fail without it.
+3. *(real defect)* `$h26-faint` at **3.71:1** failed pa11y WCAG2AA on 14
+   elements — the a11y gate was doing its job.
+4. *(silent coverage loss)* The homepage `volatile`/`listing` config in
+   `visual-snapshot.spec.ts` still named `.hero-post` and `.topic-grid`, both
+   deleted by the redesign. The mask matched nothing, quietly re-coupling the
+   baseline to publication and undoing #1186/#1191. Also: the two `"Source:"`
+   teaser guards failed on their own "expected at least one teaser card"
+   precondition, meaning the homepage was **unguarded**, not merely red.
+
+**Carry this into Streams B–D.** Items 2–4 are the failure mode this spec is
+built to reduce, so they are worth stating plainly: the gate's *pixel* and *a11y*
+jobs caught two real defects here, and a stale selector list silently removed
+coverage without failing anything. D3's contract suite must not assume that
+"tests failed" means "tests are rot" — on this branch that inference was wrong
+3 times out of 4. In particular, **D1's decision to retain the visual gate is
+reinforced**: it was the only check that would have caught #4.
+
+### Stream B — purge assertions that cannot fail (`agent:qa-gatekeeper`)
+
+Delete `responsive.spec.ts` and `content-edge-cases.spec.ts`. Remove the 8
+conditional `test.skip()` calls in `navigation.spec.ts` — assert the element if it
+must exist; delete the test if it is optional. Real invariants preserved into
+Stream D's contract suite: touch targets ≥ 44×44px, no horizontal overflow at
+320px, post pages render without layout breaks, external `_blank` links carry
+`rel="noopener|noreferrer"`.
+
+### Stream C — fix the generator (`governance-update`)
+
+Rewrite §"Defensive Patterns" in `.github/instructions/tests.instructions.md`:
+`try/catch` may not convert a failure into a pass; `test.skip()` may not be
+conditioned on the absence of an element under test; every test must have at least
+one assertion that can fail. Update §"Assertions" so `toBeGreaterThanOrEqual(0)`
+and equivalents are named as forbidden.
+
+### Stream D — restructure the gate (`agent:qa-gatekeeper`)
+
+- Add `tests/playwright-agents/page-contract.spec.ts` (~15 tests, Mobile +
+  Desktop): every page type returns 200 and renders its `h1`; no console errors;
+  no horizontal overflow at 320px; nav opens and closes; internal links resolve;
+  touch targets ≥ 44px.
+- `test-quality.yml` PR path: build Jekyll **once**, upload `_site`, and run one
+  contract job plus 🖼️ Visual Regression against the artifact. Delete the three
+  shard jobs, `select-tests.sh` invocation, and `quality-report` from the PR path.
+- Nightly (`schedule`) path: full 138-test suite across three viewports, pa11y,
+  Lighthouse — non-blocking, opens an issue on failure.
+- Update branch protection: required contexts become `build`, `🔒 Security Audit`,
+  `🖼️ Visual Regression`, `🎭 Page Contract`. Removes the three shard contexts.
+- Retire `scripts/select-tests.sh` and the `@REQ-*` grep routing, or reduce it to
+  the nightly path. Note it currently never selects `@REQ-VISUAL-SNAP`,
+  `@REQ-PAGE-CHROME`, `@REQ-CONTENT-03/04`, `@REQ-CONTENT-CAPTION-CASE` — those
+  tests silently do not run on any targeted run today.
+
+---
 
 ## 5. Commands
 
 ```bash
-bundle exec jekyll build                      # validate before the PR
-
-# Re-seed baselines — CI only. They are -linux PNGs; regenerating on macOS bakes
-# in anti-aliasing noise and makes the gate permanently flaky.
-# Rebase onto main FIRST, then seed.
-gh workflow run test-quality.yml --repo oviney/blog \
-  --ref <branch> -f update_snapshots=true
+bundle exec jekyll build                          # must stay green throughout
+npx playwright test tests/playwright-agents/page-contract.spec.ts
+npx playwright test --project="Mobile Chrome"     # 320px overflow checks
+npm run test:visual:snap                          # visual gate, local
+bash scripts/validate-posts.sh --all
+gh workflow run test-quality.yml --ref <branch> -f update_snapshots=true   # reseed
 ```
-
-Two traps in that seed run, both hit during #1186:
-
-- The 🎭 Playwright shards in the **same** dispatch run compare against the
-  *pre*-seed baselines and fail. Expected — read the 🖼️ Visual Regression job,
-  ignore the shards.
-- The bot's seed commit lands as `action_required`, so the follow-up checks never
-  start until approved:
-  `gh api -X POST repos/oviney/blog/actions/runs/<id>/approve`
-
-## 6. Boundaries
-
-- **Never** push to `main`; PR only, admin-merge when green.
-- **Never** regenerate `-linux` baselines locally.
-- Protected files: `_config.yml`, `.github/CODEOWNERS`,
-  `.github/copilot-instructions.md`, `Gemfile`, `Gemfile.lock`.
-- Do not touch `index.md`. This is a test-harness change; the homepage renders
-  correctly and is not the defect.
-- Do not widen scope to the fixture-content build (see §3, rejected).
-- Local backlog item, not a GitHub Issue — `docs/BACKLOG.md` is the queue for
-  in-session work; Issues stay for Copilot cloud agents.
 
 ---
 
-## Appendix — session of 2026-08-01, for cold-start context
+## 6. Testing strategy
 
-Both prior P2 rows cleared. Three PRs merged, `main` at `4864a8c`, queue empty.
+Each stream is verified against a **local dev server**, not by reading the diff:
 
-| PR | Change | Verified by |
-|----|--------|-------------|
-| [#1183](https://github.com/oviney/blog/pull/1183) | Orchestrator issue-refs bound to closing keywords: `/\b(?:close[sd]?\|fix(?:e[sd])?\|resolve[sd]?)\b[\s:]+#(\d+)\b/gi`. Fixes all three consumers of `issueRefMap`, not just duplicate detection. | Two-sided probe on throwaway PRs 1184/1185 — prose mentions produced no duplicate close; `Closes #1110` on the same pair did. |
-| [#1186](https://github.com/oviney/blog/pull/1186) | `listing: true` on the three category pages; nine baselines re-seeded, nothing else moved. | Throwaway post into Security (3 → 4 cards); all nine category snapshots held. |
-| [#1187](https://github.com/oviney/blog/pull/1187) | Backlog reconciled — both P2 rows retired, stale "In review" cleared, visual epic marked closed. | Docs only. |
+- **A** — full `homepage.spec.ts` green on all three projects; visual gate green
+  after reseed.
+- **B** — suite green after deletion; `grep -c "toBeGreaterThanOrEqual(0)"` = 0;
+  `grep -c "test.skip("` in `navigation.spec.ts` = 0.
+- **C** — no test changes; instruction file only.
+- **D** — measure the new PR run: job-minutes, wall-clock, Jekyll build count
+  reported in the PR body against the §1 table. Deliberately break the page (e.g.
+  reintroduce the 320px canvas overflow) and confirm the contract suite reds.
 
-**Writing `#NNN` in PR bodies is safe again** — the prose workaround #1183 was
-filed against is retired.
+**Regression guard for D:** the contract suite must fail on a reintroduced
+dashboard-canvas overflow. If it does not, the restructure has lost the only bug
+this gate ever caught and must be revised before merge.
 
-**Two observations raised alongside this spec, both since resolved as no-action**
-— see [`tasks/plan.md`](tasks/plan.md) §Decisions D2 and D3:
+---
 
-1. Change-based selection can skip all three *required* Playwright shards, and
-   GitHub counts a skipped required check as satisfied. No action: that is the
-   intent of change-based selection, the dangerous misclassification was fixed in
-   #1176, and `🖼️ Visual Regression` runs unconditionally as a safety net.
-2. The bot's baseline seed commit needs a manual `actions/runs/<id>/approve`.
-   No action: the fix costs a long-lived PAT and a recursion risk to save one CLI
-   call on a rare operation.
+## 7. Boundaries
 
-**One item found while planning** — `AGENTS.md:159` still tells agents never to
-write a bare `#<number>` because "an orchestration bot misreads it as an issue
-ref". #1183 retired that bot behaviour, so the line now teaches a workaround
-that no longer applies. Corrected as Phase 0 of [`tasks/todo.md`](tasks/todo.md);
-needs the `protected-file-update` label.
+**Always** — run `bundle exec jekyll build` before every PR; keep each PR atomic
+and independently reviewable; verify against a running dev server; label Stream C
+`governance-update`.
+
+**Ask first** — any change to branch-protection required contexts beyond the four
+named in Stream D; deleting a spec file not named in Stream B; anything that
+reduces the visual gate's coverage.
+
+**Never** — modify `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`,
+`.github/copilot-instructions.md`; push directly to `main`; weaken an assertion to
+make a test pass; seed visual baselines on `main`.
+
+---
+
+## 8. Out of scope
+
+Cross-browser coverage (existing P3 backlog row — Firefox/WebKit remain opt-in);
+the hero type-scale tokenisation P3; de-duplicating Jekyll builds in `test-build.yml`
+and `content-validation.yml` (the existing P3 row is *partly* absorbed by Stream D,
+which fixes `test-quality.yml` only); `REQ-SEARCH-01`'s missing spec.

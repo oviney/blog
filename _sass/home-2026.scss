@@ -3,10 +3,17 @@
 // `.homepage` rules in economist-theme.scss stay untouched and inert.
 //
 // Typography reuses the site's loaded families (Merriweather serif for
-// editorial voice, Inter for furniture) and the Economist red #E3120B. No new
-// palette is introduced.
+// editorial voice, Inter for furniture).
+//
+// The brand red is taken from the theme rather than restated, per CLAUDE.md
+// ("variables-only, never hardcode") — `@use` loads a module once, so pulling
+// it in here emits no duplicate CSS. The neutrals below ARE new: this layout
+// needs a paper/band/rule ramp the theme does not define. They are declared
+// here, scoped to this file, rather than pushed into the theme's global
+// namespace for one page.
+@use 'economist-theme' as theme;
 
-$h26-red: #E3120B;
+$h26-red: theme.$economist-red;
 $h26-ink: #121212;
 $h26-paper: #fbfaf8;
 $h26-band: #f2efea;
