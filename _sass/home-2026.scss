@@ -14,7 +14,10 @@ $h26-rule: #ddd8d1;
 $h26-rule-light: #e6e1da;
 $h26-body: #4a4a4a;
 $h26-muted: #6b665e;
-$h26-faint: #8a847b;
+// De-emphasised furniture (rail meta, topic counts' unit, topics note). Must
+// clear WCAG 2 AA 4.5:1 on the page background — #8a847b measured 3.71:1 and
+// failed the pa11y gate on 14 elements. Darkened for margin over the 4.5:1 line.
+$h26-faint: #736d64;
 
 $h26-serif: 'Merriweather', Georgia, 'Times New Roman', serif;
 $h26-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -44,6 +47,16 @@ $h26-bp: 48em; // two-column → single-column
     width: 1px;
     height: 0.8em;
     background: $h26-rule;
+  }
+
+  // The theme's mobile drop-cap rule (economist-theme.scss:1416,
+  // `article > p:first-of-type::first-letter { font-size: 3rem }`) is unscoped,
+  // so below its breakpoint it lands on the first <p> child of ANY <article> —
+  // here `.h26-lead-subtitle` and each `.h26-rail-item`'s category label,
+  // rendering a 10.4px uppercase kicker's first letter at 48px. Neutralised
+  // here rather than by narrowing the theme rule, which post pages still use.
+  article > p:first-of-type::first-letter {
+    font-size: inherit;
   }
 
   // ---- 1. positioning band ---------------------------------------------
