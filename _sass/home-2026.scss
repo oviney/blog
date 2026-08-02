@@ -1,0 +1,540 @@
+// Homepage redesign (2026). Scoped entirely under `.home-2026` so it cannot
+// leak into the blog index, category pages, or posts — and so the previous
+// `.homepage` rules in economist-theme.scss stay untouched and inert.
+//
+// Typography reuses the site's loaded families (Merriweather serif for
+// editorial voice, Inter for furniture) and the Economist red #E3120B. No new
+// palette is introduced.
+
+$h26-red: #E3120B;
+$h26-ink: #121212;
+$h26-paper: #fbfaf8;
+$h26-band: #f2efea;
+$h26-rule: #ddd8d1;
+$h26-rule-light: #e6e1da;
+$h26-body: #4a4a4a;
+$h26-muted: #6b665e;
+// De-emphasised furniture (rail meta, topic counts' unit, topics note). Must
+// clear WCAG 2 AA 4.5:1 on the page background — #8a847b measured 3.71:1 and
+// failed the pa11y gate on 14 elements. Darkened for margin over the 4.5:1 line.
+$h26-faint: #736d64;
+
+$h26-serif: 'Merriweather', Georgia, 'Times New Roman', serif;
+$h26-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+$h26-bp: 48em; // two-column → single-column
+
+.home-2026 {
+  color: $h26-ink;
+  font-family: $h26-serif;
+
+  a { text-decoration: none; }
+
+  // ---- shared furniture -------------------------------------------------
+  .h26-kicker,
+  .h26-section-label,
+  .h26-rail-heading,
+  .h26-topics-heading,
+  .h26-author-kicker,
+  .h26-rail-category {
+    font-family: $h26-sans;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .h26-rule {
+    display: inline-block;
+    width: 1px;
+    height: 0.8em;
+    background: $h26-rule;
+  }
+
+  // The theme's mobile drop-cap rule (economist-theme.scss:1416,
+  // `article > p:first-of-type::first-letter { font-size: 3rem }`) is unscoped,
+  // so below its breakpoint it lands on the first <p> child of ANY <article> —
+  // here `.h26-lead-subtitle` and each `.h26-rail-item`'s category label,
+  // rendering a 10.4px uppercase kicker's first letter at 48px. Neutralised
+  // here rather than by narrowing the theme rule, which post pages still use.
+  article > p:first-of-type::first-letter {
+    font-size: inherit;
+  }
+
+  // ---- 1. positioning band ---------------------------------------------
+  .h26-lede {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    gap: 3rem;
+    align-items: end;
+    padding-bottom: 2.75rem;
+    border-bottom: 1px solid $h26-rule;
+    margin-bottom: 0;
+  }
+
+  .h26-kicker {
+    margin: 0 0 1rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: $h26-red;
+  }
+
+  .h26-headline {
+    margin: 0;
+    font-family: $h26-serif;
+    font-size: clamp(2rem, 4.4vw, 3.1rem);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    max-width: 22ch;
+  }
+
+  .h26-lede-aside {
+    border-left: 1px solid $h26-rule;
+    padding-left: 1.75rem;
+  }
+
+  .h26-standfirst {
+    margin: 0 0 1.1rem;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: #3a3a3a;
+    text-wrap: pretty;
+  }
+
+  .h26-lede-link {
+    margin: 0;
+
+    a {
+      font-family: $h26-sans;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: $h26-ink;
+      border-bottom: 2px solid $h26-red;
+      padding-bottom: 2px;
+
+      &:hover,
+      &:focus-visible { color: $h26-red; }
+    }
+  }
+
+  // ---- 2. credibility strip --------------------------------------------
+  .h26-facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    background: $h26-band;
+    border-bottom: 1px solid $h26-rule;
+  }
+
+  .h26-fact {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 1.15rem 1.35rem;
+    border-left: 1px solid $h26-rule;
+
+    &:first-child { border-left: 0; }
+  }
+
+  .h26-fact-num {
+    font-family: $h26-sans;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .h26-fact-label {
+    font-family: $h26-sans;
+    font-size: 0.775rem;
+    line-height: 1.35;
+    color: $h26-muted;
+  }
+
+  // ---- 3. lead story + rail --------------------------------------------
+  .h26-news {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    border-bottom: 1px solid $h26-rule;
+  }
+
+  .h26-lead {
+    padding: 2.5rem 3rem 3rem 0;
+    border-right: 1px solid $h26-rule;
+  }
+
+  .h26-lead-flags {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .h26-flag {
+    font-family: $h26-sans;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: $h26-red;
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .h26-section-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: $h26-muted;
+  }
+
+  .h26-lead-image {
+    display: block;
+    margin-bottom: 1.5rem;
+
+    picture,
+    img {
+      display: block;
+      width: 100%;
+      height: clamp(180px, 22vw, 280px);
+      object-fit: cover;
+      background: $h26-band;
+      border: 1px solid $h26-rule;
+    }
+  }
+
+  .h26-lead-title {
+    margin: 0 0 0.85rem;
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    line-height: 1.16;
+    font-weight: 700;
+    letter-spacing: -0.018em;
+    text-wrap: balance;
+
+    a {
+      color: $h26-ink;
+
+      &:hover,
+      &:focus-visible { color: $h26-red; }
+    }
+  }
+
+  .h26-lead-subtitle {
+    margin: 0 0 0.8rem;
+    font-size: 1.15rem;
+    line-height: 1.5;
+    font-style: italic;
+    color: #2e2e2e;
+  }
+
+  .h26-lead-excerpt {
+    margin: 0 0 1.35rem;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: $h26-body;
+    max-width: 62ch;
+    text-wrap: pretty;
+  }
+
+  .h26-lead-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.9rem;
+    font-family: $h26-sans;
+    font-size: 0.8rem;
+    color: $h26-muted;
+  }
+
+  .h26-lead-cta {
+    font-weight: 600;
+    color: $h26-red;
+
+    &:hover,
+    &:focus-visible { text-decoration: underline; }
+  }
+
+  .h26-rail {
+    padding: 2.5rem 0 3rem 2.5rem;
+  }
+
+  .h26-rail-heading {
+    margin: 0 0 0.25rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: $h26-ink;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid $h26-ink;
+  }
+
+  .h26-rail-item {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid $h26-rule-light;
+  }
+
+  .h26-rail-category {
+    margin: 0 0 0.5rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: $h26-red;
+  }
+
+  .h26-rail-title {
+    margin: 0 0 0.5rem;
+    font-size: 1.2rem;
+    line-height: 1.28;
+    font-weight: 700;
+    letter-spacing: -0.012em;
+    text-wrap: pretty;
+
+    a {
+      color: $h26-ink;
+
+      &:hover,
+      &:focus-visible { color: $h26-red; }
+    }
+  }
+
+  .h26-rail-excerpt {
+    margin: 0 0 0.6rem;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: #55504a;
+  }
+
+  .h26-rail-meta {
+    margin: 0;
+    font-family: $h26-sans;
+    font-size: 0.72rem;
+    color: $h26-faint;
+  }
+
+  .h26-rail-more {
+    margin: 1.1rem 0 0;
+
+    a {
+      font-family: $h26-sans;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: $h26-ink;
+      border-bottom: 2px solid $h26-red;
+      padding-bottom: 2px;
+
+      &:hover,
+      &:focus-visible { color: $h26-red; }
+    }
+  }
+
+  // ---- 4. topics --------------------------------------------------------
+  .h26-topics {
+    padding: 3rem 0 3.25rem;
+    border-bottom: 1px solid $h26-rule;
+  }
+
+  .h26-topics-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 2px solid $h26-ink;
+    padding-bottom: 0.7rem;
+    margin-bottom: 2rem;
+  }
+
+  .h26-topics-heading {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .h26-topics-note {
+    margin: 0;
+    font-family: $h26-sans;
+    font-size: 0.78rem;
+    color: $h26-faint;
+  }
+
+  .h26-topics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2.5rem;
+  }
+
+  .h26-topic {
+    display: block;
+    border-top: 3px solid $h26-ink;
+    padding-top: 1.1rem;
+    color: $h26-ink;
+
+    &.is-primary { border-top-color: $h26-red; }
+
+    &:hover .h26-topic-title,
+    &:focus-visible .h26-topic-title { color: $h26-red; }
+  }
+
+  .h26-topic-count {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    margin: 0 0 0.7rem;
+  }
+
+  .h26-topic-num {
+    font-family: $h26-sans;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .h26-topic-unit {
+    font-family: $h26-sans;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $h26-faint;
+  }
+
+  .h26-topic-title {
+    margin: 0 0 0.6rem;
+    font-size: 1.35rem;
+    line-height: 1.22;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
+  .h26-topic-desc {
+    margin: 0 0 0.85rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: $h26-body;
+    text-wrap: pretty;
+  }
+
+  .h26-topic-link {
+    font-family: $h26-sans;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: $h26-red;
+  }
+
+  // ---- 5. author --------------------------------------------------------
+  .h26-author {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    background: $h26-ink;
+    color: #f2efea;
+    padding: 2.5rem 2.25rem 2.75rem;
+  }
+
+  .h26-author-avatar {
+    flex: none;
+    width: 64px;
+    height: 64px;
+    background: $h26-red;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: $h26-sans;
+    font-size: 1.35rem;
+    font-weight: 700;
+  }
+
+  .h26-author-kicker {
+    margin: 0 0 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #9a948c;
+  }
+
+  .h26-author-name {
+    margin: 0 0 0.7rem;
+    font-size: 1.7rem;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.018em;
+    color: $h26-paper;
+  }
+
+  .h26-author-bio {
+    margin: 0 0 1.2rem;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: #c8c2b9;
+    max-width: 58ch;
+    text-wrap: pretty;
+  }
+
+  .h26-author-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.35rem;
+  }
+
+  .h26-author-link {
+    font-family: $h26-sans;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #c8c2b9;
+
+    &.is-primary {
+      color: $h26-paper;
+      border-bottom: 2px solid $h26-red;
+      padding-bottom: 2px;
+    }
+
+    &:hover,
+    &:focus-visible { color: #fff; }
+  }
+
+  // ---- responsive -------------------------------------------------------
+  @media (max-width: $h26-bp) {
+    .h26-lede {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      padding-bottom: 2rem;
+    }
+
+    .h26-lede-aside {
+      border-left: 0;
+      padding-left: 0;
+      border-top: 1px solid $h26-rule;
+      padding-top: 1.25rem;
+    }
+
+    .h26-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .h26-fact {
+      padding: 1rem;
+      border-top: 1px solid $h26-rule;
+
+      &:nth-child(odd) { border-left: 0; }
+      &:first-child,
+      &:nth-child(2) { border-top: 0; }
+    }
+
+    .h26-news { grid-template-columns: 1fr; }
+
+    .h26-lead {
+      padding: 2rem 0 2rem;
+      border-right: 0;
+      border-bottom: 1px solid $h26-rule;
+    }
+
+    .h26-rail { padding: 2rem 0 2.25rem; }
+
+    .h26-topics-grid {
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+    }
+
+    .h26-author {
+      flex-direction: column;
+      gap: 1.25rem;
+      padding: 2rem 1.5rem 2.25rem;
+    }
+  }
+}

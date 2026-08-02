@@ -4,6 +4,10 @@
 // The Economist Theme
 @use 'economist-theme';
 
+// Homepage redesign (2026) — scoped under `.home-2026`, loaded after the theme
+// so its rules win over any residual `.homepage` cascade.
+@use 'home-2026';
+
 // Web fonts (Merriweather + Inter) are loaded via document-level <link> tags in
 // _layouts/default.html <head>, with preconnect, so the browser discovers them
 // at first byte instead of waiting for this stylesheet to download and parse
