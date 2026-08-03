@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-07-27T10:44:33.353Z",
+  "generatedAt": "2026-08-03T10:44:39.605Z",
   "kpis": {
-    "agentPRsMerged30d": 3,
+    "agentPRsMerged30d": 6,
     "evalPassRate": 33,
     "contentAvgScore": null,
-    "openBacklog": 2,
-    "openPRCount": 2,
+    "openBacklog": 1,
+    "openPRCount": 0,
     "evalCount": 3,
     "remediationQueueDepth": 0,
     "remediationThreshold": 85
@@ -70,196 +70,182 @@
   "content": null,
   "recentPRs": [
     {
-      "number": 1161,
-      "title": "docs(ci): correct baseline-seeding steps and finish the setup-node bump",
+      "number": 1203,
+      "title": "style(theme): remove the legacy homepage CSS the 2026 redesign orphaned",
       "author": "oviney",
-      "mergedAt": "2026-07-25T09:59:07Z",
+      "mergedAt": "2026-08-02T22:56:39Z",
+      "labels": [
+        "agent:creative-director",
+        "needs-human-review"
+      ],
+      "isAgent": true
+    },
+    {
+      "number": 1202,
+      "title": "docs(spec): spec the two CI rows the PR-gate epic left behind",
+      "author": "oviney",
+      "mergedAt": "2026-08-02T15:35:52Z",
       "labels": [],
       "isAgent": false
     },
     {
-      "number": 1136,
-      "title": "docs: retire BackstopJS references from contributor docs",
+      "number": 1201,
+      "title": "docs(backlog): close the PR-gate epic — all four streams shipped",
       "author": "oviney",
-      "mergedAt": "2026-07-25T09:53:02Z",
+      "mergedAt": "2026-08-02T13:26:56Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1200,
+      "title": "test(qa): split content-edge-cases into real guards and dead weight",
+      "author": "oviney",
+      "mergedAt": "2026-08-02T13:22:42Z",
       "labels": [
-        "needs-human-review"
+        "agent:qa-gatekeeper"
+      ],
+      "isAgent": true
+    },
+    {
+      "number": 1197,
+      "title": "ci(qa): slim the PR gate to a page contract, move the full suite to nightly",
+      "author": "oviney",
+      "mergedAt": "2026-08-02T13:08:12Z",
+      "labels": [
+        "agent:qa-gatekeeper"
+      ],
+      "isAgent": true
+    },
+    {
+      "number": 1198,
+      "title": "docs: correct Stream B/C status in SPEC.md and BACKLOG",
+      "author": "oviney",
+      "mergedAt": "2026-08-02T12:49:00Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1196,
+      "title": "chore: wrap up the homepage-redesign loose ends (tokens, spec, backlog)",
+      "author": "oviney",
+      "mergedAt": "2026-08-02T12:44:11Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1195,
+      "title": "docs(instructions): forbid tests that cannot fail",
+      "author": "oviney",
+      "mergedAt": "2026-08-02T12:32:46Z",
+      "labels": [
+        "governance-update"
       ],
       "isAgent": false
     },
     {
-      "number": 1150,
-      "title": "chore(deps): Bump actions/setup-node from 6 to 7",
-      "author": "dependabot[bot]",
-      "mergedAt": "2026-07-25T09:49:06Z",
+      "number": 1194,
+      "title": "test(qa): delete assertions that cannot fail, replace conditional skips",
+      "author": "oviney",
+      "mergedAt": "2026-08-02T12:32:43Z",
       "labels": [
-        "needs-human-review"
+        "agent:qa-gatekeeper"
       ],
+      "isAgent": true
+    },
+    {
+      "number": 1193,
+      "title": "Redesign home page: editorial layout with lead story and topic index",
+      "author": "oviney",
+      "mergedAt": "2026-08-02T12:20:38Z",
+      "labels": [],
       "isAgent": false
     },
     {
-      "number": 1137,
-      "title": "docs(GH-1109): add Handoff Packet convention to AGENTS.md",
+      "number": 1192,
+      "title": "docs(backlog): retire the homepage-baseline row and archive the lifecycle",
       "author": "oviney",
-      "mergedAt": "2026-07-25T09:48:29Z",
+      "mergedAt": "2026-08-01T22:06:20Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1191,
+      "title": "qa(visual): decouple the homepage baseline from post publication",
+      "author": "oviney",
+      "mergedAt": "2026-08-01T22:01:49Z",
       "labels": [
-        "needs-human-review",
+        "agent:qa-gatekeeper"
+      ],
+      "isAgent": true
+    },
+    {
+      "number": 1190,
+      "title": "docs(agents): retire the stale bare-#NNN warning in the Handoff Packet",
+      "author": "oviney",
+      "mergedAt": "2026-08-01T21:45:49Z",
+      "labels": [
         "protected-file-update"
       ],
       "isAgent": false
     },
     {
-      "number": 1134,
-      "title": "docs(roadmap): mark both Tech Debt items resolved",
+      "number": 1189,
+      "title": "docs(plan): resolve the three open decisions and plan the homepage decoupling",
       "author": "oviney",
-      "mergedAt": "2026-07-25T09:48:00Z",
-      "labels": [
-        "needs-human-review"
-      ],
-      "isAgent": false
-    },
-    {
-      "number": 1160,
-      "title": "fix(ci): unblock the PR queue — repair the visual and security gates, and stop them re-breaking",
-      "author": "oviney",
-      "mergedAt": "2026-07-25T09:43:41Z",
+      "mergedAt": "2026-08-01T19:58:21Z",
       "labels": [],
       "isAgent": false
     },
     {
-      "number": 1159,
-      "title": "fix(B-013): review layout extends post, not single (fixes bare render + noindex)",
+      "number": 1188,
+      "title": "docs(spec): spec the homepage visual-baseline decoupling",
       "author": "oviney",
-      "mergedAt": "2026-07-25T00:34:05Z",
-      "labels": [
-        "needs-human-review"
-      ],
-      "isAgent": false
-    },
-    {
-      "number": 1157,
-      "title": "feat: B-013 unlisted review-draft collection (noindex, no listings)",
-      "author": "oviney",
-      "mergedAt": "2026-07-24T10:28:54Z",
-      "labels": [
-        "needs-human-review"
-      ],
-      "isAgent": false
-    },
-    {
-      "number": 1119,
-      "title": "feat(ci): blocking Playwright visual gate, retire BackstopJS [Gap A]",
-      "author": "oviney",
-      "mergedAt": "2026-07-08T17:55:43Z",
-      "labels": [
-        "needs-human-review",
-        "bulk-content"
-      ],
-      "isAgent": false
-    },
-    {
-      "number": 1132,
-      "title": "fix(nav): highlight Blog section + render newsletter CTA across page allowlist",
-      "author": "oviney",
-      "mergedAt": "2026-07-08T01:22:15Z",
+      "mergedAt": "2026-08-01T19:43:36Z",
       "labels": [],
       "isAgent": false
     },
     {
-      "number": 1131,
-      "title": "test(qa): assert listing width against 1040px design token (Gap E)",
+      "number": 1187,
+      "title": "docs(backlog): clear the two P2 rows and reconcile the queue",
       "author": "oviney",
-      "mergedAt": "2026-07-08T01:21:55Z",
+      "mergedAt": "2026-08-01T12:26:13Z",
       "labels": [],
       "isAgent": false
     },
     {
-      "number": 1130,
-      "title": "test(gap-d): guard content/markup quality on built HTML",
+      "number": 1186,
+      "title": "qa(visual): decouple the category baselines from post publication",
       "author": "oviney",
-      "mergedAt": "2026-07-08T01:20:49Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1120,
-      "title": "feat(search): match-windowed highlighted search-result snippets (GH-1108)",
-      "author": "oviney",
-      "mergedAt": "2026-07-08T01:18:50Z",
+      "mergedAt": "2026-08-01T12:22:20Z",
       "labels": [
-        "agent:creative-director",
-        "needs-human-review"
+        "agent:qa-gatekeeper"
       ],
       "isAgent": true
     },
     {
-      "number": 1123,
-      "title": "refactor(cards): extract canonical post-card include across listing pages",
+      "number": 1183,
+      "title": "fix(ci): bind the orchestrator's duplicate-PR closer to closing keywords",
       "author": "oviney",
-      "mergedAt": "2026-07-08T01:18:37Z",
+      "mergedAt": "2026-08-01T12:02:08Z",
       "labels": [
-        "needs-human-review"
+        "governance-update"
       ],
       "isAgent": false
     },
     {
-      "number": 1125,
-      "title": "fix(a11y): keep share controls clear of fixed chrome at 320px (#1101)",
+      "number": 1182,
+      "title": "docs(backlog): retire the shipped skill-refresh row",
       "author": "oviney",
-      "mergedAt": "2026-07-08T01:18:24Z",
-      "labels": [
-        "agent:creative-director",
-        "needs-human-review"
-      ],
-      "isAgent": true
-    },
-    {
-      "number": 1122,
-      "title": "test(GH): viewport-overflow guard (Gap C) + fix dashboard sideways-scroll",
-      "author": "oviney",
-      "mergedAt": "2026-07-08T01:05:52Z",
-      "labels": [
-        "agent:qa-gatekeeper",
-        "needs-human-review"
-      ],
-      "isAgent": true
-    },
-    {
-      "number": 1118,
-      "title": "qa(GH-1105): add axe runner alongside htmlcs in pa11y CI (WCAG 2.2)",
-      "author": "oviney",
-      "mergedAt": "2026-07-02T00:56:30Z",
+      "mergedAt": "2026-08-01T11:12:16Z",
       "labels": [],
       "isAgent": false
     },
     {
-      "number": 1115,
-      "title": "qa(GH-1107): escape user-facing fields in client-side search rendering",
+      "number": 1179,
+      "title": "docs(backlog): close the branch-protection follow-up",
       "author": "oviney",
-      "mergedAt": "2026-07-02T00:52:13Z",
-      "labels": [
-        "needs-human-review"
-      ],
-      "isAgent": false
-    },
-    {
-      "number": 1095,
-      "title": "chore(deps): Bump json from 2.7.6 to 2.20.0",
-      "author": "dependabot[bot]",
-      "mergedAt": "2026-07-02T00:50:35Z",
-      "labels": [
-        "needs-human-review"
-      ],
-      "isAgent": false
-    },
-    {
-      "number": 1104,
-      "title": "fix(visual P2): category thumbnails use WebP via responsive-image include",
-      "author": "oviney",
-      "mergedAt": "2026-06-30T12:54:02Z",
-      "labels": [
-        "needs-human-review"
-      ],
+      "mergedAt": "2026-08-01T02:42:59Z",
+      "labels": [],
       "isAgent": false
     }
   ],
@@ -267,14 +253,9 @@
     "agent:creative-director": [],
     "agent:qa-gatekeeper": [
       {
-        "number": 1138,
-        "title": "qa(GH-1120): close Gap B — visual coverage for uncovered page types",
-        "age": 19
-      },
-      {
         "number": 1035,
         "title": "Workflow ROI Review — 2026-06-01",
-        "age": 56
+        "age": 63
       }
     ],
     "agent:editorial-chief": [],
@@ -283,8 +264,8 @@
   "remediationQueue": [],
   "copilotUsage": {
     "seatsActive": null,
-    "billingCycleStart": "2026-07-01",
-    "billingCycleEnd": "2026-07-31",
+    "billingCycleStart": "2026-08-01",
+    "billingCycleEnd": "2026-08-31",
     "seatCostPerMonth": 19,
     "apiAvailable": false,
     "note": "Copilot billing API unavailable. Add a PAT with manage_billing:copilot or read:org scope as secret COPILOT_BILLING_PAT to enable live seat data."
