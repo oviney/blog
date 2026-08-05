@@ -283,7 +283,13 @@ jobs:
     if: github.event_name == 'schedule' || inputs.full_suite
     permissions:
       contents: read
-      issues: write
+
+    # Surfaced so the alarm job below can report which part broke. Job outputs
+    # are the only way to get step-level detail across a job boundary.
+    outputs:
+      playwright: ${{ steps.playwright.outcome }}
+      a11y: ${{ steps.a11y.outcome }}
+      lighthouse: ${{ steps.lighthouse.outcome }}
 
     steps:
       - uses: actions/checkout@v7
@@ -344,11 +350,40 @@ jobs:
             .lighthouseci/
           retention-days: 7
 
-      # A nightly failure nobody sees is the same as no nightly. One issue per
-      # failing night, deduped by title so a persistent failure comments on the
-      # existing issue instead of opening a new one every day.
-      - name: Open an issue on failure
-        if: failure() && github.event_name == 'schedule'
+  # ---------------------------------------------------------------------------
+  # A nightly failure nobody sees is the same as no nightly. This lived as a step
+  # inside 🌙 Nightly Full Suite, which meant it only fired when *that* job failed
+  # — so when 🔒 Security Audit broke on 2026-08-04 and 08-05 the nightly went red
+  # two nights running and filed nothing, because the suite job itself was green.
+  #
+  # It is a separate job so it can watch every sibling. `if: always()` is required:
+  # without it the job is skipped the moment a dependency fails, which is exactly
+  # when it needs to run.
+  #
+  # It also fires on a manual `full_suite` dispatch, which matches 🌙 Nightly Full
+  # Suite's own trigger. That is deliberate: an alarm you cannot test on demand is
+  # how the previous one went two nights without anyone noticing it was mute.
+  # ---------------------------------------------------------------------------
+  nightly-alarm:
+    name: 🔔 Nightly Alarm
+    runs-on: ubuntu-latest
+    if: always() && (github.event_name == 'schedule' || inputs.full_suite)
+    needs:
+      - build-site
+      - page-contract
+      - visual-regression
+      - content-validation
+      - security
+      - nightly-full-suite
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      # One issue per failing night, deduped by title so a persistent failure
+      # comments on the existing issue instead of opening a new one every day.
+      - name: Open an issue when any nightly job fails
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -357,19 +392,32 @@ jobs:
             --search "\"$TITLE\" in:title" --json number --jq '.[0].number // empty')
 
           BODY=$(cat <<EOF
-          The nightly full suite failed on \`main\`.
+          The nightly run failed on \`main\`.
 
           Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
           Commit: ${GITHUB_SHA}
 
+          | Job | Result |
+          |-----|--------|
+          | 🏗️ Build Site | ${{ needs.build-site.result }} |
+          | 🎭 Page Contract | ${{ needs.page-contract.result }} |
+          | 🖼️ Visual Regression | ${{ needs.visual-regression.result }} |
+          | 📝 Content Validation | ${{ needs.content-validation.result }} |
+          | 🔒 Security Audit | ${{ needs.security.result }} |
+          | 🌙 Nightly Full Suite | ${{ needs.nightly-full-suite.result }} |
+
+          Within the full suite:
+
           | Step | Outcome |
           |------|---------|
-          | Playwright | ${{ steps.playwright.outcome }} |
-          | pa11y | ${{ steps.a11y.outcome }} |
-          | Lighthouse | ${{ steps.lighthouse.outcome }} |
+          | Playwright | ${{ needs.nightly-full-suite.outputs.playwright }} |
+          | pa11y | ${{ needs.nightly-full-suite.outputs.a11y }} |
+          | Lighthouse | ${{ needs.nightly-full-suite.outputs.lighthouse }} |
 
-          This suite does not gate PRs. Triage decides whether a finding becomes
-          a fix, a new contract test, or an accepted risk.
+          Note that 🔒 Security Audit *does* gate PRs — if it is failing here it is
+          also blocking every open PR. The rest of this run does not gate merges;
+          triage decides whether a finding becomes a fix, a new contract test, or
+          an accepted risk.
           EOF
           )
 
