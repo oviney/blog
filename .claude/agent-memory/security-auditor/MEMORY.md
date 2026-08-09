@@ -1,0 +1,2 @@
+- [Header Control Boundary](reference_header_control_boundary.md) — GitHub Pages hosting means CSP/HSTS findings are unfixable in-repo; don't report them as PR findings
+- [CSS Orphan Grep Antipattern](feedback_css_orphan_grep_antipattern.md) — prove a deleted class is dead via class-attribute matches in markup, not substring grep across docs

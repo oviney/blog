@@ -32,6 +32,36 @@ duplicate the queue.
 
 ---
 
+## Where to pick up (last updated 2026-08-09)
+
+Session closed to move machines. Nothing is in flight — working tree clean, no
+unpushed commits, no stashes.
+
+- **`main` is green and deployed.** Last deploy 2026-08-05 (#1235), production
+  smoke green. A GitHub Actions **major outage on 2026-08-06** (began 15:22 UTC,
+  Actions + Pages) cancelled every scheduled run at ~15 min while they sat queued
+  with no runner. Those failures are **not a repo regression** and self-healed —
+  all scheduled workflows green again as of 2026-08-09. Don't file defects for
+  that window.
+- **Open PRs:** four Dependabot bumps opened 2026-08-09 — [#1242](https://github.com/oviney/blog/pull/1242)
+  (jekyll-remote-theme 0.4.3→0.5.2, a **minor** bump, review before merging),
+  [#1243](https://github.com/oviney/blog/pull/1243) (json 2.20.0→2.21.2),
+  [#1244](https://github.com/oviney/blog/pull/1244) (@playwright/test 1.62.0→1.62.1),
+  [#1245](https://github.com/oviney/blog/pull/1245) (jekyll-include-cache 0.2.1→0.2.2).
+  Plus [#1232](https://github.com/oviney/blog/pull/1232) (dashboard data refresh,
+  automation) — `MERGEABLE` but **BEHIND**; needs a rebase.
+- **Issue noise is one problem, not 24.** 24 open `triage: stale skill file — *`
+  issues (P3, auto-filed 2026-08-03) plus P2 [#1206](https://github.com/oviney/blog/issues/1206)
+  are the same finding: skill files >90 days untouched. They will keep
+  regenerating until the files are refreshed or the audit's staleness threshold is
+  retuned. Decide which — don't work them one at a time.
+- **Top real P3s:** `tasks/` is publishing internal planning docs to production
+  (`viney.ca/tasks/…` returns 200) — needs an owner decision, `_config.yml` is
+  protected so no agent may fix it. Then `.featured-post` dead CSS and the
+  `.home-intro-links` margin collision.
+
+---
+
 ## Active (priority order)
 
 > **Epic — Agent evals & governance gap-closure** — **CLOSED 2026-06-13 at P1–P3.**
