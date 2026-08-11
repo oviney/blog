@@ -6,9 +6,12 @@ name: 💡 Idea Triage
 #
 # Signals detected:
 #   1. Missing images    — image: front-matter value not found in assets/images/
-#   2. Stale skill files — .github/skills/*/SKILL.md not updated in 90+ days
-#   3. Test coverage gap — fewer spec files than layout files
-#   4. Stale post links  — posts >365 days old with dead external URLs (404/410)
+#   2. Test coverage gap — fewer spec files than layout files
+#   3. Stale post links  — posts >365 days old with dead external URLs (404/410)
+#
+# Stale skill files are deliberately NOT checked here. doc-audit.sh already
+# files a single rollup for them; filing one issue per file as well turned one
+# fact into 25 issues. Removed 2026-08-10.
 #
 # Issues are labelled "triage" and "P3:low". Deduplication prevents re-filing
 # an issue that is already open with the same title.

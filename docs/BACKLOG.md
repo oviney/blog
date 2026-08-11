@@ -32,29 +32,37 @@ duplicate the queue.
 
 ---
 
-## Where to pick up (last updated 2026-08-09)
+## Where to pick up (last updated 2026-08-10)
 
-Session closed to move machines. Nothing is in flight — working tree clean, no
-unpushed commits, no stashes.
+Resumed after the machine switch. `main` fast-forwarded 130 commits; the
+2026-08-09 handoff below it was accurate — nothing had been left in flight.
 
-- **`main` is green and deployed.** Last deploy 2026-08-05 (#1235), production
-  smoke green. A GitHub Actions **major outage on 2026-08-06** (began 15:22 UTC,
-  Actions + Pages) cancelled every scheduled run at ~15 min while they sat queued
-  with no runner. Those failures are **not a repo regression** and self-healed —
-  all scheduled workflows green again as of 2026-08-09. Don't file defects for
-  that window.
-- **Open PRs:** four Dependabot bumps opened 2026-08-09 — [#1242](https://github.com/oviney/blog/pull/1242)
-  (jekyll-remote-theme 0.4.3→0.5.2, a **minor** bump, review before merging),
-  [#1243](https://github.com/oviney/blog/pull/1243) (json 2.20.0→2.21.2),
-  [#1244](https://github.com/oviney/blog/pull/1244) (@playwright/test 1.62.0→1.62.1),
-  [#1245](https://github.com/oviney/blog/pull/1245) (jekyll-include-cache 0.2.1→0.2.2).
-  Plus [#1232](https://github.com/oviney/blog/pull/1232) (dashboard data refresh,
-  automation) — `MERGEABLE` but **BEHIND**; needs a rebase.
-- **Issue noise is one problem, not 24.** 24 open `triage: stale skill file — *`
-  issues (P3, auto-filed 2026-08-03) plus P2 [#1206](https://github.com/oviney/blog/issues/1206)
-  are the same finding: skill files >90 days untouched. They will keep
-  regenerating until the files are refreshed or the audit's staleness threshold is
-  retuned. Decide which — don't work them one at a time.
+- **`main` is green.** The 2026-08-10 scheduled nightly is **7/7 green**,
+  `🔒 Security Audit` included — [#1247](https://github.com/oviney/blog/pull/1247)
+  cleared the js-yaml advisory. [#1240](https://github.com/oviney/blog/issues/1240)
+  was closed as resolved; don't re-diagnose it.
+- **The 2026-08-06 Actions outage still stands as explained** (began 15:22 UTC,
+  Actions + Pages; runs cancelled at ~15 min while queued with no runner). Not a
+  repo regression, self-healed. Don't file defects for that window.
+- **Healing Monitor retired** — [#1251](https://github.com/oviney/blog/issues/1251).
+  It had **0 successful runs in 40 attempts** since 2026-08-04 while burning ~18
+  jobs/day, and `dashboard/dashboard-data.json` had not been written since
+  **2026-04-04** — so `viney.ca/dashboard/` was publishing a four-month-stale,
+  partly-hardcoded metric. Two follow-ups are open: **[#1252](https://github.com/oviney/blog/issues/1252)**
+  (remove the orphaned scripts — *read `healing-monitor.js` before deleting it*)
+  and **[#1253](https://github.com/oviney/blog/issues/1253)**.
+- **Dependabot needs `--admin`, structurally.** `scripts/check-pr-scope.sh` has no
+  bot exemption and `Gemfile*` are unbypassable protected files, so every bundler
+  bump fails `check-agent-scope` and can never go green.
+  [#1253](https://github.com/oviney/blog/issues/1253) tracks the fix. #1243/#1244/#1245
+  merged this way; **[#1242](https://github.com/oviney/blog/pull/1242)
+  (jekyll-remote-theme 0.4.3→0.5.2) is still open and needs an owner call** — it is a
+  minor bump to the theme resolver.
+- **Issue noise was two generators, not one.** `scripts/idea-triage.sh:133` filed
+  one issue *per* stale skill file (the 24 + #1250) while `scripts/doc-audit.sh:567`
+  filed a single rollup (#1206) — the same fact, twice. The per-file generator is
+  gone; **#1206 stays open** because #1175 showed staleness sometimes signals real
+  drift.
 - **Top real P3s:** `tasks/` is publishing internal planning docs to production
   (`viney.ca/tasks/…` returns 200) — needs an owner decision, `_config.yml` is
   protected so no agent may fix it. Then `.featured-post` dead CSS and the
@@ -82,6 +90,8 @@ unpushed commits, no stashes.
 
 | Pri | Task | Scope / label | Status | Ref |
 |----|------|---------------|--------|-----|
+| P2 | **Scope guard blocks every bundler Dependabot PR.** `check-pr-scope.sh` has no bot exemption and `Gemfile`/`Gemfile.lock` are in `PROTECTED_FILES` (`:49-57`) with the `protected-file-update` bypass deliberately withheld (`:59-66`). So every bundler bump fails `check-agent-scope` structurally and needs `--admin` — #1243/#1245 were merged that way on 2026-08-10. #1244 (npm) passed only because `package-lock.json` isn't protected. Recommended fix: exempt `dependabot[bot]` *and* require the diff to touch only `Gemfile*`, so a mis-scoped bot PR still trips the guard. | `governance-update` | Not started | [#1253](https://github.com/oviney/blog/issues/1253) |
+| P3 | **Remove the healing machinery orphaned by #1251.** Retiring the workflow stranded `scripts/healing-monitor.js`, `analyze-healing-trends.js`, `check-healing-degradation.js`, `dashboard-server.js`, five `package.json` scripts (`:27-35`), `healing-metrics/`, `healing-reports/`, `healing-alerts/` and the two healing badges. Split out of #1251 because the combined change is ~25 files and trips Rule 2. **Read `healing-monitor.js` before deleting it** — the retirement was decided on operational grounds and nobody has yet checked whether its analysis is worth preserving. | `agent:qa-gatekeeper` | Not started | [#1252](https://github.com/oviney/blog/issues/1252) |
 | P3 | De-duplicate Jekyll builds in CI. A PR builds the site ~4 times across `test-build`, `content-validation` and `test-quality` jobs. Build once, upload `_site` as an artifact, download in dependents. **`test-quality.yml` done in #1197** — it now builds once in `🏗️ Build Site` and serves the artifact via `jekyll serve --skip-initial-build`. `test-build.yml` still builds its own copy; `content-validation.yml` no longer builds at all. Remaining scope is `test-build.yml` only. | `agent:qa-gatekeeper` | Partly done — #1197 | — |
 | P3 | **`tasks/` is published to production.** `_config.yml`'s `exclude:` list omits `tasks/`, so internal lifecycle planning docs are live on viney.ca — `https://www.viney.ca/tasks/archive/2026-08-01-homepage-hero-baseline/spec.md` returns **200**. `docs/` is excluded; `tasks/` was never added. **Needs an owner decision, not an agent fix:** `_config.yml` is a protected file, so no agent may edit it. Decide exclude-vs-keep, then apply by hand. | *(protected file — owner only)* | **Not started — needs decision** | — |
 | P3 | **Remove `.featured-post` from `assets/css/custom.css`.** Six dead rule openers at `:31-64`, zero occurrences in any template or in built `_site`. A *different* legacy from the 2026 redesign — it hardcodes Cayman green `#159957` and `#f6f8fa`, so it predates the economist theme and sits outside the Sass pipeline, which is why the #1203 audit of `_sass/` missed it. Deliberately not folded into #1203 to keep that PR to one concern. | `agent:creative-director` | Not started | — |

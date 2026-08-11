@@ -111,6 +111,6 @@ git push origin fix/issue-description
 
 - **Production site**: https://www.viney.ca/
 - **GitHub Actions**: https://github.com/oviney/blog/actions
-- **Healing dashboard**: https://oviney.github.io/blog/dashboard/
+- **Agent dashboard**: https://www.viney.ca/dashboard/agents.html
 - **Architecture overview**: [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Full documentation**: [docs/](docs/)

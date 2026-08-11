@@ -40,7 +40,6 @@ Core workflows that matter directly to the published blog include:
 | Deploy | `jekyll.yml` | Build and deploy to GitHub Pages (~1–2 min) |
 | Test Build | `test-build.yml` | Jekyll build validation + HTML checks |
 | Quality Tests | `test-quality.yml` | Visual regression, a11y, Lighthouse, security |
-| Healing Monitor | `healing-monitor.yml` | Playwright test healing (runs every 4 hours) |
 
 The repository also contains additional operational workflows for agent support,
 reporting, and governance. Those workflows are part of the current operating
@@ -55,7 +54,7 @@ of `oviney/blog`.
 - **CI**: Accessibility (pa11y-ci, WCAG 2.1 AA)
 - **CI**: Performance/SEO (Lighthouse CI)
 - **CI**: Security audit (npm audit)
-- **Monitoring**: Playwright healing dashboard at `/dashboard/`
+- **Monitoring**: agent observability dashboard at `/dashboard/agents.html`
 
 ## Content
 
@@ -78,7 +77,7 @@ Blog articles are produced using the [economist-agents](https://github.com/ovine
 - **Production**: https://www.viney.ca/
 - **Repository**: https://github.com/oviney/blog
 - **Actions**: https://github.com/oviney/blog/actions
-- **Dashboard**: https://oviney.github.io/blog/dashboard/
+- **Dashboard**: https://www.viney.ca/dashboard/agents.html
 
 ## Boundary Note
 
