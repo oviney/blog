@@ -41,18 +41,32 @@
 - [x] Investigated a 4th failure, `category-security-Mobile`: passed on `main` isolated,
       passed on branch isolated, passed on branch full-suite re-run, failed once under
       parallel load. **Pre-existing flake, not caused by this change.** Follow-up, not a blocker
-- [ ] Refresh the homepage baselines via the documented path — dispatch `test-quality.yml`
-      on the branch with `update_snapshots=true`. **Not regenerated locally:** the suite header
+- [x] Refreshed the homepage baselines via the documented path — dispatched `test-quality.yml`
+      with `update_snapshots=true` (run 31544190321). **Not regenerated locally:** the suite header
       requires baselines be produced in the CI environment so anti-aliasing stays consistent
-- [ ] Confirm no non-homepage snapshot changed in the refreshed commit
+- [x] Confirmed what the refresh changed — and caught that it clobbered a 4th, unrelated baseline.
+      The seed run captured `not-found-Tablet` at 1024px; the page measures 1026px on `main`
+      locally, on this branch locally, and in this PR's CI. The pre-seed baseline was right, so it
+      was restored (`f02e20a`). Baseline diff is now the 3 homepage entries only
+- [x] All 3 homepage baselines pass in CI against the refreshed images
 
-## Phase 4 — Review & ship
+## Phase 4 — Review & ship ✅
 
-- [ ] Five-axis review of the diff
-- [ ] `bash scripts/check-pr-scope.sh` — passes with no label
-- [ ] Push branch, open PR, leave unmerged for review
-- [ ] File the two-H1 issue as follow-up (SPEC §3 D4)
-- [ ] File the `category-security-Mobile` visual flake as follow-up
+- [x] Five-axis review of the diff — two findings in my own work, both fixed in `8cc9a3a`:
+      a restated breakpoint (`768px` vs the `$h26-bp: 48em` token — not interchangeable, since
+      `em` in a media query resolves against the browser's initial font size) and `$h26-paper`
+      left dead after the author band inverted
+- [x] `bash scripts/check-pr-scope.sh` — **PASSED**, no label needed
+- [x] Pushed; **PR [#1260](https://github.com/oviney/blog/pull/1260)** open and unmerged
+- [x] CI green: Visual Regression, Page Contract, Build, Security Audit, Content Validation,
+      check-agent-scope, validate-editorial all pass
+- [x] Filed the two-H1 follow-up — **[#1261](https://github.com/oviney/blog/issues/1261)**
+- [x] Filed the visual-flake follow-up — **[#1262](https://github.com/oviney/blog/issues/1262)**,
+      covering `not-found` (and the seed path that committed a bad baseline), `search`, and
+      `category-security`
+
+> **COMPLETE 2026-08-11.** PR #1260 open, all gates green, left unmerged for review.
+> Two follow-ups filed: #1261, #1262.
 
 ## Out of scope
 
