@@ -31,11 +31,40 @@ $h26-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
 $h26-bp: 48em; // two-column → single-column
 
+// The theme caps `.main-content` at 900px and escapes that cap per page type
+// with `:has()` (.economist-article, .topic-page, .econ-topic-page, .homepage).
+// The redesign's wrapper is `.home-2026`, which matches none of them, so the
+// home page rendered pinched inside the reading column beneath a full-bleed
+// masthead. Escape it the same way the theme's other page types do, and adopt
+// the 1040px rhythm the blog index and category pages use so the home page
+// aligns with its sibling listings.
+//
+// This is the one rule in this file that sits outside `.home-2026` — it selects
+// the wrapper's parent, so it cannot be nested inside it.
+.main-content:has(.home-2026) {
+  max-width: 100%;
+  padding: 0;
+}
+
 .home-2026 {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: theme.$spacing-xl theme.$spacing-lg;
   color: $h26-ink;
   font-family: $h26-serif;
 
-  a { text-decoration: none; }
+  // The theme's global `a` carries `border-bottom: 1px solid $economist-red`
+  // for inline prose links. Left unreset it draws a red rule under every
+  // block-level link here — most visibly a full-width line beneath each topic
+  // card. Underlines are re-applied per component where they are wanted.
+  a {
+    text-decoration: none;
+    border-bottom: none;
+  }
+
+  @media (max-width: 768px) {
+    padding: theme.$spacing-md theme.$spacing-sm;
+  }
 
   // ---- shared furniture -------------------------------------------------
   .h26-kicker,
@@ -427,13 +456,18 @@ $h26-bp: 48em; // two-column → single-column
   }
 
   // ---- 5. author --------------------------------------------------------
+  // Sits directly above the newsletter CTA and the site footer (#1a1a1a). A
+  // dark band here produced black / light / black stacked slabs at the foot of
+  // the page. Rendered light with a red top rule instead, so the footer is the
+  // page's only dark mass. Descendant colours below invert with it.
   .h26-author {
     display: flex;
     gap: 1.5rem;
     align-items: flex-start;
-    background: $h26-ink;
-    color: #f2efea;
-    padding: 2.5rem 2.25rem 2.75rem;
+    background: $h26-band;
+    border-top: 3px solid $h26-red;
+    color: $h26-ink;
+    padding: 2.25rem 2rem 2.5rem;
   }
 
   .h26-author-avatar {
@@ -454,7 +488,7 @@ $h26-bp: 48em; // two-column → single-column
     margin: 0 0 0.6rem;
     font-size: 0.72rem;
     font-weight: 600;
-    color: #9a948c;
+    color: $h26-muted;
   }
 
   .h26-author-name {
@@ -463,14 +497,14 @@ $h26-bp: 48em; // two-column → single-column
     line-height: 1.2;
     font-weight: 700;
     letter-spacing: -0.018em;
-    color: $h26-paper;
+    color: $h26-ink;
   }
 
   .h26-author-bio {
     margin: 0 0 1.2rem;
     font-size: 1rem;
     line-height: 1.65;
-    color: #c8c2b9;
+    color: $h26-body;
     max-width: 58ch;
     text-wrap: pretty;
   }
@@ -485,16 +519,16 @@ $h26-bp: 48em; // two-column → single-column
     font-family: $h26-sans;
     font-size: 0.85rem;
     font-weight: 500;
-    color: #c8c2b9;
+    color: $h26-body;
 
     &.is-primary {
-      color: $h26-paper;
+      color: $h26-ink;
       border-bottom: 2px solid $h26-red;
       padding-bottom: 2px;
     }
 
     &:hover,
-    &:focus-visible { color: #fff; }
+    &:focus-visible { color: $h26-red; }
   }
 
   // ---- responsive -------------------------------------------------------
