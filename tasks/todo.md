@@ -11,35 +11,40 @@
 - [x] Confirm the bundle would regress three repo fixes if copied verbatim (SPEC §3 D1)
 - [x] Capture pre-change renders at 1440 and 390
 - [x] Write SPEC / plan / todo
-- [ ] Branch off `main`
-- [ ] Confirm `$spacing-xl` / `$spacing-lg` resolve in `_sass/home-2026.scss`
+- [x] Branch off `main` — `fix/homepage-design-drop`
+- [x] Confirm `$spacing-*` resolve — they do, but the file uses `@use ... as theme`, so they need the `theme.` prefix (the bundle's bare `$spacing-xl` would not have compiled)
 
-## Phase 1 — Port the fixes
+## Phase 1 — Port the fixes ✅
 
-- [ ] **T1** `.main-content:has(.home-2026)` escape + wrapper box model (1040px, centred, padded, mobile override)
-- [ ] **Checkpoint A** — home page content width matches `/blog/`
+- [x] **T1** `.main-content:has(.home-2026)` escape + wrapper box model (1040px, centred, padded, mobile override)
+- [x] **Checkpoint A** — measured: home wrapper `x=200 w=1040`, **identical to `/blog/`** (`x=200 w=1040`)
 
-- [ ] **T2** extend the scoped `a` reset with `border-bottom: none`
-- [ ] **T3** `.h26-author` → light band + 3px red top rule + repad
-- [ ] **T3b** re-point `.h26-author-*` descendant colours at the ink/body/muted ramp
-- [ ] **T4** remove LinkedIn + GitHub from `.h26-author-links` in `index.md`
-- [ ] **Checkpoint B** — all four defects gone at 1440; no new breakage at 390
+- [x] **T2** extend the scoped `a` reset with `border-bottom: none`
+- [x] **T3** `.h26-author` → light band + 3px red top rule + repad
+- [x] **T3b** re-point five `.h26-author-*` descendant colours at the ink/body/muted ramp
+- [x] **T4** remove LinkedIn + GitHub from `.h26-author-links` in `index.md`
+- [x] **Checkpoint B** — all four defects gone at 1440; 390 clean
 
-## Phase 2 — Verify
+## Phase 2 — Verify ✅
 
-- [ ] `bundle exec jekyll build` clean
-- [ ] `npx playwright test tests/playwright-agents/homepage.spec.ts` green
-- [ ] pa11y-ci on `/` — 0 errors
-- [ ] Drop-cap regression guard still passes (proves fix C survived)
-- [ ] Confirm `$h26-red` still derives from the theme token; `$h26-faint` still `#736d64`
-- [ ] Post-change renders at 1440 / 390, compared against Phase 0 captures
-- [ ] **Checkpoint C** — build, specs, and a11y all green
+- [x] `bundle exec jekyll build` clean
+- [x] `homepage.spec.ts` — **45/45 passed**
+- [x] pa11y-ci — **0 errors** on `/` and `/blog/` (inverted author band clears AA in the new direction)
+- [x] Drop-cap regression guard passes (`homepage.spec.ts:327`) — fix C survived
+- [x] `$h26-red` still `theme.$economist-red`; `$h26-faint` still `#736d64`; no hardcoded `#E3120B`
+- [x] Post-change renders at 1440 / 390 compared against Phase 0 captures
+- [x] **Checkpoint C** — build, specs, and a11y all green
 
 ## Phase 3 — Baseline
 
-- [ ] Run the visual regression suite; inspect what moved
-- [ ] Reseed the homepage entry only, if it moved
-- [ ] Confirm no non-homepage snapshot changed
+- [x] Ran the visual suite — 3 homepage entries moved (deliberate, per SPEC D3)
+- [x] Investigated a 4th failure, `category-security-Mobile`: passed on `main` isolated,
+      passed on branch isolated, passed on branch full-suite re-run, failed once under
+      parallel load. **Pre-existing flake, not caused by this change.** Follow-up, not a blocker
+- [ ] Refresh the homepage baselines via the documented path — dispatch `test-quality.yml`
+      on the branch with `update_snapshots=true`. **Not regenerated locally:** the suite header
+      requires baselines be produced in the CI environment so anti-aliasing stays consistent
+- [ ] Confirm no non-homepage snapshot changed in the refreshed commit
 
 ## Phase 4 — Review & ship
 
@@ -47,6 +52,7 @@
 - [ ] `bash scripts/check-pr-scope.sh` — passes with no label
 - [ ] Push branch, open PR, leave unmerged for review
 - [ ] File the two-H1 issue as follow-up (SPEC §3 D4)
+- [ ] File the `category-security-Mobile` visual flake as follow-up
 
 ## Out of scope
 

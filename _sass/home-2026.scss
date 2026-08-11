@@ -15,7 +15,6 @@
 
 $h26-red: theme.$economist-red;
 $h26-ink: #121212;
-$h26-paper: #fbfaf8;
 $h26-band: #f2efea;
 $h26-rule: #ddd8d1;
 $h26-rule-light: #e6e1da;
@@ -62,7 +61,7 @@ $h26-bp: 48em; // two-column → single-column
     border-bottom: none;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: $h26-bp) {
     padding: theme.$spacing-md theme.$spacing-sm;
   }
 
