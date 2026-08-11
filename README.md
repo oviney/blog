@@ -142,24 +142,52 @@ Some of this tooling may move to a separate repository over time if it becomes b
 
 **Script:** `scripts/check-pr-scope.sh`
 
-A lightweight pre-push self-check that every agent should run before opening or updating a PR. It diffs the current branch against `origin/main` and enforces three scope rules:
+A lightweight pre-push self-check that every agent should run before opening or updating a PR. It diffs the current branch against `origin/main` and enforces four scope rules:
 
 | Rule | What it flags |
 |------|--------------|
-| **Protected files** | Any change to `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`, `AGENTS.md`, or `ARCHITECTURE.md` |
-| **Scope explosion** | More than 15 files changed in a single PR |
-| **Governance surfaces** | Any change under `.github/skills/` or `.github/instructions/` — these require a dedicated issue |
+| **1. Protected files** | Any change to `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`, `.github/copilot-instructions.md`, `AGENTS.md`, or `ARCHITECTURE.md` |
+| **2. Scope explosion** | More than 15 files changed in a single PR |
+| **3. Governance surfaces** | Any change under `.github/skills/` or `.github/instructions/` — these require a dedicated issue |
+| **4. Agent scope** | Files outside the active `agent:*` label's allowed zone (skipped entirely when no agent label is present) |
 
 **When to run:** Before every `git push` on an agent branch.
 
 ```bash
 bash scripts/check-pr-scope.sh
+
+# If the PR carries a label-driven exemption, pass it in:
+PR_LABELS=governance-update bash scripts/check-pr-scope.sh
 ```
 
 - Exit `0` → no violations; safe to push.
 - Exit `1` → one or more violations found; fix them before pushing.
 
-No dependencies beyond `git` and `bash`.
+#### Exemptions
+
+Three are label-driven and one is author-driven. All are deliberate-intent
+escapes — the script cannot detect misuse, so reviewers must.
+
+| Exemption | Gated on | Effect |
+|-----------|----------|--------|
+| `bulk-content` | label | Skips Rule 2 |
+| `governance-update` | label | Skips Rule 3 |
+| `protected-file-update` | label | Relaxes Rule 1 **per-file**, for `AGENTS.md` and `ARCHITECTURE.md` only |
+| Dependabot | `PR_AUTHOR` | Relaxes Rule 1 for `Gemfile` and `Gemfile.lock` only, and only when the diff touches nothing else |
+
+The Dependabot exemption ([#1253](https://github.com/oviney/blog/issues/1253))
+exists because those two files are protected so that an *agent* never edits them
+as a side-effect — but Dependabot is the mechanism by which they are supposed to
+change. Without it, every bundler bump failed `check-agent-scope` structurally
+and could only be merged with `--admin`. It requires **both** an exact
+`dependabot[bot]` author match **and** a diff confined to those two files, so a
+bot PR that also reaches for `_config.yml` still trips the rule.
+
+`_config.yml`, `.github/CODEOWNERS` and `.github/copilot-instructions.md` remain
+unbypassable by any label or author.
+
+No dependencies beyond `git` and `bash`. Fixture tests live in
+`tests/scope-guard.sh` and run in CI alongside the guard itself.
 
 ### Agent Merge Unblocker
 
