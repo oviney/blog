@@ -118,6 +118,13 @@ jobs:
         run: bash scripts/check-pr-scope.sh
         env:
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          # Gates the Rule 1 Dependabot exemption (#1253). Trustworthy only
+          # because this workflow triggers on `pull_request`, where the login
+          # comes from GitHub's event payload rather than the PR's own branch.
+          # Switching to `pull_request_target` would make it spoofable — see
+          # is_dependabot_bump() in scripts/check-pr-scope.sh before doing so.
+          # Empty on push events, which means no exemption (fails closed).
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
 
       - name: Run scope-guard fixture tests
         run: bash tests/scope-guard.sh

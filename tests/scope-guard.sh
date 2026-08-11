@@ -17,6 +17,11 @@
 #   I. Static-config invariant: PROTECTED_FILE_UPDATE_BYPASS ⊆ PROTECTED_FILES
 #   J. _sass/ modified, PR_LABELS=agent:qa-gatekeeper → fails (Rule 4 forbidden-zone; canonical agent label)
 #   K. _sass/ modified, PR_LABELS=agent:qa-gatekeeper-trainee (substring superset) → passes (Rule 4 anchored; not an agent label)
+#   L. Gemfile.lock, PR_AUTHOR=dependabot[bot]                → passes (Rule 1 Dependabot exemption, #1253)
+#   M. Gemfile + Gemfile.lock, PR_AUTHOR=dependabot[bot]      → passes (both files bypassed)
+#   N. Gemfile.lock + _config.yml, PR_AUTHOR=dependabot[bot]  → fails  (path gate: diff escapes the owned set)
+#   O. Gemfile.lock, PR_AUTHOR unset                          → fails  (author gate; pre-#1253 behaviour)
+#   P. Gemfile.lock, PR_AUTHOR=not-dependabot[bot]-x          → fails  (author anchored, cf. D/E/F/K)
 #
 # Dependencies: bash, git. Same constraint as the script under test.
 
@@ -39,18 +44,23 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# run_case <name> <pr_labels> <files_to_modify> <expected_exit> <expected_grep>
+# run_case <name> <pr_labels> <files_to_modify> <expected_exit> <expected_grep> [pr_author]
 #
 # files_to_modify is a newline-separated list of paths. Each path is touched
 # (created if not in the baseline) on the test branch so it shows up in the
 # diff vs origin/main. A single path is a valid 1-element list — Cases A–D
 # continue to work unchanged under this contract.
+#
+# pr_author is optional and defaults to empty, so Cases A–K keep their original
+# 5-argument calls. Empty means "no Dependabot exemption", which is exactly the
+# behaviour that predates it — the guard fails closed when the author is unknown.
 run_case() {
   local name="$1"
   local labels="$2"
   local files_to_modify="$3"
   local expected_exit="$4"
   local expected_grep="$5"
+  local pr_author="${6:-}"
 
   local file_count
   file_count=$(printf '%s\n' "$files_to_modify" | wc -l | tr -d ' ')
@@ -63,6 +73,7 @@ run_case() {
     echo "  files:   $file_count paths"
   fi
   echo "  labels:  '${labels:-<unset>}'"
+  echo "  author:  '${pr_author:-<unset>}'"
   echo "  expect:  exit=$expected_exit, grep='$expected_grep'"
 
   local tmp
@@ -111,7 +122,7 @@ EOF
   local output
   local exit_code
   set +e
-  output=$(cd "$work" && PR_LABELS="$labels" bash scripts/check-pr-scope.sh 2>&1)
+  output=$(cd "$work" && PR_LABELS="$labels" PR_AUTHOR="$pr_author" bash scripts/check-pr-scope.sh 2>&1)
   exit_code=$?
   set -e
 
@@ -220,6 +231,55 @@ run_case "K: _sass/ modified, confusable agent:qa-gatekeeper-trainee substring l
   "_sass/scope-guard-test.scss" \
   "0" \
   "no agent label found in PR_LABELS"
+
+# ---------------------------------------------------------------------------
+# Rule 1 Dependabot exemption (#1253).
+#
+# Gemfile and Gemfile.lock are protected and deliberately excluded from the
+# protected-file-update bypass, which made every bundler bump structurally
+# unmergeable without --admin. The exemption requires BOTH an exact author
+# match and no path escape, so these cases pin both gates independently:
+# L/M are the allow side, N/O/P the deny side. Dropping either gate would
+# still pass some of these — only the full set pins the conjunction.
+# ---------------------------------------------------------------------------
+run_case "L: Gemfile.lock modified by dependabot[bot] → Rule 1 bypassed, guard passes" \
+  "" \
+  "Gemfile.lock" \
+  "0" \
+  "dependabot[bot] dependency bump — bypassing protection for 'Gemfile.lock'" \
+  "dependabot[bot]"
+
+run_case "M: Gemfile + Gemfile.lock modified by dependabot[bot] → both bypassed, guard passes" \
+  "" \
+  "$(printf 'Gemfile\nGemfile.lock')" \
+  "0" \
+  "dependabot[bot] dependency bump — bypassing protection for 'Gemfile'" \
+  "dependabot[bot]"
+
+# Path gate. The bot's diff reaches outside the files it owns, so the exemption
+# must not apply — to _config.yml OR to the Gemfile.lock riding alongside it.
+run_case "N: Gemfile.lock + _config.yml modified by dependabot[bot] → path escape, guard fails" \
+  "" \
+  "$(printf 'Gemfile.lock\n_config.yml')" \
+  "1" \
+  "VIOLATION [protected-file]: '_config.yml'" \
+  "dependabot[bot]"
+
+# Author gate. Identical diff to Case L, but no author — must still fail.
+run_case "O: Gemfile.lock modified, author unset → no exemption, guard fails" \
+  "" \
+  "Gemfile.lock" \
+  "1" \
+  "VIOLATION [protected-file]: 'Gemfile.lock'"
+
+# Author anchoring, mirroring D/E/F/K. An unanchored match would let any author
+# string *containing* the bot name qualify. Exact compare must reject this.
+run_case "P: Gemfile.lock modified by confusable not-dependabot[bot]-x author → guard fails" \
+  "" \
+  "Gemfile.lock" \
+  "1" \
+  "VIOLATION [protected-file]: 'Gemfile.lock'" \
+  "not-dependabot[bot]-x"
 
 # Static-config invariant: every entry in PROTECTED_FILE_UPDATE_BYPASS must
 # also appear in PROTECTED_FILES. The two arrays live adjacent in the script

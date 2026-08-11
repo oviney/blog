@@ -34,6 +34,20 @@
 #   FAIL: PR with bulk-content label and unrelated changes (anti-pattern, but the
 #         script can't detect this — see CLAUDE.md for human review guidance)
 #
+# Author-driven exemption (not a label — reads PR_AUTHOR env):
+#   dependabot[bot]         — bypasses Rule 1 for Gemfile and Gemfile.lock ONLY,
+#                             and only when the diff touches nothing else. Those
+#                             two files are protected precisely so an *agent*
+#                             never edits them as a side-effect; Dependabot is
+#                             the mechanism by which they are supposed to change,
+#                             so without this every bundler bump needed --admin.
+#   PASS: dependabot[bot] changing Gemfile.lock alone
+#   PASS: dependabot[bot] changing Gemfile + Gemfile.lock
+#   FAIL: dependabot[bot] changing Gemfile.lock + _config.yml — the whole diff
+#         must stay inside the owned set, so both files are reported
+#   FAIL: any other author changing Gemfile.lock, including 'not-dependabot[bot]-x'
+#   See is_dependabot_bump() for the security constraint on PR_AUTHOR.
+#
 # Dependencies: git and bash only. No other tools required.
 # Exit codes: 0 = clean, 1 = one or more violations found.
 
@@ -63,6 +77,15 @@ PROTECTED_FILES=(
 PROTECTED_FILE_UPDATE_BYPASS=(
   "AGENTS.md"
   "ARCHITECTURE.md"
+)
+
+# Protected files Dependabot legitimately owns. Kept separate from
+# PROTECTED_FILE_UPDATE_BYPASS because the two exemptions are gated on
+# different things — that one on a human-applied label, this one on the PR
+# author plus the shape of the diff. See is_dependabot_bump() below.
+DEPENDABOT_ALLOWED_FILES=(
+  "Gemfile"
+  "Gemfile.lock"
 )
 
 # ---------------------------------------------------------------------------
@@ -96,6 +119,52 @@ has_label() {
 }
 
 # ---------------------------------------------------------------------------
+# is_dependabot_bump — true only when BOTH gates hold:
+#
+#   1. PR_AUTHOR is exactly 'dependabot[bot]', and
+#   2. the diff touches nothing outside DEPENDABOT_ALLOWED_FILES.
+#
+# Gate 2 is what makes this safe. Gate 1 alone would give a mis-scoped or
+# compromised bot PR a free pass on Gemfile and Gemfile.lock; requiring the
+# whole diff to stay inside the owned set means a bot PR that also reaches for
+# _config.yml or .github/CODEOWNERS still trips Rule 1 — on every protected
+# file in it, including the Gemfile.lock.
+#
+# The comparison is an exact `=`, never a pattern match: '[' and ']' are glob
+# metacharacters, and an unanchored match would let 'not-dependabot[bot]-x'
+# qualify. Cases L–P in tests/scope-guard.sh pin both gates.
+#
+# SECURITY CONSTRAINT — read before changing test-build.yml's triggers.
+# Trusting PR_AUTHOR is only sound because the guard runs under `pull_request`,
+# where github.event.pull_request.user.login comes from the GitHub-generated
+# event payload rather than from anything inside the PR's own branch. Under
+# `pull_request_target` this exemption MUST be re-reviewed. See #1253.
+#
+# PR_AUTHOR unset (local runs, push events) means no exemption — fails closed,
+# which is the pre-#1253 behaviour.
+# ---------------------------------------------------------------------------
+is_dependabot_bump() {
+  [ "${PR_AUTHOR:-}" = "dependabot[bot]" ] || return 1
+
+  local changed
+  while IFS= read -r changed; do
+    [ -z "$changed" ] && continue
+    printf '%s\n' "${DEPENDABOT_ALLOWED_FILES[@]}" | grep -qx "$changed" || return 1
+  done <<EOF
+$CHANGED_FILES
+EOF
+  return 0
+}
+
+# Evaluated once rather than per protected file — the answer is a property of
+# the PR, not of the file being checked.
+if is_dependabot_bump; then
+  DEPENDABOT_BUMP=1
+else
+  DEPENDABOT_BUMP=0
+fi
+
+# ---------------------------------------------------------------------------
 # Rule 1: Protected files
 # ---------------------------------------------------------------------------
 for protected in "${PROTECTED_FILES[@]}"; do
@@ -103,6 +172,11 @@ for protected in "${PROTECTED_FILES[@]}"; do
     if has_label 'protected-file-update' && \
        printf '%s\n' "${PROTECTED_FILE_UPDATE_BYPASS[@]}" | grep -qx "$protected"; then
       echo "check-pr-scope: protected-file-update label present — bypassing protection for '$protected'."
+      continue
+    fi
+    if [ "$DEPENDABOT_BUMP" = "1" ] && \
+       printf '%s\n' "${DEPENDABOT_ALLOWED_FILES[@]}" | grep -qx "$protected"; then
+      echo "check-pr-scope: dependabot[bot] dependency bump — bypassing protection for '$protected'."
       continue
     fi
     echo "VIOLATION [protected-file]: '$protected' is in the protected list and must not be modified as a side-effect."
