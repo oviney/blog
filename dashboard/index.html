@@ -1,363 +1,119 @@
 ---
-# Internal observability page: keep crawlable for direct links but out of the
-# sitemap and search index (GH-1053).
+# Internal observability index: keep crawlable for direct links but out of the
+# sitemap and search index (GH-1053). `sitemap-exclusions.spec.ts` asserts this
+# route stays reachable (200) and noindex, so it must not be deleted outright.
 sitemap: false
 ---
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>Playwright Healing Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background: #f8f9fa;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .logo {
-            color: #E3120B;
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .subtitle {
-            color: #666;
-            font-size: 1.1em;
-        }
-        .metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-        .metric-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 6px;
-            border-left: 4px solid #E3120B;
-        }
-        .metric-title {
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-        .metric-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #333;
-        }
-        .metric-change {
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-        .positive { color: #28a745; }
-        .negative { color: #dc3545; }
-        .chart-container {
-            margin: 30px 0;
-            background: white;
-            padding: 20px;
-            border-radius: 6px;
-            border: 1px solid #e9ecef;
-        }
-        .chart-title {
-            font-size: 1.3em;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #333;
-        }
-        .status {
-            padding: 10px 15px;
-            border-radius: 4px;
-            font-weight: 500;
-            text-align: center;
-            margin: 20px 0;
-        }
-        .status.healthy {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .status.warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-        .status.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-        .last-updated {
-            text-align: center;
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 30px;
-        }
-        canvas {
-            max-height: 400px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Observability — The Economist Blog</title>
+  <style>
+    :root {
+      --red:     #E3120B;
+      --text:    #1a1a1a;
+      --muted:   #666;
+      --border:  #ddd;
+      --bg:      #f9f9f9;
+      --card-bg: #fff;
+      --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-serif: 'Merriweather', Georgia, serif;
+      --radius:  6px;
+      --shadow:  0 2px 8px rgba(0,0,0,.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .site-header {
+      background: var(--card-bg);
+      border-bottom: 3px solid var(--red);
+      padding: 1.25rem 1rem;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    .site-header h1 {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .site-header p {
+      color: var(--muted);
+      font-size: .875rem;
+      margin-top: .25rem;
+    }
+    main { padding: 2rem 1rem; }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .card h2 {
+      font-family: var(--font-serif);
+      font-size: 1.125rem;
+      margin-bottom: .5rem;
+    }
+    .card p { color: var(--muted); font-size: .9375rem; }
+    .card a {
+      color: var(--red);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .card a:hover, .card a:focus { text-decoration: underline; }
+    .retired {
+      border-left: 3px solid var(--border);
+      background: transparent;
+      box-shadow: none;
+    }
+    .retired h2 { color: var(--muted); }
+    footer {
+      color: var(--muted);
+      font-size: .8125rem;
+      padding: 0 1rem 2rem;
+    }
+    footer a { color: var(--red); }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">📊 Healing Dashboard</div>
-            <div class="subtitle">Playwright Test Healing Monitor</div>
-        </div>
+  <header class="site-header">
+    <div class="wrap">
+      <h1>Observability</h1>
+      <p>Internal surfaces for <a href="/" style="color:var(--red)">viney.ca</a>. Not indexed.</p>
+    </div>
+  </header>
 
-        <div id="loading" class="loading">
-            Loading dashboard data...
-        </div>
-
-        <div id="dashboard" style="display: none;">
-            <div class="metrics" id="metrics"></div>
-
-            <div id="status-indicator"></div>
-
-            <div class="chart-container">
-                <div class="chart-title">Healing Success Rate Trend</div>
-                <canvas id="successChart"></canvas>
-            </div>
-
-            <div class="chart-container">
-                <div class="chart-title">Test Results Over Time</div>
-                <canvas id="resultsChart"></canvas>
-            </div>
-
-            <div class="last-updated" id="lastUpdated"></div>
-        </div>
+  <main class="wrap">
+    <div class="card">
+      <h2><a href="/dashboard/agents.html">Agent observability dashboard →</a></h2>
+      <p>
+        Agent activity, evaluation outcomes and rework rates. Refreshed
+        automatically by <code>agent-dashboard.yml</code>.
+      </p>
     </div>
 
-    <script>
-        let successChart = null;
-        let resultsChart = null;
+    <div class="card retired">
+      <h2>Playwright healing dashboard — retired</h2>
+      <p>
+        Removed in August 2026. The workflow that fed it had not written data
+        since April 2026, and part of the metric it displayed was a hardcoded
+        constant rather than a measurement. Rather than publish a figure that
+        was both stale and partly synthetic, the dashboard and its generating
+        workflow were retired together.
+      </p>
+    </div>
+  </main>
 
-        async function loadDashboardData() {
-            try {
-                // Try to fetch data from GitHub Actions artifacts via GitHub API
-                console.log('Attempting to fetch dashboard data...');
-                const response = await fetch('./dashboard-data.json?v=' + Date.now());
-                console.log('Fetch response status:', response.status, response.statusText);
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Successfully loaded real data:', data);
-                    updateDashboard(data);
-                } else {
-                    console.log('Fetch failed, status:', response.status, 'Loading demo data...');
-                    // Fallback to demo data for development/preview
-                    loadDemoData();
-                }
-            } catch (error) {
-                console.log('Fetch error:', error, 'Loading demo data for preview');
-                loadDemoData();
-            }
-        }
-
-        function loadDemoData() {
-            const demoData = {
-                timestamp: new Date().toISOString(),
-                metrics: {
-                    totalTests: 135,
-                    passingTests: 128,
-                    healingSuccessRate: 94.8,
-                    lastRunDuration: 284
-                },
-                trend: [
-                    { date: '2026-01-10', successRate: 89.2, totalTests: 130, passingTests: 116 },
-                    { date: '2026-01-11', successRate: 91.5, totalTests: 132, passingTests: 121 },
-                    { date: '2026-01-12', successRate: 93.1, totalTests: 134, passingTests: 125 },
-                    { date: '2026-01-13', successRate: 94.8, totalTests: 135, passingTests: 128 }
-                ],
-                status: 'healthy'
-            };
-            updateDashboard(demoData);
-        }
-
-        function updateDashboard(data) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-
-            updateMetrics(data.metrics);
-            updateStatus(data.status, data.metrics);
-            updateCharts(data.trend);
-            updateLastUpdated(data.timestamp);
-        }
-
-        function updateMetrics(metrics) {
-            const metricsContainer = document.getElementById('metrics');
-            const failureRate = ((metrics.totalTests - metrics.passingTests) / metrics.totalTests * 100).toFixed(1);
-
-            metricsContainer.innerHTML = `
-                <div class="metric-card">
-                    <div class="metric-title">Success Rate</div>
-                    <div class="metric-value">${metrics.healingSuccessRate.toFixed(1)}%</div>
-                    <div class="metric-change positive">Target: 95%</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-title">Passing Tests</div>
-                    <div class="metric-value">${metrics.passingTests}/${metrics.totalTests}</div>
-                    <div class="metric-change ${failureRate < 5 ? 'positive' : 'negative'}">${failureRate}% failure rate</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-title">Last Run</div>
-                    <div class="metric-value">${metrics.lastRunDuration}s</div>
-                    <div class="metric-change">Execution time</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-title">Healing Status</div>
-                    <div class="metric-value">${metrics.healingSuccessRate >= 95 ? '✅' : metrics.healingSuccessRate >= 90 ? '⚠️' : '❌'}</div>
-                    <div class="metric-change">${metrics.healingSuccessRate >= 95 ? 'Excellent' : metrics.healingSuccessRate >= 90 ? 'Good' : 'Needs attention'}</div>
-                </div>
-            `;
-        }
-
-        function updateStatus(status, metrics) {
-            const statusContainer = document.getElementById('status-indicator');
-            let statusClass = 'healthy';
-            let statusMessage = 'All systems operational';
-
-            if (metrics.healingSuccessRate < 90) {
-                statusClass = 'error';
-                statusMessage = 'Healing success rate below target - requires investigation';
-            } else if (metrics.healingSuccessRate < 95) {
-                statusClass = 'warning';
-                statusMessage = 'Healing success rate approaching target threshold';
-            }
-
-            statusContainer.innerHTML = `<div class="status ${statusClass}">${statusMessage}</div>`;
-        }
-
-        function updateCharts(trendData) {
-            const dates = trendData.map(d => d.date);
-            const successRates = trendData.map(d => d.successRate);
-            const passingTests = trendData.map(d => d.passingTests);
-            const totalTests = trendData.map(d => d.totalTests);
-
-            // Success Rate Trend Chart
-            const successCtx = document.getElementById('successChart').getContext('2d');
-            if (successChart) successChart.destroy();
-
-            successChart = new Chart(successCtx, {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [{
-                        label: 'Healing Success Rate',
-                        data: successRates,
-                        borderColor: '#E3120B',
-                        backgroundColor: 'rgba(227, 18, 11, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }, {
-                        label: '95% Target',
-                        data: dates.map(() => 95),
-                        borderColor: '#28a745',
-                        borderDash: [5, 5],
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            min: 80,
-                            max: 100,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Test Results Chart
-            const resultsCtx = document.getElementById('resultsChart').getContext('2d');
-            if (resultsChart) resultsChart.destroy();
-
-            resultsChart = new Chart(resultsCtx, {
-                type: 'bar',
-                data: {
-                    labels: dates,
-                    datasets: [{
-                        label: 'Passing Tests',
-                        data: passingTests,
-                        backgroundColor: '#28a745'
-                    }, {
-                        label: 'Failing Tests',
-                        data: totalTests.map((total, i) => total - passingTests[i]),
-                        backgroundColor: '#dc3545'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true
-                        }
-                    },
-                    scales: {
-                        x: {
-                            stacked: true
-                        },
-                        y: {
-                            stacked: true,
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateLastUpdated(timestamp) {
-            const lastUpdatedElement = document.getElementById('lastUpdated');
-            const date = new Date(timestamp);
-            lastUpdatedElement.textContent = `Last updated: ${date.toLocaleString()}`;
-        }
-
-        // Auto-refresh every 5 minutes
-        function startAutoRefresh() {
-            setInterval(loadDashboardData, 5 * 60 * 1000);
-        }
-
-        // Initialize dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            loadDashboardData();
-            startAutoRefresh();
-        });
-    </script>
+  <footer class="wrap">
+    Test results now surface through the PR gate and the nightly suite in
+    <a href="https://github.com/oviney/blog/actions">GitHub Actions</a>.
+  </footer>
 </body>
 </html>

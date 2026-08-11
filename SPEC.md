@@ -1,218 +1,154 @@
-# SPEC — The two CI rows the PR-gate epic left behind
+# SPEC — Retire the Healing Monitor, and stop publishing the metric it stopped producing
 
-**Stream:** `docs/BACKLOG.md` P3 ×2 · **Priority:** P3 · **Scope:** S · **Dependencies:** none (the P1 epic closed in #1201)
-**Date:** 2026-08-02 · **Label:** `agent:qa-gatekeeper` · **Issue:** none — local backlog items
-**Status:** not started — **read §2 first, it recommends closing one row without writing code**
+**Stream:** session resume 2026-08-10 · **Priority:** P1 (active resource burn) · **Scope:** M
+**Date:** 2026-08-10 · **Label:** `agent:qa-gatekeeper` · **Issues:** [#1238](https://github.com/oviney/blog/issues/1238), [#1240](https://github.com/oviney/blog/issues/1240), [#1206](https://github.com/oviney/blog/issues/1206) + 25 `triage:` issues
+**Status:** specified — awaiting owner sign-off on the plan
 
 ---
 
 ## 1. Objective
 
-The PR-gate restructure (#1194, #1195, #1197, #1200) closed as a four-stream epic
-and left two P3 rows open. This spec exists so the next session does not
-re-derive them, and to record that **one of the two should probably be closed as
-done rather than built**.
+Resuming after a machine switch, `main` fast-forwarded 130 commits and the
+handoff in `docs/BACKLOG.md` ("Where to pick up", 2026-08-09) proved accurate:
+nothing was in flight. What the handoff could not see is that **one scheduled
+workflow has been failing continuously for a week and silently publishing a
+frozen metric to production for four months**.
 
-Neither row blocks anything. Both are cheap to get wrong in the direction of
-over-engineering, which is the specific failure this repo has already paid for.
-
----
-
-## 2. Row 1 — De-duplicate Jekyll builds. RECOMMENDATION: close as done.
-
-**The row's premise is stale.** It says a PR builds the site "~4 times across
-`test-build`, `content-validation` and `test-quality` jobs". Measured on
-post-#1197 `main`, a PR builds it **twice**:
-
-| Workflow | Job | Builds? | Why |
-|----------|-----|---------|-----|
-| `test-build.yml` | `build` | **yes** | htmlproofer runs against `_site/`, so the job needs a build regardless |
-| `test-quality.yml` | `build-site` | **yes** | uploads `site-build-quality` for the contract and pixel jobs |
-| `test-build.yml` | `validate-editorial` | no | `validate-posts.sh` reads `_posts/`, not `_site/` |
-| `test-build.yml` | `check-agent-scope` | no | operates on the diff |
-| `content-validation.yml` | `validate-posts` | no | never built; also only fires on `_posts/**` |
-
-#1197 already took the count from 4 to 2. The row's remaining scope is "make it 1".
-
-**The remaining duplicate costs ~25s.** The `build` job runs 24-30s *in total*
-across five sampled PR runs, and that includes Ruby setup, htmlproofer and
-front-matter validation — the build itself is a fraction. Because GitHub bills
-per job-minute, removing the duplicate build saves **zero billable minutes**: the
-job still has to exist for htmlproofer.
-
-**Why the obvious fix is not worth it.** The two builds live in *different
-workflows*, and GitHub cannot share an artifact between workflows running
-concurrently — `workflow_run` fires after completion, not during. Removing the
-duplicate therefore means merging `test-build.yml`'s `build` job into
-`test-quality.yml`, which:
-
-- moves or renames the `build` required status check, requiring another
-  branch-protection change — the operation that deadlocks the repo if mistimed
-  (see #1197);
-- collapses two workflows with different trigger sets into one;
-- saves ~25s on a job that runs in parallel with slower ones, so the PR's
-  critical path does not move at all.
-
-That is three workflows' worth of risk to save one script's worth of time. The
-repo's own standing principle — *one script beats three workflows, match
-complexity to scale* — says no.
-
-**Recommendation: close the row**, recording that #1197 did the part that paid
-(4 → 2 builds, 13.3 → 7 job-min) and that the last duplicate is load-bearing for
-htmlproofer. If it is ever revisited, do it as a deliberate
-consolidate-the-workflows change with its own spec, not as a performance tweak.
-
-If the owner disagrees and wants it built anyway, the acceptance criteria are
-in §4.
+This spec retires that workflow, unpublishes what it fed, and collapses a
+duplicated issue generator. Four owner decisions were taken before writing it
+(§6) — none of the work below is open-ended.
 
 ---
 
-## 3. Row 2 — Decide the fate of cross-browser coverage
+## 2. The Healing Monitor is dead and has been for some time
 
-`playwright.config.ts:98-115` declares Desktop Firefox and Desktop Safari behind
-`PLAYWRIGHT_ALL_BROWSERS=1`. They are opt-in because CI installs chromium only,
-so **376 of the suite's 940 test executions had never run once** while
-`continue-on-error: true` on the shards swallowed the "Executable doesn't exist"
-failures. The suite advertised cross-browser coverage it never had.
+`.github/workflows/healing-monitor.yml` runs every 4 hours across a 3-browser
+matrix. Measured on `main`:
 
-This is a **decision**, not an implementation. Two honest options:
+| Evidence | Value |
+|----------|-------|
+| Last 40 runs (since 2026-08-04) | **38 `cancelled`, 2 `failure`, 0 success** |
+| `dashboard/dashboard-data.json` last successful commit | **2026-04-04** |
+| Cost | ~18 jobs/day, ~126 jobs/week |
+| Alerting | already disabled — `if: false` at `:418` |
 
-**Option A — enable on the nightly path only.** Add
-`npx playwright install firefox webkit --with-deps` and
-`PLAYWRIGHT_ALL_BROWSERS=1` to `🌙 Nightly Full Suite` in `test-quality.yml`.
-Non-blocking by construction, and the repo is public so Actions minutes are free.
+Three independent defects, each sufficient on its own:
 
-- *Real cost:* these tests have **never executed**, so the first run will almost
-  certainly produce a burst of failures — engine-specific rendering, focus
-  behaviour, `boundingBox` rounding. That burst becomes triage work, arriving as
-  one auto-filed issue at 02:00 UTC.
-- *Real benefit:* the site is static Jekyll with little JavaScript, so the
-  plausible cross-browser defects are CSS-layout ones — exactly what the existing
-  overflow and design-token assertions would catch in another engine.
+**D1 — the chromium leg always times out.** It runs the full suite across three
+projects (`:47`) under `timeout-minutes: 15` (`:40`). It is cancelled at the
+limit every run. Because `monitor-healing` declares `needs: playwright-tests`
+(`:205`), the cancel means **the metric is never computed and the dashboard is
+never written**. The workflow's entire output is dead.
 
-**Option B — delete the projects.** Remove the `PLAYWRIGHT_ALL_BROWSERS` block
-and its comment. Honest, zero maintenance, and stops the config implying coverage
-that does not exist.
+**D2 — two of three matrix legs run zero tests.** The firefox and webkit legs
+pass `--project "Desktop Firefox"` / `"Desktop Safari"` (`:48-51`), but those
+projects only exist when `PLAYWRIGHT_ALL_BROWSERS=1` (`playwright.config.ts:109`),
+which this workflow never sets. They select nothing and pass in ~1 minute —
+after paying full freight for checkout, Ruby, `npm ci`, `playwright install
+--with-deps` and a Jekyll build. This is the **same** defect as the open
+`docs/BACKLOG.md` P3 "decide the fate of cross-browser coverage"; that row
+recorded it in the PR gate and did not know it also bites here.
 
-**Recommendation: Option A with a tripwire.** Enable on nightly, then triage the
-first run *once*. If the failures are engine noise rather than real defects,
-delete the projects (Option B) and record why. If any real defect surfaces, keep
-them. Decide within one nightly cycle — do not leave a red nightly standing,
-because a permanently-failing non-blocking job is how this repo got here in the
-first place.
+**D3 — the metric is partly fabricated.** `:626` hardcodes `totalTests: 135`
+and derives `passingTests` as `round(135 × successRate/100)` (`:585`). The
+count is not measured.
 
-The tripwire matters more than the choice. Either outcome is fine; drifting
-without deciding is not.
-
----
-
-## 4. Acceptance criteria
-
-**Row 1 — only if built against the §2 recommendation**
-
-- [ ] A PR builds the site exactly once, proven by counting `jekyll build` steps
-      in one PR's runs, not by reading the YAML.
-- [ ] `build` still reports under that exact name, or branch protection is
-      updated in the same window as the merge.
-- [ ] htmlproofer still runs against a real `_site/`.
-- [ ] Billable job-minutes measured before and after, stated in the PR body.
-      **If the delta is zero, close the row instead of merging.**
-
-**Row 2**
-
-- [ ] A written decision — A or B — recorded in `docs/BACKLOG.md` with its reason.
-- [ ] If A: `🌙 Nightly Full Suite` installs firefox and webkit and sets
-      `PLAYWRIGHT_ALL_BROWSERS=1`; the first nightly is triaged within one cycle
-      and the outcome recorded.
-- [ ] If B: the projects and their comment are gone from `playwright.config.ts`,
-      and `docs/TEST_TRACEABILITY.md` states the suite is chromium-only.
-- [ ] Either way, no config remains that implies coverage the suite does not have.
+**Why this went unnoticed:** the alert step is disabled, the tests are wrapped
+in `|| true` (`:161`) so failures never surface, and the only signal left is
+`#1238` — one CI-health issue that reads as a single flaky workflow rather than
+a week of total failure.
 
 ---
 
-## 5. Commands
+## 3. The dead metric is on the public site
 
-```bash
-bundle exec jekyll build                              # validate before any PR
-npm run test:contract                                 # the blocking gate, ~20s
-npx playwright install firefox webkit --with-deps     # Option A only
-PLAYWRIGHT_ALL_BROWSERS=1 npx playwright test         # Option A, run locally first
+`_config.yml:130-131` carries `include: - dashboard/`. Verified live:
 
-# Count real builds in a PR's runs — do not infer this from the YAML.
-gh run view <run-id> --json jobs --jq '.jobs[].name'
-```
+| URL | Status | Content |
+|-----|--------|---------|
+| `viney.ca/dashboard/` | **200** | healing metrics, frozen at **2026-04-04** |
+| `viney.ca/dashboard/agents.html` | 200 | agent observability — genuinely live (PR #1232 refreshes it) |
 
----
+The live payload reads `"healingSuccessRate": 85.71, "totalTests": 135`. A
+public page on a blog whose own editorial line critiques self-healing test
+claims (`_posts/2026-01-02-self-healing-tests-myth-vs-reality.md`) should not be
+serving a four-month-stale, partly-synthesized healing success rate.
 
-## 6. Testing strategy
-
-Both rows are CI changes, so the pipeline is the test:
-
-- Verify against a **measured run**, not a diff. State billable job-minutes and
-  wall-clock in the PR body against the post-#1197 baseline of **7 job-min /
-  2m26s / 1 Jekyll build in `test-quality.yml`**.
-- For Row 2 Option A, run the two new engines **locally first**. Do not discover
-  376 first-time failures inside a scheduled job.
-- Any new or rewritten assertion must be mutation-tested — break the thing it
-  guards, watch it go red with the offender named, restore, watch it go green.
-  See `.github/instructions/tests.instructions.md` §"Every test must be able to
-  fail".
+**Constraint discovered in test:** `tests/playwright-agents/sitemap-exclusions.spec.ts:74-83`
+asserts `/dashboard/` is **reachable (200) and `noindex`**. So `/dashboard/`
+cannot simply 404 — deleting `index.html` outright turns that test red. The
+design below keeps the route alive and honest instead, which needs **no test
+edit**.
 
 ---
 
-## 7. Boundaries
+## 4. The 25 stale-skill-file issues are one fact filed by two scripts
 
-**Always** — measure before claiming an improvement; keep each PR atomic; update
-`docs/TEST_TRACEABILITY.md` in the same PR that changes what runs.
+Not one noisy generator — two, emitting the same finding at different
+granularity:
 
-**Ask first** — any change to branch-protection required contexts; any change
-that renames or moves the `build` or `🎭 Page Contract` checks.
+| Source | Emits | Issues |
+|--------|-------|--------|
+| `scripts/idea-triage.sh:133` | one issue **per skill file** | the 24 `triage: stale skill file — *` + new #1250 |
+| `scripts/doc-audit.sh:567-621` | **one rollup** issue | #1206 |
 
-**Never** — modify `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`,
-`.github/copilot-instructions.md`; push directly to `main`; weaken an assertion
-to make a test pass; leave a permanently-red non-blocking job standing.
-
----
-
-## 8. Out of scope
-
-The other two open P3 rows have their own owners and are already described in
-`docs/BACKLOG.md`: removing the legacy homepage CSS orphaned by #1193
-(`agent:creative-director` — 35 dead rule openers, keep `.home-intro-links`), and
-the custom-agents-vs-label-routing ADR (`governance-update`, #1110).
+Both use a 90-day cutoff (`doc-audit.sh:574`). The per-file generator is pure
+duplication of the rollup and is the entire source of the issue-list noise.
+Precedent from #1175 says staleness sometimes signals *real* drift, so the
+rollup stays — it is the per-file fan-out that goes.
 
 ---
 
-## Appendix — what the PR-gate epic established
+## 5. `#1240` is already resolved
 
-Carried here so a cold session does not re-derive it.
+It fired because `🔒 Security Audit` was red on the js-yaml advisory.
+[#1247](https://github.com/oviney/blog/pull/1247) cleared it on 2026-08-09. The
+2026-08-10 scheduled nightly is **7/7 green**, Security Audit included. Close as
+resolved; do not re-diagnose.
 
-| | Before | After (#1197) |
-|---|---|---|
-| Billable job-min per PR | 13.3 | **7** |
-| Wall-clock | ~5 min | **2m26s** |
-| Jekyll builds in `test-quality.yml` | 4 | **1** |
+---
 
-The ≤5 job-min target was **missed**. Actual compute is ~5 min; the rest is
-GitHub's per-job minute rounding across five short jobs. Recorded as missed
-rather than quietly rescoped.
+## 6. Decisions taken (owner, 2026-08-10)
 
-**Required status checks are now** `build`, `🔒 Security Audit`,
-`🖼️ Visual Regression`, `🎭 Page Contract`. The three `🎭 Playwright Shard N/3`
-contexts were retired. **Changing what a workflow emits requires updating branch
-protection in the same window, or every later PR deadlocks on a check that never
-reports.** Verified once via throwaway PR #1199.
+| # | Decision | Rationale |
+|---|----------|-----------|
+| **D-A** | **Retire** the Healing Monitor rather than repair it | Alerting already disabled, metric uncomputed for a week, dashboard unwritten for four months, and nobody noticed — the strongest available evidence it is not load-bearing. Matches the repo's "match complexity to scale" principle. |
+| **D-B** | **Unpublish** the healing dashboard; point `/dashboard/` at the agents view | Stale, partly-fabricated metrics on a public QA-credibility blog are worse than no page. |
+| **D-C** | Merge the 3 Dependabot patch bumps **with `--admin`**; fix the scope guard as a **follow-up** | Keeps an unblock and a governance change from riding in one PR. |
+| **D-D** | **Retune** the staleness audit — drop the per-file generator, keep the rollup | Treats the noise source, not the noise. |
 
-**A correction worth keeping.** The original review characterised the
-`redesign/home-2026` failures as "5:0 rot" — all stale tests, no real bugs. That
-was wrong: it was 1 stale test plus 3 real defects (theme drop-cap leak,
-furniture contrast), fixed in `50001e9`. *"Red gate ⇒ stale tests"* is not a safe
-inference from test names alone.
+---
 
-**The generator is fixed, and that is the durable part.**
-`.github/instructions/tests.instructions.md` used to instruct every agent
-touching `tests/**` to wrap interactions in `try/catch` and log skips "rather
-than throwing". It now carries an "Every test must be able to fail" rule. A
-suite-wide sweep after #1200 returns **0** files with `nuclear` /
-`ultra-permissive`, **0** with `toBeGreaterThanOrEqual(0)`, and **0** with
-conditional `test.skip(true, …)`. Keep it that way.
+## 7. Out of scope — filed as follow-ups, not built here
+
+**F1 — the orphaned healing machinery.** Retiring the workflow strands
+`scripts/healing-monitor.js`, `analyze-healing-trends.js`,
+`check-healing-degradation.js`, `dashboard-server.js`, five `package.json`
+scripts (`:27-35`), `healing-metrics/`, `healing-reports/`, `.github/badges/`,
+and `ARCHITECTURE.md:21,65,69,74,78,80,82`. Bundling it here would blow the
+15-file Rule 2 cap. Separate PR.
+
+**F2 — the scope guard blocks every bundler Dependabot PR.**
+`scripts/check-pr-scope.sh` has **zero** Dependabot handling, and
+`Gemfile`/`Gemfile.lock` are in `PROTECTED_FILES` (`:49-57`), deliberately
+excluded from the `protected-file-update` bypass (`:59-66`: "infra files always
+trip Rule 1 — even with the label"). So #1242/#1243/#1245 fail
+`check-agent-scope` structurally and **can never go green**; #1244 (npm) passes
+because `package-lock.json` is not protected. Every future bundler bump needs
+`--admin`. Needs a deliberate governance decision, not a drive-by.
+
+---
+
+## 8. Acceptance criteria
+
+- **AC-1** `healing-monitor.yml` is gone; no scheduled run appears after the merge commit.
+- **AC-2** `#1238` and `#1240` are closed with reasons recorded.
+- **AC-3** `viney.ca/dashboard/` returns **200** and `noindex`, and serves **no** healing metrics or `dashboard-data.json`.
+- **AC-4** `sitemap-exclusions.spec.ts` passes **unmodified**.
+- **AC-5** `viney.ca/dashboard/agents.html` is unchanged and still refreshed by `agent-dashboard.yml`.
+- **AC-6** `README.md` carries no badge pointing at a deleted workflow.
+- **AC-7** `idea-triage.sh` no longer files per-file stale-skill issues; `doc-audit.sh` rollup behaviour is unchanged.
+- **AC-8** The 25 per-file issues are closed referencing the retune; **#1206 stays open**.
+- **AC-9** Dependabot #1243/#1244/#1245 merged; #1242 summarized for an owner call.
+- **AC-10** F1 and F2 exist as tracked issues.
+- **AC-11** `bundle exec jekyll build` succeeds and the PR gate is green.
