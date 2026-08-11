@@ -1,218 +1,119 @@
-# SPEC — The two CI rows the PR-gate epic left behind
+# SPEC — Let Dependabot's bundler bumps pass the scope guard on their own
 
-**Stream:** `docs/BACKLOG.md` P3 ×2 · **Priority:** P3 · **Scope:** S · **Dependencies:** none (the P1 epic closed in #1201)
-**Date:** 2026-08-02 · **Label:** `agent:qa-gatekeeper` · **Issue:** none — local backlog items
-**Status:** not started — **read §2 first, it recommends closing one row without writing code**
+**Stream:** `docs/BACKLOG.md` top Active row (P2) · **Priority:** P2 · **Scope:** S
+**Date:** 2026-08-11 · **Label:** `governance-update` · **Issue:** [#1253](https://github.com/oviney/blog/issues/1253)
+**Status:** specified — approach approved 2026-08-11
 
 ---
 
 ## 1. Objective
 
-The PR-gate restructure (#1194, #1195, #1197, #1200) closed as a four-stream epic
-and left two P3 rows open. This spec exists so the next session does not
-re-derive them, and to record that **one of the two should probably be closed as
-done rather than built**.
+`scripts/check-pr-scope.sh` has **no Dependabot handling**, and `Gemfile` /
+`Gemfile.lock` sit in `PROTECTED_FILES` with the `protected-file-update` bypass
+deliberately withheld. Every bundler bump therefore fails `check-agent-scope`
+**structurally** and can never go green — each one needs an `--admin` merge.
 
-Neither row blocks anything. Both are cheap to get wrong in the direction of
-over-engineering, which is the specific failure this repo has already paid for.
-
----
-
-## 2. Row 1 — De-duplicate Jekyll builds. RECOMMENDATION: close as done.
-
-**The row's premise is stale.** It says a PR builds the site "~4 times across
-`test-build`, `content-validation` and `test-quality` jobs". Measured on
-post-#1197 `main`, a PR builds it **twice**:
-
-| Workflow | Job | Builds? | Why |
-|----------|-----|---------|-----|
-| `test-build.yml` | `build` | **yes** | htmlproofer runs against `_site/`, so the job needs a build regardless |
-| `test-quality.yml` | `build-site` | **yes** | uploads `site-build-quality` for the contract and pixel jobs |
-| `test-build.yml` | `validate-editorial` | no | `validate-posts.sh` reads `_posts/`, not `_site/` |
-| `test-build.yml` | `check-agent-scope` | no | operates on the diff |
-| `content-validation.yml` | `validate-posts` | no | never built; also only fires on `_posts/**` |
-
-#1197 already took the count from 4 to 2. The row's remaining scope is "make it 1".
-
-**The remaining duplicate costs ~25s.** The `build` job runs 24-30s *in total*
-across five sampled PR runs, and that includes Ruby setup, htmlproofer and
-front-matter validation — the build itself is a fraction. Because GitHub bills
-per job-minute, removing the duplicate build saves **zero billable minutes**: the
-job still has to exist for htmlproofer.
-
-**Why the obvious fix is not worth it.** The two builds live in *different
-workflows*, and GitHub cannot share an artifact between workflows running
-concurrently — `workflow_run` fires after completion, not during. Removing the
-duplicate therefore means merging `test-build.yml`'s `build` job into
-`test-quality.yml`, which:
-
-- moves or renames the `build` required status check, requiring another
-  branch-protection change — the operation that deadlocks the repo if mistimed
-  (see #1197);
-- collapses two workflows with different trigger sets into one;
-- saves ~25s on a job that runs in parallel with slower ones, so the PR's
-  critical path does not move at all.
-
-That is three workflows' worth of risk to save one script's worth of time. The
-repo's own standing principle — *one script beats three workflows, match
-complexity to scale* — says no.
-
-**Recommendation: close the row**, recording that #1197 did the part that paid
-(4 → 2 builds, 13.3 → 7 job-min) and that the last duplicate is load-bearing for
-htmlproofer. If it is ever revisited, do it as a deliberate
-consolidate-the-workflows change with its own spec, not as a performance tweak.
-
-If the owner disagrees and wants it built anyway, the acceptance criteria are
-in §4.
+A protected-file guard that is routinely overridden stops carrying signal. This
+spec removes the recurring override without weakening the rule.
 
 ---
 
-## 3. Row 2 — Decide the fate of cross-browser coverage
+## 2. Evidence
 
-`playwright.config.ts:98-115` declares Desktop Firefox and Desktop Safari behind
-`PLAYWRIGHT_ALL_BROWSERS=1`. They are opt-in because CI installs chromium only,
-so **376 of the suite's 940 test executions had never run once** while
-`continue-on-error: true` on the shards swallowed the "Executable doesn't exist"
-failures. The suite advertised cross-browser coverage it never had.
+Measured 2026-08-10, after rebasing all four open Dependabot PRs onto a `main`
+that already carried the js-yaml fix (#1247):
 
-This is a **decision**, not an implementation. Two honest options:
+| PR | Bump | `🔒 Security Audit` | `check-agent-scope` |
+|----|------|--------------------|---------------------|
+| #1242 | jekyll-remote-theme 0.4.3→0.5.2 | SUCCESS | **FAILURE** |
+| #1243 | json 2.20.0→2.21.2 | SUCCESS | **FAILURE** |
+| #1245 | jekyll-include-cache 0.2.1→0.2.2 | SUCCESS | **FAILURE** |
+| #1244 | @playwright/test 1.62.0→1.62.1 | SUCCESS | SUCCESS |
 
-**Option A — enable on the nightly path only.** Add
-`npx playwright install firefox webkit --with-deps` and
-`PLAYWRIGHT_ALL_BROWSERS=1` to `🌙 Nightly Full Suite` in `test-quality.yml`.
-Non-blocking by construction, and the repo is public so Actions minutes are free.
+The split is exactly bundler-vs-npm. #1244 passes only because
+`package-lock.json` is **not** in `PROTECTED_FILES`. That confirms the cause is
+the protected-file rule, not the bump content. #1243/#1244/#1245 were merged
+with `--admin`; #1242 remains open.
 
-- *Real cost:* these tests have **never executed**, so the first run will almost
-  certainly produce a burst of failures — engine-specific rendering, focus
-  behaviour, `boundingBox` rounding. That burst becomes triage work, arriving as
-  one auto-filed issue at 02:00 UTC.
-- *Real benefit:* the site is static Jekyll with little JavaScript, so the
-  plausible cross-browser defects are CSS-layout ones — exactly what the existing
-  overflow and design-token assertions would catch in another engine.
+### Why the rule is written that way
 
-**Option B — delete the projects.** Remove the `PLAYWRIGHT_ALL_BROWSERS` block
-and its comment. Honest, zero maintenance, and stops the config implying coverage
-that does not exist.
+`check-pr-scope.sh:59-66` is explicit:
 
-**Recommendation: Option A with a tripwire.** Enable on nightly, then triage the
-first run *once*. If the failures are engine noise rather than real defects,
-delete the projects (Option B) and record why. If any real defect surfaces, keep
-them. Decide within one nightly cycle — do not leave a red nightly standing,
-because a permanently-failing non-blocking job is how this repo got here in the
-first place.
+> Kept separate from `PROTECTED_FILES` so infra files (`_config.yml`, `Gemfile*`,
+> `.github/CODEOWNERS`, `.github/copilot-instructions.md`) always trip Rule 1 —
+> even with the label.
 
-The tripwire matters more than the choice. Either outcome is fine; drifting
-without deciding is not.
+That reasoning is **correct for agent-authored PRs** and should not change.
+Dependabot is not an agent — it is the mechanism by which those two files are
+*supposed* to change.
 
 ---
 
-## 4. Acceptance criteria
+## 3. The spoofing risk does not apply here
 
-**Row 1 — only if built against the §2 recommendation**
+An author-based exemption is only as trustworthy as the author field. Checked
+before committing to the design:
 
-- [ ] A PR builds the site exactly once, proven by counting `jekyll build` steps
-      in one PR's runs, not by reading the YAML.
-- [ ] `build` still reports under that exact name, or branch protection is
-      updated in the same window as the merge.
-- [ ] htmlproofer still runs against a real `_site/`.
-- [ ] Billable job-minutes measured before and after, stated in the PR body.
-      **If the delta is zero, close the row instead of merging.**
+`test-build.yml:3-13` triggers on **`pull_request`**, not `pull_request_target`.
+Under `pull_request`, `github.event.pull_request.user.login` comes from the
+GitHub-generated event payload, not from anything inside the PR's own code or
+branch. A fork PR cannot forge it.
 
-**Row 2**
-
-- [ ] A written decision — A or B — recorded in `docs/BACKLOG.md` with its reason.
-- [ ] If A: `🌙 Nightly Full Suite` installs firefox and webkit and sets
-      `PLAYWRIGHT_ALL_BROWSERS=1`; the first nightly is triaged within one cycle
-      and the outcome recorded.
-- [ ] If B: the projects and their comment are gone from `playwright.config.ts`,
-      and `docs/TEST_TRACEABILITY.md` states the suite is chromium-only.
-- [ ] Either way, no config remains that implies coverage the suite does not have.
+**This would not hold under `pull_request_target`.** If that trigger is ever
+introduced on this workflow, this exemption must be re-reviewed. Recorded in the
+script so the constraint travels with the code.
 
 ---
 
-## 5. Commands
+## 4. Design — author gate AND path gate (D-1, approved)
 
-```bash
-bundle exec jekyll build                              # validate before any PR
-npm run test:contract                                 # the blocking gate, ~20s
-npx playwright install firefox webkit --with-deps     # Option A only
-PLAYWRIGHT_ALL_BROWSERS=1 npx playwright test         # Option A, run locally first
+Bypass Rule 1 only when **both** hold:
 
-# Count real builds in a PR's runs — do not infer this from the YAML.
-gh run view <run-id> --json jobs --jq '.jobs[].name'
-```
+1. `PR_AUTHOR` is exactly `dependabot[bot]` — exact compare, not a substring
+   match, matching the anchoring discipline cases D/E/F/K already pin; and
+2. every changed file is in `{Gemfile, Gemfile.lock}` — so a bot PR that also
+   reaches for `_config.yml` or `.github/CODEOWNERS` still trips the guard.
 
----
+Gate 2 is what makes this safe. Gate 1 alone would give a mis-scoped or
+compromised bot PR a free pass on both files.
 
-## 6. Testing strategy
+npm bumps need no exemption: `package.json` / `package-lock.json` are not
+protected, so Rule 1 never fires for them.
 
-Both rows are CI changes, so the pipeline is the test:
+| Author | Diff | Rule 1 |
+|--------|------|--------|
+| `dependabot[bot]` | `Gemfile.lock` | **pass** |
+| `dependabot[bot]` | `Gemfile` + `Gemfile.lock` | **pass** |
+| `dependabot[bot]` | `Gemfile.lock` + `_config.yml` | **fail** — path escape |
+| `dependabot[bot]` | `.github/CODEOWNERS` | **fail** |
+| `dependabot[bot]-x` / any human | `Gemfile.lock` | **fail** — author gate |
 
-- Verify against a **measured run**, not a diff. State billable job-minutes and
-  wall-clock in the PR body against the post-#1197 baseline of **7 job-min /
-  2m26s / 1 Jekyll build in `test-quality.yml`**.
-- For Row 2 Option A, run the two new engines **locally first**. Do not discover
-  376 first-time failures inside a scheduled job.
-- Any new or rewritten assertion must be mutation-tested — break the thing it
-  guards, watch it go red with the offender named, restore, watch it go green.
-  See `.github/instructions/tests.instructions.md` §"Every test must be able to
-  fail".
+Rules 2, 3 and 4 are untouched.
 
 ---
 
-## 7. Boundaries
+## 5. Out of scope
 
-**Always** — measure before claiming an improvement; keep each PR atomic; update
-`docs/TEST_TRACEABILITY.md` in the same PR that changes what runs.
-
-**Ask first** — any change to branch-protection required contexts; any change
-that renames or moves the `build` or `🎭 Page Contract` checks.
-
-**Never** — modify `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`,
-`.github/copilot-instructions.md`; push directly to `main`; weaken an assertion
-to make a test pass; leave a permanently-red non-blocking job standing.
-
----
-
-## 8. Out of scope
-
-The other two open P3 rows have their own owners and are already described in
-`docs/BACKLOG.md`: removing the legacy homepage CSS orphaned by #1193
-(`agent:creative-director` — 35 dead rule openers, keep `.home-intro-links`), and
-the custom-agents-vs-label-routing ADR (`governance-update`, #1110).
+- **Widening the exemption to other protected files.** `_config.yml`,
+  `.github/CODEOWNERS` and `.github/copilot-instructions.md` stay unbypassable
+  by anyone. Dependabot has no reason to touch them.
+- **#1242's merge decision.** Separate owner call. Note `remote_theme:` is
+  commented out at `_config.yml:37`, so `jekyll-remote-theme` loads and does
+  nothing — whether it should be a dependency at all is the better question, and
+  both files involved are protected.
+- **Auto-merge for Dependabot.** This makes the gate pass honestly; it does not
+  change who merges.
 
 ---
 
-## Appendix — what the PR-gate epic established
+## 6. Acceptance criteria
 
-Carried here so a cold session does not re-derive it.
-
-| | Before | After (#1197) |
-|---|---|---|
-| Billable job-min per PR | 13.3 | **7** |
-| Wall-clock | ~5 min | **2m26s** |
-| Jekyll builds in `test-quality.yml` | 4 | **1** |
-
-The ≤5 job-min target was **missed**. Actual compute is ~5 min; the rest is
-GitHub's per-job minute rounding across five short jobs. Recorded as missed
-rather than quietly rescoped.
-
-**Required status checks are now** `build`, `🔒 Security Audit`,
-`🖼️ Visual Regression`, `🎭 Page Contract`. The three `🎭 Playwright Shard N/3`
-contexts were retired. **Changing what a workflow emits requires updating branch
-protection in the same window, or every later PR deadlocks on a check that never
-reports.** Verified once via throwaway PR #1199.
-
-**A correction worth keeping.** The original review characterised the
-`redesign/home-2026` failures as "5:0 rot" — all stale tests, no real bugs. That
-was wrong: it was 1 stale test plus 3 real defects (theme drop-cap leak,
-furniture contrast), fixed in `50001e9`. *"Red gate ⇒ stale tests"* is not a safe
-inference from test names alone.
-
-**The generator is fixed, and that is the durable part.**
-`.github/instructions/tests.instructions.md` used to instruct every agent
-touching `tests/**` to wrap interactions in `try/catch` and log skips "rather
-than throwing". It now carries an "Every test must be able to fail" rule. A
-suite-wide sweep after #1200 returns **0** files with `nuclear` /
-`ultra-permissive`, **0** with `toBeGreaterThanOrEqual(0)`, and **0** with
-conditional `test.skip(true, …)`. Keep it that way.
+- **AC-1** A `dependabot[bot]` PR touching only `Gemfile` and/or `Gemfile.lock` exits 0.
+- **AC-2** A `dependabot[bot]` PR touching those *plus* any other protected file exits 1.
+- **AC-3** A non-Dependabot author touching `Gemfile.lock` still exits 1.
+- **AC-4** An author string that merely *contains* `dependabot[bot]` does not qualify.
+- **AC-5** Cases A–K still pass unchanged — no regression to existing bypasses.
+- **AC-6** `test-build.yml` passes `PR_AUTHOR`; the guard degrades to today's behaviour when it is unset.
+- **AC-7** The `pull_request`-trigger constraint from §3 is recorded in the script.
+- **AC-8** `README.md`'s scope-guard section documents the exemption.
+- **AC-9** The PR gate is green, and #1242 shows `check-agent-scope` passing without `--admin`.

@@ -3,9 +3,14 @@
 #
 # Signals checked:
 #   1. Missing images    — image: front-matter path not found in assets/images/
-#   2. Stale skill files — .github/skills/*/SKILL.md not modified in 90+ days
-#   3. Test coverage gap — fewer spec files in tests/playwright-agents/ than layouts in _layouts/
-#   4. Stale post links  — _posts/ with date: older than 365 days containing dead external URLs
+#   2. Test coverage gap — fewer spec files in tests/playwright-agents/ than layouts in _layouts/
+#   3. Stale post links  — _posts/ with date: older than 365 days containing dead external URLs
+#
+# NOT checked here: stale skill files (.github/skills/*/SKILL.md >90 days). That
+# signal lives in scripts/doc-audit.sh, which files a single rollup issue listing
+# every stale file. This script used to file one issue *per* file as well, which
+# meant the same fact arrived as 25 issues instead of one. Removed 2026-08-10 —
+# keep it that way; if the threshold needs tuning, tune doc-audit.sh.
 #
 # Issues are labelled "triage" and "P3:low". Deduplication prevents filing the
 # same issue twice while an open issue with that title already exists.
@@ -107,52 +112,11 @@ _Filed automatically by the [idea-triage workflow](../../actions/workflows/idea-
 done < <(find _posts -name "*.md" 2>/dev/null | sort)
 
 # ---------------------------------------------------------------------------
-# Signal 2: Stale skill files (not modified in 90+ days)
+# Signal 2: Test coverage gap
 # ---------------------------------------------------------------------------
 
 echo ""
-echo "=== Signal 2: Stale skill files ==="
-
-# NOTE: GNU date (-d) is used throughout; this script is designed to run on
-# Ubuntu-based GitHub Actions runners. macOS/BSD runners would need `date -v`.
-NINETY_DAYS_AGO=$(date -d "90 days ago" +%s)
-
-for skill_file in .github/skills/*/SKILL.md; do
-  [[ -f "$skill_file" ]] || continue
-
-  last_modified_str=$(git log -1 --format="%ci" -- "$skill_file" 2>/dev/null || true)
-  [[ -z "$last_modified_str" ]] && continue
-
-  last_modified_ts=$(date -d "$last_modified_str" +%s 2>/dev/null || true)
-  [[ -z "$last_modified_ts" ]] && continue
-
-  if [[ "$last_modified_ts" -lt "$NINETY_DAYS_AGO" ]]; then
-    skill_name=$(basename "$(dirname "$skill_file")")
-    days_old=$(( ($(date +%s) - last_modified_ts) / 86400 ))
-    last_modified_date="${last_modified_str%% *}"
-    title="triage: stale skill file — ${skill_name}"
-    body="## Stale Skill File
-
-The skill file \`${skill_file}\` has not been updated in **${days_old} days** (last modified: ${last_modified_date}).
-
-Skill files should be reviewed every 90 days to ensure they reflect current agent conventions, tooling changes, and process improvements.
-
-**Action required:** Review and update \`${skill_file}\` with any relevant changes since ${last_modified_date}.
-
-_Filed automatically by the [idea-triage workflow](../../actions/workflows/idea-triage.yml)._"
-    file_issue "$title" "$body"
-  else
-    skill_name=$(basename "$(dirname "$skill_file")")
-    echo "  [ok] ${skill_name} — updated recently ($(date -d "$last_modified_str" +%Y-%m-%d))"
-  fi
-done
-
-# ---------------------------------------------------------------------------
-# Signal 3: Test coverage gap
-# ---------------------------------------------------------------------------
-
-echo ""
-echo "=== Signal 3: Test coverage gap ==="
+echo "=== Signal 2: Test coverage gap ==="
 
 spec_count=$(find tests/playwright-agents -maxdepth 1 -name "*.spec.ts" 2>/dev/null | wc -l)
 layout_count=$(find _layouts -name "*.html" 2>/dev/null | wc -l)
@@ -184,11 +148,11 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# Signal 4: Stale posts with dead external URLs
+# Signal 3: Stale posts with dead external URLs
 # ---------------------------------------------------------------------------
 
 echo ""
-echo "=== Signal 4: Stale posts with dead external URLs ==="
+echo "=== Signal 3: Stale posts with dead external URLs ==="
 
 CUTOFF_DATE=$(date -d "365 days ago" +%Y-%m-%d)
 echo "  Cutoff date: ${CUTOFF_DATE}"

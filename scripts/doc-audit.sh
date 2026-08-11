@@ -518,6 +518,14 @@ fi
 
 # ---------------------------------------------------------------------------
 # Check 4: Workflow files referenced in docs exist
+#
+# `tasks/` and CHANGELOG.md are excluded. Both are historical records: a
+# lifecycle spec/plan/todo that retires a workflow necessarily names the file it
+# deleted, and an archived spec keeps naming it forever. Auditing them turns an
+# accurate record of a deletion into a recurring "broken reference" finding —
+# the same failure mode as the per-file stale-skill issues this PR removed from
+# idea-triage.sh. This check is for typo'd or renamed workflow references in
+# *live* documentation.
 # ---------------------------------------------------------------------------
 
 echo ""
@@ -542,6 +550,8 @@ done < <(find . \
   -not -path './_site/*' \
   -not -path './worktrees/*' \
   -not -path './.worktrees/*' \
+  -not -path './tasks/*' \
+  -not -name 'CHANGELOG.md' \
   -name '*.md' \
   | sort)
 

@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <desc>An Economist-style graphic editorial illustration of a robot archivist cataloguing crumbling web pages while glowing green test assertions pass in the foreground, unaware that the web references behind every assertion have dissolved.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="redAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E3120B"/>
+      <stop offset="100%" stop-color="#FF3B30"/>
+    </linearGradient>
+    <linearGradient id="greenPass" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1600" height="900" fill="url(#bg)"/>
+
+  <!-- Economist Red Header Accent Strip -->
+  <rect x="0" y="0" width="1600" height="12" fill="#E3120B"/>
+
+  <!-- Background Graphic Grid / Disappearing Web Layers -->
+  <g opacity="0.15" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="8 8">
+    <line x1="100" y1="100" x2="1500" y2="100"/>
+    <line x1="100" y1="250" x2="1500" y2="250"/>
+    <line x1="100" y1="400" x2="1500" y2="400"/>
+    <line x1="100" y1="550" x2="1500" y2="550"/>
+    <line x1="100" y1="700" x2="1500" y2="700"/>
+    <line x1="300" y1="50" x2="300" y2="850"/>
+    <line x1="600" y1="50" x2="600" y2="850"/>
+    <line x1="900" y1="50" x2="900" y2="850"/>
+    <line x1="1200" y1="50" x2="1200" y2="850"/>
+  </g>
+
+  <!-- Left Side: Crumbling Web Documents / Dissolving Pages -->
+  <g transform="translate(180, 160)">
+    <!-- Crumbling Document 1 (Dissolving Page) -->
+    <rect x="0" y="0" width="280" height="380" rx="8" fill="#1E293B" stroke="#475569" stroke-width="2"/>
+    <rect x="30" y="40" width="140" height="16" rx="4" fill="#E3120B" opacity="0.8"/>
+    <rect x="30" y="80" width="220" height="8" rx="3" fill="#64748B"/>
+    <rect x="30" y="100" width="180" height="8" rx="3" fill="#64748B"/>
+    <rect x="30" y="120" width="200" height="8" rx="3" fill="#64748B"/>
+    <!-- Broken Link Element -->
+    <rect x="30" y="160" width="220" height="40" rx="6" fill="#0F172A" stroke="#EF4444" stroke-width="1.5"/>
+    <text x="50" y="185" fill="#EF4444" font-family="sans-serif" font-size="14" font-weight="bold">404 NOT FOUND</text>
+    <!-- Dissolving Particles / Fragmented Geometry -->
+    <polygon points="240,300 280,310 260,350" fill="#475569" opacity="0.6"/>
+    <polygon points="210,330 250,360 220,380" fill="#334155" opacity="0.4"/>
+    <polygon points="260,240 290,260 275,290" fill="#E3120B" opacity="0.5"/>
+  </g>
+
+  <g transform="translate(520, 120)">
+    <!-- Crumbling Document 2 -->
+    <rect x="0" y="0" width="300" height="420" rx="8" fill="#1E293B" stroke="#475569" stroke-width="2"/>
+    <rect x="30" y="40" width="160" height="18" rx="4" fill="#38BDF8" opacity="0.8"/>
+    <rect x="30" y="80" width="240" height="8" rx="3" fill="#64748B"/>
+    <rect x="30" y="100" width="210" height="8" rx="3" fill="#64748B"/>
+    <rect x="30" y="120" width="190" height="8" rx="3" fill="#64748B"/>
+    <!-- Stale API Reference -->
+    <rect x="30" y="160" width="240" height="50" rx="6" fill="#0F172A" stroke="#F59E0B" stroke-width="1.5"/>
+    <text x="50" y="190" fill="#F59E0B" font-family="sans-serif" font-size="14" font-weight="bold">DEPRECATED API (2013)</text>
+    <!-- Crumbling edge effect -->
+    <path d="M 280,320 L 320,350 L 290,400 Z" fill="#64748B" opacity="0.5"/>
+    <circle cx="295" cy="280" r="8" fill="#F59E0B" opacity="0.7"/>
+    <circle cx="315" cy="310" r="5" fill="#38BDF8" opacity="0.6"/>
+  </g>
+
+  <!-- Center Robot Archivist Silhouette -->
+  <g transform="translate(860, 200)">
+    <!-- Robot Head -->
+    <rect x="80" y="40" width="120" height="100" rx="16" fill="#334155" stroke="#94A3B8" stroke-width="3"/>
+    <!-- Antenna -->
+    <line x1="140" y1="40" x2="140" y2="10" stroke="#94A3B8" stroke-width="4"/>
+    <circle cx="140" cy="8" r="8" fill="#E3120B"/>
+    <!-- Visor / Eyes -->
+    <rect x="100" y="70" width="80" height="28" rx="6" fill="#0F172A"/>
+    <circle cx="120" cy="84" r="7" fill="#F59E0B"/>
+    <circle cx="160" cy="84" r="7" fill="#F59E0B"/>
+    <!-- Body -->
+    <path d="M 50,150 L 230,150 L 250,380 L 30,380 Z" fill="#1E293B" stroke="#94A3B8" stroke-width="3"/>
+    <!-- Chest Panel -->
+    <rect x="80" y="180" width="120" height="140" rx="8" fill="#0F172A" stroke="#475569" stroke-width="2"/>
+    <circle cx="110" cy="210" r="10" fill="#E3120B"/>
+    <circle cx="140" cy="210" r="10" fill="#F59E0B"/>
+    <circle cx="170" cy="210" r="10" fill="#10B981"/>
+    <!-- Graph on Robot Screen -->
+    <path d="M 95,280 L 115,260 L 135,270 L 165,230" fill="none" stroke="#E3120B" stroke-width="3"/>
+    <!-- Robot Arms holding dissolving ledger -->
+    <path d="M 40,180 L -20,240 L 40,280" fill="none" stroke="#94A3B8" stroke-width="6" stroke-linecap="round"/>
+    <path d="M 240,180 L 300,240 L 240,280" fill="none" stroke="#94A3B8" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <!-- Foreground Right: Glowing Green Test Assertion Suite (Passing oblivious tests) -->
+  <g transform="translate(1080, 480)">
+    <!-- Terminal Window Container -->
+    <rect x="0" y="0" width="440" height="340" rx="12" fill="#022C22" stroke="#10B981" stroke-width="2.5"/>
+    <!-- Terminal Header Bar -->
+    <rect x="0" y="0" width="440" height="40" rx="12" fill="#064E3B"/>
+    <circle cx="25" cy="20" r="6" fill="#EF4444"/>
+    <circle cx="45" cy="20" r="6" fill="#F59E0B"/>
+    <circle cx="65" cy="20" r="6" fill="#10B981"/>
+    <text x="90" y="25" fill="#A7F3D0" font-family="monospace" font-size="13" font-weight="bold">test_suite.py — 100% PASSING</text>
+    
+    <!-- Test Result Rows -->
+    <g transform="translate(25, 70)">
+      <circle cx="12" cy="12" r="10" fill="url(#greenPass)"/>
+      <path d="M 7,12 L 11,16 L 17,8" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+      <text x="35" y="17" fill="#34D399" font-family="monospace" font-size="14">test_api_contract_v1() ... PASSED</text>
+    </g>
+    <g transform="translate(25, 120)">
+      <circle cx="12" cy="12" r="10" fill="url(#greenPass)"/>
+      <path d="M 7,12 L 11,16 L 17,8" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+      <text x="35" y="17" fill="#34D399" font-family="monospace" font-size="14">test_fetch_docs_reference() ... PASSED</text>
+    </g>
+    <g transform="translate(25, 170)">
+      <circle cx="12" cy="12" r="10" fill="url(#greenPass)"/>
+      <path d="M 7,12 L 11,16 L 17,8" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+      <text x="35" y="17" fill="#34D399" font-family="monospace" font-size="14">test_package_dependency() ... PASSED</text>
+    </g>
+    <g transform="translate(25, 220)">
+      <circle cx="12" cy="12" r="10" fill="url(#greenPass)"/>
+      <path d="M 7,12 L 11,16 L 17,8" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+      <text x="35" y="17" fill="#34D399" font-family="monospace" font-size="14">test_hallucinated_assert() ... PASSED</text>
+    </g>
+
+    <!-- Bottom summary badge -->
+    <rect x="25" y="270" width="390" height="40" rx="6" fill="#065F46"/>
+    <text x="45" y="295" fill="#6EE7B7" font-family="monospace" font-size="14" font-weight="bold">OK (4 tests passed, 0 failures, 0 errors)</text>
+  </g>
+
+  <!-- Editorial Title Banner Overlay (Bottom Left) -->
+  <g transform="translate(100, 720)">
+    <rect x="0" y="0" width="600" height="100" rx="8" fill="#0F172A" opacity="0.9" stroke="#E3120B" stroke-width="2"/>
+    <rect x="0" y="0" width="10" height="100" fill="#E3120B"/>
+    <text x="30" y="42" fill="#F8FAFC" font-family="serif" font-size="24" font-weight="bold">Dead Links, Live Bugs</text>
+    <text x="30" y="74" fill="#94A3B8" font-family="sans-serif" font-size="16">The Hallucination Debt in AI-Generated Tests</text>
+  </g>
+</svg>
