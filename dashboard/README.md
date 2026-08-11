@@ -1,39 +1,41 @@
-# Playwright Healing Dashboard
+# Observability dashboards
 
-This directory contains the healing monitoring dashboard for Playwright test automation.
+Internal observability surfaces for the blog. Both pages carry
+`sitemap: false` and `noindex, nofollow` — they are reachable by direct link but
+excluded from the sitemap and search engines (GH-1053).
 
 ## Files
 
-- `index.html` - Static HTML dashboard with Chart.js visualizations
-- `dashboard-data.json` - Generated JSON data file (updated by GitHub Actions)
-
-## Features
-
-- Real-time healing success rate monitoring
-- Historical trend analysis with interactive charts
-- Test results visualization
-- Page auto-refresh every 5 minutes (data updates every 4 hours via GitHub Actions)
-- Responsive design matching Economist theme
+| File | Purpose | Data source |
+|------|---------|-------------|
+| `index.html` | Landing page — links to the agent dashboard | none (static) |
+| `agents.html` | Agent activity, evaluations, rework rates | `agents-data.json` |
+| `agents-data.json` | Generated agent metrics | `agent-dashboard.yml` |
 
 ## Access
 
-**Live Dashboard**: [https://oviney.github.io/blog/dashboard/](https://oviney.github.io/blog/dashboard/)
+- **Landing**: <https://www.viney.ca/dashboard/>
+- **Agent dashboard**: <https://www.viney.ca/dashboard/agents.html>
 
-**Local Development**:
-```bash
-npm run dashboard:dev  # Serves on localhost:8081
-```
+## Data updates
 
-## Data Updates
+`agent-dashboard.yml` regenerates `agents-data.json` via
+`scripts/agent-dashboard-data.js` and opens a PR on the
+`automation/agent-dashboard-data` branch. The data is reviewed and merged like
+any other change — it is not committed straight to `main`.
 
-The dashboard data is automatically updated every 4 hours by the GitHub Actions healing monitor workflow. The workflow:
+## Contract
 
-1. Runs Playwright tests and healing analysis
-2. Generates current metrics and historical trends
-3. Updates `dashboard-data.json` with latest data
-4. Commits changes back to the repository
-5. Dashboard automatically reflects new data on next load
+`tests/playwright-agents/sitemap-exclusions.spec.ts` asserts that both pages
+stay **reachable (200)** and **non-indexable**, and that neither appears in
+`sitemap.xml`. `tests/playwright-agents/viewport-overflow.spec.ts` covers
+`agents.html` at 320px. Deleting either page outright will turn those specs red
+— replace it with a reachable stub instead.
 
-## Navigation
+## Retired
 
-The dashboard is accessible from the main blog navigation menu via the "📊 Dashboard" link.
+The **Playwright healing dashboard** (`index.html` + `dashboard-data.json`) was
+removed in August 2026 along with `healing-monitor.yml`. The workflow had not
+successfully written data since 2026-04-04, and the metric it published derived
+`passingTests` from a hardcoded `totalTests: 135` rather than a measurement.
+See issue #1251.
