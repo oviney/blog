@@ -32,41 +32,47 @@ duplicate the queue.
 
 ---
 
-## Where to pick up (last updated 2026-08-10)
+## Where to pick up (last updated 2026-08-11)
 
-Resumed after the machine switch. `main` fast-forwarded 130 commits; the
-2026-08-09 handoff below it was accurate — nothing had been left in flight.
+`main` is green and deployed. Nothing in flight — working tree clean, no unpushed
+commits. Two old stashes remain, both **verified obsolete** (see
+`tasks/archive/2026-08-10-retire-healing-monitor/todo.md`); dropping them is a
+one-liner and the owner's call.
 
-- **`main` is green.** The 2026-08-10 scheduled nightly is **7/7 green**,
-  `🔒 Security Audit` included — [#1247](https://github.com/oviney/blog/pull/1247)
-  cleared the js-yaml advisory. [#1240](https://github.com/oviney/blog/issues/1240)
-  was closed as resolved; don't re-diagnose it.
-- **The 2026-08-06 Actions outage still stands as explained** (began 15:22 UTC,
-  Actions + Pages; runs cancelled at ~15 min while queued with no runner). Not a
-  repo regression, self-healed. Don't file defects for that window.
-- **Healing Monitor retired** — [#1251](https://github.com/oviney/blog/issues/1251).
-  It had **0 successful runs in 40 attempts** since 2026-08-04 while burning ~18
-  jobs/day, and `dashboard/dashboard-data.json` had not been written since
-  **2026-04-04** — so `viney.ca/dashboard/` was publishing a four-month-stale,
-  partly-hardcoded metric. Two follow-ups are open: **[#1252](https://github.com/oviney/blog/issues/1252)**
-  (remove the orphaned scripts — *read `healing-monitor.js` before deleting it*)
-  and **[#1253](https://github.com/oviney/blog/issues/1253)**.
-- **Dependabot needs `--admin`, structurally.** `scripts/check-pr-scope.sh` has no
-  bot exemption and `Gemfile*` are unbypassable protected files, so every bundler
-  bump fails `check-agent-scope` and can never go green.
-  [#1253](https://github.com/oviney/blog/issues/1253) tracks the fix. #1243/#1244/#1245
-  merged this way; **[#1242](https://github.com/oviney/blog/pull/1242)
-  (jekyll-remote-theme 0.4.3→0.5.2) is still open and needs an owner call** — it is a
-  minor bump to the theme resolver.
-- **Issue noise was two generators, not one.** `scripts/idea-triage.sh:133` filed
-  one issue *per* stale skill file (the 24 + #1250) while `scripts/doc-audit.sh:567`
-  filed a single rollup (#1206) — the same fact, twice. The per-file generator is
-  gone; **#1206 stays open** because #1175 showed staleness sometimes signals real
-  drift.
+- **Healing Monitor is retired** ([#1251](https://github.com/oviney/blog/issues/1251),
+  #1254) and the retirement is **holding** — zero runs across four missed scheduled
+  slots. `viney.ca/dashboard/` is now a `noindex` landing page pointing at
+  `agents.html`; the four-month-stale healing metric and its `dashboard-data.json`
+  are gone. Leftover: **[#1252](https://github.com/oviney/blog/issues/1252)** removes
+  the orphaned scripts — **read `healing-monitor.js` before deleting it.**
+- **Dependabot no longer needs `--admin`** ([#1253](https://github.com/oviney/blog/issues/1253),
+  #1257). Proven on #1242: `check-agent-scope` now passes with
+  `dependabot[bot] dependency bump — bypassing protection for 'Gemfile.lock'`.
+  The exemption needs **both** an exact author match and a diff confined to
+  `Gemfile`/`Gemfile.lock`, and is only sound because the guard runs under
+  `pull_request` — **re-review it if that trigger ever becomes `pull_request_target`.**
+- **Issue noise is fixed at the source** (#1255). Two scripts were filing the same
+  stale-skill fact; the per-file generator is gone and 25 duplicates are closed.
+  **#1206 stays open** — it is the surviving rollup, and #1175 showed staleness can
+  signal real drift.
+- **New: [#1258](https://github.com/oviney/blog/issues/1258) — the visual gate has a
+  third-party dependency.** `🖼️ Visual Regression` is required and blocking, but
+  post pages load `giscus.app/client.js` and `page.goto` waits for `load`, so a slow
+  third party turns the gate red. Seen once on #1257 (6 failed / 24 passed, all six
+  being the two post pages × 3 viewports); a plain re-run passed. **Worth clearing
+  before further visual work** — a required check that flakes teaches people to
+  re-run instead of read.
+- **Owner decision outstanding: [#1242](https://github.com/oviney/blog/pull/1242)**
+  (jekyll-remote-theme 0.4.3→0.5.2). Builds clean locally with 0.5.2 and now passes
+  the gate. But `remote_theme:` is **commented out** at `_config.yml:37`, so the
+  plugin loads and does nothing — whether it should be a dependency at all is the
+  better question. Both `Gemfile` and `_config.yml` are protected, so that is
+  owner-only.
 - **Top real P3s:** `tasks/` is publishing internal planning docs to production
-  (`viney.ca/tasks/…` returns 200) — needs an owner decision, `_config.yml` is
-  protected so no agent may fix it. Then `.featured-post` dead CSS and the
-  `.home-intro-links` margin collision.
+  (`viney.ca/tasks/…` returns 200) — owner decision, `_config.yml` is protected.
+  Then `.featured-post` dead CSS and the `.home-intro-links` margin collision.
+- **Two `_review/` drafts await a publish decision** — `review-queue-throughput-tax`
+  and `hallucination-debt-ai-test-generation` (landed on `main` 2026-08-11).
 
 ---
 
