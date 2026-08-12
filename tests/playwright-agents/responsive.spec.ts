@@ -248,20 +248,36 @@ test.describe('@visual Gap E — Listing width matches design token @REQ-VISUAL-
   const WIDTH_TOKEN = 1040;
   const WIDTH_TOLERANCE = 50; // accept [990, 1090]
 
+  // Wrapper and card selectors are per-page rather than one shared family list.
+  // That is the whole lesson of #1260: the homepage redesign named its wrapper
+  // `.home-2026`, which is in neither the `.topic-page` nor `.econ-topic-page`
+  // family, so it matched neither the theme's `:has()` width unlock NOR this
+  // guard. The page was born pinched at 852px — the exact defect #1 value this
+  // block exists to catch — and born uncovered, because the fix and the guard
+  // were keyed on the same strings. A new page type must now name its selectors
+  // here explicitly, and a missing entry is visible in this list rather than
+  // silently absent from a shared union selector.
   const listingPages = [
-    { path: '/security/', name: 'Security' },
-    { path: '/software-engineering/', name: 'Software Engineering' },
-    { path: '/test-automation/', name: 'Test Automation' },
-    { path: '/blog/', name: 'Blog index' },
+    { path: '/', name: 'Homepage', wrapper: '.home-2026', card: '.h26-topic' },
+    { path: '/security/', name: 'Security', wrapper: '.topic-page', card: '.topic-card' },
+    { path: '/software-engineering/', name: 'Software Engineering', wrapper: '.topic-page', card: '.topic-card' },
+    { path: '/test-automation/', name: 'Test Automation', wrapper: '.topic-page', card: '.topic-card' },
+    // /blog/ renders `.topic-card`, not `.econ-article-card`. The previous
+    // shared union selector (`.topic-card, .econ-article-card`) hid that:
+    // `.econ-article-card` is emitted by no template on the site and survives
+    // only as orphaned CSS at economist-theme.scss:1767, so the union always
+    // resolved via the `.topic-card` half. Naming selectors per page surfaces
+    // dead ones instead of silently falling back past them.
+    { path: '/blog/', name: 'Blog index', wrapper: '.econ-topic-page', card: '.topic-card' },
   ];
 
-  for (const { path, name } of listingPages) {
+  for (const { path, name, wrapper: wrapperSel, card: cardSel } of listingPages) {
     test(`${name} (${path}) wrapper width ≈ ${WIDTH_TOKEN}px at 1920px`, async ({ page }) => {
       await page.setViewportSize(viewports.desktop);
       await page.goto(path);
       await page.waitForLoadState('networkidle');
 
-      const wrapper = page.locator('.topic-page, .econ-topic-page').first();
+      const wrapper = page.locator(wrapperSel).first();
       await expect(wrapper).toBeVisible();
 
       const wrapperBox = await wrapper.boundingBox();
@@ -271,9 +287,10 @@ test.describe('@visual Gap E — Listing width matches design token @REQ-VISUAL-
       // lower bound, which is exactly how Gap E slipped through.
       expect(Math.abs(wrapperBox!.width - WIDTH_TOKEN)).toBeLessThanOrEqual(WIDTH_TOLERANCE);
 
-      // Listing cards (`.topic-card` on category pages, `.econ-article-card` on
-      // /blog/) must keep the >= ~280px per-column width the 3-up grid needs.
-      const firstCard = page.locator('.topic-card, .econ-article-card').first();
+      // Listing cards (`.topic-card` on category pages and /blog/, `.h26-topic`
+      // on the homepage) must keep the >= ~280px per-column width the 3-up grid
+      // needs. The pinched homepage rendered these at 257px.
+      const firstCard = page.locator(cardSel).first();
       await expect(firstCard).toBeVisible();
 
       const cardBox = await firstCard.boundingBox();
