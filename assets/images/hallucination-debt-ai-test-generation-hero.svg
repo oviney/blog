@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <title>Dead Links, Live Bugs: The Hallucination Debt in AI-Generated Tests</title>
   <desc>An Economist-style graphic editorial illustration of a robot archivist cataloguing crumbling web pages while glowing green test assertions pass in the foreground, unaware that the web references behind every assertion have dissolved.</desc>
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -15,14 +16,14 @@
     </linearGradient>
   </defs>
 
-  <!-- Background -->
-  <rect width="1600" height="900" fill="url(#bg)"/>
+  <!-- Background Layer -->
+  <rect x="0" y="0" width="1600" height="900" fill="url(#bg)"/>
 
   <!-- Economist Red Header Accent Strip -->
-  <rect x="0" y="0" width="1600" height="12" fill="#E3120B"/>
+  <rect x="0" y="0" width="1600" height="14" fill="#E3120B"/>
 
-  <!-- Background Graphic Grid / Disappearing Web Layers -->
-  <g opacity="0.15" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="8 8">
+  <!-- Geometric Architectural Grid / Grid Lines -->
+  <g opacity="0.12" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="8 8">
     <line x1="100" y1="100" x2="1500" y2="100"/>
     <line x1="100" y1="250" x2="1500" y2="250"/>
     <line x1="100" y1="400" x2="1500" y2="400"/>
@@ -42,9 +43,9 @@
     <rect x="30" y="80" width="220" height="8" rx="3" fill="#64748B"/>
     <rect x="30" y="100" width="180" height="8" rx="3" fill="#64748B"/>
     <rect x="30" y="120" width="200" height="8" rx="3" fill="#64748B"/>
-    <!-- Broken Link Element -->
     <rect x="30" y="160" width="220" height="40" rx="6" fill="#0F172A" stroke="#EF4444" stroke-width="1.5"/>
-    <text x="50" y="185" fill="#EF4444" font-family="sans-serif" font-size="14" font-weight="bold">404 NOT FOUND</text>
+    <circle cx="55" cy="180" r="10" fill="#EF4444"/>
+    <line x1="80" y1="180" x2="220" y2="180" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/>
     <!-- Dissolving Particles / Fragmented Geometry -->
     <polygon points="240,300 280,310 260,350" fill="#475569" opacity="0.6"/>
     <polygon points="210,330 250,360 220,380" fill="#334155" opacity="0.4"/>
@@ -58,9 +59,9 @@
     <rect x="30" y="80" width="240" height="8" rx="3" fill="#64748B"/>
     <rect x="30" y="100" width="210" height="8" rx="3" fill="#64748B"/>
     <rect x="30" y="120" width="190" height="8" rx="3" fill="#64748B"/>
-    <!-- Stale API Reference -->
     <rect x="30" y="160" width="240" height="50" rx="6" fill="#0F172A" stroke="#F59E0B" stroke-width="1.5"/>
-    <text x="50" y="190" fill="#F59E0B" font-family="sans-serif" font-size="14" font-weight="bold">DEPRECATED API (2013)</text>
+    <circle cx="60" cy="185" r="10" fill="#F59E0B"/>
+    <line x1="85" y1="185" x2="230" y2="185" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
     <!-- Crumbling edge effect -->
     <path d="M 280,320 L 320,350 L 290,400 Z" fill="#64748B" opacity="0.5"/>
     <circle cx="295" cy="280" r="8" fill="#F59E0B" opacity="0.7"/>
@@ -101,40 +102,41 @@
     <circle cx="25" cy="20" r="6" fill="#EF4444"/>
     <circle cx="45" cy="20" r="6" fill="#F59E0B"/>
     <circle cx="65" cy="20" r="6" fill="#10B981"/>
-    <text x="90" y="25" fill="#A7F3D0" font-family="monospace" font-size="13" font-weight="bold">test_suite.py — 100% PASSING</text>
+    <rect x="90" y="14" width="220" height="12" rx="4" fill="#A7F3D0" opacity="0.8"/>
     
     <!-- Test Result Rows -->
     <g transform="translate(25, 70)">
       <circle cx="12" cy="12" r="10" fill="url(#greenPass)"/>
       <path d="M 7,12 L 11,16 L 17,8" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
-      <text x="35" y="17" fill="#34D399" font-family="monospace" font-size="14">test_api_contract_v1() ... PASSED</text>
+      <rect x="35" y="6" width="280" height="12" rx="4" fill="#34D399"/>
     </g>
     <g transform="translate(25, 120)">
       <circle cx="12" cy="12" r="10" fill="url(#greenPass)"/>
       <path d="M 7,12 L 11,16 L 17,8" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
-      <text x="35" y="17" fill="#34D399" font-family="monospace" font-size="14">test_fetch_docs_reference() ... PASSED</text>
+      <rect x="35" y="6" width="310" height="12" rx="4" fill="#34D399"/>
     </g>
     <g transform="translate(25, 170)">
       <circle cx="12" cy="12" r="10" fill="url(#greenPass)"/>
       <path d="M 7,12 L 11,16 L 17,8" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
-      <text x="35" y="17" fill="#34D399" font-family="monospace" font-size="14">test_package_dependency() ... PASSED</text>
+      <rect x="35" y="6" width="260" height="12" rx="4" fill="#34D399"/>
     </g>
     <g transform="translate(25, 220)">
       <circle cx="12" cy="12" r="10" fill="url(#greenPass)"/>
       <path d="M 7,12 L 11,16 L 17,8" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
-      <text x="35" y="17" fill="#34D399" font-family="monospace" font-size="14">test_hallucinated_assert() ... PASSED</text>
+      <rect x="35" y="6" width="290" height="12" rx="4" fill="#34D399"/>
     </g>
 
     <!-- Bottom summary badge -->
     <rect x="25" y="270" width="390" height="40" rx="6" fill="#065F46"/>
-    <text x="45" y="295" fill="#6EE7B7" font-family="monospace" font-size="14" font-weight="bold">OK (4 tests passed, 0 failures, 0 errors)</text>
+    <circle cx="45" cy="290" r="8" fill="#6EE7B7"/>
+    <rect x="65" y="284" width="260" height="12" rx="4" fill="#6EE7B7"/>
   </g>
 
-  <!-- Editorial Title Banner Overlay (Bottom Left) -->
+  <!-- Editorial Decorative Focal Panel (Bottom Left) -->
   <g transform="translate(100, 720)">
     <rect x="0" y="0" width="600" height="100" rx="8" fill="#0F172A" opacity="0.9" stroke="#E3120B" stroke-width="2"/>
     <rect x="0" y="0" width="10" height="100" fill="#E3120B"/>
-    <text x="30" y="42" fill="#F8FAFC" font-family="serif" font-size="24" font-weight="bold">Dead Links, Live Bugs</text>
-    <text x="30" y="74" fill="#94A3B8" font-family="sans-serif" font-size="16">The Hallucination Debt in AI-Generated Tests</text>
+    <rect x="30" y="24" width="320" height="20" rx="4" fill="#F8FAFC"/>
+    <rect x="30" y="58" width="460" height="14" rx="3" fill="#94A3B8"/>
   </g>
 </svg>
