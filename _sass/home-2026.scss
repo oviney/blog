@@ -11,6 +11,7 @@
 // needs a paper/band/rule ramp the theme does not define. They are declared
 // here, scoped to this file, rather than pushed into the theme's global
 // namespace for one page.
+@use 'sass:color';
 @use 'economist-theme' as theme;
 
 $h26-red: theme.$economist-red;
@@ -30,6 +31,11 @@ $h26-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
 $h26-bp: 48em; // two-column → single-column
 
+// Outer width of the page, matching the 1040px rhythm the blog index and
+// category pages use. Referenced by the newsletter re-cap below, which has to
+// line up with this wrapper's *content* box, not its border box.
+$h26-max: 1040px;
+
 // The theme caps `.main-content` at 900px and escapes that cap per page type
 // with `:has()` (.economist-article, .topic-page, .econ-topic-page, .homepage).
 // The redesign's wrapper is `.home-2026`, which matches none of them, so the
@@ -43,10 +49,31 @@ $h26-bp: 48em; // two-column → single-column
 .main-content:has(.home-2026) {
   max-width: 100%;
   padding: 0;
+
+  // `_layouts/default.html` renders the newsletter include as a *sibling* of
+  // `.home-2026`, inside `.main-content`. `.newsletter-signup` sets no width of
+  // its own, so un-capping the parent above un-caps the CTA too — it went
+  // full-bleed while the content stayed at 1040px. Visible symptom: the author
+  // band's new 3px red top rule (inset) and the CTA's own 3px red top rule
+  // (edge to edge) sat ~100px apart at different widths. Re-cap it here so the
+  // two rules line up. `/about/` already constrains its CTA this way; `/blog/`
+  // and post pages leave theirs full-bleed, but neither has a red rule directly
+  // above it to clash with.
+  //
+  // Capped to the wrapper's *content* box, not its border box: every visible
+  // block on this page (topic cards, author band) sits inside the wrapper's
+  // horizontal padding, so matching `$h26-max` alone would still leave the CTA
+  // one padding-step wider than everything above it — and its red rule 32px
+  // proud of the author band's on each side.
+  > .newsletter-signup {
+    max-width: calc(#{$h26-max} - #{theme.$spacing-lg} * 2);
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 .home-2026 {
-  max-width: 1040px;
+  max-width: $h26-max;
   margin: 0 auto;
   padding: theme.$spacing-xl theme.$spacing-lg;
   color: $h26-ink;
@@ -519,15 +546,31 @@ $h26-bp: 48em; // two-column → single-column
     font-size: 0.85rem;
     font-weight: 500;
     color: $h26-body;
+    // The scoped `a` reset above strips the theme's global red bottom border.
+    // Without a replacement this link is byte-identical to `.h26-author-bio`
+    // beside it — same colour, no border, no underline — so nothing marks it as
+    // a link (WCAG 1.4.1). `.is-primary` re-declares its own; this is the
+    // resting affordance for the plain variant.
+    //
+    // `currentColor`, not `$h26-rule` — that grey measures 1.24:1 against the
+    // band, which is an underline you cannot see (WCAG 1.4.11 wants 3:1 for a
+    // non-text affordance). Tracking the text colour puts it at 7.73:1 and
+    // keeps it correct through the hover state for free.
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
 
     &.is-primary {
       color: $h26-ink;
       border-bottom: 2px solid $h26-red;
-      padding-bottom: 2px;
     }
 
+    // `$h26-red` on the band ($h26-band) measures 4.20:1 and fails AA at this
+    // size — it clears 4.5:1 on white, which is why the same red is fine for
+    // `.h26-lead-cta` and `.h26-topic-link` elsewhere in this file, but not
+    // here. Darkened to #B20E09 (6.19:1). pa11y tests resting state only, so
+    // this would not have been caught by the gate.
     &:hover,
-    &:focus-visible { color: $h26-red; }
+    &:focus-visible { color: color.adjust($h26-red, $lightness: -10%); }
   }
 
   // ---- responsive -------------------------------------------------------

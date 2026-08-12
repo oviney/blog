@@ -125,8 +125,12 @@ description: Two decades of software and quality engineering distilled into prac
       <h2 class="h26-author-name">{{ site.author.name }}</h2>
       <p class="h26-author-bio">{{ site.author.bio }} &mdash; most of it spent arguing for the unglamorous work that keeps releases boring.</p>
       <div class="h26-author-links">
-        <!-- LinkedIn/GitHub/Twitter/RSS intentionally omitted: the site footer's
-             "Connect" column carries them a few hundred pixels below. -->
+        {% comment %}
+          LinkedIn/GitHub/Twitter/RSS intentionally omitted: the site footer's
+          "Connect" column carries them a few hundred pixels below. A Liquid
+          comment, not an HTML one, so the rationale stays in source instead of
+          shipping to every reader.
+        {% endcomment %}
         <a href="{{ '/about/' | relative_url }}" class="h26-author-link is-primary">About me</a>
         <a href="mailto:{{ site.email }}" class="h26-author-link">Contact</a>
       </div>
