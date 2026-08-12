@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
   <title>Dead Links, Live Bugs: The Hallucination Debt in AI-Generated Tests</title>
-  <desc>An Economist-style graphic editorial illustration of a robot archivist cataloguing crumbling web pages while glowing green test assertions pass in the foreground, unaware that the web references behind every assertion have dissolved.</desc>
+  <desc>A robot stands between crumbling document pages and a test panel where every check passes green.</desc>
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#0F172A"/>
