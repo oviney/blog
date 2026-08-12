@@ -65,8 +65,52 @@
       covering `not-found` (and the seed path that committed a bad baseline), `search`, and
       `category-security`
 
-> **COMPLETE 2026-08-11.** PR #1260 open, all gates green, left unmerged for review.
-> Two follow-ups filed: #1261, #1262.
+## Phase 5 — `/ship` fan-out (3 personas, parallel)
+
+- [x] `security-auditor` — **no findings above Low.** Net reduction in surface: the rendered
+      homepage now has zero `target="_blank"` occurrences, so no window-opener relationship
+      with any external origin. Baseline PNGs verified structurally clean (`IEND` at EOF)
+- [x] `test-engineer` — found that **the guard for defect 1 already existed**: `responsive.spec.ts`
+      "Gap E" asserts `|width − 1040| ≤ 50` and `card ≥ 280`, both of which fail against the
+      pre-fix 852px/257px homepage. It never ran on `/` because it was keyed on
+      `.topic-page, .econ-topic-page` — the same class-name keying that broke the CSS
+- [x] `code-reviewer` — **changes requested**, three Important findings, all verified by
+      measuring the rendered page and all fixed in `c5bbf96`
+
+### Findings fixed (Phase 5a)
+
+- [x] "Contact" link had no affordance — computed `rgb(74,74,74) / 0px none / none`,
+      byte-identical to the paragraph beside it (WCAG 1.4.1). Used `currentColor` (7.73:1)
+      rather than `$h26-rule`, which measures **1.24:1** on the band — an invisible underline
+- [x] Author-link hover failed AA — `$h26-red` on `$h26-band` is **4.20:1**. Darkened via the
+      theme's own `color.adjust(..., $lightness: -10%)` → `#B20E09`, 6.19:1. **pa11y tests the
+      resting state only**, so no gate in the stack could have caught this
+- [x] The `:has()` escape un-capped the newsletter CTA. **My earlier claim that this was
+      pre-existing site-wide behaviour was wrong** — I compared the homepage to `/blog/` after
+      the change instead of the homepage before vs after. `/about/` disproves it (`x=214 w=852`).
+      Re-capped to the wrapper's *content* box; band and CTA now both `x=152 w=976`
+- [x] Author-links rationale moved to a Liquid comment so it stops shipping to readers
+
+### Regression guard (Phase 5b)
+
+- [x] Extended Gap E to cover `/` with per-page selectors. **Proven, not assumed:** with the
+      `:has()` escape disabled the new case fails with `Received: 188` (1040 − 852); enabled, 5/5 pass
+- [x] The refactor surfaced a dead selector the union had hidden — `/blog/` renders
+      `.topic-card`, not `.econ-article-card`, which no template emits. Filed as #1263
+
+### Process errors I made, recorded so they are not repeated
+
+- [x] Used `git stash` to switch branches on an already-clean tree — it tried to pop a
+      **pre-existing unrelated stash**. No contamination (verified clean, both stashes intact),
+      but the pattern is unsafe. Use a worktree or plain checkout
+- [x] Used `git add -A` while subagents were writing to `.claude/agent-memory/`, sweeping 11
+      tracked files into the branch — then made it worse with `git rm --cached`, turning
+      modifications into deletions. Restored the path from `main`; persona memory content
+      preserved in the session scratchpad. **`git add -A` is the wrong verb after a fan-out**
+
+> **COMPLETE 2026-08-11.** PR #1260 open — 9 files, all gates green, unmerged for review.
+> Four follow-ups filed: #1261 (two H1s), #1262 (visual-suite instability + the seed path that
+> committed bad baselines on both dispatches), #1263 (orphaned `.econ-article-card` CSS).
 
 ## Out of scope
 
