@@ -1,0 +1,4 @@
+- [Dead-CSS Deletion Review](review_dead_css_deletion.md) — verify with a compiled-CSS diff + generated `_site` grep, never a source grep alone
+- [Legacy Class Retention](review_legacy_class_retention.md) — a kept legacy class stacked on a modern one collides at equal specificity; source order decides
+- [Verify Defect Exists](feedback_verify_defect_exists.md) — confirm a "fix" branch's defect is actually on origin/main before crediting the diff; a test-only guard for an already-fixed bug is not a fix
+- [Responsive Image Include](pattern_responsive_image_include.md) — flag bare `<img src>` in page templates; should use responsive-image.html include for WebP + CLS handling
