@@ -1,7 +1,0 @@
-- [Dead-CSS Deletion Review](review_dead_css_deletion.md) — verify with a compiled-CSS diff + generated `_site` grep, never a source grep alone
-- [Legacy Class Retention](review_legacy_class_retention.md) — a kept legacy class stacked on a modern one collides at equal specificity; source order decides
-- [Verify Defect Exists](feedback_verify_defect_exists.md) — confirm a "fix" branch's defect is actually on origin/main before crediting the diff; a test-only guard for an already-fixed bug is not a fix
-- [Responsive Image Include](pattern_responsive_image_include.md) — flag bare `<img src>` in page templates; should use responsive-image.html include for WebP + CLS handling
-- [Scoped Link Reset](review_scoped_link_reset.md) — a scoped `a { border-bottom: none }` can strip a link's only affordance; enumerate every anchor in the markup
-- [Hover/Focus Contrast Gap](review_hover_focus_contrast_gap.md) — pa11y-ci tests resting state only; brand red is 4.82:1 on white but 4.20:1 on `$h26-band`
-- [main-content :has() Escape](pattern_main_content_has_escape.md) — width escapes also un-cap the layout's newsletter sibling; measure it, not just the wrapper
