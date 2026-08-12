@@ -9,7 +9,7 @@ subtitle: "What a green test suite conceals, and why the obvious explanation for
 slug: "hallucination-debt-ai-test-generation"
 tags: [quality-engineering, software-engineering, test-automation, security]
 image: /assets/images/hallucination-debt-ai-test-generation-hero.svg
-image_alt: "An Economist-style graphic editorial illustration of a robot archivist cataloguing crumbling web pages while glowing green test assertions pass in the foreground, unaware that the web references behind every assertion have dissolved."
+image_alt: "A robot stands between crumbling document pages and a test panel where every check passes green."
 image_caption: "A robot archivist catalogues crumbling web pages while passing test assertions run oblivious to the dissolving reference base behind them."
 ---
 
@@ -41,7 +41,7 @@ Veracode's GenAI Security Report 2025, spanning more than 100 LLMs across 80 cod
 
 The debt is real and the mechanism is not the one the title implies. Teams will not discover the gap through a failing build, because a hallucinated dependency that has been squatted resolves cleanly, installs cleanly, and passes the suite written to cover it. They will discover it through a breach, or through a quarterly defect trend they cannot explain because nobody recorded which code was AI-authored. As the chart below shows, web content decay across Wikipedia, news, and general domains mirrors the package hallucination rates of open-source models, highlighting a quality gap that QA teams are beginning to measure. The four controls that follow are cheap. The third one, the authorship field on the pull request, is the only way anyone, including me, will find out whether this article was pointing at the right thing.
 
-![Chart](/assets/charts/hallucination-debt-ai-test-generation.png)
+![Horizontal bar chart comparing web decay with AI hallucination rates: Wikipedia pages with broken references 54%, QA teams reporting higher bug volume 52%, webpages from 2013 to 2023 now inaccessible 25%, news webpages with broken links 23%, open-source LLM package hallucinations 21.7%.](/assets/charts/hallucination-debt-ai-test-generation.png)
 
 ## What to Do on Monday
 
