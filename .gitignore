@@ -75,10 +75,6 @@ Thumbs.db
 # Synced locally as tooling; not part of the site or its build.
 .agents/
 
-# Healing monitoring (runtime data)
-healing-metrics/
-healing-reports/
-healing-success-report.md
 .bundle/
 
 # Ruby vendor directory

@@ -24,15 +24,8 @@
     "test:agents:heal": "npx playwright heal --interactive",
     "test:security": "node scripts/check-npm-audit.js",
     "pretest": "echo 'Ensure Jekyll is running on port 4000 before running tests'",
-    "monitor:healing": "node scripts/healing-monitor.js",
-    "analyze:healing-trends": "node scripts/analyze-healing-trends.js",
-    "analyze:failures": "node scripts/analyze-failures.js",
-    "alert:healing-degradation": "node scripts/check-healing-degradation.js",
-    "alert:system": "node scripts/alert-system.js",
     "dashboard": "echo 'Dashboard available at: https://oviney.github.io/blog/dashboard/' && npx serve dashboard --port 8081",
-    "dashboard:dev": "npx serve dashboard --port 8081",
-    "monitoring:full": "npm run monitor:healing && npm run alert:system",
-    "deploy:dashboard": "echo 'Dashboard automatically available at: https://oviney.github.io/blog/dashboard/' && echo 'Data updates by pushing to main branch or running: gh workflow run healing-monitor.yml'"
+    "dashboard:dev": "npx serve dashboard --port 8081"
   },
   "repository": {
     "type": "git",
