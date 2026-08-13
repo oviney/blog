@@ -149,11 +149,23 @@ issue_exists() {
   [[ "${count:-0}" -gt 0 ]]
 }
 
+# Set DOC_AUDIT_DRY_RUN=1 to report findings without opening issues.
+#
+# Running this script locally to check your own work used to file against the
+# live repo, which is a trap: on 2026-08-12 two spurious issues were opened that
+# way within an hour (#1276 from deliberately breaking a skill reference to prove
+# Check 5 caught it, #1279 from a half-finished archive move), and both had to be
+# closed by hand. Verifying should be free.
 file_issue() {
   local title="$1"
   local body="$2"
   if issue_exists "$title"; then
     echo "  [skip] already open: $title"
+    return
+  fi
+  if [[ "${DOC_AUDIT_DRY_RUN:-0}" == "1" ]]; then
+    echo "  [dry-run] would file: $title"
+    FINDINGS=$(( FINDINGS + 1 ))
     return
   fi
   gh issue create \
