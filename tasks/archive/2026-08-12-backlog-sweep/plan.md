@@ -1,6 +1,6 @@
 # PLAN — Stop the blocking visual gate depending on third-party hosts
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Issue:** [#1258](https://github.com/oviney/blog/issues/1258)
+**Spec:** [SPEC.md](SPEC.md) · **Issue:** [#1258](https://github.com/oviney/blog/issues/1258)
 **Branch:** `fix/visual-gate-third-party-1258` · **Date:** 2026-08-12
 
 ---
