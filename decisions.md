@@ -96,4 +96,30 @@ configuration, design conventions, or content standards.
 
 ---
 
+## ADR-010: Defer `.github/agents/*.agent.md` — `agent:*` Labels Stay Canonical
+
+**Date**: August 2026
+**Status**: Active
+**Context**: GitHub now supports native custom agents at `.github/agents/<name>.agent.md`, each with its own description, `tools`, `mcp-servers`, `model` and prompt body, selectable when assigning an issue to the Copilot cloud agent (#1110, from Research Sweep #1074). This overlaps the repo's `agent:*` label routing. Labels are not deprecated; a native mechanism simply now exists alongside them.
+
+The deciding fact is how far label routing has already been wired in. `agent:*` is not a convention held in one document — it is load-bearing in **21 files** across five distinct layers: enforcement (`scripts/check-pr-scope.sh`, `tests/scope-guard.sh`), CI (`agent-eval.yml`, `research-sweep.yml`, `test-quality.yml`), documentation (`AGENTS.md`, `CLAUDE.md`, `docs/agents/ROSTER.md`, `docs/BACKLOG.md`, `docs/agents/sprint-orchestrator.md`), the five skills that name personas, and the published dashboard (`dashboard/agents.html`, `scripts/agent-dashboard-data.js`).
+
+Two of those are **protected files** — `.github/CODEOWNERS` and `.github/copilot-instructions.md`, the latter being the canonical routing document for issue-assigned cloud agents. Neither can be changed without a separate governance-labelled PR and human approval, so no adoption of native agents can make itself canonical in one step. The intervening state is exactly what #1110 warns against: two routing systems, both partially authoritative, drifting.
+
+Against that, the concrete benefit today is small. The personas already have prompt bodies — the skill files — and the repo has no per-persona `tools`, `mcp-servers` or `model` requirement that labels cannot express. Adoption would buy per-agent model selection the repo does not currently need, at the cost of a migration touching protected files.
+
+`.github/agents/` already exists and holds `healer-config.yml` and `healer-workflow.sh`, neither of which is an `.agent.md` and neither of which is wired to any workflow. So the directory's presence is not evidence of partial adoption.
+
+**Decision**: **Defer.** `agent:*` labels, as documented in `.github/copilot-instructions.md` and `AGENTS.md`, remain the single canonical routing mechanism. Do not add `.github/agents/*.agent.md` files. This is a deliberate decision recorded against #1110's acceptance criteria, not an absence of one.
+
+Revisit when **any** of these becomes true:
+
+1. A persona needs a capability labels cannot express — a distinct model, a restricted tool set, or its own MCP servers.
+2. GitHub deprecates or degrades label-based assignment for the Copilot cloud agent.
+3. The routing surface shrinks enough that a migration no longer has to cross a protected file — in practice, that means `.github/copilot-instructions.md` being revised for another reason anyway, so the change can ride along rather than forcing a protected-file edit of its own.
+
+**Consequences**: Agents continue routing by label; `.github/copilot-instructions.md` stays the source of truth. Any PR introducing an `.agent.md` file must supersede this ADR first, and must migrate all five layers in one deliberate sequence rather than adding a second parallel system. Because that sequence necessarily touches protected files, it needs human approval before implementation, not after.
+
+---
+
 *Add new decisions below this line, following the ADR-NNN format.*
