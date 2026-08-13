@@ -1,6 +1,6 @@
 # Plan — Retire the Healing Monitor and unpublish its stale dashboard
 
-**Spec:** [../SPEC.md](../SPEC.md)
+**Spec:** [spec.md](spec.md)
 **Issues:** closes [#1238](https://github.com/oviney/blog/issues/1238), [#1240](https://github.com/oviney/blog/issues/1240); retunes the #1206 issue family
 **Date:** 2026-08-10 · **Label:** `agent:qa-gatekeeper`
 

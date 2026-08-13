@@ -1,6 +1,6 @@
 # Plan — Dependabot exemption for the scope guard
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Issue:** [#1253](https://github.com/oviney/blog/issues/1253)
+**Spec:** [spec.md](spec.md) · **Issue:** [#1253](https://github.com/oviney/blog/issues/1253)
 **Branch:** `chore/1253-dependabot-scope-exemption` · **Date:** 2026-08-11
 
 ## Shape

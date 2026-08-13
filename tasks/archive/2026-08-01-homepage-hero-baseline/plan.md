@@ -1,6 +1,6 @@
 # Plan — Decouple the homepage visual baseline from post publication
 
-**Spec:** [../SPEC.md](../SPEC.md)
+**Spec:** [spec.md](spec.md)
 **Backlog row:** `docs/BACKLOG.md`, top P2 (Active)
 **Issue:** none — local backlog item ([[local-backlog]] convention: in-session work
 pulls from `docs/BACKLOG.md`; GitHub Issues stay for Copilot cloud agents)

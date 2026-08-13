@@ -44,7 +44,7 @@ would no longer be caught by pixels. Theme-wide regressions still surface —
 `about` and both post scenarios remain full-page captures.
 
 Rationale and the two rejected mitigations are in
-[`tasks/plan.md`](tasks/plan.md) §Decisions (D1). Two further observations
+[`plan.md`](plan.md) §Decisions (D1). Two further observations
 raised alongside this spec (skippable required shards, `action_required` on the
 seed commit) are resolved there too, as D2 and D3. **No decision is outstanding
 — this spec is ready to build.**
@@ -135,7 +135,7 @@ Both prior P2 rows cleared. Three PRs merged, `main` at `4864a8c`, queue empty.
 filed against is retired.
 
 **Two observations raised alongside this spec, both since resolved as no-action**
-— see [`tasks/plan.md`](tasks/plan.md) §Decisions D2 and D3:
+— see [`plan.md`](plan.md) §Decisions D2 and D3:
 
 1. Change-based selection can skip all three *required* Playwright shards, and
    GitHub counts a skipped required check as satisfied. No action: that is the
@@ -148,5 +148,5 @@ filed against is retired.
 **One item found while planning** — `AGENTS.md:159` still tells agents never to
 write a bare `#<number>` because "an orchestration bot misreads it as an issue
 ref". #1183 retired that bot behaviour, so the line now teaches a workaround
-that no longer applies. Corrected as Phase 0 of [`tasks/todo.md`](tasks/todo.md);
+that no longer applies. Corrected as Phase 0 of [`todo.md`](todo.md);
 needs the `protected-file-update` label.

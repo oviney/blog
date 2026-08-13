@@ -78,6 +78,51 @@ If `npm audit` is clean **and** an override touches the same transitive dep as t
 
 ---
 
+## Archiving a lifecycle cycle breaks its own cross-links
+
+**Symptom.** `doc-audit` files a "broken internal Markdown links" issue a few
+days after a cycle ships, listing `../SPEC.md` in `tasks/archive/<slug>/plan.md`
+and `todo.md`. It gets closed or ignored, and the next cycle adds two more.
+By #1205 there were 14 across 6 archived cycles.
+
+**Trap.** The links are *correct while the cycle is live*. `tasks/plan.md`
+sits one level below the repo root, so `../SPEC.md` resolves to the root
+`SPEC.md`. Archiving moves the file to `tasks/archive/<slug>/plan.md`, which is
+two levels down — the same `../SPEC.md` now points at `tasks/archive/SPEC.md`,
+which never exists. Nothing fails at archive time, and the author has moved on
+by the time the audit runs. The mirror case is a spec that links *down* to
+`tasks/plan.md` from the repo root; after archiving, its siblings are alongside
+it, not under a `tasks/` subdirectory.
+
+**Detection.** `bash scripts/doc-audit.sh` — Check 1 resolves every internal
+link and prints the computed target, which is what makes the two-levels-down
+arithmetic obvious.
+
+**Recovery.** When archiving, rewrite the links in the same commit as the move.
+Rewrite these link *targets* — and the matching link text, since a label reading
+`../SPEC.md` that resolves to a sibling is more confusing than the broken link
+was:
+
+```text
+../SPEC.md      ->  SPEC.md      (or spec.md — match the file in the directory)
+tasks/plan.md   ->  plan.md
+tasks/todo.md   ->  todo.md
+```
+
+If no spec was archived with the cycle, unlink it rather than inventing a
+target — `SPEC.md — not archived with this cycle`.
+
+Write those as bare paths, never as real Markdown links. Check 1 resolves every
+link it finds, including ones inside a document explaining the bug and including
+fenced blocks — this lesson failed its own check twice before the examples were
+reduced to plain paths.
+
+Note the filename is not consistent across cycles — older ones archived `SPEC.md`,
+newer ones `spec.md` — so match the file actually present in the directory
+rather than assuming.
+
+---
+
 ## Adding new lessons
 
 Lessons here should be:
