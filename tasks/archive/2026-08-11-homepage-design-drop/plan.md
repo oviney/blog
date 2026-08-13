@@ -1,6 +1,6 @@
 # Plan — Apply the undelivered homepage design drop
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Issue:** none — local backlog item
+**Spec:** [SPEC.md](SPEC.md) · **Issue:** none — local backlog item
 **Branch:** `fix/homepage-design-drop` · **Date:** 2026-08-11
 
 ## Shape

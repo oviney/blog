@@ -1,6 +1,6 @@
 # TODO — Decouple the homepage visual baseline from post publication
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md)
+**Spec:** [spec.md](spec.md) · **Plan:** [plan.md](plan.md)
 **Branch:** `qa/decouple-homepage-hero-baseline` — merged as
 [#1191](https://github.com/oviney/blog/pull/1191), branch deleted
 

@@ -1,6 +1,6 @@
 # TODO — Apply the undelivered homepage design drop
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Plan:** [plan.md](plan.md) · **Issue:** none
+**Spec:** [SPEC.md](SPEC.md) · **Plan:** [plan.md](plan.md) · **Issue:** none
 **Date:** 2026-08-11
 
 ## Phase 0 — Groundwork
