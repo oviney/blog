@@ -1,112 +1,69 @@
-# Plan — Apply the undelivered homepage design drop
+# PLAN — Stop the blocking visual gate depending on third-party hosts
 
-**Spec:** [../SPEC.md](../SPEC.md) · **Issue:** none — local backlog item
-**Branch:** `fix/homepage-design-drop` · **Date:** 2026-08-11
+**Spec:** [../SPEC.md](../SPEC.md) · **Issue:** [#1258](https://github.com/oviney/blog/issues/1258)
+**Branch:** `fix/visual-gate-third-party-1258` · **Date:** 2026-08-12
 
-## Shape
+---
 
-One PR, two product files. The work is a **port, not a copy** (SPEC §3 D1): the
-design bundle predates three fixes the repo already carries, so each of the four
-changes is transferred by hand and the bundle's own regressions are left behind.
+## Approach
 
-Verification is evidence-led rather than test-first. There is no failing test to
-write — the defects are presentational, and `homepage.spec.ts` deliberately
-asserts structure, not width or colour. The proof is a before/after render plus
-the existing a11y and structural gates staying green. Where a check *could* be
-written cheaply and would have caught the defect, Phase 4 adds it.
+One spec file changes. The risk is not in the code — it is in the baseline
+re-seed, which #1262 shows can corrupt files the branch never touched. So the
+plan front-loads measurement and treats the seed as the step needing scrutiny.
 
-**Label:** none required. Five files, no protected file, nothing under
-`.github/skills/` or `.github/instructions/`. Well inside the 15-file cap, so no
-`bulk-content`; no `governance-update`; no `protected-file-update`.
+## Phase 0 — Establish ground truth (done during DEFINE)
 
-## File manifest (5 files + baseline, inside the 15-file cap)
+Reproduce the CI environment locally and prove the local render matches the
+committed baselines before changing anything. Local full-page heights at
+1920px came out at **6872** (`post-testing-times`) and **6810**
+(`post-self-healing-tests`), which are exactly the committed Desktop baseline
+dimensions. Without that match, nothing measured locally would transfer.
 
-| # | File | Change |
-|---|------|--------|
-| 1 | `index.md` | Drop the LinkedIn + GitHub anchors from `.h26-author-links`; leave the comment recording why |
-| 2 | `_sass/home-2026.scss` | `.main-content:has(.home-2026)` escape; wrapper box model; `border-bottom: none` on the scoped `a` reset; light `.h26-author` band |
-| 3–5 | `SPEC.md`, `tasks/plan.md`, `tasks/todo.md` | Lifecycle artifacts |
-| + | homepage visual baseline | Reseed only if it moves (SPEC §3 D3) |
+## Phase 1 — Isolate what each host costs
 
-## Dependency graph
+Block hosts one group at a time and compare full-page screenshots byte-for-byte
+against allow-all, across all 10 suite pages. This decides which blocks are free
+and which force a re-baseline. Recorded as D2/D3/D4 in the spec.
 
-```
-T1 (width escape) ──┐
-T2 (link reset)   ──┼──→ T5 (verify: build + a11y + specs) ──→ T6 (re-baseline) ──→ T7 (review) ──→ T8 (ship)
-T3 (author band)  ──┤
-T4 (author links) ──┘
-```
+## Phase 2 — Implement
 
-T1–T4 are independent — they touch disjoint rule blocks and can land in any
-order. They are sequenced below by blast radius, largest first, so that the
-biggest layout change is on screen before the smaller ones are judged against it.
+Add a `page.route` handler to `visual-snapshot.spec.ts` that aborts requests to
+giscus and analytics hosts, continues everything else. Allowlist by "is this
+localhost or a font host", not a denylist of tracker domains — a denylist rots
+the moment an analytics vendor changes.
 
-## Order
+The comment must record *why fonts are exempt*, with the measured reflow, or the
+next person will "finish the job" and re-baseline the whole suite.
 
-1. **T1 — width escape.** The `:has()` rule plus the wrapper's box model. This
-   is the one change that moves every other element on the page, so it goes
-   first: T2 and T3 are judged against the corrected canvas, not the pinched one.
-2. **T2 — link border reset.** One declaration. Independent of T1 but visually
-   easier to confirm once the cards are at full width.
-3. **T3 — author band.** Recolour and repad. Contrast direction inverts here,
-   so it carries a real a11y risk (SPEC §6.2).
-4. **T4 — author links.** Markup only. The single `index.md` hunk.
-5. **T5 — verify.** Build, structural specs, pa11y, and a fresh render at both
-   viewports compared against the pre-change captures.
-6. **T6 — re-baseline** if and only if T5 shows the visual snapshot moved, and
-   only the homepage entry.
-7. **T7 — review** the diff on the five axes before calling it done.
-8. **T8 — ship.** Push, open the PR, leave it unmerged.
+## Phase 3 — Verify before seeding
 
-## Checkpoints
+Run the spec locally. Expect: 24 non-post cases pass unchanged against existing
+baselines, 6 post cases fail on a 160px height mismatch. **That specific failure
+shape is the evidence the change did what it claims** — if a non-post case also
+fails, D3 is wrong and the analytics block is not pixel-neutral.
 
-- **Checkpoint A** (after T1): home page content spans the same width as
-  `/blog/`. If it does not, the `:has()` escape is not matching and everything
-  downstream is being judged against the wrong canvas — stop and fix before
-  continuing.
-- **Checkpoint B** (after T4): all four defects visually gone at 1440px, and
-  the mobile render at 390px shows no new breakage.
-- **Checkpoint C** (after T5): pa11y 0 errors, `homepage.spec.ts` green,
-  `bundle exec jekyll build` clean. Any failure here is a real regression and
-  gets root-caused, not worked around.
+## Phase 4 — Re-seed, then audit the seed
 
-## Implementation sketch
+Dispatch `test-quality.yml` with `update_snapshots=true`. Then, before trusting
+it, diff the committed baselines against the pre-seed state and confirm exactly
+6 files changed. Per #1262 this has failed twice, so restore anything outside
+the expected set and note it on that issue.
 
-```scss
-// T1 — cannot be nested; the one rule that lives outside `.home-2026`.
-.main-content:has(.home-2026) {
-  max-width: 100%;
-  padding: 0;
-}
+## Phase 5 — Full suite, review, ship
 
-.home-2026 {
-  max-width: 1040px;
-  margin: 0 auto;
-  padding: $spacing-xl $spacing-lg;
-  // ...
-  a { text-decoration: none; border-bottom: none; }   // T2
-
-  @media (max-width: 768px) { padding: $spacing-md $spacing-sm; }
-}
-
-// T3 — light band, red top rule; the footer becomes the page's only dark mass.
-.h26-author {
-  background: $h26-band;
-  border-top: 3px solid $h26-red;
-  color: $h26-ink;
-  padding: 2.25rem 2rem 2.5rem;
-}
-```
-
-Descendant colours inside `.h26-author` (`-kicker`, `-name`, `-bio`, `-link`)
-were written for a dark ground and must be re-pointed at the ink/body/muted ramp,
-not left as-is. This is the part of T3 most likely to be missed.
+Run the whole suite, not just the visual spec — `analytics.spec.ts` is the one
+that could plausibly break, since it is about the hosts being blocked.
 
 ## Risks
 
-| Risk | Mitigation |
+| Risk | Handling |
 |---|---|
-| `$spacing-xl` / `$spacing-lg` are not in scope in this file | Confirm the theme exposes them via the existing `@use 'economist-theme' as theme` before writing T1; namespace them if required |
-| `:has()` escape does not match, or the theme's cap wins on specificity | Checkpoint A catches it immediately |
-| Author band contrast fails in the inverted direction | pa11y at Checkpoint C; both directions must clear 4.5:1 |
-| Visual baseline churn beyond the home page | Reseed the homepage entry only; inspect any other moved snapshot rather than blanket-accepting |
+| Seed corrupts an unrelated baseline (#1262, twice) | Audit the post-seed diff file-by-file; restore outliers |
+| Analytics block is not actually pixel-neutral | Phase 3 failure shape catches it before the seed |
+| Blocking fonts by accident | Explicit allowlist + a comment recording the 348px reflow |
+| Route handler slows every navigation | Measure goto time before/after; expect it to drop, not rise |
+
+## Rollback
+
+Revert the spec change and `git checkout` the 6 baselines. No production
+surface is touched — this is test-only.

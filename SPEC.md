@@ -1,149 +1,128 @@
-# SPEC — Apply the undelivered homepage design drop
+# SPEC — Stop the blocking visual gate depending on third-party hosts
 
-**Stream:** homepage 2026 · **Priority:** P2 · **Scope:** S (1 PR) · **Dependencies:** none
-**Date:** 2026-08-11 · **Labels:** `agent:creative-director` · **Issue:** none — local backlog item
-**Status:** not started
+**Stream:** CI reliability · **Priority:** P1 · **Scope:** S (1 PR) · **Dependencies:** none
+**Date:** 2026-08-12 · **Labels:** `agent:qa-gatekeeper` · **Issue:** [#1258](https://github.com/oviney/blog/issues/1258)
+**Status:** in progress
 
 ---
 
 ## 1. Objective
 
-The Claude Design project `Viney home page redesign`
-(`9356d593-185c-461f-b943-f3bafdf3790e`) carries a `deploy/` bundle and an
-`APPLY.md` describing four presentation defects in the shipped home page. The
-bundle was never applied. `main` still runs the original #1193 markup and CSS,
-so all four defects are live on `/`.
+`🖼️ Visual Regression` is a **required, blocking** status check. Today it can
+fail because a third-party host is slow or unreachable from the GitHub runner,
+which has nothing to do with the change under test. Make the gate depend only on
+the local Jekyll server.
 
-Apply the four fixes to the repo's **current** files. Do not copy the bundle
-verbatim — see §3.
+## 2. Problem
 
-**Success criteria**
+Observed on PR #1257, run
+[31518679335](https://github.com/oviney/blog/actions/runs/31518679335):
+**6 failed / 24 passed**, and the 6 were exactly the **2 post pages × 3
+viewports** — every non-post page passed. The failure was not a pixel diff:
 
-| | Now | Target |
-|---|---|---|
-| Home page content width at 1440px | ~850px (theme's 900px reading column) | 1040px, matching `/blog/` and category pages |
-| Dark bands stacked at page foot | 2 (`.h26-author` + `.site-footer`) | 1 (`.site-footer`) |
-| Red rules drawn under block links | every `.h26-topic` card | 0 |
-| Author links duplicated in footer's Connect column | 2 (LinkedIn, GitHub) | 0 |
-| pa11y WCAG2AA errors on `/` | 0 | 0 (unchanged) |
-| `homepage.spec.ts` | green | green |
+```
+Error: page.goto: Test timeout of 30000ms exceeded.
+Call log:
+  - navigating to "http://localhost:4000/2025/12/31/testing-times/", waiting until "load"
+```
 
----
+The job took **10.3 minutes** instead of ~2, because each failure burns
+30 s × 3 attempts. A plain re-run passed.
 
-## 2. Evidence
+### Mechanism
 
-Rendered `/` at 1440×1000 and 390×844 against a local `jekyll serve` build of
-`main` (dbb2780). Three of the four defects are visible in the desktop capture:
-the content column sits inside ~300px of dead margin per side, the author band
-renders as a black slab above a light CTA and a dark footer, and each topic card
-carries a full-width red rule.
+`visual-snapshot.spec.ts:134` calls `page.goto(path)` with Playwright's default
+`waitUntil: 'load'`, which does not resolve until every subresource has settled.
+`:145` then adds `waitForLoadState('networkidle')` on top. Post pages are the
+only pages that load `https://giscus.app/client.js` (`_layouts/post.html:248`,
+gated on `site.giscus`, which **is** configured in `_config.yml:134`). If giscus
+is slow, `load` never fires inside the timeout.
 
-Confirmed in source:
+Post pages are the worst case but not the only exposure. Measured on a local
+build, the suite's pages request these external hosts:
 
-| Fix | Repo state |
-|---|---|
-| 1. width escape | `_sass/home-2026.scss:34` — `.home-2026` declares no `max-width`, `margin`, or `padding`; no `.main-content:has(.home-2026)` rule exists |
-| 2. link border reset | `_sass/home-2026.scss:38` — `a { text-decoration: none; }` only. The theme's global `a { border-bottom: 1px solid $economist-red }` is never reset |
-| 3. author band | `_sass/home-2026.scss:434` — `background: $h26-ink; color: #f2efea` |
-| 4. duplicate links | `index.md:128–129` — LinkedIn and GitHub anchors |
-
-`diff index.md deploy/index.md` returns exactly one hunk: item 4. The markup is
-otherwise byte-identical, which is why the page's *structure* matches the design
-while its *presentation* does not.
-
----
+```
+giscus.app, github.githubassets.com          ← posts only
+www.googletagmanager.com, plausible.io,
+analytics.google.com, stats.g.doubleclick.net,
+www.google.ca                                 ← every page
+fonts.googleapis.com, fonts.gstatic.com       ← every page, RENDER-AFFECTING
+```
 
 ## 3. Decisions
 
-**D1 — Port the fixes; do not copy the bundle verbatim.** `APPLY.md` instructs
-"copy them across verbatim." That instruction is stale: the bundle was authored
-from the `redesign/home-2026` branch *before* #1193's own follow-up commits and
-#1196 landed. Copying it would revert three fixes the repo has and the bundle
-does not:
+**D1 — Block third-party requests at the route layer, not by relaxing the wait.**
+Switching `waitUntil` to `domcontentloaded` would not fix it: the following
+`waitForLoadState('networkidle')` would still stall on the same host. Only
+removing the dependency makes the gate deterministic.
 
-| | Repo (keep) | Bundle (reject) | Cost of copying |
-|---|---|---|---|
-| A | `@use 'economist-theme' as theme; $h26-red: theme.$economist-red` | `$h26-red: #E3120B` | Reverts #1196; violates CLAUDE.md "variables-only, never hardcode" |
-| B | `$h26-faint: #736d64` | `$h26-faint: #8a847b` | 3.71:1 contrast — fails the pa11y WCAG2AA gate on 14 elements. Breaks CI |
-| C | `article > p:first-of-type::first-letter { font-size: inherit }` | absent | Theme's unscoped drop-cap returns; a 10.4px kicker renders at 48px below 768px |
+**D2 — Block giscus and analytics. Do NOT block fonts.**
+`_layouts/default.html:37` loads Merriweather/Inter from `fonts.googleapis.com`
+as a render-blocking stylesheet. Blocking it changes glyph metrics and reflows
+every page. Measured on `/2025/12/31/testing-times/` with `.post-comments`
+hidden: **6602px with fonts → 6254px without**, a 348px reflow. Fonts stay.
 
-Neither side is a superset of the other. The unit of transfer is the fix, not
-the file.
+This leaves the gate dependent on Google Fonts. That is a real, accepted
+residual risk (§7), not an oversight — removing it means self-hosting the fonts,
+which is a separate change with its own baseline churn.
 
-**D2 — Keep the fixes scoped under `.home-2026`.** The single exception is
-`.main-content:has(.home-2026)`, which cannot be nested. `_layouts/default.html`
-and `_sass/economist-theme.scss` stay untouched, matching the bundle's own
-ground rules and this repo's protected-file boundary.
+**D3 — Analytics blocking is pixel-neutral and needs no re-baseline.**
+Measured across **all 10 pages** in the suite, full-page screenshots with
+analytics blocked are **byte-identical** to allow-all. Load time improves from
+~1.2 s to ~0.8 s per page.
 
-**D3 — Re-baseline the visual regression snapshot.** Fixes 1 and 3 change the
-home page's pixels deliberately. A baseline failure is the correct result and
-reseeding is the right response — the same call #1193 made and the PR-gate spec
-recorded as D1. Reseed only the homepage entry.
+**D4 — Blocking giscus costs exactly 160px on post pages, and that is the
+correct trade.** The `.post-comments` section measures 222px with the giscus
+iframe and 62px without (just its `<h3>Discussion</h3>`). So **6 baselines must
+be re-seeded** — 2 posts × 3 viewports. Worth it: the iframe's height is
+third-party content that changes whenever anyone comments on GitHub
+Discussions, so it was already an uncontrolled volatility source inside a
+blocking gate.
 
-**D4 — The two-H1 issue stays out of scope.** The masthead renders with
-`aria-level="1"` on `/` and the redesign headline is an `<h1>`. Fixing it means
-editing `_layouts/default.html`, which affects every page. The bundle called
-this out as deliberately not fixed; that judgement still holds. File it as
-follow-up, do not bundle it here.
+**D5 — Keep `.post-comments` visible rather than hiding it as `volatile`.**
+With giscus blocked the section is a stable 62px heading, which is our own
+markup and worth covering. Hiding it would give up that coverage for no gain.
 
----
+**D6 — Scope the route to `visual-snapshot.spec.ts`; do not put it in
+`playwright.config.ts`.** 12 specs navigate to post pages and share the
+exposure, but `analytics.spec.ts` asserts on analytics script tags. Those
+assertions read the DOM rather than the network so they would survive a global
+`route.abort()`, but a config-level block changes every spec's environment for a
+gain this issue does not ask for. Follow-up, not this PR.
 
-## 4. Scope
+## 4. Acceptance criteria
 
-Two product files:
+1. No request leaves `localhost:4000` during a visual-snapshot run except to
+   `fonts.googleapis.com` / `fonts.gstatic.com`.
+2. The 24 non-post baselines are unchanged — no re-seed.
+3. The 6 post baselines are re-seeded, and the diff contains **only** those 6.
+4. Post-page navigation no longer waits on giscus: `goto` drops from ~2.0 s to
+   ~0.9 s locally.
+5. `npx playwright test visual-snapshot.spec.ts` passes on Linux.
+6. The whole suite still passes — in particular `analytics.spec.ts`.
 
-- `index.md` — remove the LinkedIn and GitHub anchors from `.h26-author-links`,
-  leaving a comment recording that the footer's Connect column carries them.
-- `_sass/home-2026.scss` — add the `.main-content:has(.home-2026)` escape and
-  the wrapper's `max-width: 1040px` / `margin` / `padding` box model; extend the
-  scoped `a` reset with `border-bottom: none`; recolour `.h26-author` to the
-  light band with a red top rule and adjust its padding.
+## 5. Out of scope
 
-Plus lifecycle artifacts (`SPEC.md`, `tasks/plan.md`, `tasks/todo.md`) and, if
-the baseline moves, the homepage visual snapshot.
+- The other three items in #1262 (`not-found` boundary, `search` and
+  `category-security` flakes) — separate issue, separate PR.
+- Self-hosting web fonts (§7).
+- Applying the route globally in `playwright.config.ts` (D6).
 
-**Out of scope:** `_layouts/default.html`, `_sass/economist-theme.scss`, any
-protected file, the two-H1 fix (D4), and any change to the design bundle itself.
+## 6. Files
 
----
+| File | Change |
+|---|---|
+| `tests/playwright-agents/visual-snapshot.spec.ts` | Add a third-party route block + document why fonts are exempt |
+| `tests/playwright-agents/visual-snapshot.spec.ts-snapshots/post-*.png` | Re-seed 6 baselines (CI-generated) |
 
-## 5. Commands
+## 7. Residual risk
 
-```bash
-bundle exec jekyll build                                   # must succeed
-bundle exec jekyll serve --config _config.yml,_config_dev.yml
-npx playwright test tests/playwright-agents/homepage.spec.ts
-npx pa11y-ci                                               # 0 errors on /
-bash scripts/check-pr-scope.sh                             # scope guard
-```
+The gate still depends on Google Fonts being reachable. If `fonts.googleapis.com`
+stalls, every page fails rather than just the two post pages — a louder,
+easier-to-diagnose failure than today's, but still an outage. Self-hosting the
+fonts would close it and is worth filing separately.
 
----
-
-## 6. Testing strategy
-
-1. **Structural** — `homepage.spec.ts` asserts sections, links, and Liquid-
-   rendered counts. It does not assert width or band colour, so it should pass
-   unchanged. Verify rather than assume; if it fails, the failure is a real
-   regression, not churn.
-2. **Accessibility** — pa11y-ci on `/` must stay at 0 errors. The author band
-   inverts from light-on-dark to dark-on-light; both directions need to clear
-   4.5:1, so this is a real check, not a formality.
-3. **Visual** — capture `/` at 1440 and 390 before and after. Confirm the three
-   visible defects are gone and nothing else moved. Reseed the baseline per D3.
-4. **Regression guard** — the drop-cap guard added in #1193 must still pass;
-   it proves fix C survived the port.
-
----
-
-## 7. Boundaries
-
-**Always:** keep new CSS scoped under `.home-2026`; take brand colour from the
-theme token; run `bundle exec jekyll build` before opening the PR.
-
-**Ask first:** any change to `_layouts/default.html` or the theme partial; any
-change that would need `bulk-content`, `governance-update`, or
-`protected-file-update`.
-
-**Never:** modify `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`,
-or `.github/copilot-instructions.md`; hardcode `#E3120B`; loosen `$h26-faint`
-back below 4.5:1; merge the PR without review.
+Re-seeding is itself a known-unreliable path: per #1262 a seed dispatch has
+**twice** committed a wrong baseline for a page the branch never touched
+(`not-found`, then `about`). The plan verifies the post-seed diff file-by-file
+and restores anything outside the expected 6.

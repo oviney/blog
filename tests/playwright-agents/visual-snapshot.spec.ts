@@ -129,6 +129,48 @@ test.describe('@visual Visual regression snapshots @REQ-VISUAL-SNAP', () => {
     'visual baselines are -linux only; run in CI (ubuntu) or via test:visual:snap:update',
   );
 
+  // This is a BLOCKING gate, so it must not depend on a third party being
+  // reachable from the runner. It used to: `page.goto` below waits until
+  // `load`, which does not fire until every subresource settles, and
+  // `waitForLoadState('networkidle')` then waits again. Post pages are the only
+  // pages that load https://giscus.app/client.js (_layouts/post.html, gated on
+  // site.giscus), so when giscus was slow exactly the 2 post pages × 3
+  // viewports failed with a 30 s navigation timeout while every other page
+  // passed — 6 red on a required check for reasons unrelated to the PR, and a
+  // 10.3-minute job instead of ~2 (#1258, run 31518679335).
+  //
+  // Relaxing `waitUntil` to `domcontentloaded` would not have fixed it: the
+  // `networkidle` wait would stall on the same host. The dependency has to go.
+  //
+  // Allowlist, not denylist: anything that is not the local Jekyll server or a
+  // font host is aborted. A denylist of tracker domains rots the first time an
+  // analytics vendor changes hostname, and it fails open — the gate goes back
+  // to hanging without anyone noticing.
+  //
+  // Fonts are the deliberate exception, and must stay that way. Merriweather
+  // and Inter come from fonts.googleapis.com as a render-blocking stylesheet
+  // (_layouts/default.html), so blocking them substitutes fallback glyphs and
+  // reflows every page — measured at 6602px → 6254px on post-testing-times,
+  // a 348px difference. Do NOT "finish the job" by adding them here: it would
+  // invalidate all 30 baselines, not fix anything. Closing that last
+  // dependency means self-hosting the fonts, which is its own change.
+  //
+  // What this cost: blocking giscus drops `.post-comments` from 222px to 62px
+  // (the iframe goes, its `<h3>Discussion</h3>` stays), so the 6 post baselines
+  // were re-seeded in this PR. The other 24 are byte-identical — verified
+  // before seeding, since analytics renders nothing. That 160px was never
+  // stable anyway: it is third-party content that changes whenever someone
+  // comments on GitHub Discussions.
+  const FONT_HOSTS = /^https:\/\/fonts\.(googleapis|gstatic)\.com\//;
+
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/*', (route) => {
+      const url = route.request().url();
+      const local = url.startsWith('http://localhost:4000');
+      return local || FONT_HOSTS.test(url) ? route.continue() : route.abort();
+    });
+  });
+
   for (const { name, path, listing, volatile } of PAGES) {
     test(`${name} matches its committed baseline`, async ({ page }) => {
       const response = await page.goto(path);
