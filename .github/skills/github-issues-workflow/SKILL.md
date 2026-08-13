@@ -177,10 +177,10 @@ Add label based on domain:
 
 | Bug Domain | Agent | Label | Skill File |
 |------------|-------|-------|------------|
-| Layout/CSS/Visual | Creative Director | `agent:creative-director` | `economist-theme/SKILL.md` |
-| Tests/CI/Performance | QA Gatekeeper | `agent:qa-gatekeeper` | `jekyll-development/SKILL.md` |
-| Content/Posts/SEO | Editorial Chief | `agent:editorial-chief` (alias: `agent:editorial-manager`) | `editorial/SKILL.md` |
-| Audience/UX/Usability Research | Audience Researcher | `agent:audience-researcher` | `audience-research/SKILL.md` |
+| Layout/CSS/Visual | Creative Director | `agent:creative-director` | `.github/skills/economist-theme/SKILL.md` |
+| Tests/CI/Performance | QA Gatekeeper | `agent:qa-gatekeeper` | `.github/skills/jekyll-development/SKILL.md` |
+| Content/Posts/SEO | Editorial Chief | `agent:editorial-chief` (alias: `agent:editorial-manager`) | `.github/skills/editorial/SKILL.md` |
+| Audience/UX/Usability Research | Audience Researcher | `agent:audience-researcher` | `.github/skills/audience-research/SKILL.md` |
 
 **Add comment:**
 ```markdown
