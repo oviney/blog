@@ -7,6 +7,15 @@ layout: default
     margin: 10px auto;
     max-width: 600px;
     text-align: center;
+    /* Height floor, not decoration. Without it this page ended just 2px past
+       the viewport at 768x1024 (scrollHeight 1026), so whether it overflowed
+       at all was marginal — and a visual-baseline seed could capture either
+       side of the boundary. It did: a seed run committed the 404 Tablet
+       baseline at 1024px against a page that measures 1026px everywhere else,
+       and the gate then failed against its own refreshed baseline (#1262).
+       A viewport-proportional floor puts the height decisively past the fold
+       at every covered viewport instead of tuning a pixel tolerance. */
+    min-height: 60vh;
   }
   h1 {
     margin: 30px 0;
