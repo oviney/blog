@@ -574,61 +574,66 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# Check 5: Stale skill files (> 90 days since last commit)
+# Check 5: Skill files that describe something no longer true
+#
+# This used to flag any SKILL.md whose last commit was over 90 days old, and its
+# remediation text told the reader to "update the file and commit even if no
+# content changes are needed to reset the staleness clock" — i.e. to make an
+# empty commit to silence the check. That is not an audit; a doc can be two
+# years old and perfectly accurate, or edited yesterday and wrong.
+#
+# It also re-filed on a fixed cadence. On 2026-08-12 it had 26 skills listed and
+# had been reopened repeatedly while every one of them was in fact accurate
+# (#1206), which is the failure mode that buries real findings.
+#
+# So the signal is now accuracy, not age: every back-tick path a skill asserts
+# must resolve, relative to the skill's own directory or to the repo root. Age
+# is still printed as context, but on its own it files nothing.
 # ---------------------------------------------------------------------------
 
 echo ""
-echo "=== Check 5: Stale skill files ==="
+echo "=== Check 5: Skill file accuracy ==="
 
-stale_skills=()
-CUTOFF=$(date -d "90 days ago" +%Y-%m-%d 2>/dev/null || true)
-if [[ -z "${CUTOFF:-}" ]]; then
-  # macOS / BSD date fallback
-  CUTOFF=$(date -v-90d +%Y-%m-%d 2>/dev/null || true)
-fi
-if [[ -z "${CUTOFF:-}" ]]; then
-  echo "  [warn] cannot determine CUTOFF date; skipping stale-skill check" >&2
-  CUTOFF=""
-fi
+bad_skill_refs=()
+while IFS= read -r line; do
+  bad_skill_refs+=("$line")
+  echo "  [broken] ${line}"
+done < <(python3 - <<'PYEOF'
+import glob, os, re
 
-while IFS= read -r skill_file; do
-  [[ -z "${CUTOFF:-}" ]] && break  # skip if CUTOFF could not be determined
-  # Last commit date for this file
-  last_commit=$(git log -1 --format="%cs" -- "$skill_file" 2>/dev/null || echo "")
-  if [[ -z "$last_commit" ]]; then
-    last_commit="$(python3 - "$skill_file" <<'PY'
-from datetime import datetime
-from pathlib import Path
-import sys
+# Illustrative placeholders, not claims about the repo.
+PLACEHOLDER = ('YYYY-MM-DD', 'another/file', 'dir/index.html', 'path/to')
 
-print(datetime.fromtimestamp(Path(sys.argv[1]).stat().st_mtime).strftime("%Y-%m-%d"))
-PY
-)" || last_commit=""
-  fi
-  [[ -z "$last_commit" ]] && continue
-  if [[ "$last_commit" < "$CUTOFF" ]]; then
-    stale_skills+=("${skill_file} (last updated: ${last_commit})")
-    echo "  [stale] ${skill_file}: last commit ${last_commit}"
-  fi
-done < <(find .github/skills -name "SKILL.md" | sort)
+for skill in sorted(glob.glob('.github/skills/*/SKILL.md')):
+    here = os.path.dirname(skill)
+    text = open(skill, encoding='utf-8').read()
+    for ref in sorted(set(re.findall(r'`([A-Za-z0-9_./-]+\.(?:md|js|sh|yml|yaml|json|scss|ts|html))`', text))):
+        if '/' not in ref or any(ph in ref for ph in PLACEHOLDER):
+            continue
+        if os.path.exists(os.path.normpath(os.path.join(here, ref))) or os.path.exists(ref):
+            continue
+        print(f'{skill}: {ref}')
+PYEOF
+)
 
-if [[ ${#stale_skills[@]} -gt 0 ]]; then
-  list=$(printf -- '- %s\n' "${stale_skills[@]}")
+if [[ ${#bad_skill_refs[@]} -gt 0 ]]; then
+  list=$(printf -- '- %s\n' "${bad_skill_refs[@]}")
   file_issue \
-    "doc-audit: skill files not updated in > 90 days" \
-    "## Stale Skill Files
+    "doc-audit: skill files reference paths that do not exist" \
+    "## Skill files asserting paths that do not resolve
 
-The following skill files have not been updated in over 90 days and may be out of date:
+Each entry is a back-tick path inside a \`SKILL.md\` that resolves neither
+relative to its own directory nor from the repo root. A skill that points at a
+file which is not there will send an agent to the wrong place.
 
 ${list}
 
-**Action required:** Review each skill file to ensure it still accurately describes the
-current workflow. Update the file and commit even if no content changes are needed to
-reset the staleness clock.
+**Action required:** correct the path, or remove the reference if what it
+described is gone.
 
 _Filed automatically by the [doc-audit workflow](../../actions/workflows/doc-audit.yml)._"
 else
-  echo "  [ok] all skill files updated within 90 days"
+  echo "  [ok] every path asserted by a skill file resolves"
 fi
 
 # ---------------------------------------------------------------------------
