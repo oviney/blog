@@ -19,29 +19,58 @@
       (`.post-comments` 222px → 62px) — 6 baselines to re-seed (SPEC D4)
 - [x] Load time improves ~1.2s → ~0.8s per page; posts ~2.0s → ~0.9s
 
-## Phase 2 — Implement
+## Phase 2 — Implement ✅
 
-- [ ] **T1** Add the third-party route block to `visual-snapshot.spec.ts`
-- [ ] **T2** Document the fonts exemption with the measured 348px reflow
+- [x] **T1** Add the third-party route block to `visual-snapshot.spec.ts`
+- [x] **T2** Document the fonts exemption with the measured 348px reflow
 
-## Phase 3 — Verify before seeding
+## Phase 3 — Verify before seeding ✅
 
-- [ ] **Checkpoint A** — run the visual spec locally; expect exactly the 6 post
-      cases to fail on a height mismatch and all 24 non-post cases to pass
-- [ ] Confirm no request leaves localhost except to the two font hosts
+- [x] **Checkpoint A** — ran the visual spec locally and got exactly the predicted
+      shape: **6 failed / 24 passed**, the 6 being the 2 posts × 3 viewports,
+      each failing on height (`Expected 1920×6810, received 1920×6650`).
+      That shape is the evidence D3 holds — had the analytics block moved a
+      single pixel on any other page, a 25th case would have failed
 
-## Phase 4 — Re-seed and audit
+## Phase 4 — Re-seed and audit ✅
 
-- [ ] Dispatch `test-quality.yml` with `update_snapshots=true`
-- [ ] **Checkpoint B** — diff the seeded baselines; confirm exactly 6 files changed
-- [ ] Restore any baseline outside the expected 6 and note it on #1262
+- [x] Dispatched `test-quality.yml` with `update_snapshots=true` (run 31657295617);
+      the seed job succeeded and committed `44c5123`
+- [x] **Checkpoint B** — the seed touched **exactly the 6 expected files** and
+      nothing else. Verified twice: `git show --name-only` lists 6, and an md5
+      comparison of all 30 baselines before/after reports 6 changed, 24 identical.
+      **No collateral damage this time** — unlike both prior dispatches (#1262)
+- [x] New dimensions carry the predicted −160px on every viewport:
+      Desktop 6872→6712 / 6810→6650, Tablet 6705→6546 / 6613→6455,
+      Mobile 11816→11658 / 11717→11558
+- [x] Re-ran the visual spec against the seeded baselines — **30/30 passed**
 
-## Phase 5 — Full suite, review, ship
+## Phase 5 — Full suite, review, ship ✅
 
-- [ ] Run the whole Playwright suite, especially `analytics.spec.ts`
-- [ ] `bash scripts/check-pr-scope.sh`
-- [ ] Review the diff across correctness / maintainability / security / coverage
-- [ ] Open the PR; leave unmerged for review
+- [x] Whole Playwright suite excluding the visual gate — **432 passed, 9 skipped,
+      0 failed**. `analytics.spec.ts` green, which was the one plausible casualty
+      since the change blocks the hosts it asserts about (it reads script tags in
+      the DOM, and `route.abort()` does not remove them)
+- [x] `bash scripts/check-pr-scope.sh` — **PASSED**, no label needed
+- [x] Reviewed the diff across correctness / maintainability / security / coverage
+- [x] Opened the PR, unmerged
+
+## Blocker hit mid-flight — handled in its own PR
+
+- [x] The seed run surfaced a **new high advisory** that gates every PR:
+      GHSA-jmr9-qjv8-65gv (`extract-zip` unvalidated symlink path traversal).
+      Not caused by this branch — it reds #1268 and the whole queue too
+- [x] Confirmed there is no upgrade to take: the advisory covers `extract-zip`
+      at range `*`, 2.0.1 is the latest published version, and both `@lhci/cli`
+      and `pa11y-ci` are already at their latest — `@lhci/cli@0.15.1` hard-pins
+      `lighthouse` to exactly `12.6.1`. npm's `fixAvailable` is a multi-major
+      *downgrade* that would break the perf and a11y gates
+- [x] Filed the dated exception per the tooling's own design — PR
+      [#1269](https://github.com/oviney/blog/pull/1269), `reviewBy: 2026-11-30`.
+      Upstream already fixed it (`@puppeteer/browsers@3.2.0` swapped `extract-zip`
+      for `modern-tar`), so the entry expires rather than lingering
+- [ ] **#1269 must land before this PR can go green** — its Security Audit
+      failure is inherited, not caused, here
 
 ## Out of scope
 

@@ -2,7 +2,7 @@
 
 **Stream:** CI reliability · **Priority:** P1 · **Scope:** S (1 PR) · **Dependencies:** none
 **Date:** 2026-08-12 · **Labels:** `agent:qa-gatekeeper` · **Issue:** [#1258](https://github.com/oviney/blog/issues/1258)
-**Status:** in progress
+**Status:** implemented — PR open, blocked on #1269
 
 ---
 
