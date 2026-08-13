@@ -1758,108 +1758,8 @@ table {
   }
 }
 
-.econ-article-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0 $spacing-xl * 1.25;
-}
-
-.econ-article-card {
-  padding: $spacing-md 0 $spacing-lg 0;
-  border-top: 1px solid $border-color;
-
-  // Override global link border-bottom for all links in cards
-  a {
-    border-bottom: none;
-  }
-
-  &:hover .econ-card-title a {
-    color: $economist-red;
-  }
-}
-
-.econ-card-image-link {
-  display: block;
-  margin-bottom: $spacing-sm;
-  overflow: hidden;
-}
-
-.econ-card-image {
-  width: 100%;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-
-.econ-card-category {
-  display: block;
-  font-family: $font-sans;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: $economist-red;
-  margin-bottom: 6px;
-}
-
-.econ-card-title {
-  font-family: $font-serif;
-  font-size: 1.0625rem;
-  font-weight: 700;
-  line-height: 1.35;
-  margin: 0 0 8px 0;
-
-  a {
-    color: $text-primary;
-    text-decoration: none;
-    border-bottom: none;
-    transition: color 0.15s ease;
-
-    &:hover {
-      color: $economist-red;
-      text-decoration: none;
-    }
-
-    &:visited {
-      color: $text-primary;
-    }
-  }
-}
-
-.econ-card-excerpt {
-  font-family: $font-serif;
-  font-size: 0.875rem;
-  color: $text-secondary;
-  line-height: 1.4;
-  margin: 0 0 8px 0;
-}
-
-.econ-card-author {
-  margin: 0 0 $spacing-xs 0;
-}
-
-.econ-card-author-name {
-  font-family: $font-sans;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: $text-secondary;
-  letter-spacing: 0.02em;
-}
-
-.econ-card-meta {
-  font-family: $font-sans;
-  font-size: 0.75rem;
-  color: $text-tertiary;
-}
-
 // Responsive: tablet
 @media (max-width: 1024px) {
-  .econ-article-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0 $spacing-lg;
-  }
-
   .econ-topic-page {
     padding: $spacing-xl $spacing-lg;
   }
@@ -1867,11 +1767,6 @@ table {
 
 // Responsive: mobile
 @media (max-width: 768px) {
-  .econ-article-grid {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
   .econ-topic-page {
     // Reduce to 16px side padding so cards feel wider on small screens
     padding: $spacing-md $spacing-sm;
@@ -1885,10 +1780,6 @@ table {
 
   .econ-topic-title {
     font-size: 1.75rem;
-  }
-
-  .econ-card-image {
-    aspect-ratio: 3 / 2;
   }
 }
 

@@ -41,6 +41,17 @@ test.describe('@contract Page contract @REQ-CONTENT-02 @REQ-NAV-01', () => {
       // breaks it differently and is a recurring regression on listing pages.
       await expect(page.locator('h1'), `${path} must have exactly one h1`).toHaveCount(1);
       await expect(page.locator('h1')).toBeVisible();
+
+      // ...and exactly one level-1 heading in the ACCESSIBILITY TREE, which is
+      // not the same assertion. `locator('h1')` matches elements by tag name and
+      // cannot see `role="heading" aria-level="1"`, so a second level-1 heading
+      // built that way is invisible to the check above — which is precisely how
+      // the masthead and the homepage headline both claimed level 1 without any
+      // gate noticing (#1261). Screen readers read the tree, not the tag.
+      await expect(
+        page.getByRole('heading', { level: 1 }),
+        `${path} must expose exactly one level-1 heading to assistive tech`,
+      ).toHaveCount(1);
     });
   }
 
