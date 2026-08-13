@@ -78,7 +78,24 @@
   {% assign show_newsletter = false %}
   {% if nav_home or nav_blog or nav_about %}{% assign show_newsletter = true %}{% endif %}
   <header class="page-header">
-    <div class="site-title" role="heading" aria-level="{% if page.url == '/' %}1{% else %}2{% endif %}">
+    {%- comment -%}
+      No `role="heading"` here. The masthead is site branding and a link home —
+      it is the same text in the same place on all 42 pages, so it describes the
+      site rather than titling the page, and it belongs to the banner landmark
+      that already announces it.
+
+      It used to claim `aria-level="1"` on `/` and `2` elsewhere. On `/` that
+      collided with the redesign's positioning headline, giving the home page two
+      level-1 headings (#1261). Dropping to level 2 would have fixed the
+      collision while leaving a heading that titles nothing and pushes every
+      real page heading a level down the outline.
+
+      Removing it is safe because every page carries its own `<h1>`: verified
+      across the built `_site`, 42 of 42 pages have exactly one (the only
+      exception is the Google Search Console verification stub, which renders no
+      layout). So each page keeps exactly one level-1 heading — its own.
+    {%- endcomment -%}
+    <div class="site-title">
       <a href="{{ '/' | relative_url }}">{{ display_site_title }}</a>
     </div>
     <button type="button" class="nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="site-navigation">
