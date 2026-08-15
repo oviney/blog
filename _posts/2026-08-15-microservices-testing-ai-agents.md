@@ -9,7 +9,7 @@ subtitle: "Agents feel faster than the clock says, and the queue collects the di
 slug: "microservices-testing-ai-agents"
 tags: [quality-engineering, software-engineering, test-automation, security]
 image: /assets/images/microservices-testing-ai-agents-hero.svg
-image_alt: "An Economist-style editorial illustration of a robotic arm clicking approve on a pull request while a tangle of microservice nodes catches fire in the background, framed by a glowing green checkmark."
+image_alt: "A robotic arm presses approve on a pull request while a tangle of microservice nodes burns behind it, beneath a large green checkmark."
 image_caption: "Green builds at the boundary do not guarantee intact contracts: AI agents accelerate pull requests while downstream service integration defects quietly accumulate."
 ---
 
