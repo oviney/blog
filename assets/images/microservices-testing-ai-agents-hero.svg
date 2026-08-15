@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
   <title>Velocity Illusion: Microservices Testing in the Era of AI Agents</title>
-  <desc>An Economist-style editorial illustration of a robotic arm clicking approve on a pull request while a tangle of microservice nodes catches fire in the background, framed by a glowing green checkmark.</desc>
+  <desc>A robotic arm presses approve on a pull request while a tangle of microservice nodes burns behind it, beneath a large green checkmark.</desc>
   <defs>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#0F172A"/>
