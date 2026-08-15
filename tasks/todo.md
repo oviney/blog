@@ -9,17 +9,34 @@ The 2026-08-12 backlog sweep is archived under
 
 ## This cycle
 
-- [ ] **Slice 1** — add the masthead-axis guard to `responsive.spec.ts` and prove
+- [x] **Slice 1** — add the masthead-axis guard to `responsive.spec.ts` and prove
       it fails on 5 of 6 page types against the current build
-- [ ] **Slice 2** — add `$grid-max-width`; point `.site-title` and `.site-nav ul`
+- [x] **Slice 2** — add `$grid-max-width`; point `.site-title` and `.site-nav ul`
       at it with a `min-width: 768px` gutter
-- [ ] **Slice 3** — normalize `.econ-topic-page` to a `$spacing-lg` side gutter
+- [x] **Slice 3** — normalize `.econ-topic-page` to a `$spacing-lg` side gutter
       so `/blog/` joins the grid
-- [ ] **Slice 4** — retire the last `1040px` literals in `.topic-page` and
+- [x] **Slice 4** — retire the last `1040px` literals in `.topic-page` and
       `home-2026.scss`'s `$h26-max`
-- [ ] **Slice 5** — full gate run: build, `homepage.spec.ts`,
+- [x] **Slice 5** — full gate run: build, `homepage.spec.ts`,
       `responsive.spec.ts`, `pa11y-ci`, 390px overflow, mobile geometry diff
-- [ ] **Slice 6** — refresh visual baselines in CI, inspect the diff, open the PR
+- [x] **Slice 6** — refresh visual baselines in CI, inspect the diff, open the PR
+
+**Shipped as [#1282](https://github.com/oviney/blog/pull/1282)**, awaiting review.
+The seed dispatch touched exactly the 10 Desktop `-linux` PNGs that moved and
+nothing else — the #1262 clobbering did not recur. Labelled `bulk-content`: 16
+files, one over the Rule 2 cap, and the SCSS and its baselines cannot be split
+without leaving `main` red in between.
+
+## Blocked on someone else's change
+
+- **`main` is red on the editorial gate.** `9fe0922` published
+  `_posts/2026-08-15-microservices-testing-ai-agents.md` with an `image_alt`
+  that reads as prompt/style text rather than accessible alt text, so
+  `validate-editorial` and Content Validation fail on every PR including #1282.
+  Confirmed independent of #1282: `scripts/validate-post-quality.sh` reports 0
+  errors on the branch alone and 1 after merging `origin/main`. Needs its own
+  PR under `agent:editorial-chief` — folding a content fix into a theme change
+  is what the scope guard exists to prevent.
 
 ## Blocked
 
