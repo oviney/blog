@@ -1,7 +1,7 @@
 ---
-layout: review
+layout: post
 title: "Velocity Illusion: AI Agents Are Shipping Microservices That Pass the Build and Break Production"
-date: 2026-08-12
+date: 2026-08-15
 author: "Ouray Viney"
 categories: ["Quality Engineering", "Software Engineering", "Test Automation", "Security"]
 description: "AI agents are merging microservices code faster than reviewers can reach it. Spec-driven development is the only discipline that puts the contract first."
