@@ -26,6 +26,13 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica N
 
 // Spacing
 $content-max-width: 750px;
+// The site grid. Listings and the home page fill it; the masthead and nav
+// anchor to it; narrower reading measures ($content-max-width on posts, the
+// 900px .main-content cap on plain pages) sit centred inside it. Before this
+// token existed, 1040 was written out in three unrelated selectors and the
+// masthead was on a fourth width entirely, so the "grid" was a coincidence
+// rather than a contract. Guarded by responsive.spec.ts "Gap F".
+$grid-max-width: 1040px;
 $wide-max-width: 1200px;
 $spacing-xs: 0.5rem;
 $spacing-sm: 1rem;
@@ -88,10 +95,20 @@ body {
     margin: 0;
     padding: 0;
     width: 100%;
-    max-width: 900px;
+    max-width: $grid-max-width;
     text-align: left;
+    // $spacing-lg above the breakpoint, because that is the gutter the 1040px
+    // wrappers use — it is what puts the logo flush with the content column.
+    // The base value below is left as it was: the mobile block further down
+    // this file zeroes `.site-title`'s padding and moves the gutter onto
+    // `.page-header`, so small screens never render this declaration and are
+    // untouched by the change.
     padding-left: $spacing-md;
-    
+
+    @media (min-width: 768px) {
+      padding-left: $spacing-lg;
+    }
+
     a {
       display: inline-block;
       background-color: $economist-red;
@@ -122,8 +139,17 @@ body {
     display: flex;
     flex-wrap: wrap;
     width: 100%;
-    max-width: 900px;
-    
+    max-width: $grid-max-width;
+
+    // $spacing-xs, not $spacing-lg: each nav link below carries its own
+    // `padding: $spacing-sm $spacing-md`, so the list needs
+    // $spacing-lg - $spacing-md to put the first link's *text* on the grid.
+    // Matching the masthead's gutter here would leave the visible nav 24px
+    // inboard of the logo.
+    @media (min-width: 768px) {
+      padding: 0 $spacing-xs;
+    }
+
     li {
       margin: 0;
       
@@ -1713,9 +1739,13 @@ table {
 // ============================================
 
 .econ-topic-page {
-  max-width: 1040px;
+  max-width: $grid-max-width;
   margin: 0 auto;
-  padding: $spacing-xl 0;
+  // Was `$spacing-xl 0`. /blog/ and the category pages are both 1040px
+  // listings, but the zero side gutter started /blog/'s text 32px left of
+  // every other one — so the grid the masthead anchors to was not a single
+  // axis. Matched to .topic-page below.
+  padding: $spacing-xl $spacing-lg;
 }
 
 .econ-topic-header {
@@ -1758,12 +1788,12 @@ table {
   }
 }
 
-// Responsive: tablet
-@media (max-width: 1024px) {
-  .econ-topic-page {
-    padding: $spacing-xl $spacing-lg;
-  }
-}
+// (A `max-width: 1024px` override setting `.econ-topic-page` to
+// `$spacing-xl $spacing-lg` used to sit here. It is now the base value, so the
+// rule restated it verbatim. Its existence is the tell for the original bug:
+// /blog/ had a 32px gutter on tablet and none at all above 1024px, a
+// discontinuity nothing intended. Removed rather than left in place, so a
+// future reader does not infer that 1024px is a meaningful breakpoint here.)
 
 // Responsive: mobile
 @media (max-width: 768px) {
@@ -1788,7 +1818,7 @@ table {
 // ============================================
 
 .topic-page {
-  max-width: 1040px;
+  max-width: $grid-max-width;
   margin: 0 auto;
   padding: $spacing-xl $spacing-lg;
 }
