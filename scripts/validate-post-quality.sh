@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
-# validate-post-quality.sh — editorial quality gate for _posts/
+# validate-post-quality.sh — editorial quality gate for _posts/ and _review/
 #
-# Validates every _posts/*.md file against the Economist-inspired quality
-# baseline.  Each check is classified as either ERROR (blocks merge) or
-# WARNING (non-blocking, informational).
+# Validates every _posts/*.md and _review/*.md file against the
+# Economist-inspired quality baseline.  Each check is classified as either
+# ERROR (blocks merge) or WARNING (non-blocking, informational).
+#
+# Drafts are held to the same bar as published posts because they are promoted
+# verbatim — a defect written at draft time is a defect on `main` the moment
+# the draft is published, and by then it blocks every open PR.
 #
 # Usage:
-#   bash scripts/validate-post-quality.sh          # validate all posts
+#   bash scripts/validate-post-quality.sh          # validate posts and drafts
 #   bash scripts/validate-post-quality.sh --help   # show this header
 #
 # Exit codes:
@@ -59,7 +63,18 @@ if [[ "${1:-}" == "--help" ]]; then
   exit 0
 fi
 
-POSTS=$(find "$REPO_ROOT/_posts" -maxdepth 1 \( -name "*.md" -o -name "*.markdown" \) | sort)
+# `_review/` is checked alongside `_posts/`, not after it. Drafts there carry
+# the same front matter as a published post and are promoted into `_posts/`
+# verbatim, so a metadata defect written at draft time survives the promotion
+# untouched. That is not hypothetical: 9fe0922 published a draft whose
+# `image_alt` was the image *prompt*, turning `main` red on the editorial gate
+# and blocking every open PR until #1285. Checking only `_posts/` meant the
+# gate could not fail until the defect was already on `main`.
+#
+# The directory is optional — it is empty whenever no draft is awaiting a
+# publish decision.
+POSTS=$(find "$REPO_ROOT/_posts" "$REPO_ROOT/_review" -maxdepth 1 \
+  \( -name "*.md" -o -name "*.markdown" \) 2>/dev/null | sort)
 
 if [[ -z "$POSTS" ]]; then
   echo "validate-post-quality: no posts found."
@@ -305,8 +320,10 @@ for post in $POSTS; do
   # ------------------------------------------------------------------
   # 11. Published status — no published: false  [ERROR]
   # ------------------------------------------------------------------
+  # Scoped to `_posts/` deliberately. A `_review/` draft is *supposed* to be
+  # unpublished, so `published: false` there is correct rather than a defect.
   pub_val=$(fm_value "$post" "published")
-  if [[ "$pub_val" == "false" ]]; then
+  if [[ "$rel" == _posts/* && "$pub_val" == "false" ]]; then
     echo "❌  $rel — published: false (unpublished post in _posts/)"
     ERRORS=$((ERRORS + 1))
     post_errors=$((post_errors + 1))
