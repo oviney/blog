@@ -10,7 +10,7 @@ slug: "code-coverage-mutation-score-quality"
 tags: [quality-engineering, test-automation]
 image_caption: "Green coverage dashboards reward visiting code rather than catching defects, leaving logic errors undetected behind a wall of passing assertions."
 image: /assets/images/code-coverage-mutation-score-quality-hero.svg
-image_alt: "A towering green percentage meter glows on a boardroom wall while beneath the floorboards a deep chasm reveals broken components and undetected faults."
+image_alt: "An Economist-style editorial illustration of a towering green percentage meter glowing on a boardroom wall while beneath the floorboards a deep chasm reveals broken components and undetected faults."
 ---
 
 Software engineers learned long ago that you cannot improve what you cannot measure. Boards took that lesson and ran with it, straight into the wrong metric. Code coverage (the percentage of source lines executed during a test run) now adorns dashboards from Silicon Valley to Singapore as the primary signal of software health. Mandate 80%, watch the number climb, congratulate the team, and file the slide. The ritual is reassuring, repeatable, and wrong. Code coverage is the BMI of software quality: a single number that feels scientific, correlates poorly with what actually matters, and is optimised above all else for its own improvement. Achieving a high score demands nothing so inconvenient as tests that catch bugs, merely tests that visit code. The board's comfortable green dashboard may be the most expensive misunderstanding in modern engineering, and the industry has spent two decades building governance architecture on top of it.
@@ -33,7 +33,7 @@ The Monday version of this is checkable. Pick the most critical service in your 
 
 As the chart below illustrates, reported line coverage consistently outstrips genuine defect detection and mutation survival across industry benchmarks.
 
-![The Code Coverage Mirage](/assets/charts/code-coverage-mutation-score-quality.png)
+[![The Code Coverage Mirage](/assets/charts/code-coverage-mutation-score-quality.png)](/assets/charts/code-coverage-mutation-score-quality.png)
 
 ## References
 

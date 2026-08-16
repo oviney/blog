@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
   <title>Coverage is the BMI of Software Quality</title>
-  <desc>A towering green percentage meter glows on a boardroom wall while beneath the floorboards a deep chasm reveals broken components and undetected faults.</desc>
+  <desc>An Economist-style editorial illustration of a towering green percentage meter glowing on a boardroom wall while beneath the floorboards a deep chasm reveals broken components and undetected faults.</desc>
   <defs>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#0F172A"/>
