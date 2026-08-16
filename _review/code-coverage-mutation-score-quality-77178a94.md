@@ -33,7 +33,7 @@ The Monday version of this is checkable. Pick the most critical service in your 
 
 As the chart below illustrates, reported line coverage consistently outstrips genuine defect detection and mutation survival across industry benchmarks.
 
-![The Code Coverage Mirage](/assets/charts/code-coverage-mutation-score-quality.png)
+[![The Code Coverage Mirage](/assets/charts/code-coverage-mutation-score-quality.png)](/assets/charts/code-coverage-mutation-score-quality.png)
 
 ## References
 
