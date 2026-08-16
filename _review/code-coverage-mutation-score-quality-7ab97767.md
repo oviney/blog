@@ -9,7 +9,7 @@ subtitle: "What 93% coverage conceals: the mutation gap where logic errors breed
 slug: "code-coverage-mutation-score-quality"
 tags: [quality-engineering, test-automation]
 image: /assets/images/code-coverage-mutation-score-quality-hero.svg
-image_alt: "An Economist-style editorial illustration of a towering green percentage meter glowing on a boardroom wall while beneath the floorboards a deep chasm reveals broken components and undetected faults."
+image_alt: "A towering green percentage meter glows on a boardroom wall while beneath the floorboards a deep chasm reveals broken components and undetected faults."
 image_caption: "Green coverage dashboards reward visiting code rather than catching defects, leaving logic errors undetected behind a wall of passing assertions."
 ---
 
