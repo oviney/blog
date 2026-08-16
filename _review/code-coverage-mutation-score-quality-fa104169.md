@@ -31,7 +31,7 @@ The deeper problem is not the metric itself but the governance architecture buil
 
 The honest counter-case deserves the floor. The same Google group found coverage genuinely useful as developer feedback (Code Coverage at Google, ESEC/FSE 2019), and its mutation service pointedly computes no mutation score at all: coverage decides which lines get mutated, and the authors call mutation adequacy neither practical nor desirable. Mutation score is itself an imperfect proxy with a contested link to real faults. The defensible claim is therefore narrower than "coverage lies": coverage is a fine floor and a poor ceiling, and it is the gap between coverage and kill rate, not either number alone, that carries signal. What would prove this post wrong: codebases where high line coverage coincides with high mutation kill rates at scale, or evidence that closing the oracle gap fails to reduce escaped defects.
 
-The chart below puts the four numbers side by side: one team's reported coverage, the folk-tale threshold, the same threshold after an honest refactoring, and what the tests actually caught.
+As the chart below illustrates, four numbers put the dynamic side by side: one team's reported coverage, the folk-tale threshold, the same threshold after an honest refactoring, and what the tests actually caught.
 
 [![The Code Coverage Mirage](/assets/charts/code-coverage-mutation-score-quality.png)](/assets/charts/code-coverage-mutation-score-quality.png)
 
