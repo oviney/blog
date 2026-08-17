@@ -1,0 +1,180 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <title>Abolish the Quality Police: Delivery teams must own what they ship</title>
+  <desc>An Economist-style editorial illustration of a quality inspector stamping approved on a crumbling tower of software containers while engineering squads look on below.</desc>
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F19"/>
+      <stop offset="60%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="boxGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="boxGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="boxHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#64748B"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <linearGradient id="redAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E3120B"/>
+      <stop offset="100%" stop-color="#EF4444"/>
+    </linearGradient>
+    <linearGradient id="stampGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E3120B"/>
+      <stop offset="100%" stop-color="#991B1B"/>
+    </linearGradient>
+    <linearGradient id="fissureGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EF4444"/>
+      <stop offset="50%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#DC2626"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1600" height="900" fill="url(#bgGrad)"/>
+
+  <!-- Economist Red Header Band -->
+  <rect x="0" y="0" width="1600" height="16" fill="#E3120B"/>
+
+  <!-- Grid Blueprint Lines -->
+  <g opacity="0.1" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="6 6">
+    <line x1="100" y1="150" x2="1500" y2="150"/>
+    <line x1="100" y1="350" x2="1500" y2="350"/>
+    <line x1="100" y1="550" x2="1500" y2="550"/>
+    <line x1="100" y1="750" x2="1500" y2="750"/>
+    <line x1="300" y1="50" x2="300" y2="850"/>
+    <line x1="600" y1="50" x2="600" y2="850"/>
+    <line x1="900" y1="50" x2="900" y2="850"/>
+    <line x1="1200" y1="50" x2="1200" y2="850"/>
+  </g>
+
+  <!-- Base Platform / Foundation -->
+  <rect x="250" y="780" width="1100" height="24" rx="4" fill="#1E293B" stroke="#475569" stroke-width="2"/>
+
+  <!-- Crumbling / Leaning Tower of Software Modules (Centre) -->
+  <g id="leaning-tower">
+    <!-- Base Layer Cracks / Fissures -->
+    <g filter="url(#glow)">
+      <path d="M 680 780 L 720 710 L 700 640 L 760 580" fill="none" stroke="url(#fissureGrad)" stroke-width="4"/>
+      <path d="M 880 780 L 850 690 L 890 620 L 860 540" fill="none" stroke="url(#fissureGrad)" stroke-width="3.5"/>
+      <path d="M 720 710 L 790 730 L 850 690" fill="none" stroke="url(#fissureGrad)" stroke-width="3"/>
+    </g>
+
+    <!-- Bottom Tier Boxes (Foundation Level) -->
+    <!-- Box 1 Left (Tilting Left) -->
+    <g transform="translate(540, 660) rotate(-4)">
+      <polygon points="0,0 150,-30 250,10 100,40" fill="url(#boxHighlight)" stroke="#64748B" stroke-width="2"/>
+      <polygon points="0,0 100,40 100,120 0,80" fill="url(#boxGrad1)" stroke="#334155" stroke-width="2"/>
+      <polygon points="100,40 250,10 250,90 100,120" fill="url(#boxGrad2)" stroke="#334155" stroke-width="2"/>
+      <!-- Internal Error Indicator -->
+      <circle cx="120" cy="75" r="8" fill="#EF4444" opacity="0.8"/>
+    </g>
+
+    <!-- Box 2 Right (Cracking Foundation) -->
+    <g transform="translate(800, 650) rotate(5)">
+      <polygon points="0,0 160,-25 260,15 100,40" fill="url(#boxHighlight)" stroke="#64748B" stroke-width="2"/>
+      <polygon points="0,0 100,40 100,120 0,80" fill="url(#boxGrad1)" stroke="#334155" stroke-width="2"/>
+      <polygon points="100,40 260,15 260,95 100,120" fill="url(#boxGrad2)" stroke="#334155" stroke-width="2"/>
+      <!-- Warning Accent Stripe -->
+      <line x1="30" y1="20" x2="80" y2="90" stroke="#F59E0B" stroke-width="3" stroke-dasharray="6 4"/>
+    </g>
+
+    <!-- Mid Tier Boxes (Unstable Stacking) -->
+    <!-- Box 3 Centre (Displaced) -->
+    <g transform="translate(640, 480) rotate(-8)">
+      <polygon points="0,0 160,-30 270,10 110,40" fill="url(#boxHighlight)" stroke="#64748B" stroke-width="2"/>
+      <polygon points="0,0 110,40 110,130 0,90" fill="url(#boxGrad1)" stroke="#334155" stroke-width="2"/>
+      <polygon points="110,40 270,10 270,100 110,130" fill="url(#boxGrad2)" stroke="#334155" stroke-width="2"/>
+      <!-- Red Stress Marker -->
+      <line x1="20" y1="30" x2="90" y2="100" stroke="#E3120B" stroke-width="3.5"/>
+    </g>
+
+    <!-- Box 4 Offset (Overhanging) -->
+    <g transform="translate(760, 360) rotate(7)">
+      <polygon points="0,0 150,-25 250,15 100,40" fill="url(#boxHighlight)" stroke="#64748B" stroke-width="2"/>
+      <polygon points="0,0 100,40 100,110 0,70" fill="url(#boxGrad1)" stroke="#334155" stroke-width="2"/>
+      <polygon points="100,40 250,15 250,85 100,110" fill="url(#boxGrad2)" stroke="#334155" stroke-width="2"/>
+    </g>
+
+    <!-- Top Tier Box (Under the Stamp) -->
+    <g transform="translate(680, 240) rotate(-3)">
+      <polygon points="0,0 160,-30 260,10 100,40" fill="url(#boxHighlight)" stroke="#94A3B8" stroke-width="2"/>
+      <polygon points="0,0 100,40 100,100 0,60" fill="url(#boxGrad1)" stroke="#475569" stroke-width="2"/>
+      <polygon points="100,40 260,10 260,70 100,100" fill="url(#boxGrad2)" stroke="#475569" stroke-width="2"/>
+      <!-- Glowing Red Impact Seal / Target -->
+      <ellipse cx="140" cy="5" rx="45" ry="20" fill="url(#redAccent)" opacity="0.85" filter="url(#glow)"/>
+    </g>
+  </g>
+
+  <!-- Inspection Tower / Gantry & Quality Police Inspector (Top Right) -->
+  <g transform="translate(1020, 100)">
+    <!-- High Inspection Podium / Scaffolding -->
+    <rect x="60" y="60" width="220" height="300" rx="8" fill="#1E293B" stroke="#475569" stroke-width="2.5"/>
+    <line x1="60" y1="120" x2="280" y2="120" stroke="#334155" stroke-width="2"/>
+    <line x1="60" y1="200" x2="280" y2="200" stroke="#334155" stroke-width="2"/>
+    <!-- Diagonal Braces -->
+    <line x1="60" y1="60" x2="280" y2="200" stroke="#334155" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <line x1="280" y1="60" x2="60" y2="200" stroke="#334155" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+    <!-- Bureaucratic Inspector Silhouette -->
+    <!-- Head with Visor/Hat -->
+    <circle cx="160" cy="30" r="26" fill="#E2E8F0"/>
+    <path d="M 125 25 L 195 25 L 185 10 L 135 10 Z" fill="#0F172A"/>
+    <!-- Body in Dark Coat -->
+    <path d="M 125 56 C 125 45, 195 45, 195 56 L 220 180 L 100 180 Z" fill="#334155"/>
+    <!-- Extended Arm holding Massive Stamp -->
+    <path d="M 130 80 L -120 120 L -115 155 L 135 110 Z" fill="#475569"/>
+    
+    <!-- Massive Heavy Duty Quality Stamp -->
+    <g transform="translate(-140, 115) rotate(12)">
+      <!-- Wooden/Metal Handle -->
+      <rect x="15" y="-60" width="30" height="60" rx="6" fill="#94A3B8" stroke="#334155" stroke-width="2"/>
+      <circle cx="30" cy="-65" r="16" fill="#CBD5E1"/>
+      <!-- Heavy Rectangular Stamp Head -->
+      <rect x="-20" y="0" width="100" height="35" rx="4" fill="url(#stampGlow)" stroke="#FFFFFF" stroke-width="2" filter="url(#glow)"/>
+      <rect x="-15" y="5" width="90" height="25" rx="2" fill="#E3120B"/>
+    </g>
+  </g>
+
+  <!-- Delivery Engineers Silhouettes (Bottom Left & Right Foreground) -->
+  <!-- Engineer Squad 1 (Left - Gesturing at Collapse) -->
+  <g transform="translate(320, 620)">
+    <!-- Engineer 1 -->
+    <circle cx="60" cy="40" r="22" fill="#E2E8F0"/>
+    <path d="M 35 62 C 35 55, 85 55, 85 62 L 95 160 L 25 160 Z" fill="#334155"/>
+    <!-- Arm Pointing at Structural Fissure -->
+    <path d="M 70 80 L 170 30 L 175 45 L 75 95 Z" fill="#64748B"/>
+
+    <!-- Engineer 2 (Holding Diagnostics Tablet) -->
+    <circle cx="160" cy="55" r="20" fill="#CBD5E1"/>
+    <path d="M 135 75 C 135 70, 185 70, 185 75 L 195 160 L 125 160 Z" fill="#475569"/>
+    <!-- Tablet Screen (Glowing Blue Diagnostic) -->
+    <rect x="190" y="70" width="35" height="50" rx="3" fill="#38BDF8" filter="url(#glow)"/>
+  </g>
+
+  <!-- Engineer Squad 2 (Right - Pushing Back on Falling Load) -->
+  <g transform="translate(1080, 640)">
+    <!-- Engineer 3 Straining -->
+    <circle cx="60" cy="45" r="20" fill="#E2E8F0"/>
+    <path d="M 35 65 C 35 60, 85 60, 85 65 L 95 140 L 25 140 Z" fill="#334155"/>
+    <!-- Arms Braced Forward -->
+    <path d="M 45 80 L -40 30 L -35 15 L 50 65 Z" fill="#64748B"/>
+  </g>
+
+  <!-- Floating Warning Sparks / Fragmenting Code Shards -->
+  <g fill="#EF4444" opacity="0.8">
+    <polygon points="620,420 635,410 630,430"/>
+    <polygon points="860,340 875,335 870,355"/>
+    <polygon points="560,570 580,560 570,585"/>
+    <polygon points="920,580 940,575 930,595"/>
+    <polygon points="780,210 795,200 790,225"/>
+  </g>
+</svg>
