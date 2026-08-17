@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-10T09:58:56.220Z",
+  "generatedAt": "2026-08-17T09:44:29.796Z",
   "kpis": {
-    "agentPRsMerged30d": 7,
+    "agentPRsMerged30d": 2,
     "evalPassRate": 33,
     "contentAvgScore": null,
-    "openBacklog": 2,
-    "openPRCount": 5,
+    "openBacklog": 0,
+    "openPRCount": 1,
     "evalCount": 3,
     "remediationQueueDepth": 0,
     "remediationThreshold": 85
@@ -70,199 +70,181 @@
   "content": null,
   "recentPRs": [
     {
-      "number": 1246,
-      "title": "docs: close out the session — commit project agent memory, record repo state",
+      "number": 1288,
+      "title": "fix(content): alt text on the regenerated coverage draft (4th occurrence)",
       "author": "oviney",
-      "mergedAt": "2026-08-09T12:04:50Z",
+      "mergedAt": "2026-08-16T02:22:21Z",
       "labels": [],
       "isAgent": false
     },
     {
-      "number": 1247,
-      "title": "fix(deps): clear the js-yaml quadratic-CPU advisory blocking the Security Audit gate",
+      "number": 1287,
+      "title": "fix(gate): check _review/ drafts, and fix the draft already carrying the defect",
       "author": "oviney",
-      "mergedAt": "2026-08-09T12:01:38Z",
+      "mergedAt": "2026-08-16T02:11:34Z",
       "labels": [],
       "isAgent": false
     },
     {
-      "number": 1235,
-      "title": "ci(qa): make the nightly alarm watch every job, not just one",
+      "number": 1286,
+      "title": "docs(backlog): the published-internal-docs P3 is ten files, not just tasks/",
       "author": "oviney",
-      "mergedAt": "2026-08-05T13:40:14Z",
+      "mergedAt": "2026-08-15T23:00:49Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1285,
+      "title": "fix(content): replace prompt text with real alt text on the microservices hero",
+      "author": "oviney",
+      "mergedAt": "2026-08-15T22:32:53Z",
       "labels": [
-        "agent:qa-gatekeeper"
+        "agent:editorial-chief"
       ],
       "isAgent": true
     },
     {
-      "number": 1234,
-      "title": "fix(deps): clear the six npm advisories blocking the Security Audit gate",
+      "number": 1280,
+      "title": "docs: archive the 2026-08-12 cycle and stop local doc-audit runs filing issues",
       "author": "oviney",
-      "mergedAt": "2026-08-05T13:18:28Z",
-      "labels": [
-        "agent:qa-gatekeeper"
-      ],
-      "isAgent": true
-    },
-    {
-      "number": 1203,
-      "title": "style(theme): remove the legacy homepage CSS the 2026 redesign orphaned",
-      "author": "oviney",
-      "mergedAt": "2026-08-02T22:56:39Z",
-      "labels": [
-        "agent:creative-director",
-        "needs-human-review"
-      ],
-      "isAgent": true
-    },
-    {
-      "number": 1202,
-      "title": "docs(spec): spec the two CI rows the PR-gate epic left behind",
-      "author": "oviney",
-      "mergedAt": "2026-08-02T15:35:52Z",
+      "mergedAt": "2026-08-13T02:52:13Z",
       "labels": [],
       "isAgent": false
     },
     {
-      "number": 1201,
-      "title": "docs(backlog): close the PR-gate epic — all four streams shipped",
+      "number": 1278,
+      "title": "docs: ADR-010 — defer native custom agents, agent:* labels stay canonical",
       "author": "oviney",
-      "mergedAt": "2026-08-02T13:26:56Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1200,
-      "title": "test(qa): split content-edge-cases into real guards and dead weight",
-      "author": "oviney",
-      "mergedAt": "2026-08-02T13:22:42Z",
-      "labels": [
-        "agent:qa-gatekeeper"
-      ],
-      "isAgent": true
-    },
-    {
-      "number": 1197,
-      "title": "ci(qa): slim the PR gate to a page contract, move the full suite to nightly",
-      "author": "oviney",
-      "mergedAt": "2026-08-02T13:08:12Z",
-      "labels": [
-        "agent:qa-gatekeeper"
-      ],
-      "isAgent": true
-    },
-    {
-      "number": 1198,
-      "title": "docs: correct Stream B/C status in SPEC.md and BACKLOG",
-      "author": "oviney",
-      "mergedAt": "2026-08-02T12:49:00Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1196,
-      "title": "chore: wrap up the homepage-redesign loose ends (tokens, spec, backlog)",
-      "author": "oviney",
-      "mergedAt": "2026-08-02T12:44:11Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1195,
-      "title": "docs(instructions): forbid tests that cannot fail",
-      "author": "oviney",
-      "mergedAt": "2026-08-02T12:32:46Z",
+      "mergedAt": "2026-08-13T02:38:12Z",
       "labels": [
         "governance-update"
       ],
       "isAgent": false
     },
     {
-      "number": 1194,
-      "title": "test(qa): delete assertions that cannot fail, replace conditional skips",
+      "number": 1277,
+      "title": "fix(doc-audit): audit skill files for accuracy instead of age",
       "author": "oviney",
-      "mergedAt": "2026-08-02T12:32:43Z",
+      "mergedAt": "2026-08-13T02:35:29Z",
       "labels": [
-        "agent:qa-gatekeeper"
+        "governance-update"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 1242,
+      "title": "chore(deps-dev): Bump jekyll-remote-theme from 0.4.3 to 0.5.2",
+      "author": "dependabot[bot]",
+      "mergedAt": "2026-08-13T02:32:49Z",
+      "labels": [
+        "needs-human-review"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 1275,
+      "title": "docs: repair the archived-cycle cross-links and record why they break",
+      "author": "oviney",
+      "mergedAt": "2026-08-13T02:32:33Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1274,
+      "title": "chore: remove the healing machinery orphaned by the monitor retirement",
+      "author": "oviney",
+      "mergedAt": "2026-08-13T02:22:52Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1273,
+      "title": "fix(404): give the page a height floor so its baseline stops straddling the fold",
+      "author": "oviney",
+      "mergedAt": "2026-08-13T02:20:15Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1272,
+      "title": "fix(a11y): stop the masthead claiming a heading level, and guard the outline",
+      "author": "oviney",
+      "mergedAt": "2026-08-13T02:17:09Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1271,
+      "title": "refactor(css): delete the orphaned econ-card cluster from the theme",
+      "author": "oviney",
+      "mergedAt": "2026-08-13T02:07:52Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1270,
+      "title": "test(visual): stop the blocking pixel gate depending on third-party hosts",
+      "author": "oviney",
+      "mergedAt": "2026-08-13T01:47:31Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1268,
+      "title": "docs(agent-memory): record the four lessons the #1260 fan-out produced",
+      "author": "oviney",
+      "mergedAt": "2026-08-13T01:47:20Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1269,
+      "title": "fix(security): accept the extract-zip advisory so the PR queue is not blocked",
+      "author": "oviney",
+      "mergedAt": "2026-08-13T01:36:15Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1260,
+      "title": "fix(home): apply the four fixes from the undelivered Claude Design drop",
+      "author": "oviney",
+      "mergedAt": "2026-08-12T03:59:48Z",
+      "labels": [
+        "needs-human-review"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 1264,
+      "title": "fix(a11y): replace prompt text with real alt text on the hallucination-debt post",
+      "author": "oviney",
+      "mergedAt": "2026-08-12T03:56:33Z",
+      "labels": [
+        "agent:editorial-chief"
       ],
       "isAgent": true
     },
     {
-      "number": 1193,
-      "title": "Redesign home page: editorial layout with lead story and topic index",
+      "number": 1259,
+      "title": "docs(lifecycle): close out the Dependabot scope-exemption work",
       "author": "oviney",
-      "mergedAt": "2026-08-02T12:20:38Z",
+      "mergedAt": "2026-08-11T18:04:31Z",
       "labels": [],
       "isAgent": false
     },
     {
-      "number": 1192,
-      "title": "docs(backlog): retire the homepage-baseline row and archive the lifecycle",
+      "number": 1257,
+      "title": "chore(ci): let Dependabot's bundler bumps pass the scope guard on their own",
       "author": "oviney",
-      "mergedAt": "2026-08-01T22:06:20Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1191,
-      "title": "qa(visual): decouple the homepage baseline from post publication",
-      "author": "oviney",
-      "mergedAt": "2026-08-01T22:01:49Z",
-      "labels": [
-        "agent:qa-gatekeeper"
-      ],
-      "isAgent": true
-    },
-    {
-      "number": 1190,
-      "title": "docs(agents): retire the stale bare-#NNN warning in the Handoff Packet",
-      "author": "oviney",
-      "mergedAt": "2026-08-01T21:45:49Z",
-      "labels": [
-        "protected-file-update"
-      ],
-      "isAgent": false
-    },
-    {
-      "number": 1189,
-      "title": "docs(plan): resolve the three open decisions and plan the homepage decoupling",
-      "author": "oviney",
-      "mergedAt": "2026-08-01T19:58:21Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1188,
-      "title": "docs(spec): spec the homepage visual-baseline decoupling",
-      "author": "oviney",
-      "mergedAt": "2026-08-01T19:43:36Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1187,
-      "title": "docs(backlog): clear the two P2 rows and reconcile the queue",
-      "author": "oviney",
-      "mergedAt": "2026-08-01T12:26:13Z",
+      "mergedAt": "2026-08-11T17:56:23Z",
       "labels": [],
       "isAgent": false
     }
   ],
   "openIssuesByLabel": {
     "agent:creative-director": [],
-    "agent:qa-gatekeeper": [
-      {
-        "number": 1240,
-        "title": "Nightly quality suite failing",
-        "age": 3
-      },
-      {
-        "number": 1035,
-        "title": "Workflow ROI Review — 2026-06-01",
-        "age": 70
-      }
-    ],
+    "agent:qa-gatekeeper": [],
     "agent:editorial-chief": [],
     "agent:editorial-manager": []
   },
