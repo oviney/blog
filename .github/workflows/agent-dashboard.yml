@@ -2,8 +2,19 @@ name: Agent Observability Dashboard
 
 on:
   schedule:
-    # Every Monday at 09:30 UTC — after the activity report (09:00) has run
-    - cron: "30 9 * * 1"
+    # 09:30 UTC on the 1st — after agent-rework-tracking and workflow-roi
+    # (both 09:00 on the 1st), matching the monthly rhythm they already use.
+    #
+    # Was weekly, which was 4x more often than the data can change: every KPI
+    # in agents-data.json is either a 30-day window (agentPRsMerged30d) or a
+    # monthly billing figure (copilotUsage.billingCycleStart/End,
+    # seatCostPerMonth). A weekly refresh of monthly data produced a PR that
+    # could not self-serve — bot-authored PRs sit in `action_required` so no
+    # check ever runs on them — which the orchestrator then labelled
+    # needs-human-review after 2h, and which the following week's run
+    # superseded. 4 of the 8 refresh PRs to date were closed unmerged that way;
+    # #1296 sat open for 12 days.
+    - cron: "30 9 1 * *"
   workflow_dispatch:
 
 permissions:
