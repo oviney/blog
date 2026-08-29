@@ -122,4 +122,80 @@ Revisit when **any** of these becomes true:
 
 ---
 
+## ADR-011: Extract the Agent Framework — the Classification ADR-008 Asked For
+
+**Date**: August 2026
+**Status**: Active — classification agreed, execution not yet scheduled
+**Supersedes nothing. Executes [ADR-008](#adr-008-publication-first-repository-boundary).**
+
+**Context**: ADR-008 (May 2026) decided this repository is publication-first and
+said extraction discussions "should start by classifying automation into
+keep-in-blog, extract, or decide-later buckets." That classification was never
+produced, so ADR-008 has been a stated principle with no operative consequence
+for three months. In the same period the machinery grew and the publication did
+not.
+
+Measured 2026-08-29:
+
+| Surface | Keep | Extract | Decide later | Extract share |
+|---|---:|---:|---:|---:|
+| Workflows | 987 | **2,461** | 34 | **72%** |
+| Scripts | 3,161 | **2,976** | — | **49%** |
+| Skills | 3,876 | **3,505** | — | **48%** |
+| **Total** | 8,024 | **8,942** | 34 | **53%** |
+
+More than half the automation in the blog's repository is not about the blog.
+
+The delivery record says the same thing. Of the last 250 merged PRs: 76
+CI/agent machinery, 51 docs/governance, 35 site/theme, 22 dependency bumps,
+**7 content**. Of the last 300 workflow runs, **295** were `CI Orchestrator` and
+`CI Health Monitor` — and **none** was a deploy.
+
+The cost is not abstract. In the week this ADR was written, `main` failed its
+nightly seven consecutive nights on one line of alt text, a fully green PR sat
+unmerged for fourteen days, no deploy ran for twelve days, and the orchestrator
+whose first stated job is "merge passing PRs" turned out never to have merged
+one — three independent permanent blockers, discovered only because someone went
+looking. The machinery was not neglected. It was *unowned*, which in a
+single-maintainer repository is the same thing arriving more slowly.
+
+**Decision**: Adopt the classification in
+[`specs/extract-agent-framework.md`](specs/extract-agent-framework.md). Three
+buckets, by one test — **does this exist to publish, validate, deploy or protect
+viney.ca?**
+
+1. **Keep** — the deploy pipeline, the public-page quality gates, the content
+   validators and the editorial pipeline. These fail loudly and visibly when the
+   blog breaks, which is the property that makes them worth their cost.
+2. **Extract** — the orchestrator, the eval harness, the health monitor, the
+   activity/ROI/rework reporters, the observability dashboard, the doc auditor,
+   and the twenty-one generic lifecycle skills that are mirrors of upstream
+   `agent-skills` rather than anything about this blog.
+3. **Decide later** — `copilot-setup-steps.yml`, which GitHub requires wherever
+   Copilot cloud agents run, and `check-pr-scope.sh`, whose *engine* is generic
+   but whose *rules* name this repository's protected files. Both move only if
+   their consumer moves.
+
+Execution is **not** scheduled by this ADR. Creating repositories and moving
+history requires owner action.
+
+**Consequences**: `ROADMAP.md`, `CLAUDE.md` and `docs/CURRENT_STATE.md` stop
+being aspirational about the boundary and can cite a concrete list. Any new
+workflow or script must declare its bucket in the PR that introduces it; a change
+landing in the extract bucket needs a reason it cannot wait for the extraction.
+
+The reversal cost is low and worth stating plainly: extraction is a file move
+plus a pinned dependency. If it proves wrong, the files come back. That is a
+weaker commitment than the three months of drift it replaces, which is the
+argument for making it now rather than deferring again.
+
+The honest risk is the opposite one. A single maintainer running two repositories
+has more overhead than one running one, and the extracted repository inherits the
+same ownership gap that let the orchestrator sit broken. Extraction relocates
+that machinery; it does not by itself fix it. The spec therefore requires that
+anything extracted is either **actively used** in its new home or **deleted** —
+moving it is not a way of keeping it.
+
+---
+
 *Add new decisions below this line, following the ADR-NNN format.*
