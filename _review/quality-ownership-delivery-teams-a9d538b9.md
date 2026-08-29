@@ -10,7 +10,7 @@ slug: quality-ownership-delivery-teams
 tags: [quality-engineering, software-engineering]
 image_caption: "Centralised testing gates manufacture a false sense of security, approving fragile deployments while delivery teams defer the true cost of quality."
 image: /assets/images/quality-ownership-delivery-teams-hero.svg
-image_alt: "An Economist-style editorial illustration of a quality inspector stamping approved on a crumbling tower of software containers while engineering squads look on below."
+image_alt: 'A quality inspector stamps "approved" on a crumbling tower of software containers while engineering squads look on below.'
 ---
 
 A persistent illusion haunts software leadership: that quality is something done *to* code by specialists downstream, rather than built into it by the people who write it. For decades, organisations erected Testing Centres of Excellence — centralised gatekeeping functions whose mandate was to catch what developers had not bothered to prevent. The gates are still standing. The quality is still missing. According to the Tricentis 2025 Quality Transformation Report, which surveyed 2,750 organisations across ten countries, 45% explicitly prioritise delivery speed over quality; only 13% say quality comes first. More revealingly, 63% admit to deploying code without fully testing it. This is not a tactical concession under deadline pressure — it is the revealed preference of an industry that has externalised accountability so comprehensively it has forgotten what accountability feels like. The quality crisis is not accidental. It was designed.
