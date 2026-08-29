@@ -31,10 +31,10 @@ $h26-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
 $h26-bp: 48em; // two-column → single-column
 
-// Outer width of the page, matching the 1040px rhythm the blog index and
-// category pages use. Referenced by the newsletter re-cap below, which has to
-// line up with this wrapper's *content* box, not its border box.
-$h26-max: 1040px;
+// Outer width of the page: the site grid the blog index, category pages and
+// the masthead all sit on. Referenced by the newsletter re-cap below, which has
+// to line up with this wrapper's *content* box, not its border box.
+$h26-max: theme.$grid-max-width;
 
 // The theme caps `.main-content` at 900px and escapes that cap per page type
 // with `:has()` (.economist-article, .topic-page, .econ-topic-page, .homepage).

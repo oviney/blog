@@ -301,6 +301,118 @@ test.describe('@visual Gap E — Listing width matches design token @REQ-VISUAL-
 
 });
 
+test.describe('@visual Gap F — Masthead sits on the site grid @REQ-VISUAL-01', () => {
+
+  // Gap E asserts a listing wrapper is ~1040px wide. Nothing asserted that the
+  // masthead sits on the same axis as that wrapper, and the two were never
+  // connected in CSS: `.site-title` and `.site-nav ul` carried their own
+  // hardcoded `max-width: 900px`. So the masthead lined up with the content
+  // column on exactly one page type (`/about/`) and was off by between -83px
+  // and +94px everywhere else.
+  //
+  // #1260 made that visible on `/` — it widened the home page to 1040px but
+  // could not move the masthead, because `_sass/economist-theme.scss` was out
+  // of scope for that cycle. It then re-seeded the visual baselines, which
+  // recorded the misalignment as expected. A pixel gate cannot flag a
+  // regression it has been taught to expect, which is why this has to be a
+  // geometric assertion rather than a screenshot.
+  //
+  // The contract: masthead and nav anchor to one grid on every page, whatever
+  // that page's own reading measure is.
+  const GRID_MAX_WIDTH = 1040; // $grid-max-width
+  const GRID_GUTTER = 32;      // $spacing-lg at the site's 16px root
+  const TOLERANCE = 1;         // sub-pixel rounding only
+
+  // Where the grid's text edge falls at a given viewport. Computed rather than
+  // hardcoded: asserting a literal `232` would pass at 1440px and be silently
+  // meaningless at every other width.
+  const gridTextLeft = (viewportWidth: number) =>
+    Math.max(0, (viewportWidth - GRID_MAX_WIDTH) / 2) + GRID_GUTTER;
+
+  // The grid only binds above the 767px nav breakpoint; below it the masthead
+  // keeps the narrow `$spacing-md` gutter and this contract does not apply.
+  // 1024 is deliberate: below the grid's own width, so `gridTextLeft` clamps to
+  // a bare gutter. It proves the assertion is computed rather than a 1440px
+  // coincidence, and covers the band where the wrappers are fluid.
+  const gridViewports = [
+    { width: 1024, height: 768 },
+    { width: 1440, height: 900 },
+    { width: 1920, height: 1080 },
+  ];
+
+  // `onGrid: true` means the page's content column is the grid itself, so its
+  // text must share the masthead's axis. `false` means the page deliberately
+  // narrows its reading measure inside the grid — `/about/` at 900px and posts
+  // at 750px ($content-max-width) — and is expected to be inset. Those pages
+  // still assert the masthead, because the masthead belongs to the site rather
+  // than to the article.
+  const pages = [
+    { path: '/', name: 'Homepage', wrapper: '.home-2026', onGrid: true },
+    { path: '/blog/', name: 'Blog index', wrapper: '.econ-topic-page', onGrid: true },
+    { path: '/security/', name: 'Security', wrapper: '.topic-page', onGrid: true },
+    { path: '/search/', name: 'Search', wrapper: '.topic-page', onGrid: true },
+    { path: '/about/', name: 'About', wrapper: '.main-content', onGrid: false },
+    { path: '/2025/12/31/testing-times/', name: 'Post', wrapper: '.economist-article', onGrid: false },
+  ];
+
+  // Left edge of an element's *content* box — where the reader sees text or a
+  // block start, not where its padding starts.
+  const textLeft = (selector: string) => async (page) =>
+    page.locator(selector).first().evaluate((el: Element) => {
+      const rect = el.getBoundingClientRect();
+      return rect.left + parseFloat(window.getComputedStyle(el).paddingLeft);
+    });
+
+  for (const viewport of gridViewports) {
+    for (const { path, name, wrapper, onGrid } of pages) {
+      test(`${name} (${path}) masthead is on the grid at ${viewport.width}px`, async ({ page }) => {
+        await page.setViewportSize(viewport);
+        await page.goto(path);
+        await page.waitForLoadState('networkidle');
+
+        const expected = gridTextLeft(viewport.width);
+
+        // The masthead's red logo block is an inline-block anchor flush with
+        // the title's content box, so its own left edge is the visible axis.
+        const logo = page.locator('.site-title a').first();
+        await expect(logo).toBeVisible();
+        const logoLeft = (await logo.boundingBox())!.x;
+        expect(
+          Math.abs(logoLeft - expected),
+          `masthead at ${logoLeft}px, grid at ${expected}px`,
+        ).toBeLessThanOrEqual(TOLERANCE);
+
+        // Each nav link carries its own `padding-left: $spacing-md`, so it is
+        // the link's text edge — not the list box — that has to land on the
+        // grid. Checking the `ul` instead would pass while the visible nav sat
+        // 24px inboard of the masthead, which is what it did before this guard.
+        const navLinkLeft = await textLeft('.site-nav ul li a')(page);
+        expect(
+          Math.abs(navLinkLeft - expected),
+          `first nav link at ${navLinkLeft}px, grid at ${expected}px`,
+        ).toBeLessThanOrEqual(TOLERANCE);
+
+        const contentLeft = await textLeft(wrapper)(page);
+        if (onGrid) {
+          expect(
+            Math.abs(contentLeft - expected),
+            `${wrapper} text at ${contentLeft}px, grid at ${expected}px`,
+          ).toBeLessThanOrEqual(TOLERANCE);
+        } else {
+          // Inset by design. Assert it really is inset rather than skipping:
+          // a narrow measure that drifted *outboard* of the grid would be a
+          // regression this branch would otherwise wave through.
+          expect(
+            contentLeft,
+            `${wrapper} should be inset from the grid, not outboard of it`,
+          ).toBeGreaterThan(expected);
+        }
+      });
+    }
+  }
+
+});
+
 test.describe('@visual Image Responsiveness @REQ-VISUAL-01', () => {
 
   test('Hero images never exceed the viewport at any width', async ({ page }) => {
