@@ -13,7 +13,11 @@ name: 🤖 CI Orchestrator
 
 on:
   schedule:
-    - cron: '*/15 * * * *'   # every 15 minutes
+    # Hourly. Was */15, which cost ~96 runs/day — 169 of the last 300 runs in
+    # this repo — on a blog that merges a couple of PRs a week. The `push`
+    # trigger below already covers the case that actually matters (a merge
+    # landing on main); the cron is only a safety net for the rest.
+    - cron: '0 * * * *'
   push:
     branches: [main]          # run on every merge to main; idempotent if nothing to act on
   workflow_dispatch:
@@ -31,6 +35,12 @@ permissions:
 
 env:
   DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+  # Unattended merging is OFF unless the repo variable is set to 'true'. The
+  # merge path below carried three independent permanent blockers and had
+  # therefore never merged a single PR in this repository's history, so enabling
+  # it is a genuinely new behaviour rather than a restoration of a lost one.
+  # Opt in deliberately: `gh variable set ORCHESTRATOR_AUTO_MERGE --body true`.
+  AUTO_MERGE: ${{ vars.ORCHESTRATOR_AUTO_MERGE || 'false' }}
   # Cross-repo token (optional — only needed for economist-agents operations)
   ORCHESTRATOR_TOKEN: ${{ secrets.ORCHESTRATOR_TOKEN }}
 
@@ -48,6 +58,7 @@ jobs:
         env:
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
           DRY_RUN: ${{ env.DRY_RUN }}
+          AUTO_MERGE: ${{ env.AUTO_MERGE }}
           ORCHESTRATOR_TOKEN: ${{ env.ORCHESTRATOR_TOKEN }}
         with:
           # Use ORCHESTRATOR_TOKEN when available so cross-repo writes are
@@ -58,6 +69,7 @@ jobs:
             // Helpers
             // ─────────────────────────────────────────────────────────────────
             const DRY_RUN = process.env.DRY_RUN === 'true';
+            const AUTO_MERGE = process.env.AUTO_MERGE === 'true';
             const NOW      = Date.now();
             const MIN      = 60 * 1000;
 
@@ -259,9 +271,29 @@ jobs:
                   repo:  context.repo.repo,
                   ref:   pr.head.sha,
                 });
-                const REQUIRED_CHECKS = ['Copilot code review'];
+                // BLOCKER 1 (was): REQUIRED_CHECKS = ['Copilot code review'].
+                // No check by that name has ever run on this repository — the
+                // rollup is build / Build Site / check-agent-scope / Content
+                // Validation / Evaluate Agent PR / Nightly Alarm / Nightly Full
+                // Suite / Page Contract / Security Audit / validate-editorial /
+                // Visual Regression. `missingCheck` was therefore always truthy
+                // and every PR was skipped, permanently. Left empty rather than
+                // guessing a replacement: branch protection already encodes
+                // which checks are required, and duplicating that list here is
+                // how it drifted out of existence in the first place.
+                const REQUIRED_CHECKS = [];
+
+                // BLOCKER 2 (was): `every(conclusion === 'success')`. Three
+                // checks conclude `skipped` by design — Nightly Alarm, Nightly
+                // Full Suite and Evaluate Agent PR all gate themselves off on a
+                // normal PR — so this was false on every PR, permanently. A
+                // skipped or neutral run is not a failure; only a completed run
+                // with a bad conclusion is.
+                const BLOCKING_CONCLUSIONS = ['failure', 'timed_out', 'cancelled', 'action_required'];
+                const unfinished = checkRuns.check_runs.filter(r => r.status !== 'completed');
+                const failing = checkRuns.check_runs.filter(r => BLOCKING_CONCLUSIONS.includes(r.conclusion));
                 const allRunsPass = checkRuns.check_runs.length > 0 &&
-                  checkRuns.check_runs.every(r => r.status === 'completed' && r.conclusion === 'success');
+                  unfinished.length === 0 && failing.length === 0;
                 // total_count === 0 means no legacy status checks configured; rely on allRunsPass
                 const statusPass = checkStatus.state === 'success' || checkStatus.total_count === 0;
 
@@ -271,6 +303,11 @@ jobs:
 
                 if (missingCheck) {
                   skipped.push(`blog#${pr.number} — required check '${missingCheck}' not yet passing`);
+                } else if (!AUTO_MERGE) {
+                  skipped.push(
+                    `blog#${pr.number} — MERGEABLE and green, but AUTO_MERGE is off ` +
+                    `(set repo variable ORCHESTRATOR_AUTO_MERGE=true to enable)`
+                  );
                 } else if (allRunsPass && statusPass) {
                   await exec(
                     `Merged blog#${pr.number} (all checks passed)`,
@@ -282,10 +319,25 @@ jobs:
                     })
                   );
                 } else {
-                  skipped.push(`blog#${pr.number} — checks still running or pending`);
+                  const why = failing.length
+                    ? `failing: ${failing.map(r => r.name).join(', ')}`
+                    : `still running: ${unfinished.map(r => r.name).join(', ') || 'combined status not green'}`;
+                  skipped.push(`blog#${pr.number} — ${why}`);
                 }
               } else if (fullPR.mergeable_state === 'behind') {
-                skipped.push(`blog#${pr.number} — branch behind main, waiting for rebase`);
+                // BLOCKER 3 (was): this logged "waiting for rebase" and waited
+                // forever, because nothing in this repository rebases a behind
+                // branch. #1282 sat MERGEABLE/BEHIND and fully green for 14
+                // days across roughly 1,300 orchestrator runs. Update the
+                // branch instead of narrating the deadlock.
+                await exec(
+                  `Updated blog#${pr.number} from main (was behind)`,
+                  () => github.rest.pulls.updateBranch({
+                    owner:       context.repo.owner,
+                    repo:        context.repo.repo,
+                    pull_number: pr.number,
+                  })
+                );
               } else if (fullPR.mergeable_state === 'unstable') {
                 skipped.push(`blog#${pr.number} — checks not yet passing`);
               }
