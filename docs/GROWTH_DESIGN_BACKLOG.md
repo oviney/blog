@@ -1,13 +1,57 @@
-# Blog Growth and Design Backlog
+# Blog Growth and Design Audit — 2026-06-13
 
 Audit date: 2026-06-13
 Site reviewed: https://www.viney.ca/
+**Triaged against the codebase: 2026-08-29** (see below)
+
+## Status: this is an audit record, not a queue
+
+This file was untouched between 2026-06-26 and 2026-08-29 while asserting that
+shipped work was still open. It is no longer a backlog. It is the **record of
+the June 2026 audit**, kept because the analysis behind each item is worth
+keeping, and because `ROADMAP.md` cites it.
+
+**The queue is [`BACKLOG.md`](BACKLOG.md).** Live items from this audit have been
+promoted there. Do not pull work from this file — pull it from `BACKLOG.md`.
+
+### Triage, 2026-08-29 — verified against the codebase
+
+Seven items were **already shipped** and are marked `✅ SHIPPED` in place below.
+Each was verified by inspection, not by memory:
+
+| Item | Evidence |
+|------|----------|
+| BLOG-001 sitemap URL | `robots.txt` → `Sitemap: https://www.viney.ca/sitemap.xml` |
+| BLOG-002 utility pages deindexed | `dashboard/index.html` → `noindex, nofollow` + `sitemap: false` |
+| BLOG-017 intrinsic image dimensions | `_plugins/inject-image-dimensions.rb` + `_data/image_dimensions.yml` |
+| BLOG-019 Google Fonts `@import` | `_layouts/default.html:35,37` → `preconnect` + `<link rel="stylesheet">` |
+| BLOG-023 Person structured data | `_includes/seo-jsonld.html` |
+| BLOG-024 URL slug policy | `docs/URL_SLUG_POLICY.md` |
+| BLOG-025 automated public-page gates | `test-quality.yml` — a11y, visual, Lighthouse, security |
+
+**BLOG-022 is still open, and narrower than written.** `og:image` *is* emitted —
+`jekyll-seo-tag` handles it — so the item's premise ("generate reliable social
+preview images") is half wrong. The real defect is the **format**: 23 posts use
+PNG heroes, but **8 pages emit an SVG `og:image`**, and no major social platform
+renders SVG previews. Those eight share without a preview image. Promoted to
+`BACKLOG.md` with that corrected scope.
+
+**BLOG-005** is [#1063](https://github.com/oviney/blog/issues/1063), blocked on an
+owner decision (`ROADMAP.md` lists email subscription as out of scope).
+
+**BLOG-007 and BLOG-008** (consulting page, contact flow) are live but are
+business decisions, not agent work. They stay listed here until the owner wants
+them.
+
+The remaining seventeen items were **not** re-verified in this triage — they need
+design judgement rather than a grep, and claiming a verdict on them would be
+guessing. Treat them as *unverified as of 2026-06-13*.
 
 ## Relationship to the Repository Backlog
 
-This document is the portfolio backlog for reader growth, customer conversion,
-design, and public-site quality. The shorter [`BACKLOG.md`](BACKLOG.md) remains
-the priority queue for local implementation sessions.
+This document is the June 2026 audit record for reader growth, customer
+conversion, design, and public-site quality. [`BACKLOG.md`](BACKLOG.md) is the
+priority queue for local implementation sessions.
 
 Before implementation, mirror the selected item to a GitHub issue and assign the
 repository's appropriate agent and priority labels. Product ideas that conflict
@@ -48,7 +92,7 @@ Establish a baseline before implementation, then review monthly:
 
 ## Phase 1: Repair Discovery and Subscription Foundations
 
-### BLOG-001: Fix the production sitemap URL in `robots.txt`
+### BLOG-001: Fix the production sitemap URL in `robots.txt` ✅ SHIPPED
 
 **Priority:** P0
 **Area:** Technical SEO
@@ -70,7 +114,7 @@ The production `robots.txt` currently points crawlers to
 
 **Dependencies:** None
 
-### BLOG-002: Remove internal utility pages from search indexing
+### BLOG-002: Remove internal utility pages from search indexing ✅ SHIPPED
 
 **Priority:** P0
 **Area:** Technical SEO / Information exposure
@@ -509,7 +553,7 @@ reader should click.
 
 ## Phase 4: Performance, Sharing, and Maintainability
 
-### BLOG-017: Add intrinsic dimensions and responsive sizing to images
+### BLOG-017: Add intrinsic dimensions and responsive sizing to images ✅ SHIPPED
 
 **Priority:** P1
 **Area:** Performance / Layout stability
@@ -582,7 +626,7 @@ assets for appropriate dimensions and compression.
 
 **Dependencies:** BLOG-017
 
-### BLOG-019: Replace Google Fonts CSS `@import`
+### BLOG-019: Replace Google Fonts CSS `@import` ✅ SHIPPED
 
 **Priority:** P2
 **Area:** Performance / Privacy
@@ -662,7 +706,7 @@ serve distinct, documented needs.
 
 **Dependencies:** BLOG-005, BLOG-006, BLOG-008, BLOG-012
 
-### BLOG-022: Generate reliable social preview images
+### BLOG-022: Generate reliable social preview images — OPEN, rescoped (see triage)
 
 **Priority:** P2
 **Area:** Social acquisition
@@ -687,7 +731,7 @@ which are not handled consistently by every sharing platform.
 
 **Dependencies:** BLOG-015
 
-### BLOG-023: Improve person and professional structured data
+### BLOG-023: Improve person and professional structured data ✅ SHIPPED
 
 **Priority:** P2
 **Area:** SEO / Authority
@@ -711,7 +755,7 @@ professional Person profile.
 
 **Dependencies:** BLOG-003, BLOG-009
 
-### BLOG-024: Establish a durable URL slug policy
+### BLOG-024: Establish a durable URL slug policy ✅ SHIPPED
 
 **Priority:** P2
 **Area:** SEO / Content operations
@@ -740,7 +784,7 @@ so no live URL changes.
 
 **Dependencies:** None
 
-### BLOG-025: Add automated quality gates for public pages
+### BLOG-025: Add automated quality gates for public pages ✅ SHIPPED
 
 **Priority:** P2
 **Area:** Quality engineering

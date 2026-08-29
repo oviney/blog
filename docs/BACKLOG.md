@@ -21,6 +21,31 @@ label-routed work). This backlog is for *local* execution. When you hand a backl
 item to a cloud agent, mirror it to an Issue and link the number here — don't
 duplicate the queue.
 
+## The routing rule (2026-08-29)
+
+There are **two** queues and no others. Anything else that looks like a backlog
+is an archive.
+
+| Where | What belongs there |
+|---|---|
+| **GitHub Issues** | Anything a cloud agent will pick up; anything a bot files; anything needing an owner decision that should outlive a session |
+| **This file** | The local session queue — what to pull next in an interactive `spec → plan → build → ship` run |
+
+Everything else is an **audit record**, not a queue, and must say so at the top:
+
+- [`GROWTH_DESIGN_BACKLOG.md`](GROWTH_DESIGN_BACKLOG.md) — the June 2026 site audit
+- [`CURRENT_STATE.md`](CURRENT_STATE.md) — a snapshot
+- [`../ROADMAP.md`](../ROADMAP.md) — direction and scope boundaries, not tasks
+- `tasks/todo.md` — **the current cycle only**, never a backlog
+
+**Why this rule exists.** Before it, work was tracked in six places. `tasks/todo.md`
+recorded the `image_alt` breakage on 2026-08-15 as "blocked on someone else's
+change"; it recurred twice more, `main` failed its nightly for seven consecutive
+nights, and nobody noticed for two weeks. Meanwhile `GROWTH_DESIGN_BACKLOG.md`
+went untouched for two months while listing seven already-shipped items as open.
+More queues did not mean more tracking. It meant each one could assume another was
+being read.
+
 ## How to use
 
 - Tasks are listed **highest-priority first** within each section.
@@ -98,6 +123,8 @@ one-liner and the owner's call.
 
 | Pri | Task | Scope / label | Status | Ref |
 |----|------|---------------|--------|-----|
+| P2 | **Eight pages emit an SVG `og:image`, so they share with no preview.** `jekyll-seo-tag` emits `og:image` correctly — the defect is the format, not the tag. 23 posts use PNG heroes; 8 pages point `og:image`/`twitter:image` at a `.svg`, and X, LinkedIn and Facebook all decline to render SVG previews. Fix is to rasterise those eight heroes to PNG at share dimensions and point the front matter at the raster, keeping the SVG for the page itself. Promoted from BLOG-022, whose original framing ("generate reliable social preview images") was half wrong — verified 2026-08-29 against built `_site` output. | `agent:creative-director` | Not started | BLOG-022 |
+| P3 | **Delete the orphaned Cayman theme SCSS.** `_sass/jekyll-theme-cayman.scss` carries a render-blocking `@import url('https://fonts.googleapis.com/…')` at `:4` — the exact anti-pattern BLOG-019 was raised to remove, surviving in a file nothing compiles. `_sass/cayman.scss` `@forward`s it and is itself imported by nothing. The live theme already does this correctly (`_layouts/default.html:35,37` — `preconnect` + `<link rel="stylesheet">`). Read both files before deleting; confirm the compiled `styles.css` diff is byte-identical. | `agent:creative-director` | Not started | — |
 | P3 | **Remove the healing machinery orphaned by #1251.** Retiring the workflow stranded `scripts/healing-monitor.js`, `analyze-healing-trends.js`, `check-healing-degradation.js`, `dashboard-server.js`, five `package.json` scripts (`:27-35`), `healing-metrics/`, `healing-reports/`, `healing-alerts/` and the two healing badges. Split out of #1251 because the combined change is ~25 files and trips Rule 2. Read before deleting, as required: the analysis was **not** worth preserving — `healing-monitor.js` hardcodes `TOTAL_PLAYWRIGHT_TESTS = 111` against a suite that now runs 579, and both it and `alert-system.js` read `healing-metrics/`, which #1251 already removed. | `agent:qa-gatekeeper` | **Done** — PR #1274 | [#1252](https://github.com/oviney/blog/issues/1252) |
 | P3 | De-duplicate Jekyll builds in CI. A PR builds the site ~4 times across `test-build`, `content-validation` and `test-quality` jobs. Build once, upload `_site` as an artifact, download in dependents. **`test-quality.yml` done in #1197** — it now builds once in `🏗️ Build Site` and serves the artifact via `jekyll serve --skip-initial-build`. `test-build.yml` still builds its own copy; `content-validation.yml` no longer builds at all. Remaining scope is `test-build.yml` only. | `agent:qa-gatekeeper` | Partly done — #1197 | — |
 | P3 | **Internal docs are published to production — `tasks/` and eight root files, not just `tasks/`.** `_config.yml`'s `exclude:` names `CHANGELOG.md` and `docs/` but no other repo document, and a `.md` file without front matter is copied verbatim rather than rendered. Measured on 2026-08-15, all `200 text/markdown`: `AGENTS.md` (14.3 KB), `README.md` (15.2 KB), `decisions.md` (10.9 KB), `CLAUDE.md` (8.6 KB), `ARCHITECTURE.md` (6.1 KB), `GETTING_STARTED.md` (4.3 KB), `ROADMAP.md` (3.9 KB), `SECURITY.md` (1.5 KB), plus `tasks/todo.md` and `tasks/lessons.md`. The root `SPEC.md` and `tasks/plan.md` join them whenever a cycle is in progress on `main`. Not a disclosure problem — the repo is public — but the agent instructions, the protected-file list and the scope-guard bypass semantics are all served from the reader-facing domain. Low blast radius: static files are absent from the sitemap, so they are reachable but not advertised. **Needs an owner decision, not an agent fix:** `_config.yml` is protected. Decide per-file exclude-vs-keep (`README`/`SECURITY` are conventional to publish; `CLAUDE.md`/`AGENTS.md`/`tasks/` are not), then apply by hand. | *(protected file — owner only)* | **Not started — needs decision** | — |

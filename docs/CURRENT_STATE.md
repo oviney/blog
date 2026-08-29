@@ -1,4 +1,12 @@
-# Current State — April 2026
+# Current State — snapshot, refreshed 2026-08-29
+
+> **This is a snapshot, not a queue.** It describes how the site is built and
+> deployed. Work is tracked in exactly two places — GitHub Issues and
+> [`BACKLOG.md`](BACKLOG.md); see the routing rule there. Nothing should be
+> pulled from this file.
+>
+> Header previously read "April 2026" while being edited as recently as
+> 2026-08-10, which is how a snapshot quietly becomes wrong.
 
 ## Summary
 
