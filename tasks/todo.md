@@ -1,73 +1,41 @@
 # TODO
 
-**Cycle in progress:** anchor the masthead to a single site grid.
-Spec: [`SPEC.md`](../SPEC.md) · Plan: [`plan.md`](plan.md) · Branch:
-`fix/masthead-grid-alignment`
+**Cycle in progress:** restore the product boundary of `oviney/blog`.
+Spec: [`SPEC.md`](../SPEC.md) · Plan: [`plan.md`](plan.md)
 
-The 2026-08-12 backlog sweep is archived under
-[tasks/archive/2026-08-12-backlog-sweep/](archive/2026-08-12-backlog-sweep/).
+The masthead cycle is archived under
+[tasks/archive/2026-08-29-masthead-grid-alignment/](archive/2026-08-29-masthead-grid-alignment/)
+(shipped as #1282).
 
 ## This cycle
 
-- [x] **Slice 1** — add the masthead-axis guard to `responsive.spec.ts` and prove
-      it fails on 5 of 6 page types against the current build
-- [x] **Slice 2** — add `$grid-max-width`; point `.site-title` and `.site-nav ul`
-      at it with a `min-width: 768px` gutter
-- [x] **Slice 3** — normalize `.econ-topic-page` to a `$spacing-lg` side gutter
-      so `/blog/` joins the grid
-- [x] **Slice 4** — retire the last `1040px` literals in `.topic-page` and
-      `home-2026.scss`'s `$h26-max`
-- [x] **Slice 5** — full gate run: build, `homepage.spec.ts`,
-      `responsive.spec.ts`, `pa11y-ci`, 390px overflow, mobile geometry diff
-- [x] **Slice 6** — refresh visual baselines in CI, inspect the diff, open the PR
+- [x] **Slice 1** — unblock `main`: alt text on the quality-ownership draft and
+      its SVG `<desc>`. **Shipped as [#1307](https://github.com/oviney/blog/pull/1307).**
+      `main` had been red seven consecutive nights; 1 error → 0.
+- [x] **Slice 2** — clear the merge queue.
+      **[#1282](https://github.com/oviney/blog/pull/1282) merged** (`9ba1bc9`)
+      after 14 days green. #1296 deliberately held for slice 6.
+- [x] **Slice 3** — stop the producer at source.
+      **[oviney/economist-agents#484](https://github.com/oviney/economist-agents/pull/484)**
+      adds the `<desc>` prompt-language guard. Awaiting merge in that repo;
+      [#1289](https://github.com/oviney/blog/issues/1289) stays open until it lands.
+- [ ] **Slice 4** — untrack `vendor/` (3,599 files) and `.playwright-mcp/` (24);
+      drop the `Gemfile.lock` line from `.gitignore`
+- [ ] **Slice 5** — delete workflows and scripts that neither run nor are acted on
+- [ ] **Slice 6** — decide keep/retire on the observability surface; settles #1296
+- [ ] **Slice 7** — collapse six backlogs to two and write the routing rule down
+- [ ] **Slice 8** — ADR + migration spec for extracting the agent framework
 
-**Shipped as [#1282](https://github.com/oviney/blog/pull/1282)**, awaiting review.
-The seed dispatch touched exactly the 10 Desktop `-linux` PNGs that moved and
-nothing else — the #1262 clobbering did not recur. Labelled `bulk-content`: 16
-files, one over the Rule 2 cap, and the SCSS and its baselines cannot be split
-without leaving `main` red in between.
+## Open, not in this cycle
 
-## Blocked on someone else's change
-
-- **`main` is red on the editorial gate.** `9fe0922` published
-  `_posts/2026-08-15-microservices-testing-ai-agents.md` with an `image_alt`
-  that reads as prompt/style text rather than accessible alt text, so
-  `validate-editorial` and Content Validation fail on every PR including #1282.
-  Confirmed independent of #1282: `scripts/validate-post-quality.sh` reports 0
-  errors on the branch alone and 1 after merging `origin/main`. Needs its own
-  PR under `agent:editorial-chief` — folding a content fix into a theme change
-  is what the scope guard exists to prevent.
-
-## Blocked
-
-- **Cross-check the original Claude Design bundle.** Owner reported the masthead
-  defect while asking for the shipped repo to be diffed against the design
-  drop's `APPLY.md` and `deploy/` files. The bundle lives in a Claude Design
-  project and is not on this machine — searched for `APPLY.md`, any `deploy/`
-  directory, and the project name and ID; the only local traces are the archived
-  [2026-08-11 cycle docs](archive/2026-08-11-homepage-design-drop/) that describe
-  it. Owner agreed to paste the contents. Until then only the masthead half of
-  that request can proceed, and it is possible the bundle specifies masthead
-  treatment beyond width.
-
-## Open
-
-- **[#1063](https://github.com/oviney/blog/issues/1063)** — replace the newsletter
-  placeholder with a real email signup. **Blocked on owner approval, not on work:**
-  `ROADMAP.md:71` lists "Newsletter or email subscription service" under *Out of
-  Scope*, and the issue names that conflict as a PR-0 gate. It also needs a
-  provider chosen and an account created, which is not an agent decision.
-
-## Needs a protected-file change (owner only)
-
-Both were found during the 2026-08-12 sweep and left alone deliberately —
-`_config.yml`, `Gemfile` and `Gemfile.lock` are on the never-modify list.
-
-- **`tasks/` is published to production.** `_config.yml`'s `exclude:` omits it, so
-  internal lifecycle planning documents are served from viney.ca. Already tracked
-  as a P3 row in `docs/BACKLOG.md`.
-- **`jekyll-remote-theme` is dead weight.** `remote_theme` is commented out at
-  `_config.yml:37` and ADR-006 records that as a decision, yet the gem is still in
-  `Gemfile` and the plugin still in `_config.yml`'s plugin list — so it loads and
-  does nothing, and Dependabot keeps bumping it (most recently #1242). Removing it
-  touches two protected files.
+- **[#1063](https://github.com/oviney/blog/issues/1063)** — real email signup.
+  **Blocked on owner approval, not on work:** `ROADMAP.md` lists
+  "Newsletter or email subscription service" under *Out of Scope*, and the issue
+  names that conflict as a PR-0 gate. Needs a provider chosen and an account
+  created — not an agent decision.
+- **Cross-check the original Claude Design bundle.** The bundle lives in a Claude
+  Design project and is not on this machine. Carried over from the masthead
+  cycle; owner agreed to paste the contents. The masthead half shipped in #1282.
+- **Two stale stashes** on `main` (`scoring-verification-baseline`,
+  `copilot-temp-before-pull`), both verified obsolete in the 2026-08-10 cycle.
+  Dropping them is a one-liner and the owner's call.
