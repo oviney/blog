@@ -7,7 +7,6 @@ _site
 .jekyll-metadata
 .backup
 .jekyll-cache
-Gemfile.lock
 .Gemfile
 .githubauth%
 
@@ -77,8 +76,6 @@ Thumbs.db
 
 .bundle/
 
-# Ruby vendor directory
-vendor/
 
 # Parallel-agent worktrees (local-only — isolated agent sessions on issue
 # branches; never synced and excluded from the Jekyll build)
