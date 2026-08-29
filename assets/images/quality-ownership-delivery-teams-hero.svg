@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
   <title>Abolish the Quality Police: Delivery teams must own what they ship</title>
-  <desc>An Economist-style editorial illustration of a quality inspector stamping approved on a crumbling tower of software containers while engineering squads look on below.</desc>
+  <desc>A quality inspector stamps "approved" on a crumbling tower of software containers while engineering squads look on below.</desc>
   <defs>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#0B0F19"/>
