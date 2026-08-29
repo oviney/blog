@@ -1,175 +1,121 @@
-# SPEC — Anchor the masthead to a single site grid
+# SPEC — Restore the product boundary of `oviney/blog`
 
-**Stream:** homepage 2026 · **Priority:** P2 · **Scope:** S (1 PR) · **Dependencies:** none
-**Date:** 2026-08-15 · **Labels:** `agent:creative-director` · **Issue:** none — reported directly by the owner
-**Status:** implemented; awaiting CI baseline refresh
+**Cycle:** 2026-08-29 · **Branch series:** `chore/*`, `docs/*`
+**Prior cycle:** [masthead grid alignment](tasks/archive/2026-08-29-masthead-grid-alignment/SPEC.md) (shipped as #1282)
 
----
+## 1. Problem
 
-## 1. Objective
+`oviney/blog` is the source repository for the viney.ca publication. It is
+currently running three products under one roof, and the two nobody asked for
+consume most of the throughput.
 
-The masthead (`.site-title`) and primary nav (`.site-nav ul`) carry their own
-hardcoded `max-width: 900px`. Every content wrapper on the site sets its width
-independently. The two have never been connected, so the masthead lines up with
-the content column on exactly one page type — `/about/` — and is off by between
-−83px and +94px everywhere else.
+Measured on 2026-08-29:
 
-PR #1260 made this visible on `/`. It widened the home page's content column to
-1040px via a `.main-content:has(.home-2026)` escape, but `_sass/economist-theme.scss`
-was declared out of scope by that cycle's SPEC §4, so the masthead could not
-follow. The result is three stacked widths down the page — masthead 900,
-content 1040, footer 1200.
+| Surface | Lines | Share |
+|---|---:|---:|
+| **The publication** — theme 4,694 · layouts/includes 884 · 29 posts 1,686 | ~7,300 | 24% |
+| **Agent governance** — 25 skill files 7,453 · scripts 6,113 · meta docs 5,271 | ~18,800 | 62% |
+| **Agent observability** — 21 workflows 3,430 · `.claude/` 937 | ~4,400 | 14% |
 
-Give the masthead a single grid to sit on, and make the 1040px wrappers agree
-with each other so that grid is actually one grid.
+The same ratio shows in delivery. Of the last 250 merged PRs: **76** CI/agent
+machinery, **51** docs/governance, **35** site/theme, **22** dependency bumps,
+**7** content. And of the last **300 workflow runs, 295** were `CI Orchestrator`
+(169) and `CI Health Monitor` (126) — automation observing automation. **None of
+those 300 runs was a site deploy.**
 
-**Success criteria** (measured at 1440×1000 unless noted)
+The cost is not theoretical. On 2026-08-29 the repository was in this state:
 
-| | Now | Target |
-|---|---|---|
-| Masthead text left edge, all page types | 294 | 232 |
-| Nav first-item text left edge, all page types | 318 | 232 |
-| `/blog/` content text left edge | 200 | 232 |
-| `/`, `/security/`, `/search/` content text left edge | 232 | 232 (unchanged) |
-| Page types where masthead is flush with the content column | 1 of 6 | 4 of 6 (see D2) |
-| Hardcoded `1040px` literals in SCSS | 3 | 0 — one `$grid-max-width` token |
-| Guard asserting masthead shares the content axis | none | `responsive.spec.ts` |
-| pa11y WCAG2AA errors | 0 | 0 (unchanged) |
-| `homepage.spec.ts`, `responsive.spec.ts` | green | green |
+- `main` had failed nightly Content Validation **seven consecutive nights**
+- **no deploy since 2026-08-17** (12 days)
+- **no human merge since 2026-08-16** (13 days)
+- **#1282 had been green and unmerged for 14 days**
+- 3,599 files of vendored Ruby gems were tracked *despite* `vendor/` appearing in
+  `.gitignore` twice — **87% of all tracked files**, and a 211 MB `.git`
 
----
+A publication that ships two posts a month should not be able to accumulate that.
 
-## 2. Evidence
+This is not a new diagnosis. `CLAUDE.md` ("Product Boundary"), `ROADMAP.md`
+("Operating Model") and `docs/CURRENT_STATE.md` all already say the machinery is
+"supporting infrastructure" and a "candidate for extraction". **The recognition
+was written months ago and never acted on.** This cycle acts on it.
 
-Measured against a local `jekyll serve` build of `main` (dd91413) at 1440×1000,
-comparing the left edge of the red logo block against the left edge of the
-content text on each page type:
+## 2. Goal
 
-| Page | Content wrapper | Content text left | Masthead left | Delta |
-|---|---|---|---|---|
-| `/about/` | `.main-content` 900px | 294 | 294 | **0** |
-| `/` | `.home-2026` 1040px | 232 | 294 | +62 |
-| `/security/` | `.topic-page` 1040px | 232 | 294 | +62 |
-| `/search/` | `.topic-page` 1040px | 232 | 294 | +62 |
-| `/blog/` | `.econ-topic-page` 1040px | 200 | 294 | +94 |
-| post | `.economist-article` 750px | 377 | 294 | −83 |
+Make the publication the thing this repository is optimised for, and make every
+remaining piece of machinery earn its place by that measure.
 
-Confirmed in source:
+## 3. Scope
 
-| Fact | Location |
-|---|---|
-| Masthead width is hardcoded and unrelated to any content wrapper | `_sass/economist-theme.scss:91` — `.site-title { max-width: 900px }` |
-| Same for the nav | `_sass/economist-theme.scss:125` — `.site-nav ul { max-width: 900px }` |
-| `/blog/` uses zero side padding | `_sass/economist-theme.scss:1718` — `.econ-topic-page { padding: $spacing-xl 0 }` |
-| Every other 1040px listing uses 32px | `_sass/economist-theme.scss:1793` — `.topic-page { padding: $spacing-xl $spacing-lg }` |
-| Posts are 750px, not 900 | `_sass/economist-theme.scss:327` — `.economist-article { max-width: $content-max-width }` (`$content-max-width: 750px`) |
-| No token for 1040 exists | `_sass/economist-theme.scss:28–29` — only `$content-max-width: 750px` and `$wide-max-width: 1200px` |
+### In scope
 
-**Why no gate caught it.** `responsive.spec.ts` "Gap E" asserts the content
-wrapper is ≈1040px wide; nothing asserts the masthead shares an axis with it.
-pa11y measures contrast and semantics, not alignment. And #1260 re-seeded the
-visual baselines, which recorded the misalignment as the expected state — a
-pixel gate cannot flag a regression it was taught to expect.
+| ID | Outcome |
+|----|---------|
+| **D1** | `main` is green and deploying, and stays that way without a human noticing it broke |
+| **D2** | The draft producer cannot redden `main` again |
+| **D3** | Tracked files reflect the source, not the build — no vendored gems, no debug screenshots, no ignore rules contradicting reality |
+| **D4** | Every workflow and script either runs and is acted on, or is deleted |
+| **D5** | One backlog is authoritative; the rest are archived or deleted |
+| **D6** | The extraction of the agent framework is specified precisely enough to execute, with a decision recorded |
 
----
+### Out of scope
 
-## 3. Decisions
+- **Executing** the extraction (D6 delivers the spec and the ADR; creating repos
+  and moving code is a separate cycle and needs owner action)
+- Rewriting git history to reclaim the 211 MB (untracking stops the growth;
+  rewriting is destructive, needs owner sign-off, and can follow later)
+- Any change to the theme, layouts, or published posts
+- `_config.yml`, `Gemfile`, `Gemfile.lock`, `.github/CODEOWNERS`,
+  `.github/copilot-instructions.md` — protected, unbypassable
 
-**D1 — One grid, not per-page tracking.** The masthead anchors to a single
-1040px grid on every page rather than tracking each page's own wrapper width.
-Tracking would be flush everywhere, but the logo would visibly jump between
-x=200 (`/blog/`), x=232 (listings), x=294 (`/about/`) and x=377 (posts) as the
-reader navigates. A masthead belongs to the site, not the article; anchoring it
-to the page grid is standard practice and is what the surrounding footer
-(1200px, constant) already does.
+## 4. Acceptance criteria
 
-**D2 — Narrow reading measures stay inset, and that is not a defect.**
-`/about/` (900px) and posts (750px) keep their reading measures centred inside
-the grid, so the masthead sits outboard of their text by 62px and 145px. This
-is deliberate: those measures are chosen for line length, not for alignment.
-The success criterion is therefore "4 of 6 flush", not 6 of 6.
+**D1 — `main` green**
+- `scripts/validate-post-quality.sh` reports 0 errors on `main`
+- The nightly Quality Tests run succeeds
+- A deploy has run since this cycle began
 
-**D3 — Normalize `.econ-topic-page` to a 32px gutter.** `/blog/` and
-`/security/` are both 1040px listings whose text starts 32px apart. Without
-this, the grid the masthead anchors to would not exist as a single axis and the
-guard would need a per-page exception. Owner-approved as part of this change
-rather than deferred, because the guard depends on it.
+**D2 — producer cannot redden `main`**
+- The defect fails in the producing repository, not in this one
+- A regression test asserts the exact string that caused the outage
+- #1289 is closed by a merged producer-side fix, not by another content patch
 
-This turned out to be smaller than it looked. A `@media (max-width: 1024px)`
-block already set `.econ-topic-page` to `$spacing-xl $spacing-lg`, so `/blog/`
-had a 32px gutter on tablet and none at all above 1024px — a discontinuity
-nothing intended. Moving that value to the base declaration makes the page
-consistent with itself, and leaves the tablet override restating the base
-verbatim, so it is removed.
+**D3 — tracked files reflect source**
+- `git ls-files vendor | wc -l` is `0`
+- `git ls-files .playwright-mcp | wc -l` is `0`
+- No path is both listed in `.gitignore` and tracked
+- `bundle exec jekyll build` still passes; local dev is unaffected
 
-**D4 — Introduce `$grid-max-width: 1040px` and single-source it.** 1040 is
-currently written out in three places (`.topic-page`, `.econ-topic-page`,
-`$h26-max` in `home-2026.scss`). The repo convention is variables-only. A
-single token is what makes "one grid" enforceable rather than a coincidence
-that four selectors currently share a number.
+**D4 — machinery earns its place**
+- Every retained workflow has run within 30 days *and* something acts on its output
+- Every deleted workflow/script is named in the PR body with its last run date
+- No workflow is left in a permanent `action_required` state
+- CI run volume is no longer dominated by self-observation
 
-**D5 — Preserve small-screen rendering exactly.** The new gutter applies at
-`min-width: 768px`, mirroring the idiom `.economist-article` already uses.
-In practice the mobile header rules (which zero the gutter and are declared
-later in the file) still win at exactly 768px, so the masthead switches to the
-grid at 769px — the same boundary `.home-2026`'s own `max-width: 48em` rule
-uses. Verified by pixels rather than by reading the cascade: every Mobile and
-Tablet visual baseline passes unchanged, and only the 10 Desktop baselines
-move.
+**D5 — one backlog**
+- Exactly one file is the local queue; the others are archived with a pointer
+- The rule for what belongs in GitHub Issues vs. the local file is written down
+- No open item is silently dropped in the consolidation
 
-**D6 — `_layouts/default.html` stays untouched.** The fix is entirely a width
-and gutter question; no markup change is required. #1260's out-of-scope call on
-the layout still stands.
+**D6 — extraction specified**
+- An ADR records the decision, the alternatives, and the reversal cost
+- The spec names exactly which paths move, what replaces them here, and how this
+  repo consumes them afterwards
+- The spec is executable by someone who was not in this session
 
----
+## 5. Constraints
 
-## 4. Scope
+- Every change ships as its own PR through the existing gates. No direct pushes
+  to `main`, including for the cleanup PRs.
+- The scope guard caps a PR at 15 files (Rule 2). The `vendor/` untrack is
+  structurally atomic and cannot be split without leaving `main` in a worse
+  state, so it carries `bulk-content` — the one deliberate use of that label
+  this cycle, justified in its PR body.
+- Deletions must be *verified* unused, not assumed. Read before deleting.
+- Nothing here may change what a reader sees on viney.ca.
 
-**In scope**
+## 6. Non-goals stated explicitly
 
-- `_sass/economist-theme.scss` — `$grid-max-width` token; `.site-title` and
-  `.site-nav ul` widths and gutters; `.topic-page` and `.econ-topic-page`
-  max-width via the token; `.econ-topic-page` gutter.
-- `_sass/home-2026.scss` — point `$h26-max` at the token.
-- `tests/playwright-agents/responsive.spec.ts` — the missing axis guard.
-- Visual baselines — refreshed **in CI**, never locally.
-
-**Out of scope**
-
-- `_layouts/default.html` (D6)
-- `.main-content`'s own 24px gutter. Between 768px and ~948px viewport widths
-  this leaves `/about/` 8px inboard of the masthead. Known, cosmetic, and
-  fixing it would move `/about/` — the one page that is correct today — for no
-  gain at the widths that matter.
-- Any protected file.
-- The `/decisions/` URL, which renders a repo document with no layout and no
-  masthead at all. Pre-existing and unrelated.
-
----
-
-## 5. Verification
-
-| # | Check | Result |
-|---|---|---|
-| 1 | `bundle exec jekyll build` | clean |
-| 2 | Guard fails **before** the fix — written first, run against the unmodified build | 12/12 failed, every one reporting the 62px delta from §2 |
-| 3 | Guard passes after | 18/18 at 1024 / 1440 / 1920 |
-| 4 | Measured geometry at 1440 | masthead 232, nav 232, `/blog/` content 232; 4 of 6 page types flush, `/about/` and posts inset per D2 |
-| 5 | Full Playwright suite (excl. pixel baselines) | 594 passed, 9 skipped, 0 failed |
-| 6 | `pa11y-ci` WCAG2AA | 0 errors |
-| 7 | Horizontal overflow at 320 / 390 | none |
-| 8 | Mobile + Tablet visual baselines | all pass unchanged (D5) |
-| 9 | Desktop visual baselines | 10 move — the intended blast radius |
-| 10 | `grep 1040` in `_sass/` | comments only; one token |
-
-**Note on step 2.** The guard was written and failed first on purpose. #1260
-re-seeded the visual baselines in the same PR that introduced the
-misalignment, which recorded the defect as the expected state — so "the pixel
-gate is green" carried no information. A geometric assertion proven to fail
-before the fix is the only evidence that the guard can detect this class of
-regression at all.
-
-**Outstanding:** visual baselines refreshed in CI via the `test-quality.yml`
-seed dispatch and **inspected** — that path has clobbered unrelated baselines
-on 2 of 2 prior dispatches (#1262), so the refresh commit gets read, not
-rubber-stamped.
+This cycle does **not** argue that the agent machinery is bad work. Much of it is
+careful, and the scope guard in particular has caught real defects. The argument
+is only that it does not belong in the repository that publishes the blog, and
+that keeping it here has measurably starved the publication.
