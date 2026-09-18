@@ -301,7 +301,7 @@ test.describe('@visual Gap E — Listing width matches design token @REQ-VISUAL-
 
 });
 
-test.describe('@visual Gap F — Masthead sits on the site grid @REQ-VISUAL-01', () => {
+test.describe('@visual Gap F — Masthead and nav sit on the page axis @REQ-VISUAL-01', () => {
 
   // Gap E asserts a listing wrapper is ~1040px wide. Nothing asserted that the
   // masthead sits on the same axis as that wrapper, and the two were never
@@ -317,17 +317,29 @@ test.describe('@visual Gap F — Masthead sits on the site grid @REQ-VISUAL-01',
   // regression it has been taught to expect, which is why this has to be a
   // geometric assertion rather than a screenshot.
   //
-  // The contract: masthead and nav anchor to one grid on every page, whatever
-  // that page's own reading measure is.
+  // REVISED 2026-09-18, on the owner's decision. The contract above held the
+  // masthead on the *content* grid, so on a wide viewport the top two bands were
+  // mostly empty: at 1440px the logo started 232px in, with nothing to its right
+  // for the remaining 1000px. The reference the owner works from runs two axes —
+  // masthead and section nav on the page gutter, the reading column centred and
+  // narrower — and that is now the contract here.
+  //
+  // What is unchanged: the content wrappers. They still sit on the 1040px grid,
+  // and the assertions below still hold them there. Only the site furniture moved.
   const GRID_MAX_WIDTH = 1040; // $grid-max-width
   const GRID_GUTTER = 32;      // $spacing-lg at the site's 16px root
   const TOLERANCE = 1;         // sub-pixel rounding only
 
-  // Where the grid's text edge falls at a given viewport. Computed rather than
-  // hardcoded: asserting a literal `232` would pass at 1440px and be silently
-  // meaningless at every other width.
+  // Where the content grid's text edge falls at a given viewport. Computed
+  // rather than hardcoded: asserting a literal `232` would pass at 1440px and be
+  // silently meaningless at every other width.
   const gridTextLeft = (viewportWidth: number) =>
     Math.max(0, (viewportWidth - GRID_MAX_WIDTH) / 2) + GRID_GUTTER;
+
+  // Where the site furniture sits: one gutter from the page edge, at every width
+  // above the nav breakpoint. Unlike the content axis this does not move with the
+  // viewport, which is the whole point of the change.
+  const pageAxisLeft = GRID_GUTTER;
 
   // The grid only binds above the 767px nav breakpoint; below it the masthead
   // keeps the narrow `$spacing-md` gutter and this contract does not apply.
@@ -365,7 +377,7 @@ test.describe('@visual Gap F — Masthead sits on the site grid @REQ-VISUAL-01',
 
   for (const viewport of gridViewports) {
     for (const { path, name, wrapper, onGrid } of pages) {
-      test(`${name} (${path}) masthead is on the grid at ${viewport.width}px`, async ({ page }) => {
+      test(`${name} (${path}) masthead is on the page axis at ${viewport.width}px`, async ({ page }) => {
         await page.setViewportSize(viewport);
         await page.goto(path);
         await page.waitForLoadState('networkidle');
@@ -374,23 +386,34 @@ test.describe('@visual Gap F — Masthead sits on the site grid @REQ-VISUAL-01',
 
         // The masthead's red logo block is an inline-block anchor flush with
         // the title's content box, so its own left edge is the visible axis.
+        // It belongs to the site, so it sits on the page axis, not the grid.
         const logo = page.locator('.site-title a').first();
         await expect(logo).toBeVisible();
         const logoLeft = (await logo.boundingBox())!.x;
         expect(
-          Math.abs(logoLeft - expected),
-          `masthead at ${logoLeft}px, grid at ${expected}px`,
+          Math.abs(logoLeft - pageAxisLeft),
+          `masthead at ${logoLeft}px, page axis at ${pageAxisLeft}px`,
         ).toBeLessThanOrEqual(TOLERANCE);
 
-        // Each nav link carries its own `padding-left: $spacing-md`, so it is
-        // the link's text edge — not the list box — that has to land on the
-        // grid. Checking the `ul` instead would pass while the visible nav sat
-        // 24px inboard of the masthead, which is what it did before this guard.
+        // The nav's first link shares the masthead's axis. It is the link's
+        // *text* edge that has to land there, not the list box: the list and the
+        // link split the gutter between them and the split changes at 1024px, so
+        // checking the `ul` would pass while the visible nav sat inboard.
         const navLinkLeft = await textLeft('.site-nav ul li a')(page);
         expect(
-          Math.abs(navLinkLeft - expected),
-          `first nav link at ${navLinkLeft}px, grid at ${expected}px`,
+          Math.abs(navLinkLeft - pageAxisLeft),
+          `first nav link at ${navLinkLeft}px, page axis at ${pageAxisLeft}px`,
         ).toBeLessThanOrEqual(TOLERANCE);
+
+        // Furniture and content are now two axes, and on a viewport wider than
+        // the grid they must actually differ — otherwise this suite would keep
+        // passing if the masthead drifted back onto the content column.
+        if (viewport.width > GRID_MAX_WIDTH) {
+          expect(
+            expected,
+            'content grid and page axis should be distinct above 1040px',
+          ).toBeGreaterThan(pageAxisLeft);
+        }
 
         const contentLeft = await textLeft(wrapper)(page);
         if (onGrid) {
