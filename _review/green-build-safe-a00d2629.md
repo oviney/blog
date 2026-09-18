@@ -3,6 +3,8 @@ layout: review
 title: "A Green Build Should Mean the Change Is Safe, Whoever Wrote It"
 date: 2026-09-18
 slug: green-build-safe
+rubric: "Trust in a signal"
+subtitle: "Trust in a signal is what everyone is aiming for. The more you use agents, the more that matters."
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
 description: "Cost of poor quality is an equation, not a feeling. A green build only means something when the people behind it know how to build software."
