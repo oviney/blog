@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="heroTitle heroDesc">
+  <title id="heroTitle">A green status light wired to nothing</title>
+  <desc id="heroDesc">A cut-away of a wall. On the front face a large status lamp glows green. Behind the wall its cable runs down and stops in mid-air, its bare end a short distance from the terminal block it was meant to reach. Nothing connects the lamp to the check.</desc>
+
+  <rect width="1600" height="900" fill="#f3efe4"/>
+
+  <!-- ══════ floor ══════ -->
+  <rect x="0" y="806" width="1600" height="94" fill="#e6dfce"/>
+  <rect x="0" y="806" width="1600" height="6" fill="#d6cdb6"/>
+
+  <!-- ══════ the wall, cut through ══════ -->
+  <g>
+    <!-- front face, seen edge-on to the left of the cut -->
+    <rect x="628" y="70" width="128" height="736" fill="#0f3a5f"/>
+    <!-- the cut face, lighter, showing the wall's thickness -->
+    <rect x="756" y="70" width="52" height="736" fill="#17557f"/>
+    <!-- shadow where the cut meets the front -->
+    <rect x="756" y="70" width="10" height="736" fill="#0b2b46" opacity="0.5"/>
+    <!-- torn top of the cut, painted last so nothing shows above it -->
+    <polygon points="628,60 808,60 808,104 770,86 726,108 682,84 628,102" fill="#f3efe4"/>
+    <!-- torn bottom of the cut, painted last -->
+    <polygon points="628,816 628,772 678,792 722,766 768,790 808,770 808,816" fill="#e6dfce"/>
+  </g>
+
+  <!-- ══════ the lamp, mounted on the front of the wall ══════ -->
+  <g>
+    <!-- glow -->
+    <circle cx="430" cy="438" r="250" fill="#48c46a" opacity="0.07"/>
+    <circle cx="430" cy="438" r="196" fill="#48c46a" opacity="0.10"/>
+    <circle cx="430" cy="438" r="150" fill="#48c46a" opacity="0.14"/>
+    <!-- mounting arm into the wall -->
+    <rect x="536" y="414" width="96" height="48" fill="#0b2b46"/>
+    <rect x="536" y="414" width="96" height="12" fill="#17557f"/>
+    <!-- bezel -->
+    <circle cx="430" cy="438" r="126" fill="#0b2b46"/>
+    <circle cx="430" cy="438" r="112" fill="#0f3a5f"/>
+    <!-- lens -->
+    <circle cx="430" cy="438" r="92" fill="#2e9e4f"/>
+    <circle cx="430" cy="438" r="92" fill="none" stroke="#1f7a3b" stroke-width="6"/>
+    <!-- highlight -->
+    <path d="M 372 382 a 82 82 0 0 1 74 -22 a 92 92 0 0 0 -86 74 Z" fill="#7fd897" opacity="0.85"/>
+  </g>
+
+  <!-- ══════ behind the wall: the cable that goes nowhere ══════ -->
+  <g fill="none" stroke="#0b2b46" stroke-width="18" stroke-linecap="butt" stroke-linejoin="round">
+    <path d="M 808 438 H 968 Q 1000 438 1000 470 V 654"/>
+  </g>
+  <!-- cable sheath highlight -->
+  <g fill="none" stroke="#17557f" stroke-width="5" stroke-linecap="butt">
+    <path d="M 808 429 H 968 Q 991 429 991 452 V 654"/>
+  </g>
+  <!-- the bare end, hanging in air -->
+  <g>
+    <rect x="986" y="654" width="28" height="30" fill="#c8ccd2"/>
+    <g stroke="#b4472e" stroke-width="7" stroke-linecap="round" fill="none">
+      <path d="M 992 684 V 716"/>
+      <path d="M 1008 684 V 712"/>
+    </g>
+  </g>
+
+  <!-- ══════ the terminal it never reaches ══════ -->
+  <g>
+    <!-- bracket, so the block is mounted rather than floating -->
+    <rect x="1262" y="770" width="36" height="36" fill="#8d9298"/>
+    <rect x="1216" y="794" width="128" height="14" fill="#8d9298"/>
+    <rect x="1186" y="606" width="188" height="164" fill="#0b2b46"/>
+    <rect x="1186" y="606" width="188" height="16" fill="#17557f"/>
+    <!-- screw terminals, all empty -->
+    <g fill="#e6dfce">
+      <rect x="1150" y="642" width="42" height="28"/>
+      <rect x="1150" y="706" width="42" height="28"/>
+    </g>
+    <g fill="#8d9298">
+      <circle cx="1230" cy="656" r="13"/>
+      <circle cx="1230" cy="720" r="13"/>
+    </g>
+    <g stroke="#0b2b46" stroke-width="4" stroke-linecap="round">
+      <path d="M 1223 656 H 1237"/>
+      <path d="M 1223 720 H 1237"/>
+    </g>
+  </g>
+
+  <!-- ══════ the gap: measured, and empty ══════ -->
+  <g stroke="#b4472e" stroke-width="3" fill="none" opacity="0.9">
+    <path d="M 1016 742 H 1146"/>
+    <path d="M 1016 730 V 754"/>
+    <path d="M 1146 730 V 754"/>
+  </g>
+</svg>
