@@ -83,10 +83,13 @@ body {
 .page-header {
   background-color: $background-white;
   color: $text-primary;
-  padding: $spacing-md 0;
+  // $spacing-sm, not $spacing-md: the masthead band was ~130px of mostly empty
+  // space above the nav rule. REQ-VISUAL-01 (two-axis, 2026-09-18) asks the
+  // header to sit close to the page edge and close to what follows it.
+  padding: $spacing-sm 0;
   border-bottom: 1px solid $border-color;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 
   .site-title {
     font-family: $font-serif;
@@ -95,7 +98,12 @@ body {
     margin: 0;
     padding: 0;
     width: 100%;
-    max-width: $grid-max-width;
+    // No $grid-max-width here. Under the old one-axis contract the masthead was
+    // centred inside the 1040px content grid, which left the whole right half of
+    // a wide viewport empty. The masthead belongs to the site, not to the
+    // article, so it now anchors to the page gutter and the content column keeps
+    // its own axis.
+    max-width: none;
     text-align: left;
     // $spacing-lg above the breakpoint, because that is the gutter the 1040px
     // wrappers use — it is what puts the logo flush with the content column.
@@ -130,23 +138,34 @@ body {
   padding: 0;
   font-family: $font-sans;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 
   ul {
     list-style: none;
     margin: 0;
     padding: 0 $spacing-md;
     display: flex;
-    flex-wrap: wrap;
+    // `wrap` dropped the RSS link onto a second line between the 768px nav
+    // breakpoint and the width where eight items stop fitting — roughly 768 to
+    // 900, which is where a tablet in landscape sits. Reproduced at 860px,
+    // 2026-09-18. `nowrap` with a scroll escape keeps the bar one line.
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
     width: 100%;
-    max-width: $grid-max-width;
+    // Same axis as the masthead above: the page gutter, not the content grid.
+    max-width: none;
 
-    // $spacing-xs, not $spacing-lg: each nav link below carries its own
-    // `padding: $spacing-sm $spacing-md`, so the list needs
-    // $spacing-lg - $spacing-md to put the first link's *text* on the grid.
-    // Matching the masthead's gutter here would leave the visible nav 24px
-    // inboard of the logo.
+    // The first link's *text* must land on the same axis as the masthead,
+    // $spacing-lg from the page edge. That axis is this list's padding plus the
+    // link's own padding, so the two move together: below 1024px the links wear
+    // $spacing-sm sides (so all eight fit on one line at tablet widths without
+    // RSS falling off), and the list makes up the difference.
     @media (min-width: 768px) {
+      padding: 0 $spacing-sm;
+    }
+
+    @media (min-width: 1024px) {
       padding: 0 $spacing-xs;
     }
 
@@ -155,11 +174,23 @@ body {
       
       a {
         display: block;
-        padding: $spacing-sm $spacing-md;
+        // Sides shrink below 1024px so the eight items stay on one line; the
+        // list's padding above compensates to hold the text axis at $spacing-lg.
+        // Vertical padding is untouched, so the 44px touch target still holds.
+        padding: $spacing-sm;
         color: $text-primary;
         text-decoration: none;
         font-size: 0.9rem;
         font-weight: 500;
+        // With the list set to `nowrap`, a label left free to break just moves
+        // the ragged second line inside the item instead of onto the bar:
+        // "Software Engineering" split in two at 860px. Keep each label whole
+        // and let the list scroll if the viewport cannot hold them.
+        white-space: nowrap;
+
+        @media (min-width: 1024px) {
+          padding: $spacing-sm $spacing-md;
+        }
         border-bottom: 3px solid transparent;
         transition: border-color 0.2s ease;
         
