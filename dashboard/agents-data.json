@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-24T09:45:17.770Z",
+  "generatedAt": "2026-09-01T09:36:31.664Z",
   "kpis": {
     "agentPRsMerged30d": 2,
     "evalPassRate": 33,
     "contentAvgScore": null,
     "openBacklog": 1,
-    "openPRCount": 2,
+    "openPRCount": 0,
     "evalCount": 3,
     "remediationQueueDepth": 0,
     "remediationThreshold": 85
@@ -69,6 +69,95 @@
   ],
   "content": null,
   "recentPRs": [
+    {
+      "number": 1314,
+      "title": "docs(lifecycle): close out the boundary cycle",
+      "author": "oviney",
+      "mergedAt": "2026-08-29T16:32:18Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1313,
+      "title": "docs(adr): ADR-011 — the extraction classification ADR-008 asked for",
+      "author": "oviney",
+      "mergedAt": "2026-08-29T16:26:04Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1312,
+      "title": "docs(backlog): two queues, and stop the audit files claiming to be one",
+      "author": "oviney",
+      "mergedAt": "2026-08-29T16:24:12Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1311,
+      "title": "chore(ci): refresh the dashboard monthly, which is how often its data moves",
+      "author": "oviney",
+      "mergedAt": "2026-08-29T16:20:27Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1309,
+      "title": "chore(git): untrack the vendored gems, screenshots, and stale ignore rules",
+      "author": "oviney",
+      "mergedAt": "2026-08-29T16:12:15Z",
+      "labels": [
+        "bulk-content"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 1310,
+      "title": "fix(ci): the orchestrator's merge path was unreachable, and hourly is enough",
+      "author": "oviney",
+      "mergedAt": "2026-08-29T16:15:07Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1296,
+      "title": "📊 dashboard: refresh agent observability data",
+      "author": "github-actions[bot]",
+      "mergedAt": "2026-08-29T16:13:55Z",
+      "labels": [
+        "needs-human-review"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 1308,
+      "title": "docs(lifecycle): archive the masthead cycle, spec the boundary cycle",
+      "author": "oviney",
+      "mergedAt": "2026-08-29T16:12:12Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1282,
+      "title": "fix(theme): anchor the masthead to a single site grid",
+      "author": "oviney",
+      "mergedAt": "2026-08-29T16:00:25Z",
+      "labels": [
+        "needs-human-review",
+        "bulk-content"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 1307,
+      "title": "fix(content): alt text on the quality-ownership draft (5th occurrence)",
+      "author": "oviney",
+      "mergedAt": "2026-08-29T15:55:24Z",
+      "labels": [
+        "agent:editorial-chief"
+      ],
+      "isAgent": true
+    },
     {
       "number": 1288,
       "title": "fix(content): alt text on the regenerated coverage draft (4th occurrence)",
@@ -156,99 +245,15 @@
       "mergedAt": "2026-08-13T02:22:52Z",
       "labels": [],
       "isAgent": false
-    },
-    {
-      "number": 1273,
-      "title": "fix(404): give the page a height floor so its baseline stops straddling the fold",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T02:20:15Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1272,
-      "title": "fix(a11y): stop the masthead claiming a heading level, and guard the outline",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T02:17:09Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1271,
-      "title": "refactor(css): delete the orphaned econ-card cluster from the theme",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T02:07:52Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1270,
-      "title": "test(visual): stop the blocking pixel gate depending on third-party hosts",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T01:47:31Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1268,
-      "title": "docs(agent-memory): record the four lessons the #1260 fan-out produced",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T01:47:20Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1269,
-      "title": "fix(security): accept the extract-zip advisory so the PR queue is not blocked",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T01:36:15Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1260,
-      "title": "fix(home): apply the four fixes from the undelivered Claude Design drop",
-      "author": "oviney",
-      "mergedAt": "2026-08-12T03:59:48Z",
-      "labels": [
-        "needs-human-review"
-      ],
-      "isAgent": false
-    },
-    {
-      "number": 1264,
-      "title": "fix(a11y): replace prompt text with real alt text on the hallucination-debt post",
-      "author": "oviney",
-      "mergedAt": "2026-08-12T03:56:33Z",
-      "labels": [
-        "agent:editorial-chief"
-      ],
-      "isAgent": true
-    },
-    {
-      "number": 1259,
-      "title": "docs(lifecycle): close out the Dependabot scope-exemption work",
-      "author": "oviney",
-      "mergedAt": "2026-08-11T18:04:31Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1257,
-      "title": "chore(ci): let Dependabot's bundler bumps pass the scope guard on their own",
-      "author": "oviney",
-      "mergedAt": "2026-08-11T17:56:23Z",
-      "labels": [],
-      "isAgent": false
     }
   ],
   "openIssuesByLabel": {
     "agent:creative-director": [],
     "agent:qa-gatekeeper": [
       {
-        "number": 1299,
-        "title": "Nightly quality suite failing",
-        "age": 6
+        "number": 1318,
+        "title": "Workflow ROI Review — 2026-09-01",
+        "age": 0
       }
     ],
     "agent:editorial-chief": [],
@@ -257,8 +262,8 @@
   "remediationQueue": [],
   "copilotUsage": {
     "seatsActive": null,
-    "billingCycleStart": "2026-08-01",
-    "billingCycleEnd": "2026-08-31",
+    "billingCycleStart": "2026-09-01",
+    "billingCycleEnd": "2026-09-30",
     "seatCostPerMonth": 19,
     "apiAvailable": false,
     "note": "Copilot billing API unavailable. Add a PAT with manage_billing:copilot or read:org scope as secret COPILOT_BILLING_PAT to enable live seat data."
