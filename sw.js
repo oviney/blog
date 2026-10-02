@@ -6,7 +6,7 @@ layout: null
  * Strategy:
  *   - Cache-first for immutable-ish assets (fonts, images)
  *   - Network-first for HTML, CSS and JS, which change together on every deploy
- *   - Offline fallback page when both fail
+ *   - Offline: network-first requests fall back to any cached copy
  *
  * CACHE_VERSION is stamped with the build time, so every deploy changes this
  * file's bytes, the browser installs the new worker, and `activate` purges the
