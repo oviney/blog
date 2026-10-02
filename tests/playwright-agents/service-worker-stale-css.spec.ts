@@ -11,7 +11,7 @@ import { test, expect } from '@playwright/test';
  *
  * This spec lets the real worker take control, poisons its caches with a
  * stylesheet that lacks the homepage rules (what a returning visitor's cache
- * held), reloads, and asserts the lead image still honours the current CSS.
+ * held), reloads, and asserts the homepage still honours the current CSS.
  */
 
 const STALE_CSS = 'body { margin: 0; }';
@@ -40,9 +40,16 @@ test('homepage lead image survives a stale service-worker CSS cache', async ({ p
   await page.reload({ waitUntil: 'networkidle' });
   expect(await page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
 
-  const box = await page.locator('.h26-lead-image img').boundingBox();
-  expect(box, 'lead image should render').not.toBeNull();
-  // home-2026.scss caps the lead image at clamp(180px, 22vw, 280px).
-  expect(box!.height).toBeLessThanOrEqual(280);
-  expect(box!.width).toBeLessThanOrEqual(1440);
+  // The facts strip renders unconditionally; under the stale CSS it falls back
+  // to display: block, so this holds whatever the latest post looks like.
+  await expect(page.locator('.h26-facts')).toHaveCSS('display', 'grid');
+
+  // The lead image only renders when the latest post has an `image:`.
+  const leadImage = page.locator('.h26-lead-image img');
+  if (await leadImage.count()) {
+    const box = await leadImage.boundingBox();
+    // home-2026.scss caps the lead image at clamp(180px, 22vw, 280px).
+    expect(box!.height).toBeLessThanOrEqual(280);
+    expect(box!.width).toBeLessThanOrEqual(1440);
+  }
 });
