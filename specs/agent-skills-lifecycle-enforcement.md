@@ -1,8 +1,9 @@
 # Spec: Enforce the agent-skills lifecycle in Claude Code sessions
 
-Status: Approved 2026-10-06
+Status: Amendment 1 drafted 2026-10-06, awaiting owner approval
 Issue: #1340
-Owner decision: 2026-10-02, all four layers approved
+Owner decisions: 2026-10-02, all four layers approved; 2026-10-06, freshness
+via git snapshot (Amendment 1)
 
 ## Objective
 
@@ -27,8 +28,24 @@ Root causes found:
 
 Desired behaviour: every Claude Code session in this repo starts with the
 meta-skill loaded, is reminded of the lifecycle on every prompt, reads a
-mandatory rule in `CLAUDE.md`, and cannot push or open a PR until the `test`
-and `review` skills have run after its last file edit.
+mandatory rule in `CLAUDE.md`, and cannot push or open a PR unless the `test`
+and `review` skills ran against exactly the content being pushed.
+
+## Amendment 1 (2026-10-06): why the design changed
+
+The first build passed its 32 fixture tests, but the `review` phase (an
+independent reviewer that verified each finding against the running gate)
+returned **changes requested**:
+
+| # | Finding | Severity | Resolution |
+|---|---------|----------|------------|
+| R1 | Edits made with `sed`, heredocs, `MultiEdit` or subagents did not make `test`/`review` stale; the transcript only showed `Edit`/`Write`/`NotebookEdit` | Blocker | Freshness now compares git trees (below) |
+| R2 | The gate failed open on `null` stdin (TypeError, exit 1) | Should-fix | `main` wrapped; any error on a gated action denies |
+| R3 | A `Skill` call that was denied or errored still counted | Should-fix | Recording moves to `PostToolUse`, which fires only on success |
+| R4 | Real pushes slipped past: `(git push)`, `env X=1 git push`, `timeout 60 git push`, `nohup git push &`, `bash -c "git push"`, `xargs git push`, `/usr/bin/git push`, `git -C "a b" push` | Should-fix | Command parser hardened |
+| R5 | False positives: heredoc bodies and quoted strings containing `git push`; `gh api -X GET .../pulls -f ...` | Nit | Heredoc bodies and quoted text are ignored, except the argument of `sh -c`/`bash -c`; explicit `GET` is not a write |
+| R6 | Merge operations (`gh pr merge`, MCP merge) are not gated | Nit | Intentional: admin-merging reviewed PRs is the documented workflow. Recorded below |
+| R7 | `hooks/hooks.json` leaves `${CLAUDE_PLUGIN_ROOT}` unquoted | Nit | Quoted |
 
 ## Assumptions
 
@@ -37,22 +54,50 @@ and `review` skills have run after its last file edit.
    `.github/copilot-instructions.md` and are out of scope.
 2. Hooks are registered in a committed project `.claude/settings.json` using
    `$CLAUDE_PROJECT_DIR`, so they apply to every clone without plugin install.
-3. Hook logic is written in Node (already required by the repo) rather than
-   bash + `jq`, because the gate must parse JSON hook input and a JSONL
-   transcript reliably.
-4. "Skill ran" means the session transcript contains either a `Skill` tool
-   call with `skill` equal to `test` / `review`, or a user message invoking
-   `/test` / `/review` (plain text or a `<command-name>` tag). Queued prompts
-   (`queue-operation` entries) do not count, since they can be withdrawn. The
-   built-in `/code-review` does not count as `review`.
-5. Freshness: a skill run only counts if it happened after the last
-   `Edit`, `Write` or `NotebookEdit` tool call. File changes made through
-   `Bash` (sed, heredocs) are not detected; this is a known limitation.
-6. The escape hatch is the environment variable
+3. Hook logic is written in Node (already required by the repo).
+4. **Recording (Amendment 1).** When the `test` or `review` skill runs, a hook
+   records a *snapshot*: the git tree of the whole working directory (tracked
+   files plus untracked, non-ignored files), built in a temporary index with
+   `git add -A && git write-tree`. It takes about 10 ms in this repo and never
+   touches the real index. Two triggers record it:
+   - `PostToolUse` on the `Skill` tool, when `skill` is exactly `test` or
+     `review`. It fires only when the call succeeded, so denied or failed calls
+     do not count (R3).
+   - `UserPromptSubmit`, when the user's prompt starts with `/test` or
+     `/review`.
+   Snapshots are stored per skill in `.git/lifecycle-gate.json` (via
+   `git rev-parse --git-path`), never committed and shared across sessions in
+   the clone: content reviewed in one session stays reviewed in the next.
+   The built-in `/code-review` does not count as `review`.
+5. **Freshness (Amendment 1).** For `git push`, `gh pr create` and `gh api`
+   PR writes, the gate compares the `test` and `review` snapshots with
+   `HEAD^{tree}`, the content being pushed. Running the skills on uncommitted
+   work and then committing it matches exactly. Any change afterwards, by any
+   tool, `Bash`, or subagent, does not (R1). The MCP remote-write tools send
+   content from their arguments rather than from `HEAD`, so for them the
+   snapshots must match the current working-directory tree instead.
+6. On a mismatch the deny message names the stale skill(s) and lists up to ten
+   paths that differ (`git diff --name-only`), so the agent knows what changed.
+7. The escape hatch is the environment variable
    `BLOG_LIFECYCLE_GATE_BYPASS=1` in the Claude Code process environment.
    The agent cannot set it from a `Bash` tool call, because hooks inherit
    Claude Code's environment, not the tool command's.
-7. `hooks/hooks.json` stays for plugin installs, pointing at the same script.
+8. `hooks/hooks.json` stays for plugin installs, pointing at the same script.
+
+## Known limits (recorded, not fixed)
+
+- **Not a sandbox.** The gate is a guardrail for a cooperative but forgetful
+  agent. A determined agent could edit `.git/lifecycle-gate.json`, push from
+  `$(...)`/backticks/`eval`, or call git through a script. Those are out of
+  scope.
+- **Missing Node fails open.** If `node` is not installed, the hooks exit 127
+  and Claude Code treats that as a non-blocking error. Node is a hard
+  dependency of this repo (Playwright), so this is accepted rather than
+  blocking every `Bash` call.
+- **Merges are not gated** (R6), by design.
+- **Untracked scratch files** present when `test`/`review` ran become part of
+  the snapshot. If they are not committed, the push is denied and the message
+  lists them; delete or commit them, then rerun the skills.
 
 ## Layers
 
@@ -60,8 +105,9 @@ and `review` skills have run after its last file edit.
 |---|-------|-----------|--------|
 | 1 | Session start | `SessionStart` hook, `hooks/session-start.sh` | Injects `.github/skills/using-agent-skills/SKILL.md` as context |
 | 2 | Per-prompt reminder | `UserPromptSubmit` hook, `hooks/lifecycle-reminder.sh` | Injects a short lifecycle-order reminder on every prompt |
-| 3 | Mandatory rule | `CLAUDE.md` | "Must" wording plus a top-of-file rule: no commit, push or PR before `test` and `review` |
-| 4 | Push gate | `PreToolUse` hook, `hooks/lifecycle-gate.js` | Denies `git push`, `gh pr create`, `gh api` writes to `.../pulls`, and the GitHub MCP tools that write to the remote (`create_pull_request`, `push_files`, `create_or_update_file`, `delete_file`) unless `test` and `review` ran after the last edit |
+| 3 | Mandatory rule | `CLAUDE.md` | "Must" wording plus a top-of-file rule: no push or PR before `test` and `review` |
+| 4a | Snapshot recorder | `PostToolUse` (`Skill`) and `UserPromptSubmit` hooks, `hooks/lifecycle-record.js` | Records the working-directory tree when `test` or `review` runs |
+| 4b | Push gate | `PreToolUse` hook, `hooks/lifecycle-gate.js` | Denies `git push`, `gh pr create`, `gh api` writes to `.../pulls`, and the GitHub MCP remote-write tools (`create_pull_request`, `push_files`, `create_or_update_file`, `delete_file`) unless both snapshots match the content being pushed |
 
 ## Commands
 
@@ -69,70 +115,78 @@ and `review` skills have run after its last file edit.
 bash tests/lifecycle-hooks.sh                   # fixture tests for all hooks
 bundle exec jekyll build                        # site still builds
 bash scripts/check-pr-scope.sh                  # scope guard passes
-echo '{}' | bash hooks/session-start.sh | node -e 'JSON.parse(require("fs").readFileSync(0))'
 ```
 
 ## Project Structure
 
 ```
-.claude/settings.json          → NEW: registers the three hooks
+.claude/settings.json          → registers the hooks (adds PostToolUse + recorder)
 hooks/session-start.sh         → FIX: correct output format
 hooks/lifecycle-reminder.sh    → NEW: UserPromptSubmit reminder
-hooks/lifecycle-gate.js        → NEW: PreToolUse push/PR gate
-hooks/hooks.json               → unchanged (plugin path)
+hooks/lifecycle-snapshot.js    → NEW (A1): shared tree-snapshot + state helpers
+hooks/lifecycle-record.js      → NEW (A1): records snapshots
+hooks/lifecycle-gate.js        → NEW: PreToolUse push/PR gate (A1: compares trees)
+hooks/hooks.json               → quote ${CLAUDE_PLUGIN_ROOT} (R7)
 CLAUDE.md                      → mandatory wording + top-of-file rule
 tests/lifecycle-hooks.sh       → NEW: fixture tests
 .github/workflows/test-build.yml → run tests/lifecycle-hooks.sh next to scope-guard.sh
 ```
 
+10 files, under the 15-file scope cap.
+
 ## Code Style
 
 Match `tests/scope-guard.sh`: header comment listing every case, `set -euo
-pipefail`, a `run_case` helper asserting exit code and an output grep, a
-PASS/FAIL tally. Hooks fail open on internal errors (malformed input,
-unreadable transcript) except the gate, which fails closed for push/PR
-commands so a parsing bug cannot silently disable it.
+pipefail`, temporary git repos per case, a PASS/FAIL tally. The context hooks
+fail open. The gate fails closed: any internal error while handling a gated
+action denies it.
 
 ## Testing Strategy
 
-`tests/lifecycle-hooks.sh` feeds hook-input JSON on stdin and synthetic JSONL
-transcripts, and asserts:
+`tests/lifecycle-hooks.sh` builds a temporary git repo per case, drives the
+recorder and the gate with the JSON Claude Code sends, and asserts:
 
-- A. SessionStart emits valid JSON with `hookSpecificOutput.additionalContext`
-  containing the meta-skill text.
-- B. UserPromptSubmit emits the reminder.
-- C. Gate: `git push` with no skills in transcript → denied.
-- D. Gate: `git push` with only `test` → denied, names `review` as missing.
-- E. Gate: `git push` with `test` and `review` after the last edit → allowed.
-- F. Gate: `test` and `review`, then an `Edit` → denied (stale).
-- G. Gate: user-typed `/test` and `/review` count.
-- H. Gate: `gh pr create` and `mcp__github__create_pull_request` are gated.
-- I. Gate: unrelated commands (`git status`, `git log`, `git push-hook-test`)
-  → allowed. Detecting `git push` hidden inside quoted strings or `eval` is out
-  of scope.
-- J. Gate: `BLOG_LIFECYCLE_GATE_BYPASS=1` → allowed.
-- K. Gate: missing or unreadable transcript on a push → denied (fail closed).
+- A. SessionStart emits `hookSpecificOutput.additionalContext` with the meta-skill.
+- B. UserPromptSubmit reminder is emitted.
+- C. Recorder: successful `Skill` `test`/`review` writes a snapshot; `code-review`,
+  `blog:test` and other skills do not; typed `/test` and `/review` prompts do;
+  `/code-review` does not.
+- D. Gate: no snapshots → deny, names `test` and `review`.
+- E. Gate: only `test` recorded → deny, names `review` only.
+- F. Gate: both recorded, then commit → allow (uncommitted work reviewed, then committed).
+- G. Gate: both recorded, then a file changed by plain shell (`sed`/`echo >`) and
+  committed → deny, lists the changed path (R1).
+- H. Gate: both recorded, then a new untracked file committed → deny.
+- I. Gate: every push form in R4 → deny when stale.
+- J. Gate: `gh pr create`, `gh api` POST pulls, MCP write tools → deny when stale;
+  MCP tools allow when the working tree matches.
+- K. Gate: false-positive forms in R5 and read-only commands → allow.
+- L. Gate: bypass env → allow; bypass inside the command string → deny.
+- M. Gate: `null`, non-object, or malformed stdin on a gated tool → deny (R2);
+  malformed stdin with no visible gated action → allow.
+- N. Gate: not a git repo / no `HEAD` → deny (fail closed).
 
 Then a live check in a real session: the gate denies a push before
 `test`/`review`, and allows it after.
 
 ## Boundaries
 
-- Always: keep hooks fast (< 1 s), dependency-free beyond Node and bash.
-- Ask first: extending the gate to `git commit`.
+- Always: keep hooks fast (< 1 s), dependency-free beyond Node, bash and git.
+- Ask first: extending the gate to `git commit` or merges.
 - Never: modify protected files (`_config.yml`, `.github/CODEOWNERS`,
   `.github/copilot-instructions.md`, `Gemfile`, `Gemfile.lock`); let the agent
-  bypass the gate from a tool call.
+  bypass the gate from a tool call; touch the real git index.
 
 Note: `hooks/` is published into `_site/` because `_config.yml` does not exclude
-it. `_config.yml` is protected, so that is left as a follow-up.
+it. `_config.yml` is protected, so that is left as an owner follow-up.
 
 ## Success Criteria
 
 - [ ] A fresh Claude Code session in this repo receives the meta-skill at start.
 - [ ] Every user prompt receives the lifecycle reminder.
 - [ ] `CLAUDE.md` states the lifecycle as mandatory at the top of the file.
-- [ ] `git push` / PR creation is denied until `test` and `review` run after the last edit, with a message naming the missing skills.
+- [ ] Push / PR creation is denied unless `test` and `review` ran on exactly the content being pushed, whatever tool made the edits; the message names the stale skills and the changed paths.
+- [ ] Review findings R1 to R5 and R7 each have a passing fixture test.
 - [ ] `BLOG_LIFECYCLE_GATE_BYPASS=1` in the Claude Code environment allows the push.
 - [ ] `tests/lifecycle-hooks.sh` passes locally and in CI.
 - [ ] `bundle exec jekyll build` and the scope guard pass.
@@ -141,3 +195,4 @@ it. `_config.yml` is protected, so that is left as a follow-up.
 
 1. Gate scope: push and PR creation only; `git commit` is not gated (owner, 2026-10-06).
 2. CI: `tests/lifecycle-hooks.sh` runs in `.github/workflows/test-build.yml` next to `tests/scope-guard.sh` (owner, 2026-10-06).
+3. Freshness: git tree snapshot, not transcript heuristics (owner, 2026-10-06).
