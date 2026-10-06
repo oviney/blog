@@ -14,177 +14,85 @@ image: /assets/images/green-build-safe-hero.svg
 image_alt: "A cut-away of a wall. On the front face a large status lamp glows green. Behind the wall its cable runs down and stops in mid-air, its bare end a short distance from the terminal block it was meant to reach. Nothing connects the lamp to the check."
 ---
 
-I've pretty much seen this on every project in every company since my very first day in
-software, dating back to 2000. Every single project I've worked on over the past eleven
-years, and if I go backwards in time, every job prior: a green build that didn't mean the
-change was safe. Literally every single project where proper test-driven development and
-proper developer and tester engineering for quality was missing.
+Every project I have worked on since 2000 has had the same problem: a green build that did not mean the change was safe. In each case, proper test-driven development and proper engineering for quality, by developers and testers alike, was missing.
 
-I don't really know how you would push back on this, given that the one thing everyone's
-aiming for is trust in a signal. If a build is green and cannot be trusted, I don't know how
-you would argue that.
+The cost of poor quality is the cost of a green build that isn't green. Weak checks and poor code pass, whether the fault is in code quality, in design and requirements, or in integration with other features.
 
-The cost of poor quality is the cost of a green build that isn't green. Weak checks, poor
-code — whether it's code quality, or design and requirements not working correctly, or
-integration with other application features — passes. Then it goes downstream and gets
-deployed, the post-build verification step is completely wrong, and when a tester or an
-automated bot runs a feature test, the feature test fails. For every failure and for every
-build, the cycle time increases and the cost of rework increases, and therefore the cost of
-poor quality is rising.
+The cost of poor quality is not a figure of speech. Cost of quality has been an equation since the 1950s: prevention plus appraisal plus internal failure plus external failure. Cost of poor quality is the failure half of it. Juran estimated that unplanned quality costs could run as high as 20% of sales, as Shraim (2020) summarises. Applied to software by name, research by the Consortium for Information and Software Quality (CISQ) puts the cost of poor software quality in the United States at at least $2.41 trillion in 2022. In its 2020 edition, when the total was about $2.08 trillion, operational software failures alone accounted for $1.56 trillion. CISQ's iceberg model separates the costs everyone sees, such as outages, lawsuits and service calls, from the ones nobody books: finding and fixing defects, troubled projects, unaccounted overtime and technical debt.
 
-That last phrase is not a figure of speech. Cost of quality has been an equation since the
-1950s — prevention plus appraisal plus internal failure plus external failure — and cost of
-poor quality is the failure half of it. According to Juran's Quality Control Handbook, unplanned quality costs run as high as 20% of
-sales. Applied to software by name, research by the Consortium for Information and Software
-Quality puts the cost of poor software quality in the United States at at least $2.41
-trillion, of which operational failures are $1.56 trillion and finding and fixing defects
-$607 billion. According to CISQ's 2018 edition, the hidden costs run 6 to 50 times the
-observable ones: observable being outages,
-lawsuits and lost revenue; hidden being delays, overtime, fixing bugs, off-track projects and
-technical debt.
+People often begin to point fingers at people. To me, that is addressing the symptoms of the problem rather than taking a systems thinking approach and realising that the system, as it is defined, is not working. A causal loop diagram can show someone who starts blaming people why that is the wrong approach.
 
-People often begin to point fingers at people. To me, that is addressing the symptoms of the
-problem statement rather than taking a systems thinking approach to the problem and
-realising that the system as it is defined is therefore not working. By using causal loop
-diagrams you would be able to explain the problem in a way that a person who starts blaming
-people realises that that's the wrong approach.
+That reflex has a name. Repenning and Sterman, writing in California Management Review in 2001, point out that blaming individuals rather than the system they work in is common enough that psychologists call it the fundamental attribution error. What makes it stick is what happens next. Turn up the pressure and output does rise, immediately, which looks like proof the diagnosis was right. Managers who blame the workforce, they found, take actions that seem to confirm the blame. They call this the self-confirming attribution error.
 
-That reflex has a name. Repenning and Sterman, writing in California Management Review in
-2001, put it plainly: the attribution of a problem to the characteristics — and character
-flaws — of individuals in a system rather than to the system in which they find themselves
-is so pervasive that psychologists call it the fundamental attribution error. What makes it
-stick is what happens next. Turn up the pressure and output does rise, immediately, which
-looks like proof the diagnosis was right. They call that the self-confirming attribution
-error: once managers decide the workforce is the source of their difficulties, they take
-actions that provide convincing and immediate evidence confirming the erroneous attribution.
+It is not the tooling either. A particular tool matters less than the foundations of DevSecOps, CI and CD, and an agreed definition of what constitutes a pass and a fail. A tool that does not align with sound engineering principles is a problem in itself, but in most cases the cause is improper use. I wouldn't say any particular vendor does it right or wrong. If a tool is not used as it was designed to be used, the outcome is not guaranteed.
 
-It is not the tooling either. I don't think a particular tool matters as much as do the
-foundational principles of DevSecOps and CI and CD, and what constitutes a pass and a fail.
-Any tool that doesn't align with the principles of software engineering is a problem in and
-of itself, but in most cases improper use of a tool is usually the main cause. I wouldn't say
-that a particular tool vendor does it right or wrongly. If the tool, and the way that it was
-designed, is not used accurately or correctly or as designed, then the outcome is not
-guaranteed.
+There is a reason the problem wins by default. CISQ's 2018 report found that most IT and software organisations do not collect cost-of-quality data at all. What is not measured cannot compete with a milestone date.
 
-There is a reason it wins by default. According to CISQ's 2022 report, most organisations do
-not yet collect and report their cost of poor software quality numbers, and it cites a 2017
-study of IT executives in which 35% of those surveyed said they had no idea how much IT
-system failures were costing their business.
+## One programme, the same three failures
 
-## Every single release fails for the same reason
+On one public-sector modernisation I have worked on, moving services off a mainframe onto a packaged product, releases kept failing for the same three reasons: weak planning, poor dependency management across teams, and quality that was tested in late instead of built in. The defect tracker made the last one plain. When I pulled the defect data for one release, 78% or more of defects were being found in release testing, not in the sprint where the code was written. Across two consecutive releases, the product teams had added no regression automation at all. That is one programme at one point in time, not a survey, but it is the same pattern I described at the start. Set out as a loop rather than a list, it closes on itself, as the chart below shows.
 
-On a modernisation programme at a large government organisation, taking them off the
-mainframe onto a COTS product, every single release fails for the same reason. Bad planning,
-poor dependency management across features and across the solution train, and quality that
-is not built in: no shift left, no defect prevention. As the chart shows, set out as a loop
-rather than a list it closes on itself.
+![Causal loop: build-date pressure lets weak checks pass, defects surface late, rework pushes the release, pressure rises again.](/assets/charts/green-build-safe.png)
 
-Teams are under the constant pressure of build-complete dates in order to make contractual
-milestone payments. Weak checks pass and the build goes green. It goes downstream and gets
-deployed, the post-build verification step is completely wrong, and when a tester or an
-automated bot runs a feature test, the feature test fails. By then the product teams have
-moved on and started working on new releases, and only put a certain amount of time on bug
-fixing, even though the bug fixing should have been happening during the build phase. The
-release date gets pushed because of rework and because of late-stage defect injection. For
-every failure and for every build, the cycle time increases and the cost of rework
-increases, and therefore the cost of poor quality is rising — and the next build-complete
-date arrives under more pressure than the last.
+Teams work under constant pressure to hit build-complete dates. Weak checks pass and the build goes green. It goes downstream and gets deployed, the post-build verification is wrong, and when a tester or an automated bot runs a feature test, the test fails. By then the product teams have moved on to the next release and give bug fixing only part of their time, even though that fixing should have happened during the build. The release date slips because of rework and late-stage defects. Each failed build adds cycle time and rework, the cost of poor quality rises, and the next build-complete date arrives under more pressure than the last.
 
-In this particular situation we are using SAFe, large solution configuration, but it truly
-doesn't matter because we're not using it properly.
+The delivery framework does not matter much here. Any framework fails when it is not used properly.
 
-Adding continuous improvement items to a tower is a band-aid. I don't call that a solution.
-If you don't change the root of the problem statement, you're never gonna get to green
-builds. You're never gonna get to trustworthy software. You're just gonna keep repeating the
-problem. The other path out is a replanning exercise, working backwards from the MVP: what
-parts can we move off the mainframe as fast as possible, and how can all of the rest of the
-solution be considered priority two and therefore follow a different path. Planning that
-properly means software engineering people, not management consulting people trying to do
-the job — somebody who has actually delivered a mainframe modernisation before.
+Adding continuous improvement items to the backlog is a band-aid. I don't call that a solution. If you don't change the root of the problem, you will never get to green builds you can trust. You will keep repeating the problem. The other path out is a replanning exercise that works backwards from the minimum viable product: which parts can move off the mainframe first, and which can be treated as second priority on a different path. Planning that properly needs software engineers who have delivered a mainframe modernisation before, not management consultants.
 
-Choosing the band-aid is not a lapse of character either; it is the best-documented move in
-systems thinking. Senge named it in The Fifth Discipline in 1990: shifting the burden. The
-symptomatic solution relieves the symptom, the capability for the fundamental solution
-atrophies, and reliance on the band-aid deepens — the shape, he noted, of almost every
-addiction. Repenning and Sterman drew it as two loops and simulated it: Work Harder buys an
-immediate gain and costs capability later, Work Smarter costs output now and returns
-capability later, and managers unaware of that trade-off choose working harder. The result is
-what they call the capability trap. Why it persists is an incentive rather than a failing —
-most organisations reward last-minute problem solving over the improvement that would have
-prevented the crisis. Nobody ever gets credit for fixing problems that never happened.
+Choosing the band-aid is not a lapse of character either; it is the best-documented move in systems thinking. Senge named it in The Fifth Discipline in 1990: shifting the burden. The symptomatic solution relieves the symptom, the capability for the fundamental solution atrophies, and reliance on the band-aid deepens. Senge noted that this is the structure of most addictions. Repenning and Sterman drew it as two loops and simulated it. Working harder buys an immediate gain and costs capability later. Working smarter costs output now and returns capability later. Managers unaware of that trade-off choose working harder, and the result is what the authors call a capability trap. It persists because of incentives, not failings: most organisations reward last-minute problem solving over the improvement that would have prevented the crisis. As the title of their paper puts it, nobody ever gets credit for fixing problems that never happened.
 
-The delivery model makes the trap deeper, and DORA measured that too. According to DORA's
-2018 Accelerate State of DevOps report, low-performing teams were 3.9 times more likely to
-use functional outsourcing than elite performers. The reason given is the shape of the arrangement, not the calibre of the people:
-assigning individual functions to external vendors introduces handoffs and friction between
-groups, and once contracts have been signed, changes to specifications are difficult to
-manage across external silos. Work batches, and the lead times go with it.
+The delivery model makes the trap deeper, and DORA measured that too. According to DORA's 2018 Accelerate State of DevOps report, low-performing teams were 3.9 times more likely to use functional outsourcing than elite performers. The reason given is the shape of the arrangement, not the calibre of the people. Handing individual functions to external vendors adds handoffs and friction between groups, and once contracts are signed, changes to specifications are hard to manage across external silos. Work gets batched, and lead times grow with it.
 
-None of which is unusual enough to be interesting. According to CISQ, a late-2019 prediction
-put 40% of IT budgets by 2025 on simply maintaining technical debt, and it calls this a
-primary reason that many modernisation projects fail. The same report puts the average
-developer's time on technical debt at a third of the working week.
-
-The old application is still available today, so the new one has not fully taken over — only
-certain parts of the user journeys. That is the only reason the public is not feeling this
-yet. If it is running in production and we have all these quality issues in release testing,
-then there's a high probability that there's going to be an equal number of quality issues
-identified in production, given that there's no way that end-to-end testing will cover all of
-the gaps left behind.
+None of this is unusual. CISQ's 2022 report cites a late-2019 prediction that by 2025, 40% of IT budgets would go to simply maintaining technical debt, and calls this a primary reason that many modernisation projects fail. The same report puts the average developer's time on technical debt at 13.5 of 41.1 hours a week, about a third.
 
 ## The path of least resistance
 
-So what changes when an agent wrote the code? In my mind, nothing changes. The
-responsibility around quality remains. The fact that you have an agent producing code means
-that you need to have the same rigour that you should have always had if it was a human
-writing the code. What changes is the importance of the human. Their skill set is of utmost
-importance. If they're not an expert at building software, everything breaks.
+So what changes when an agent wrote the code? The standard does not. The load on it does. An agent produces in an hour what a team used to review in a week, so every weak gate fails more often and sooner. The responsibility for quality stays where it was, and you need the same rigour you should always have had with human authors. What rises is the importance of the human. Their skill matters more than ever. If they are not expert at building software, everything breaks.
 
-Whatever they allow agents to do will follow that same pattern, which is they will follow
-the pattern of the human. And if the agent can get away with not producing quality, the
-agent will choose not to produce quality. It will take the path of least resistance to build
-something.
+Agents follow the pattern the humans around them set. If an agent can get away with not producing quality, it will. It will take the path of least resistance to build something.
 
-The 2025 DORA research reaches the same place from the data side: AI's primary role is as an
-amplifier, magnifying an organisation's existing strengths and weaknesses. According to DORA, adoption among software
-development professionals stands at 90%, and the research finds that higher adoption is
-associated with an increase in both software delivery throughput and software delivery
-instability.
+The 2025 DORA research reaches the same place from the data side: AI's primary role is as an amplifier, magnifying an organisation's existing strengths and weaknesses. According to DORA, 90% of technology professionals now use AI at work, and higher AI adoption is associated with an increase in both software delivery throughput and software delivery instability.
 
-Research by GitClear shows what the path of least resistance looks like inside a repository.
-Its 2026 analysis of 623 million changes finds that refactoring line moves fell from 21% in
-2022 to 3.8% so far in 2026, while copy-paste rose from 9.4% to 15.7%, and code block
-duplication is up 81% over 2023.
+GitClear's data shows what the path of least resistance looks like inside a repository. Its 2026 analysis of 623 million changes finds that moved (refactored) lines fell from 21% of changes in 2022 to 3.8% so far in 2026, while copy-pasted lines rose from 9.4% to 15.7%. Duplicated code blocks are up 81% since 2023. GitClear does not claim AI caused this; the trend tracks the rise of AI-authored commits, which is correlation.
 
-If I think about people who actually know their craft, I don't think anybody would argue
-with this. Quality and the attributes of quality come from knowing how to build something
-and the craft required to build it. Case in point: if you're going to build a house and you
-don't have carpentry skills, you don't have framing skills, you don't have what it requires
-to build a foundation using concrete, level, all the considerations, then you're going to
-build a house that is not going to last. The buyer's going to know it, and problems are
-going to be the first sign of it.
+Here is what would prove me wrong: teams that let agents ship under weaker gates and see no rise in their change failure rate. DORA's 2025 data points the other way, but it is a pattern across organisations, not a controlled test. And there is a limit I should own. As Dijkstra wrote in 1970, testing can show the presence of bugs but never their absence. No green build can promise a change is safe. What it can promise is that every risk you know about has a check, and that the check would have failed. That is what "safe" in the title means, and it is a higher bar than most green builds clear today.
 
-The reason why you can begin to trust it is because you know how it works. So when you don't
-know how your build process works, and you're not responsible for it when the signals come
-from it, I don't know how we automate that away. That's a human requirement, and the more
-you use agents, the more this is important.
+People who know their craft won't argue with this. Quality comes from knowing how to build something and having the craft to do it. If you build a house without carpentry, framing or foundation skills, it will not last. The buyer will know it, and the problems will be the first sign.
 
-Humans have to encode or codify the software engineering and the skills so that agents can
-bring that knowledge and rigour. Otherwise agents are going to produce slop.
+You can trust a signal because you know how it works. When you don't know how your build process works, and you are not responsible for what its signals tell you, I don't see how you automate that away. That is a human requirement, and the more you use agents, the more it matters.
 
-![Chart](/assets/charts/green-build-safe.png)
+## What to do about it
+
+Diagnosis is the easy half. These are the moves I made on the programme above, plus two for anyone starting fresh.
+
+**Measure where defects are found.** Tag each defect with the stage that found it, and report the share found in the sprint against the share found in release testing, team by team. That ratio is where the 78% came from. Until it sits on a dashboard, nobody owns it.
+
+**Put accountability where the authority is.** The teams that write the code own its quality in the sprint. Routing upstream defects to the test team to absorb is how the loop keeps running.
+
+**Make automation part of done.** A story is not done until its regression checks exist and run in the pipeline. An optional check is the first thing cut under build-date pressure.
+
+**Start with the worst teams, not all of them.** Pick the few teams producing the most late defects, embed automation engineers with them to build the first checks, then hand over. A central team should enable the work, not absorb it.
+
+**Give agents the standard in writing.** Agents follow the context they are given. Codify your engineering standard as context files and skills the agent reads on each task: what a test must cover, what blocks a merge, what done means. Otherwise agents will produce slop.
+
+**Run the ten-build check.** Take the last ten green builds that later produced a defect in release testing. For each one, name the check that should have failed. A defect without a named check is a hole in your signal. Count them again in a month.
+
+**If you buy delivery, contract for it.** Require each release report to show two numbers side by side: build status, and the count of defects found after the build went green. A vendor whose green builds keep producing late defects is showing you the size of the hole in their signal.
 
 ## References
 
-- Mustafa Shraim, "A Simple Model for Identifying Costs of Quality", American Society for Engineering Education, 2020 — https://peer.asee.org/a-simple-model-for-identifying-costs-of-quality.pdf
-- CISQ, "The Cost of Poor Software Quality in the US: A 2022 Report" — https://www.it-cisq.org/the-cost-of-poor-quality-software-in-the-us-a-2022-report/
-- CISQ, 2022 report PDF — https://www.it-cisq.org/wp-content/uploads/sites/6/2022/11/CPSQ-Report-Nov-22-2.pdf
-- DORA, "Accelerate: State of DevOps 2018" — the outsourcing chapter — https://dora.dev/research/2018/dora-report/
-- DORA, "State of AI-assisted Software Development", 2025 — https://dora.dev/dora-report-2025/
-- DORA, "Balancing AI tensions" — https://dora.dev/insights/balancing-ai-tensions/
-- Google, "How are developers using AI? Inside Google's 2025 DORA report" — https://blog.google/innovation-and-ai/technology/developers-tools/dora-report-2025/
-- GitClear, "The Maintainability Gap: 2026 AI Code Quality Research" — https://www.gitclear.com/the_ai_code_quality_maintainability_gap
-- Nelson P. Repenning and John D. Sterman, "Nobody Ever Gets Credit for Fixing Problems that Never Happened", California Management Review 43(4), 2001 — https://web.mit.edu/nelsonr/www/Repenning=Sterman_CMR_su01_.pdf
-- Peter Senge, "The Fifth Discipline", 1990 — the "Shifting the Burden" archetype — https://blog.iseesystems.com/systems-thinking/shifting-the-burden/
+- Mustafa Shraim, "A Simple Model for Identifying Costs of Quality", American Society for Engineering Education, 2020, https://peer.asee.org/a-simple-model-for-identifying-costs-of-quality.pdf
+- CISQ, "The Cost of Poor Quality Software in the US: A 2018 Report", https://www.it-cisq.org/wp-content/uploads/sites/6/2023/09/The-Cost-of-Poor-Quality-Software-in-the-US-2018-Report.pdf
+- CISQ, "The Cost of Poor Software Quality in the US: A 2020 Report", press release, https://www.it-cisq.org/cost-of-poor-software-quality/
+- CISQ, "The Cost of Poor Software Quality in the US: A 2022 Report", https://www.it-cisq.org/the-cost-of-poor-quality-software-in-the-us-a-2022-report/
+- CISQ, 2022 report PDF, https://www.it-cisq.org/wp-content/uploads/sites/6/2022/11/CPSQ-Report-Nov-22-2.pdf
+- DORA, "Accelerate: State of DevOps 2018", outsourcing chapter, https://dora.dev/research/2018/dora-report/
+- DORA, "State of AI-assisted Software Development", 2025, https://dora.dev/dora-report-2025/
+- DORA, "Balancing AI tensions", https://dora.dev/insights/balancing-ai-tensions/
+- GitClear, "The Maintainability Gap: 2026 AI Code Quality Research", https://www.gitclear.com/the_ai_code_quality_maintainability_gap
+- Nelson P. Repenning and John D. Sterman, "Nobody Ever Gets Credit for Fixing Problems that Never Happened", California Management Review 43(4), 2001, https://web.mit.edu/nelsonr/www/Repenning=Sterman_CMR_su01_.pdf
+- Peter Senge, "The Fifth Discipline", 1990, the "Shifting the Burden" archetype, https://blog.iseesystems.com/systems-thinking/shifting-the-burden/
+- Edsger W. Dijkstra, "Notes on Structured Programming" (EWD249), 1970, https://www.cs.utexas.edu/~EWD/ewd02xx/EWD249.PDF
 
 *How this was written: I was interviewed by Claude for about 70 minutes; the draft arranges my answers; I edited it; the facts were checked against sources I opened.*
