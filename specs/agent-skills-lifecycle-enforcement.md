@@ -41,8 +41,10 @@ and `review` skills have run after its last file edit.
    bash + `jq`, because the gate must parse JSON hook input and a JSONL
    transcript reliably.
 4. "Skill ran" means the session transcript contains either a `Skill` tool
-   call with `skill` equal to `test` / `review`, or a user-typed `/test` /
-   `/review` slash command.
+   call with `skill` equal to `test` / `review`, or a user message invoking
+   `/test` / `/review` (plain text or a `<command-name>` tag). Queued prompts
+   (`queue-operation` entries) do not count, since they can be withdrawn. The
+   built-in `/code-review` does not count as `review`.
 5. Freshness: a skill run only counts if it happened after the last
    `Edit`, `Write` or `NotebookEdit` tool call. File changes made through
    `Bash` (sed, heredocs) are not detected; this is a known limitation.
@@ -59,7 +61,7 @@ and `review` skills have run after its last file edit.
 | 1 | Session start | `SessionStart` hook, `hooks/session-start.sh` | Injects `.github/skills/using-agent-skills/SKILL.md` as context |
 | 2 | Per-prompt reminder | `UserPromptSubmit` hook, `hooks/lifecycle-reminder.sh` | Injects a short lifecycle-order reminder on every prompt |
 | 3 | Mandatory rule | `CLAUDE.md` | "Must" wording plus a top-of-file rule: no commit, push or PR before `test` and `review` |
-| 4 | Push gate | `PreToolUse` hook, `hooks/lifecycle-gate.js` | Denies `git push`, `gh pr create`, `gh api .../pulls` POST and `mcp__github__create_pull_request` unless `test` and `review` ran after the last edit |
+| 4 | Push gate | `PreToolUse` hook, `hooks/lifecycle-gate.js` | Denies `git push`, `gh pr create`, `gh api` writes to `.../pulls`, and the GitHub MCP tools that write to the remote (`create_pull_request`, `push_files`, `create_or_update_file`, `delete_file`) unless `test` and `review` ran after the last edit |
 
 ## Commands
 

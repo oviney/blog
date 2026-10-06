@@ -13,6 +13,8 @@
 #   E. git push, test + review after the last edit       → allow
 #   F. git push, test + review, then an Edit             → deny (stale)
 #   G. git push, user-typed /test and /review            → allow
+#      (as a plain user message or a <command-name> tag); a queued but
+#      never-delivered /test does not count
 #   H. git push, only /code-review and code-review skill → deny (not the repo skill)
 #   I. gh pr create, gh api POST .../pulls, chained and -C pushes, and the
 #      MCP push/PR tools                                 → deny
@@ -41,7 +43,9 @@ fail() { echo "  ❌ $1"; FAIL=$((FAIL + 1)); }
 # Transcript line builders, matching the JSONL Claude Code writes.
 t_skill() { printf '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Skill","input":{"skill":"%s"}}]}}\n' "$1"; }
 t_edit()  { printf '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"%s","input":{"file_path":"x"}}]}}\n' "${1:-Edit}"; }
-t_typed() { printf '{"type":"queue-operation","operation":"enqueue","content":"%s"}\n' "$1"; }
+t_typed() { printf '{"type":"user","message":{"role":"user","content":"%s"}}\n' "$1"; }
+t_cmdtag() { printf '{"type":"user","message":{"role":"user","content":"<command-name>/%s</command-name>"}}\n' "$1"; }
+t_queued() { printf '{"type":"queue-operation","operation":"enqueue","content":"%s"}\n' "$1"; }
 t_text()  { printf '{"type":"user","message":{"role":"user","content":"hello"}}\n'; }
 
 # transcript <name> <lines...>: writes a transcript file, prints its path.
@@ -97,7 +101,9 @@ ONLY_TEST=$(transcript only-test "$(t_edit)" "$(t_skill test)")
 FRESH=$(transcript fresh "$(t_edit Write)" "$(t_skill test)" "$(t_skill review)")
 STALE=$(transcript stale "$(t_skill test)" "$(t_skill review)" "$(t_edit)")
 TYPED=$(transcript typed "$(t_edit NotebookEdit)" "$(t_typed '/test')" "$(t_typed '/review ')")
-BUILTIN=$(transcript builtin "$(t_edit)" "$(t_skill test)" "$(t_typed '/code-review')" "$(t_skill code-review)")
+TAGGED=$(transcript tagged "$(t_edit)" "$(t_cmdtag test)" "$(t_cmdtag review)")
+QUEUED=$(transcript queued "$(t_edit)" "$(t_queued '/test')" "$(t_skill review)")
+BUILTIN=$(transcript builtin "$(t_edit)" "$(t_skill test)" "$(t_typed '/code-review')" "$(t_cmdtag code-review)" "$(t_skill code-review)")
 
 gate_case "C. push with no skills" deny "$NONE" Bash "git push -u origin main" "test" ""
 gate_case "C. names review too" deny "$NONE" Bash "git push" "review" ""
@@ -105,6 +111,8 @@ gate_case "D. push with only test" deny "$ONLY_TEST" Bash "git push" "missing: r
 gate_case "E. test + review after last edit" allow "$FRESH" Bash "git push -u origin feature"
 gate_case "F. edit after test + review" deny "$STALE" Bash "git push" "missing: test, review"
 gate_case "G. user-typed /test and /review" allow "$TYPED" Bash "git push"
+gate_case "G. <command-name> tags" allow "$TAGGED" Bash "git push"
+gate_case "G. queued /test does not count" deny "$QUEUED" Bash "git push" "missing: test"
 gate_case "H. /code-review is not review" deny "$BUILTIN" Bash "git push" "missing: review"
 
 gate_case "I. gh pr create" deny "$NONE" Bash "gh pr create --title x"
