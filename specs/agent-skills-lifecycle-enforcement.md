@@ -1,6 +1,6 @@
 # Spec: Enforce the agent-skills lifecycle in Claude Code sessions
 
-Status: Draft, awaiting owner approval
+Status: Approved 2026-10-06
 Issue: #1340
 Owner decision: 2026-10-02, all four layers approved
 
@@ -135,7 +135,7 @@ it. `_config.yml` is protected, so that is left as a follow-up.
 - [ ] `tests/lifecycle-hooks.sh` passes locally and in CI.
 - [ ] `bundle exec jekyll build` and the scope guard pass.
 
-## Open Questions
+## Resolved Questions
 
-1. Should `git commit` also be gated, or only push and PR creation? Proposed: push and PR only, so local work-in-progress commits stay cheap.
-2. Adding `tests/lifecycle-hooks.sh` to `.github/workflows/test-build.yml` changes CI config, which the boundaries list as ask-first. Proposed: yes, mirroring `tests/scope-guard.sh`.
+1. Gate scope: push and PR creation only; `git commit` is not gated (owner, 2026-10-06).
+2. CI: `tests/lifecycle-hooks.sh` runs in `.github/workflows/test-build.yml` next to `tests/scope-guard.sh` (owner, 2026-10-06).
