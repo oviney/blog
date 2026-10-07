@@ -21,6 +21,9 @@
 #   I. PreToolUse: evasion guards, install-on-push, MCP and gh api content
 #      writes (R20) via the proxy check, ordinary commands, malformed input (R2)
 #   J. Concurrent records (R11), temp cleanup (R12), quoted plugin path (R7)
+#   K. Amendment 2.1: install scope (R21), self-contained shim and bypass with
+#      a missing checker (R23), executable bit (R24), dry runs (R25), renamed
+#      GitHub MCP tools (R26), already-published commits (R27)
 #
 # Dependencies: bash, git, node. Same as the hooks under test.
 
@@ -105,21 +108,28 @@ gate_case() {
   pass "$1"
 }
 
+# context_of <hook script> <project dir>: the hook's additionalContext.
 context_of() {
-  echo '{}' | CLAUDE_PROJECT_DIR="$REPO_ROOT" bash "$1" 2>/dev/null | node -e 'let s="";
+  echo '{}' | CLAUDE_PROJECT_DIR="$2" bash "$1" 2>/dev/null | node -e 'let s="";
     process.stdin.on("data",d=>s+=d).on("end",()=>{try{
       process.stdout.write(JSON.parse(s).hookSpecificOutput.additionalContext||"")}catch(e){}})'
 }
 
-echo "Case A: SessionStart"
-ctx=$(context_of "$REPO_ROOT/hooks/session-start.sh" || true)
+echo "Case A: SessionStart (on a temporary project, never the real checkout, R30)"
+AP=$(new_repo session-project); rm -f "$AP/.git/hooks/pre-push"
+mkdir -p "$AP/.github/skills/using-agent-skills"
+cp "$REPO_ROOT/.github/skills/using-agent-skills/SKILL.md" "$AP/.github/skills/using-agent-skills/"
+ctx=$(context_of "$REPO_ROOT/hooks/session-start.sh" "$AP" || true)
 if printf '%s' "$ctx" | grep -q "Using Agent Skills"; then pass "A. meta-skill injected"; else fail "A. meta-skill injected"; fi
 if printf '%s' "$ctx" | grep -q "pre-push"; then pass "A. reports the pre-push shim"; else fail "A. reports the pre-push shim"; fi
+check "A. shim installed in the session's project" "$(grep -c 'lifecycle-gate pre-push shim' "$AP/.git/hooks/pre-push" 2>/dev/null || echo 0)" "1"
 
 echo "Case B: UserPromptSubmit reminder"
-ctx=$(context_of "$REPO_ROOT/hooks/lifecycle-reminder.sh" || true)
+ctx=$(context_of "$REPO_ROOT/hooks/lifecycle-reminder.sh" "$REPO_ROOT" || true)
 if printf '%s' "$ctx" | grep -q "spec" && printf '%s' "$ctx" | grep -q "review"; then
   pass "B. lifecycle reminder injected"; else fail "B. lifecycle reminder injected"; fi
+if printf '%s' "$ctx" | grep -q "exactly the content" && ! printf '%s' "$ctx" | grep -q "PR creation"; then
+  pass "B. reminder states the exact-content rule (R29)"; else fail "B. reminder states the exact-content rule (R29)"; fi
 
 echo "Case C: recorder"
 R=$(new_repo rec)
@@ -231,9 +241,9 @@ for c in "git status" "git commit -m wip" "gh pr create --title x" 'grep -rn "gi
   gate_case "I. allowed: $c" allow "$A2" Bash "$c"
 done
 U=$(new_repo uninstalled); rm -f "$U/.git/hooks/pre-push"
-gate_case "I. push installs a missing shim" allow "$U" Bash "git push origin main"
+CLAUDE_PROJECT_DIR="$U" gate_case "I. push installs a missing shim in the project" allow "$U" Bash "git push origin main"
 check "I. shim present afterwards" "$(grep -c 'lifecycle-gate pre-push shim' "$U/.git/hooks/pre-push" 2>/dev/null || echo 0)" "1"
-gate_case "I. push with a foreign hook is denied" deny "$X" Bash "git push origin main" "pre-push"
+CLAUDE_PROJECT_DIR="$X" gate_case "I. push with a foreign hook is denied" deny "$X" Bash "git push origin main" "pre-push"
 gate_case "I. MCP push_files, stale" deny "$D" mcp__github__push_files '{"owner":"o","repo":"r"}' "test, review"
 gate_case "I. MCP push_files, reviewed tree" allow "$A2" mcp__github__push_files '{"owner":"o","repo":"r"}'
 gate_case "I. gh api contents PUT, stale (R20)" deny "$D" Bash "gh api -X PUT repos/o/r/contents/a.txt -f message=x -f content=eA=="
@@ -262,6 +272,33 @@ json '{hook_event_name:"PreToolUse",cwd:a,tool_name:"mcp__github__push_files",to
 check "J. no temp files left behind (R12)" "$(ls -A "$TMP/tmpcheck")" ""
 if grep -q '"bash \\"${CLAUDE_PLUGIN_ROOT}\\"/hooks/session-start.sh"' "$REPO_ROOT/hooks/hooks.json"; then
   pass "J. CLAUDE_PLUGIN_ROOT quoted (R7)"; else fail "J. CLAUDE_PLUGIN_ROOT quoted (R7)"; fi
+
+echo "Case K: Amendment 2.1 (R21, R23-R27)"
+K0=$(new_repo unrelated); rm -f "$K0/.git/hooks/pre-push"
+CLAUDE_PROJECT_DIR="$A2" gate_case "K. unrelated repo: push allowed by the gate (R21)" allow "$K0" Bash "git push origin main"
+check "K. unrelated repo: no shim installed (R21)" "$([ -e "$K0/.git/hooks/pre-push" ] && echo yes || echo no)" "no"
+KB=$(new_repo blog-clone); rm -f "$KB/.git/hooks/pre-push"; mkdir -p "$KB/hooks"; : > "$KB/hooks/lifecycle-prepush.js"
+CLAUDE_PROJECT_DIR="$A2" gate_case "K. another blog clone: push allowed by the gate" allow "$KB" Bash "git push origin main"
+check "K. another blog clone: shim installed (R21)" "$(grep -c 'lifecycle-gate pre-push shim' "$KB/.git/hooks/pre-push" 2>/dev/null || echo 0)" "1"
+check "K. shim runs the copy in the git common dir (R23)" "$(grep -c '/lifecycle-gate/lifecycle-prepush.js' "$A2/.git/hooks/pre-push")" "2"
+check "K. checker and helper copied (R23)" "$([ -f "$A2/.git/lifecycle-gate/lifecycle-prepush.js" ] && [ -f "$A2/.git/lifecycle-gate/lifecycle-snapshot.js" ] && echo yes || echo no)" "yes"
+K1=$(new_repo missing-checker); printf 'x\n' >> "$K1/a.txt"; commit_all "$K1"; rm -f "$K1/.git/lifecycle-gate/lifecycle-prepush.js"
+push_case "K. checker copy missing: push rejected (fail closed)" reject "$K1" refs/heads/main "$(git -C "$K1" rev-parse HEAD)" "cd '$K1' && git push origin main" "missing"
+out=$(cd "$K1" && CLAUDECODE=1 BLOG_LIFECYCLE_GATE_BYPASS=1 git push -q origin main 2>&1) || true
+check "K. checker copy missing: owner bypass still works (R23)" "$(remote_sha "$K1" refs/heads/main)" "$(git -C "$K1" rev-parse HEAD)"
+K3=$(new_repo not-executable); chmod -x "$K3/.git/hooks/pre-push"
+rc=0; node "$PREPUSH" --install "$K3" >/dev/null 2>&1 || rc=$?
+check "K. install restores the executable bit (R24)" "$rc:$([ -x "$K3/.git/hooks/pre-push" ] && echo exec || echo noexec)" "0:exec"
+K4=$(new_repo dry-run); printf 'x\n' >> "$K4/a.txt"; commit_all "$K4"
+rc=0; out=$(cd "$K4" && CLAUDECODE=1 git push --dry-run origin main 2>&1) || rc=$?
+check "K. stale dry run is rejected, documented (R25)" "$([ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q 'push rejected' && echo rejected || echo "rc=$rc")" "rejected"
+for t in mcp__plugin_github_github__push_files mcp__github_remote__create_or_update_file mcp__my-github__delete_file; do
+  gate_case "K. renamed GitHub MCP tool: $t (R26)" deny "$D" "$t" '{"owner":"o","repo":"r"}' "test, review"
+  check "K. settings matcher covers $t (R26)" "$(node -e 'const s=require(process.argv[1]);const m=s.hooks.PreToolUse[0].matcher;process.stdout.write(String(new RegExp("^(?:"+m+")$").test(process.argv[2])))' "$REPO_ROOT/.claude/settings.json" "$t")" "true"
+done
+gate_case "K. a non-GitHub MCP tool is not checked" allow "$D" mcp__notes__push_files '{}'
+K5=$(new_repo published)
+push_case "K. already-published commit to a new branch (R27)" accept "$K5" refs/heads/feat/new "$(git -C "$K5" rev-parse main)" "cd '$K5' && git push origin main:feat/new"
 
 echo ""
 echo "Passed: $PASS  Failed: $FAIL"
