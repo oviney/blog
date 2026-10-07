@@ -27,6 +27,9 @@
 #   L. Amendment 2.2: fetched or stale refs cannot ride the published-commit
 #      skip (R32), the checker copy comes from the default branch (R33), the
 #      guard path without a trailing slash (R34), --uninstall (R35)
+#   M. Amendment 2.3: uninstall refused inside Claude Code (R37), rewritten
+#      local tracking refs (R38), a checker on origin/main that fails to load
+#      (R39), partial hooks on origin/main (R40), widened guards (R41)
 #
 # Dependencies: bash, git, node. Same as the hooks under test.
 
@@ -301,7 +304,7 @@ for t in mcp__plugin_github_github__push_files mcp__github_remote__create_or_upd
 done
 gate_case "K. a non-GitHub MCP tool is not checked" allow "$D" mcp__notes__push_files '{}'
 K5=$(new_repo published)
-push_case "K. already-published commit to a new branch (R27)" accept "$K5" refs/heads/feat/new "$(git -C "$K5" rev-parse main)" "cd '$K5' && git push origin main:feat/new"
+push_case "K. main:new-branch without review is checked (R27 narrowed by R38)" reject "$K5" refs/heads/feat/new "$(git -C "$K5" rev-parse main)" "cd '$K5' && git push origin main:feat/new"
 
 echo "Case L: Amendment 2.2 (R32-R35)"
 # other_clone <repo> <name>: a second clone of <repo>'s origin, as another contributor.
@@ -340,6 +343,41 @@ rc=0; node "$PREPUSH" --uninstall "$LU" >/dev/null 2>&1 || rc=$?
 check "L. --uninstall removes the shim and the copy (R35)" "$rc:$([ -e "$LU/.git/hooks/pre-push" ] && echo shim || echo noshim):$([ -e "$LU/.git/lifecycle-gate" ] && echo copy || echo nocopy)" "0:noshim:nocopy"
 rc=0; node "$PREPUSH" --uninstall "$X" >/dev/null 2>&1 || rc=$?
 check "L. --uninstall leaves a foreign hook alone (R35)" "$rc:$(tail -1 "$X/.git/hooks/pre-push")" "2:echo mine"
+
+echo "Case M: Amendment 2.3 (R37-R41)"
+MU=$(new_repo uninstall-claude)
+rc=0; out=$(CLAUDECODE=1 node "$PREPUSH" --uninstall "$MU" 2>&1) || rc=$?
+check "M. --uninstall refused inside Claude Code, shim stays (R37)" "$rc:$([ -e "$MU/.git/hooks/pre-push" ] && echo shim || echo noshim)" "2:shim"
+if printf '%s' "$out" | grep -q "own terminal"; then pass "M. refusal points the owner to their own terminal (R37)"; else fail "M. refusal points the owner to their own terminal (R37) ($out)"; fi
+rc=0; CLAUDECODE=1 BLOG_LIFECYCLE_GATE_BYPASS=1 node "$PREPUSH" --uninstall "$MU" >/dev/null 2>&1 || rc=$?
+check "M. --uninstall with the owner bypass works (R37)" "$rc:$([ -e "$MU/.git/hooks/pre-push" ] && echo shim || echo noshim)" "0:noshim"
+for c in "node hooks/lifecycle-prepush.js --uninstall && git push origin main" \
+         "git remote set-head origin copilot/x" "git update-ref refs/remotes/origin/main HEAD" \
+         "git fetch . feat:refs/remotes/origin/main" "rm -rf .git/lifecycle-gate*" "rm -rf ./.git//lifecycle-gate" \
+         "cd .git && rm -rf lifecycle-gate"; do
+  gate_case "M. guard: $c (R37, R38, R41)" deny "$A2" Bash "$c"
+done
+for c in "cat .git/lifecycle-gate-review.json" "node --check hooks/lifecycle-gate.js" "git fetch origin" "git remote -v"; do
+  gate_case "M. allowed: $c" allow "$A2" Bash "$c"
+done
+MS=$(new_repo set-head); MSO=$(other_clone "$MS" set-head-other)
+git -C "$MSO" checkout -q -b copilot/x origin/main; printf 'evil\n' > "$MSO/evil.txt"; commit_all "$MSO" unreviewed; git -C "$MSO" push -q origin copilot/x 2>/dev/null
+git -C "$MS" fetch -q origin; record_both "$MS"; EVIL=$(git -C "$MS" rev-parse origin/copilot/x)
+git -C "$MS" remote set-head origin copilot/x
+push_case "M. origin/HEAD pointed at an unreviewed branch (R38)" reject "$MS" refs/heads/main "$EVIL" "cd '$MS' && git push origin origin/copilot/x:main"
+git -C "$MS" update-ref refs/remotes/origin/main "$EVIL"
+push_case "M. origin/main rewritten to an unreviewed commit (R38)" reject "$MS" refs/heads/main "$EVIL" "cd '$MS' && git push origin $EVIL:refs/heads/main"
+MB=$(new_repo broken-checker); mkdir -p "$MB/hooks"
+printf "require('./lifecycle-util');\n" > "$MB/hooks/lifecycle-prepush.js"; cp "$REPO_ROOT/hooks/lifecycle-snapshot.js" "$MB/hooks/"
+commit_all "$MB" "broken checker on main"; git -C "$MB" push -q origin main 2>/dev/null
+rc=0; out=$(node "$PREPUSH" --install "$MB" 2>&1) || rc=$?
+check "M. checker on origin/main that fails to load is not installed (R39)" \
+  "$rc:$(cmp -s "$REPO_ROOT/hooks/lifecycle-prepush.js" "$MB/.git/lifecycle-gate/lifecycle-prepush.js" && echo working-tree || echo other)" "0:working-tree"
+if printf '%s' "$out" | grep -q "failed to load"; then pass "M. the load failure is announced (R39)"; else fail "M. the load failure is announced (R39) ($out)"; fi
+MP=$(new_repo partial-hooks); mkdir -p "$MP/hooks"; cp "$REPO_ROOT/hooks/lifecycle-prepush.js" "$MP/hooks/"
+commit_all "$MP" "only the checker on main"; git -C "$MP" push -q origin main 2>/dev/null; rm -f "$MP/.git/hooks/pre-push"
+rc=0; out=$(node "$PREPUSH" --install "$MP" 2>&1) || rc=$?
+check "M. origin/main with only some hooks: install refuses (R40)" "$rc:$([ -e "$MP/.git/hooks/pre-push" ] && echo shim || echo noshim)" "2:noshim"
 
 echo ""
 echo "Passed: $PASS  Failed: $FAIL"
