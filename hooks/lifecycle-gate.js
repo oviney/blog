@@ -39,7 +39,8 @@ const GUARDS = [
   [(c) => /--no-verify/.test(c) && /\bpush\b/.test(c), '`--no-verify` would skip the pre-push lifecycle check'],
   [(c) => /core\.hooksPath/i.test(c), 'changing core.hooksPath would disable the pre-push lifecycle check'],
   [(c) => /\.git\/hooks/.test(c), 'commands touching .git/hooks could remove the pre-push lifecycle check'],
-  [(c) => /\.git\/lifecycle-gate\//.test(c), 'commands touching .git/lifecycle-gate/ could change the pre-push lifecycle check'],
+  // The directory itself, with or without a trailing slash (R34); not the snapshot files lifecycle-gate-<skill>.json.
+  [(c) => /\.git\/lifecycle-gate(?:[/\s'"]|$)/.test(c), 'commands touching .git/lifecycle-gate/ could change the pre-push lifecycle check'],
   [(c) => /\bsend-pack\b/.test(c), '`git send-pack` pushes without running the pre-push hook'],
   [(c) => /\bCLAUDECODE\b/.test(c), 'CLAUDECODE scopes the pre-push check to Claude sessions and must not be changed'],
   [(c) => /\bBLOG_LIFECYCLE_GATE_BYPASS\b/.test(c), 'only the owner can bypass, from the environment Claude Code is launched with'],

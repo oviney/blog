@@ -16,9 +16,13 @@
 // Fails closed: any error while checking blocks the push.
 //
 //   lifecycle-prepush.js --install [repo]
-// installs the .git/hooks/pre-push shim that runs this file. It never
+// copies this checker (from the committed default branch when it carries the
+// hooks, else the working tree) into <git common dir>/lifecycle-gate/ and
+// installs the .git/hooks/pre-push shim that runs the copy. It never
 // overwrites a pre-push hook it did not write, and refuses when core.hooksPath
 // is set; both exit 2 with the reason.
+//   lifecycle-prepush.js --uninstall [repo]
+// removes the shim and the copy; a foreign pre-push hook is left alone (exit 2).
 
 const { execFileSync } = require('child_process');
 const fs = require('fs');
@@ -67,6 +71,47 @@ function writeIfChanged(file, content, mode) {
   return true;
 }
 
+function tryGit(cwd, args) {
+  try { return git(cwd, args); } catch { return null; }
+}
+
+// The remote's default branch as a local tracking ref: refs/remotes/<r>/HEAD,
+// else refs/remotes/<r>/main. Null when <remote> is not a configured remote
+// name (for example a push by URL, R36).
+function defaultBranchRef(cwd, remote) {
+  if (!remote || !tryGit(cwd, ['config', '--get', `remote.${remote}.url`])) return null;
+  const head = tryGit(cwd, ['symbolic-ref', '-q', `refs/remotes/${remote}/HEAD`]);
+  if (head) return head;
+  return tryGit(cwd, ['rev-parse', '--verify', '-q', `refs/remotes/${remote}/main`]) ? `refs/remotes/${remote}/main` : null;
+}
+
+function locations(root) {
+  const hookFile = path.resolve(root, git(root, ['rev-parse', '--git-path', 'hooks/pre-push']));
+  const copyDir = path.join(path.resolve(root, git(root, ['rev-parse', '--git-common-dir'])), 'lifecycle-gate');
+  return { hookFile, copyDir };
+}
+
+// The checker's source: the committed default branch, so unmerged edits to the
+// hooks cannot weaken the installed check (R33). Falls back to this file's own
+// directory only while the default branch does not carry the hooks yet.
+function checkerSource(root) {
+  const ref = defaultBranchRef(root, 'origin');
+  if (ref) {
+    // Not tryGit(): file contents must keep their trailing newline.
+    const show = (name) => {
+      try {
+        return execFileSync('git', ['show', `${ref}:hooks/${name}`], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+      } catch { return null; }
+    };
+    const files = COPIED.map(show);
+    if (files.every((f) => f !== null)) return { files, note: `checker copied from ${ref}` };
+  }
+  return {
+    files: COPIED.map((name) => fs.readFileSync(path.join(__dirname, name), 'utf8')),
+    note: 'checker copied from the working tree, because the default branch does not carry the lifecycle hooks yet',
+  };
+}
+
 // Returns { ok, message }. Never throws for the expected refusals.
 function installHook(repo) {
   const root = git(repo, ['rev-parse', '--show-toplevel']);
@@ -75,35 +120,52 @@ function installHook(repo) {
   if (hooksPath) {
     return { ok: false, message: `core.hooksPath is set (${hooksPath}), so the lifecycle pre-push hook cannot be installed` };
   }
-  const hookFile = path.resolve(root, git(root, ['rev-parse', '--git-path', 'hooks/pre-push']));
+  const { hookFile, copyDir } = locations(root);
   if (fs.existsSync(hookFile) && !fs.readFileSync(hookFile, 'utf8').includes(SHIM_MARK)) {
     return { ok: false, message: `${hookFile} already exists and was not written by the lifecycle gate; it was left alone` };
   }
-  const copyDir = path.join(path.resolve(root, git(root, ['rev-parse', '--git-common-dir'])), 'lifecycle-gate');
+  const source = checkerSource(root);
   fs.mkdirSync(copyDir, { recursive: true });
   let changed = false;
-  if (path.resolve(__dirname) !== copyDir) {
-    for (const name of COPIED) {
-      changed = writeIfChanged(path.join(copyDir, name), fs.readFileSync(path.join(__dirname, name), 'utf8'), 0o644) || changed;
-    }
-  }
+  COPIED.forEach((name, i) => {
+    changed = writeIfChanged(path.join(copyDir, name), source.files[i], 0o644) || changed;
+  });
   fs.mkdirSync(path.dirname(hookFile), { recursive: true });
   changed = writeIfChanged(hookFile, shim(path.join(copyDir, 'lifecycle-prepush.js')), 0o755) || changed;
-  return {
-    ok: true,
-    message: changed ? `lifecycle pre-push shim installed at ${hookFile}` : `lifecycle pre-push shim already installed at ${hookFile}`,
-  };
+  const state = changed ? 'installed' : 'already installed';
+  return { ok: true, message: `lifecycle pre-push shim ${state} at ${hookFile} (${source.note})` };
 }
 
-// True when the commit is already reachable from the remote's tracking refs,
-// i.e. pushing it publishes nothing new (R27).
-function alreadyPublished(cwd, remote, sha) {
-  if (!remote) return false;
+// Removes the shim and the checker copy (R35). Leaves a foreign hook alone.
+function uninstallHook(repo) {
+  const root = git(repo, ['rev-parse', '--show-toplevel']);
+  const { hookFile, copyDir } = locations(root);
+  if (fs.existsSync(hookFile) && !fs.readFileSync(hookFile, 'utf8').includes(SHIM_MARK)) {
+    return { ok: false, message: `${hookFile} was not written by the lifecycle gate; it was left alone` };
+  }
+  fs.rmSync(hookFile, { force: true });
+  fs.rmSync(copyDir, { recursive: true, force: true });
+  return { ok: true, message: `lifecycle pre-push check removed from ${root}` };
+}
+
+function isAncestor(cwd, sha, of) {
   try {
-    return git(cwd, ['for-each-ref', '--contains', sha, '--format=%(refname)', `refs/remotes/${remote}/`]) !== '';
+    execFileSync('git', ['merge-base', '--is-ancestor', sha, of], { cwd, stdio: 'ignore' });
+    return true;
   } catch {
     return false;
   }
+}
+
+// True when pushing <sha> publishes nothing new (R27, narrowed by R32):
+// git's live <remote sha> for this ref already contains it (a no-op or a
+// rewind), or it is in the remote's default branch, which is PR-reviewed.
+// Other tracking refs are not trusted: they may be someone else's unreviewed
+// branch or stale.
+function alreadyPublished(cwd, remote, sha, remoteSha) {
+  if (remoteSha && !ZERO.test(remoteSha) && isAncestor(cwd, sha, remoteSha)) return true;
+  const def = defaultBranchRef(cwd, remote);
+  return def ? isAncestor(cwd, sha, def) : false;
 }
 
 // Returns a list of failure descriptions for the pushed refs.
@@ -111,9 +173,9 @@ function check(cwd, lines, remote) {
   const state = readState(cwd);
   const failures = [];
   for (const line of lines) {
-    const [localRef, localSha, remoteRef] = line.trim().split(/\s+/);
+    const [localRef, localSha, remoteRef, remoteSha] = line.trim().split(/\s+/);
     if (!localSha || ZERO.test(localSha)) continue;
-    if (alreadyPublished(cwd, remote, localSha)) continue;
+    if (alreadyPublished(cwd, remote, localSha, remoteSha)) continue;
     const tree = refTree(cwd, localSha);
     if (!tree) { failures.push(`${remoteRef}: cannot resolve ${localSha}`); continue; }
     const stale = REQUIRED.filter((s) => !state[s] || state[s].tree !== tree);
@@ -153,17 +215,20 @@ function runHook() {
     ...failures.map((f) => `  - ${f}`),
     'Invoke the skill(s) with the Skill tool (exactly `test` / `review`; the built-in /code-review does',
     'not count), fix anything they find, commit, then push again. Only the owner can bypass, by',
-    'launching Claude Code with BLOG_LIFECYCLE_GATE_BYPASS=1.',
+    'launching Claude Code with BLOG_LIFECYCLE_GATE_BYPASS=1. On a branch from before the lifecycle',
+    'gate (no hooks/lifecycle-record.js), the owner can remove this check with',
+    '`node .git/lifecycle-gate/lifecycle-prepush.js --uninstall`.',
     '',
   ].join('\n'));
   return 1;
 }
 
 if (require.main === module) {
-  if (process.argv[2] === '--install') {
+  if (process.argv[2] === '--install' || process.argv[2] === '--uninstall') {
+    const install = process.argv[2] === '--install';
     let result;
-    try { result = installHook(process.argv[3] || process.cwd()); } catch (err) {
-      result = { ok: false, message: `could not install the lifecycle pre-push hook (${String(err.message).split('\n')[0]})` };
+    try { result = (install ? installHook : uninstallHook)(process.argv[3] || process.cwd()); } catch (err) {
+      result = { ok: false, message: `could not ${install ? 'install' : 'remove'} the lifecycle pre-push hook (${String(err.message).split('\n')[0]})` };
     }
     process.stdout.write(`${result.message}\n`);
     process.exitCode = result.ok ? 0 : 2;
