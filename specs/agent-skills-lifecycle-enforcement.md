@@ -1,9 +1,10 @@
 # Spec: Enforce the agent-skills lifecycle in Claude Code sessions
 
-Status: Amendment 1 approved 2026-10-07
+Status: Amendment 1.1 approved 2026-10-07
 Issue: #1340
 Owner decisions: 2026-10-02, all four layers approved; 2026-10-06, freshness
-via git snapshot (Amendment 1)
+via git snapshot (Amendment 1); 2026-10-07, fix all second-review findings and
+block bulk pushes (Amendment 1.1)
 
 ## Objective
 
@@ -47,6 +48,22 @@ returned **changes requested**:
 | R6 | Merge operations (`gh pr merge`, MCP merge) are not gated | Nit | Intentional: admin-merging reviewed PRs is the documented workflow. Recorded below |
 | R7 | `hooks/hooks.json` leaves `${CLAUDE_PLUGIN_ROOT}` unquoted | Nit | Quoted |
 
+## Amendment 1.1 (2026-10-07): second review
+
+The second `review` confirmed R1 to R5 and R7 fixed, and returned **changes
+requested** on new findings. The owner approved fixing all of them and chose to
+block bulk pushes outright.
+
+| # | Finding | Severity | Resolution |
+|---|---------|----------|------------|
+| R8 | Only `HEAD` was checked: `git push origin feat`, `feat:main`, `--all`, `--tags`, `gh pr create --head feat` pushed unreviewed content | Blocker | Every source ref being pushed is resolved and must match; bulk pushes are always denied |
+| R9 | The gate checked the session's cwd, not the repo being pushed (`cd /other && git push`, `git -C ../wt push`) | Should-fix | Target repo taken from `-C`, `--git-dir`, or a preceding `cd` in the same command |
+| R10 | Missed forms: `git --git-dir .git push`, `--work-tree X`, `sudo -u me git push`, `git \`⏎`push` | Should-fix | Parser handles them |
+| R11 | Recording `test` and `review` at the same moment lost one snapshot (27/30 runs) | Should-fix | One state file per skill, written atomically (temp file + rename) |
+| R12 | Temp index path was predictable in a shared `/tmp` | Nit | Private `mkdtemp` directory |
+| R13 | `git push --dry-run` was denied | Nit | Allowed: nothing is sent |
+| R14 | The spec claimed an exact check for MCP file writes | Nit | Reworded: for those tools it is a proxy check (Known limits) |
+
 ## Assumptions
 
 1. Scope is Claude Code sessions (local CLI, desktop, and Claude Code on the
@@ -65,17 +82,32 @@ returned **changes requested**:
      do not count (R3).
    - `UserPromptSubmit`, when the user's prompt starts with `/test` or
      `/review`.
-   Snapshots are stored per skill in `.git/lifecycle-gate.json` (via
-   `git rev-parse --git-path`), never committed and shared across sessions in
-   the clone: content reviewed in one session stays reviewed in the next.
-   The built-in `/code-review` does not count as `review`.
-5. **Freshness (Amendment 1).** For `git push`, `gh pr create` and `gh api`
-   PR writes, the gate compares the `test` and `review` snapshots with
-   `HEAD^{tree}`, the content being pushed. Running the skills on uncommitted
-   work and then committing it matches exactly. Any change afterwards, by any
-   tool, `Bash`, or subagent, does not (R1). The MCP remote-write tools send
-   content from their arguments rather than from `HEAD`, so for them the
-   snapshots must match the current working-directory tree instead.
+   Each skill's snapshot is its own file, `.git/lifecycle-gate-test.json` and
+   `.git/lifecycle-gate-review.json` (via `git rev-parse --git-path`, so linked
+   worktrees keep separate state), written atomically (R11). They are never
+   committed and are shared across sessions in the clone: content reviewed in
+   one session stays reviewed in the next. The built-in `/code-review` does
+   not count as `review`.
+5. **Freshness (Amendments 1 and 1.1).** The gate resolves the content each
+   action would publish and requires the `test` and `review` snapshots to equal
+   it:
+   - `git push`: every source ref in the refspecs (`feat`, `feat:main`,
+     `HEAD:refs/heads/x`; no refspec means `HEAD`) resolved to its tree (R8).
+     Deleting a remote ref (`:branch`, `--delete`) publishes nothing and is
+     allowed. `--all`, `--mirror`, `--tags` and `--branches` are always denied:
+     push named branches one at a time (owner decision). A ref that cannot be
+     resolved is denied. `--dry-run` / `-n` sends nothing and is allowed (R13).
+   - `gh pr create`: the `--head`/`-H` branch if given, else `HEAD`.
+   - `gh api` PR writes: the `head` field if given (`-f`/`-F`/`--field`, or
+     `--input` JSON), else `HEAD`.
+   - MCP `create_pull_request`: its `head` branch, resolved locally.
+   - MCP `push_files`, `create_or_update_file`, `delete_file`: the current
+     working tree, as a proxy (see Known limits, R14).
+   The repo is the one the command targets: `git -C <dir>`, `--git-dir <dir>`,
+   or a preceding `cd <dir>` in the same command, else the hook's cwd (R9).
+   Running the skills on uncommitted work and then committing it matches
+   exactly. Any change afterwards, by any tool, `Bash`, or subagent, does not
+   (R1).
 6. On a mismatch the deny message names the stale skill(s) and lists up to ten
    paths that differ (`git diff --name-only`), so the agent knows what changed.
 7. The escape hatch is the environment variable
@@ -87,7 +119,7 @@ returned **changes requested**:
 ## Known limits (recorded, not fixed)
 
 - **Not a sandbox.** The gate is a guardrail for a cooperative but forgetful
-  agent. A determined agent could edit `.git/lifecycle-gate.json`, push from
+  agent. A determined agent could edit the `.git/lifecycle-gate-*.json` files, push from
   `$(...)`/backticks/`eval`, or call git through a script. Those are out of
   scope.
 - **Missing Node fails open.** If `node` is not installed, the hooks exit 127
@@ -95,6 +127,12 @@ returned **changes requested**:
   dependency of this repo (Playwright), so this is accepted rather than
   blocking every `Bash` call.
 - **Merges are not gated** (R6), by design.
+- **MCP file writes are a proxy check** (R14). `push_files` and
+  `create_or_update_file` send content from their own arguments; the gate can
+  only require that the working tree is the reviewed one, not that the
+  arguments match it.
+- **Only the tip is checked.** A ref's tree must match; intermediate commits on
+  the pushed branch are not inspected individually.
 - **Untracked scratch files** present when `test`/`review` ran become part of
   the snapshot. If they are not committed, the push is denied and the message
   lists them; delete or commit them, then rerun the skills.
@@ -165,6 +203,20 @@ recorder and the gate with the JSON Claude Code sends, and asserts:
 - M. Gate: `null`, non-object, or malformed stdin on a gated tool → deny (R2);
   malformed stdin with no visible gated action → allow.
 - N. Gate: not a git repo / no `HEAD` → deny (fail closed).
+- P. Refspecs (R8): with only `main` reviewed, `git push origin feat`,
+  `feat:main`, `+feat`, `gh pr create --head feat`, `gh api` with
+  `-f head=feat`, and MCP `create_pull_request` with `head: feat` → deny;
+  `git push origin main`, `HEAD:refs/heads/x` → allow; `--all`, `--mirror`,
+  `--tags`, `--branches` → always deny; `:old` and `--delete old` → allow;
+  unknown ref → deny; `--dry-run` → allow (R13).
+- Q. Target repo (R9): from a reviewed cwd, `cd <unreviewed> && git push` and
+  `git -C <unreviewed> push` → deny; from an unreviewed cwd,
+  `git -C <reviewed> push` → allow; quoted paths with spaces resolve.
+- R. Parser (R10): `git --git-dir <dir>/.git push`, `--work-tree X`,
+  `sudo -u me git push`, line-continued `git \⏎ push` → deny when stale.
+- S. Concurrency (R11): recording `test` and `review` in parallel 20 times
+  keeps both snapshots every time.
+- T. Temp index (R12): no temp files left behind after records and gate runs.
 
 Then a live check in a real session: the gate denies a push before
 `test`/`review`, and allows it after.
@@ -185,8 +237,9 @@ it. `_config.yml` is protected, so that is left as an owner follow-up.
 - [ ] A fresh Claude Code session in this repo receives the meta-skill at start.
 - [ ] Every user prompt receives the lifecycle reminder.
 - [ ] `CLAUDE.md` states the lifecycle as mandatory at the top of the file.
-- [ ] Push / PR creation is denied unless `test` and `review` ran on exactly the content being pushed, whatever tool made the edits; the message names the stale skills and the changed paths.
-- [ ] Review findings R1 to R5 and R7 each have a passing fixture test.
+- [ ] Push / PR creation is denied unless `test` and `review` ran on exactly the content being published (every pushed ref, the PR head branch), whatever tool made the edits; the message names the stale skills and the changed paths. For MCP file writes this is a proxy check on the working tree.
+- [ ] Bulk pushes (`--all`, `--mirror`, `--tags`, `--branches`) are always denied.
+- [ ] Review findings R1 to R5 and R7 to R13 each have a passing fixture test.
 - [ ] `BLOG_LIFECYCLE_GATE_BYPASS=1` in the Claude Code environment allows the push.
 - [ ] `tests/lifecycle-hooks.sh` passes locally and in CI.
 - [ ] `bundle exec jekyll build` and the scope guard pass.
@@ -196,3 +249,5 @@ it. `_config.yml` is protected, so that is left as an owner follow-up.
 1. Gate scope: push and PR creation only; `git commit` is not gated (owner, 2026-10-06).
 2. CI: `tests/lifecycle-hooks.sh` runs in `.github/workflows/test-build.yml` next to `tests/scope-guard.sh` (owner, 2026-10-06).
 3. Freshness: git tree snapshot, not transcript heuristics (owner, 2026-10-06).
+4. Bulk pushes are always denied rather than checked ref by ref (owner, 2026-10-07).
+5. Fix all second-review findings, including nits, in this PR (owner, 2026-10-07).
