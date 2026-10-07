@@ -1,6 +1,6 @@
 # Spec: Enforce the agent-skills lifecycle in Claude Code sessions
 
-Status: Amendment 2 drafted 2026-10-07, design approved by owner
+Status: Amendment 2 approved 2026-10-07
 Issue: #1340
 Owner decisions: 2026-10-02, all four layers approved; 2026-10-06, freshness
 via git snapshot (Amendment 1); 2026-10-07, fix all second-review findings and
