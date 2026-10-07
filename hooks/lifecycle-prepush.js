@@ -71,45 +71,52 @@ function writeIfChanged(file, content, mode) {
   return true;
 }
 
-function tryGit(cwd, args) {
-  try { return git(cwd, args); } catch { return null; }
-}
-
-// The remote's default branch as a local tracking ref: refs/remotes/<r>/HEAD,
-// else refs/remotes/<r>/main. Null when <remote> is not a configured remote
-// name (for example a push by URL, R36).
-function defaultBranchRef(cwd, remote) {
-  if (!remote || !tryGit(cwd, ['config', '--get', `remote.${remote}.url`])) return null;
-  const head = tryGit(cwd, ['symbolic-ref', '-q', `refs/remotes/${remote}/HEAD`]);
-  if (head) return head;
-  return tryGit(cwd, ['rev-parse', '--verify', '-q', `refs/remotes/${remote}/main`]) ? `refs/remotes/${remote}/main` : null;
-}
-
 function locations(root) {
   const hookFile = path.resolve(root, git(root, ['rev-parse', '--git-path', 'hooks/pre-push']));
   const copyDir = path.join(path.resolve(root, git(root, ['rev-parse', '--git-common-dir'])), 'lifecycle-gate');
   return { hookFile, copyDir };
 }
 
-// The checker's source: the committed default branch, so unmerged edits to the
-// hooks cannot weaken the installed check (R33). Falls back to this file's own
-// directory only while the default branch does not carry the hooks yet.
+const SOURCE_REF = 'refs/remotes/origin/main'; // never origin/HEAD, which `git remote set-head` rewrites (R38)
+
+function workingTreeFiles() {
+  return COPIED.map((name) => fs.readFileSync(path.join(__dirname, name), 'utf8'));
+}
+
+// The checker's source: the committed origin/main, so unmerged edits to the
+// hooks cannot weaken the installed check (R33). Returns { files, note } or
+// { refuse } when origin/main carries only some of the files (R40).
 function checkerSource(root) {
-  const ref = defaultBranchRef(root, 'origin');
-  if (ref) {
-    // Not tryGit(): file contents must keep their trailing newline.
-    const show = (name) => {
-      try {
-        return execFileSync('git', ['show', `${ref}:hooks/${name}`], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
-      } catch { return null; }
-    };
-    const files = COPIED.map(show);
-    if (files.every((f) => f !== null)) return { files, note: `checker copied from ${ref}` };
-  }
-  return {
-    files: COPIED.map((name) => fs.readFileSync(path.join(__dirname, name), 'utf8')),
-    note: 'checker copied from the working tree, because the default branch does not carry the lifecycle hooks yet',
+  // Not git(): file contents must keep their trailing newline.
+  const show = (name) => {
+    try {
+      return execFileSync('git', ['show', `${SOURCE_REF}:hooks/${name}`], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    } catch { return null; }
   };
+  const files = COPIED.map(show);
+  if (files.every((f) => f !== null)) return { files, fromRef: true, note: `checker copied from ${SOURCE_REF}` };
+  if (files.some((f) => f !== null)) {
+    return { refuse: `${SOURCE_REF} carries only some of ${COPIED.join(', ')}, so the lifecycle pre-push hook was not installed` };
+  }
+  return { files: workingTreeFiles(), note: `checker copied from the working tree, because ${SOURCE_REF} does not carry the lifecycle hooks yet` };
+}
+
+// Loads the copied checker in a child process; returns an error line or null.
+function loadError(copy) {
+  try {
+    execFileSync(process.execPath, ['-e', `require(${JSON.stringify(copy)})`], { stdio: ['ignore', 'ignore', 'pipe'] });
+    return null;
+  } catch (err) {
+    return String(err.stderr || err.message).split('\n').find((l) => /Error/.test(l)) || 'unknown error';
+  }
+}
+
+function writeCopies(copyDir, files) {
+  let changed = false;
+  COPIED.forEach((name, i) => {
+    changed = writeIfChanged(path.join(copyDir, name), files[i], 0o644) || changed;
+  });
+  return changed;
 }
 
 // Returns { ok, message }. Never throws for the expected refusals.
@@ -125,19 +132,32 @@ function installHook(repo) {
     return { ok: false, message: `${hookFile} already exists and was not written by the lifecycle gate; it was left alone` };
   }
   const source = checkerSource(root);
+  if (source.refuse) return { ok: false, message: source.refuse };
   fs.mkdirSync(copyDir, { recursive: true });
-  let changed = false;
-  COPIED.forEach((name, i) => {
-    changed = writeIfChanged(path.join(copyDir, name), source.files[i], 0o644) || changed;
-  });
+  let changed = writeCopies(copyDir, source.files);
+  let { note } = source;
+  const copy = path.join(copyDir, 'lifecycle-prepush.js');
+  const broken = source.fromRef ? loadError(copy) : null;
+  if (broken) { // R39: never leave a checker that cannot run
+    changed = writeCopies(copyDir, workingTreeFiles()) || changed;
+    note = `the checker on ${SOURCE_REF} failed to load (${broken}); copied from the working tree instead`;
+  }
   fs.mkdirSync(path.dirname(hookFile), { recursive: true });
-  changed = writeIfChanged(hookFile, shim(path.join(copyDir, 'lifecycle-prepush.js')), 0o755) || changed;
+  changed = writeIfChanged(hookFile, shim(copy), 0o755) || changed;
   const state = changed ? 'installed' : 'already installed';
-  return { ok: true, message: `lifecycle pre-push shim ${state} at ${hookFile} (${source.note})` };
+  return { ok: true, message: `lifecycle pre-push shim ${state} at ${hookFile} (${note})` };
 }
 
 // Removes the shim and the checker copy (R35). Leaves a foreign hook alone.
+// Refused inside a Claude Code session unless the owner bypass is set (R37).
 function uninstallHook(repo) {
+  if (process.env.CLAUDECODE === '1' && process.env.BLOG_LIFECYCLE_GATE_BYPASS !== '1') {
+    return {
+      ok: false,
+      message: 'removing the lifecycle pre-push check is refused inside a Claude Code session. The owner can run ' +
+        'this command from their own terminal.',
+    };
+  }
   const root = git(repo, ['rev-parse', '--show-toplevel']);
   const { hookFile, copyDir } = locations(root);
   if (fs.existsSync(hookFile) && !fs.readFileSync(hookFile, 'utf8').includes(SHIM_MARK)) {
@@ -157,25 +177,22 @@ function isAncestor(cwd, sha, of) {
   }
 }
 
-// True when pushing <sha> publishes nothing new (R27, narrowed by R32):
-// git's live <remote sha> for this ref already contains it (a no-op or a
-// rewind), or it is in the remote's default branch, which is PR-reviewed.
-// Other tracking refs are not trusted: they may be someone else's unreviewed
-// branch or stale.
-function alreadyPublished(cwd, remote, sha, remoteSha) {
-  if (remoteSha && !ZERO.test(remoteSha) && isAncestor(cwd, sha, remoteSha)) return true;
-  const def = defaultBranchRef(cwd, remote);
-  return def ? isAncestor(cwd, sha, def) : false;
+// True when pushing <sha> publishes nothing new: git's live <remote sha> for
+// this ref already contains it (a no-op or a rewind). git fetched that sha
+// from the remote during the push, so local refs cannot fake it. Local
+// tracking refs are never trusted (R32, R38).
+function alreadyPublished(cwd, sha, remoteSha) {
+  return Boolean(remoteSha) && !ZERO.test(remoteSha) && isAncestor(cwd, sha, remoteSha);
 }
 
 // Returns a list of failure descriptions for the pushed refs.
-function check(cwd, lines, remote) {
+function check(cwd, lines) {
   const state = readState(cwd);
   const failures = [];
   for (const line of lines) {
     const [localRef, localSha, remoteRef, remoteSha] = line.trim().split(/\s+/);
     if (!localSha || ZERO.test(localSha)) continue;
-    if (alreadyPublished(cwd, remote, localSha, remoteSha)) continue;
+    if (alreadyPublished(cwd, localSha, remoteSha)) continue;
     const tree = refTree(cwd, localSha);
     if (!tree) { failures.push(`${remoteRef}: cannot resolve ${localSha}`); continue; }
     const stale = REQUIRED.filter((s) => !state[s] || state[s].tree !== tree);
@@ -203,8 +220,7 @@ function runHook() {
   try {
     const lines = fs.readFileSync(0, 'utf8').split('\n').filter((l) => l.trim());
     // git runs pre-push at the top of the work tree, with GIT_DIR exported when it was set.
-    // git passes the remote's name (or URL) as the first argument.
-    failures = check(process.cwd(), lines, process.argv[2]);
+    failures = check(process.cwd(), lines);
   } catch (err) {
     failures = [`could not verify the lifecycle (${String(err.message).split('\n')[0]})`];
   }
@@ -215,9 +231,9 @@ function runHook() {
     ...failures.map((f) => `  - ${f}`),
     'Invoke the skill(s) with the Skill tool (exactly `test` / `review`; the built-in /code-review does',
     'not count), fix anything they find, commit, then push again. Only the owner can bypass, by',
-    'launching Claude Code with BLOG_LIFECYCLE_GATE_BYPASS=1. On a branch from before the lifecycle',
-    'gate (no hooks/lifecycle-record.js), the owner can remove this check with',
-    '`node .git/lifecycle-gate/lifecycle-prepush.js --uninstall`.',
+    'launching Claude Code with BLOG_LIFECYCLE_GATE_BYPASS=1. (Note for the owner, not the agent: on a',
+    'branch from before the lifecycle gate, which has no recorder, run',
+    '`node .git/lifecycle-gate/lifecycle-prepush.js --uninstall` from your own terminal.)',
     '',
   ].join('\n'));
   return 1;

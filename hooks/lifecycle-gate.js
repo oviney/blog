@@ -39,8 +39,14 @@ const GUARDS = [
   [(c) => /--no-verify/.test(c) && /\bpush\b/.test(c), '`--no-verify` would skip the pre-push lifecycle check'],
   [(c) => /core\.hooksPath/i.test(c), 'changing core.hooksPath would disable the pre-push lifecycle check'],
   [(c) => /\.git\/hooks/.test(c), 'commands touching .git/hooks could remove the pre-push lifecycle check'],
-  // The directory itself, with or without a trailing slash (R34); not the snapshot files lifecycle-gate-<skill>.json.
-  [(c) => /\.git\/lifecycle-gate(?:[/\s'"]|$)/.test(c), 'commands touching .git/lifecycle-gate/ could change the pre-push lifecycle check'],
+  // `lifecycle-gate` anywhere (R34, R41), except the snapshot files and the hook sources under hooks/.
+  [(c) => /lifecycle-gate/.test(c.replace(/lifecycle-gate-(?:test|review)\.json/g, '').replace(/hooks\/lifecycle-gate\.js/g, '')),
+    'commands touching the lifecycle-gate checker copy could change the pre-push lifecycle check'],
+  [(c) => /lifecycle-prepush/.test(c) && /--uninstall/.test(c), 'only the owner can remove the pre-push lifecycle check, from their own terminal'],
+  // Ordinary commands that rewrite local tracking refs (R38).
+  [(c) => /\bremote\s+set-head\b/.test(c), '`git remote set-head` rewrites a local tracking ref'],
+  [(c) => /\bupdate-ref\b/.test(c), '`git update-ref` can rewrite local tracking refs'],
+  [(c) => /\bfetch\b[\s\S]*:refs\/remotes\//.test(c), 'fetching into refs/remotes/ rewrites local tracking refs'],
   [(c) => /\bsend-pack\b/.test(c), '`git send-pack` pushes without running the pre-push hook'],
   [(c) => /\bCLAUDECODE\b/.test(c), 'CLAUDECODE scopes the pre-push check to Claude sessions and must not be changed'],
   [(c) => /\bBLOG_LIFECYCLE_GATE_BYPASS\b/.test(c), 'only the owner can bypass, from the environment Claude Code is launched with'],
