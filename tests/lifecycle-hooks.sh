@@ -56,7 +56,7 @@ fail() { echo "  ❌ $1"; FAIL=$((FAIL + 1)); }
 # new_repo <name>: a git repo with one committed file, prints its path.
 new_repo() {
   local r="$TMP/$1"
-  git init -q "$r"
+  git init -q -b main "$r"
   git -C "$r" config user.email "lifecycle-test@example.com"
   git -C "$r" config user.name "lifecycle-test"
   git -C "$r" config commit.gpgsign false
@@ -136,7 +136,7 @@ gate_case "D. nothing recorded" deny "$D" Bash "git push" "content: test, review
 E=$(new_repo only-test); record_skill "$E" test
 gate_case "E. only test recorded" deny "$E" Bash "git push" "content: review" "content: test"
 F=$(new_repo fresh); printf 'two\n' > "$F/b.txt"; record_both "$F"; commit_all "$F"
-gate_case "F. reviewed work, then committed" allow "$F" Bash "git push -u origin feature"
+gate_case "F. reviewed work, then committed" allow "$F" Bash "git push -u origin main"
 G=$(new_repo shell-edit); record_both "$G"; sed -i 's/one/ONE/' "$G/a.txt"; commit_all "$G"
 gate_case "G. sed edit after review (R1)" deny "$G" Bash "git push" "a.txt"
 H=$(new_repo new-file); record_both "$H"; printf 'x\n' > "$H/new.txt"; commit_all "$H"
