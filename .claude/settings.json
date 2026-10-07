@@ -39,7 +39,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash|Edit|Write|NotebookEdit|mcp__github__push_files|mcp__github__create_or_update_file|mcp__github__delete_file",
+        "matcher": "Bash|Edit|Write|NotebookEdit|mcp__.*github.*__(push_files|create_or_update_file|delete_file)",
         "hooks": [
           {
             "type": "command",

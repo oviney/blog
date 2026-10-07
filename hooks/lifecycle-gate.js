@@ -23,21 +23,23 @@
 // process environment. Fails closed on errors in a gated action.
 // See specs/agent-skills-lifecycle-enforcement.md.
 
+const { execFileSync } = require('child_process');
+const fs = require('fs');
 const path = require('path');
 const { REQUIRED, repoRoot, worktreeTree, readState, changedPaths, hookCwd } = require('./lifecycle-snapshot');
 const { installHook } = require('./lifecycle-prepush');
 
-const MCP_FILE_WRITE_TOOLS = new Set([
-  'mcp__github__push_files',
-  'mcp__github__create_or_update_file',
-  'mcp__github__delete_file',
-]);
+// Any MCP server whose name contains "github" (R26); the settings matcher uses
+// the same pattern.
+const MCP_FILE_WRITE = /^mcp__.*github.*__(?:push_files|create_or_update_file|delete_file)$/i;
 const EDIT_TOOLS = new Set(['Edit', 'Write', 'NotebookEdit']);
+const PROTECTED_GIT_PATH = /(^|\/)\.git\/(?:hooks|lifecycle-gate)(\/|$)/;
 
 const GUARDS = [
   [(c) => /--no-verify/.test(c) && /\bpush\b/.test(c), '`--no-verify` would skip the pre-push lifecycle check'],
   [(c) => /core\.hooksPath/i.test(c), 'changing core.hooksPath would disable the pre-push lifecycle check'],
   [(c) => /\.git\/hooks/.test(c), 'commands touching .git/hooks could remove the pre-push lifecycle check'],
+  [(c) => /\.git\/lifecycle-gate\//.test(c), 'commands touching .git/lifecycle-gate/ could change the pre-push lifecycle check'],
   [(c) => /\bsend-pack\b/.test(c), '`git send-pack` pushes without running the pre-push hook'],
   [(c) => /\bCLAUDECODE\b/.test(c), 'CLAUDECODE scopes the pre-push check to Claude sessions and must not be changed'],
   [(c) => /\bBLOG_LIFECYCLE_GATE_BYPASS\b/.test(c), 'only the owner can bypass, from the environment Claude Code is launched with'],
@@ -87,6 +89,20 @@ function proxyProblem(input, name) {
   return `Lifecycle gate (#1340): ${name} is blocked. Not yet run on this content: ${stale.join(', ')}.${detail} ${HOW}`;
 }
 
+function commonDir(dir) {
+  const out = execFileSync('git', ['rev-parse', '--git-common-dir'], { cwd: dir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  return path.resolve(dir, out.trim());
+}
+
+// Install only into this project's repo (any worktree of it) or another clone
+// of the blog; never into unrelated repos the session happens to push from (R21).
+function isBlogRepo(root) {
+  if (fs.existsSync(path.join(root, 'hooks', 'lifecycle-prepush.js'))) return true;
+  const project = process.env.CLAUDE_PROJECT_DIR;
+  if (!project) return false;
+  try { return commonDir(root) === commonDir(project); } catch { return false; }
+}
+
 // Returns a deny reason, or null to allow.
 function evaluate(input) {
   const tool = input.tool_name || '';
@@ -94,11 +110,11 @@ function evaluate(input) {
 
   if (EDIT_TOOLS.has(tool)) {
     const file = String(toolInput.file_path || toolInput.notebook_path || '');
-    return /(^|\/)\.git\/hooks(\/|$)/.test(path.resolve(hookCwd(input), file))
-      ? 'Lifecycle gate (#1340): editing .git/hooks could remove the pre-push lifecycle check, so it is blocked.'
+    return PROTECTED_GIT_PATH.test(path.resolve(hookCwd(input), file))
+      ? 'Lifecycle gate (#1340): editing .git/hooks or .git/lifecycle-gate could change the pre-push lifecycle check, so it is blocked.'
       : null;
   }
-  if (MCP_FILE_WRITE_TOOLS.has(tool)) return proxyProblem(input, tool);
+  if (MCP_FILE_WRITE.test(tool)) return proxyProblem(input, tool);
   if (tool !== 'Bash') return null;
 
   const command = String(toolInput.command || '');
@@ -112,7 +128,7 @@ function evaluate(input) {
   if (/\bpush\b/.test(command)) {
     let root = null;
     try { root = repoRoot(hookCwd(input)); } catch { /* not in a repo: nothing to install into */ }
-    if (root) {
+    if (root && isBlogRepo(root)) {
       const result = installHook(root);
       if (!result.ok) {
         return `Lifecycle gate (#1340): pushes are blocked because the pre-push lifecycle check is not active: ${result.message}. ` +
