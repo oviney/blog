@@ -24,6 +24,9 @@
 #   K. Amendment 2.1: install scope (R21), self-contained shim and bypass with
 #      a missing checker (R23), executable bit (R24), dry runs (R25), renamed
 #      GitHub MCP tools (R26), already-published commits (R27)
+#   L. Amendment 2.2: fetched or stale refs cannot ride the published-commit
+#      skip (R32), the checker copy comes from the default branch (R33), the
+#      guard path without a trailing slash (R34), --uninstall (R35)
 #
 # Dependencies: bash, git, node. Same as the hooks under test.
 
@@ -299,6 +302,44 @@ done
 gate_case "K. a non-GitHub MCP tool is not checked" allow "$D" mcp__notes__push_files '{}'
 K5=$(new_repo published)
 push_case "K. already-published commit to a new branch (R27)" accept "$K5" refs/heads/feat/new "$(git -C "$K5" rev-parse main)" "cd '$K5' && git push origin main:feat/new"
+
+echo "Case L: Amendment 2.2 (R32-R35)"
+# other_clone <repo> <name>: a second clone of <repo>'s origin, as another contributor.
+other_clone() {
+  git clone -q "$1.git" "$TMP/$2" 2>/dev/null
+  git -C "$TMP/$2" config user.email other@example.com; git -C "$TMP/$2" config user.name other
+  echo "$TMP/$2"
+}
+LA=$(new_repo fetched); LO=$(other_clone "$LA" fetched-other)
+git -C "$LO" checkout -q -b copilot/x origin/main; printf 'evil\n' > "$LO/evil.txt"; commit_all "$LO" unreviewed; git -C "$LO" push -q origin copilot/x 2>/dev/null
+git -C "$LA" fetch -q origin; record_both "$LA"
+push_case "L. fetched unreviewed branch onto main (R32)" reject "$LA" refs/heads/main "$(git -C "$LA" rev-parse origin/copilot/x)" "cd '$LA' && git push origin origin/copilot/x:main" "uninstall"
+LB=$(new_repo stale-ref); git -C "$LB" checkout -q -b bad; printf 'evil\n' > "$LB/evil.txt"; commit_all "$LB" unreviewed
+git -C "$LB" push -q origin bad 2>/dev/null; git -C "$LB" checkout -q main; record_both "$LB"
+LBO=$(other_clone "$LB" stale-other); git -C "$LBO" push -q origin :bad 2>/dev/null
+check "L. local tracking ref is stale (setup)" "$(git -C "$LB" rev-parse --verify -q origin/bad >/dev/null && echo stale || echo gone)" "stale"
+push_case "L. stale tracking ref cannot recreate a deleted branch (R32)" reject "$LB" refs/heads/bad "$(git -C "$LB" rev-parse bad)" "cd '$LB' && git push origin bad:bad"
+LN=$(new_repo noop)
+push_case "L. no-op push of an unchanged ref passes" accept "$LN" refs/heads/main "$(git -C "$LN" rev-parse main)" "cd '$LN' && git push origin main:main"
+LC=$(new_repo default-branch-source); mkdir -p "$LC/hooks"
+cp "$REPO_ROOT/hooks/lifecycle-prepush.js" "$REPO_ROOT/hooks/lifecycle-snapshot.js" "$LC/hooks/"
+commit_all "$LC" "hooks on main"; git -C "$LC" push -q origin main 2>/dev/null
+printf '#!/usr/bin/env node\nprocess.exit(0)\n' > "$LC/hooks/lifecycle-prepush.js"
+out=$(node "$PREPUSH" --install "$LC" 2>&1) || true
+check "L. copy comes from the default branch, not the edited working tree (R33)" \
+  "$(git -C "$LC" show origin/main:hooks/lifecycle-prepush.js | cmp -s - "$LC/.git/lifecycle-gate/lifecycle-prepush.js" && echo same || echo different)" "same"
+git -C "$LC" checkout -q -- hooks; printf 'x\n' >> "$LC/a.txt"; commit_all "$LC"
+push_case "L. weakened working-tree checker does not let a stale push through (R33)" reject "$LC" refs/heads/main "$(git -C "$LC" rev-parse HEAD)" "cd '$LC' && git push origin main"
+out=$(node "$PREPUSH" --install "$K5" 2>&1) || true
+if printf '%s' "$out" | grep -q "working tree"; then pass "L. fallback to the working tree is announced (R33)"; else fail "L. fallback to the working tree is announced (R33) ($out)"; fi
+gate_case "L. guard: rm -rf .git/lifecycle-gate (R34)" deny "$A2" Bash "rm -rf .git/lifecycle-gate"
+gate_case "L. guard: mv .git/lifecycle-gate (R34)" deny "$A2" Bash "mv .git/lifecycle-gate /tmp/x"
+gate_case "L. reading a snapshot file is allowed (R34)" allow "$A2" Bash "cat .git/lifecycle-gate-test.json"
+LU=$(new_repo uninstall)
+rc=0; node "$PREPUSH" --uninstall "$LU" >/dev/null 2>&1 || rc=$?
+check "L. --uninstall removes the shim and the copy (R35)" "$rc:$([ -e "$LU/.git/hooks/pre-push" ] && echo shim || echo noshim):$([ -e "$LU/.git/lifecycle-gate" ] && echo copy || echo nocopy)" "0:noshim:nocopy"
+rc=0; node "$PREPUSH" --uninstall "$X" >/dev/null 2>&1 || rc=$?
+check "L. --uninstall leaves a foreign hook alone (R35)" "$rc:$(tail -1 "$X/.git/hooks/pre-push")" "2:echo mine"
 
 echo ""
 echo "Passed: $PASS  Failed: $FAIL"
