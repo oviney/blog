@@ -36,6 +36,9 @@ function shellQuote(s) {
   return `'${String(s).replace(/'/g, "'\\''")}'`;
 }
 
+// The shim checks the owner bypass before anything else, then runs the copy
+// of the checker kept in the git common dir, so neither depends on the branch
+// that happens to be checked out (R23).
 function shim(checker) {
   return [
     '#!/bin/sh',
@@ -43,13 +46,25 @@ function shim(checker) {
     '# Installed by hooks/lifecycle-prepush.js --install; not committed. Enforces only in Claude Code',
     '# sessions: see specs/agent-skills-lifecycle-enforcement.md.',
     '[ "$CLAUDECODE" = "1" ] || exit 0',
+    '[ "$BLOG_LIFECYCLE_GATE_BYPASS" = "1" ] && exit 0',
     `if [ ! -f ${shellQuote(checker)} ]; then`,
-    `  echo "lifecycle gate (#1340): "${shellQuote(checker)}" is missing, so this push is blocked." >&2`,
+    '  echo "lifecycle gate (#1340): the checker copy is missing, so this push is blocked. Start a new Claude Code session to reinstall it." >&2',
     '  exit 1',
     'fi',
     `exec node ${shellQuote(checker)} "$@"`,
     '',
   ].join('\n');
+}
+
+const COPIED = ['lifecycle-prepush.js', 'lifecycle-snapshot.js'];
+
+function writeIfChanged(file, content, mode) {
+  const same = fs.existsSync(file) && fs.readFileSync(file, 'utf8') === content
+    && (fs.statSync(file).mode & 0o777) === mode;
+  if (same) return false;
+  fs.writeFileSync(file, content, { mode });
+  fs.chmodSync(file, mode); // also repairs a shim that lost its executable bit (R24)
+  return true;
 }
 
 // Returns { ok, message }. Never throws for the expected refusals.
@@ -61,27 +76,44 @@ function installHook(repo) {
     return { ok: false, message: `core.hooksPath is set (${hooksPath}), so the lifecycle pre-push hook cannot be installed` };
   }
   const hookFile = path.resolve(root, git(root, ['rev-parse', '--git-path', 'hooks/pre-push']));
-  const wanted = shim(path.resolve(__filename));
-  if (fs.existsSync(hookFile)) {
-    const current = fs.readFileSync(hookFile, 'utf8');
-    if (!current.includes(SHIM_MARK)) {
-      return { ok: false, message: `${hookFile} already exists and was not written by the lifecycle gate; it was left alone` };
+  if (fs.existsSync(hookFile) && !fs.readFileSync(hookFile, 'utf8').includes(SHIM_MARK)) {
+    return { ok: false, message: `${hookFile} already exists and was not written by the lifecycle gate; it was left alone` };
+  }
+  const copyDir = path.join(path.resolve(root, git(root, ['rev-parse', '--git-common-dir'])), 'lifecycle-gate');
+  fs.mkdirSync(copyDir, { recursive: true });
+  let changed = false;
+  if (path.resolve(__dirname) !== copyDir) {
+    for (const name of COPIED) {
+      changed = writeIfChanged(path.join(copyDir, name), fs.readFileSync(path.join(__dirname, name), 'utf8'), 0o644) || changed;
     }
-    if (current === wanted) return { ok: true, message: `lifecycle pre-push shim already installed at ${hookFile}` };
   }
   fs.mkdirSync(path.dirname(hookFile), { recursive: true });
-  fs.writeFileSync(hookFile, wanted, { mode: 0o755 });
-  fs.chmodSync(hookFile, 0o755);
-  return { ok: true, message: `lifecycle pre-push shim installed at ${hookFile}` };
+  changed = writeIfChanged(hookFile, shim(path.join(copyDir, 'lifecycle-prepush.js')), 0o755) || changed;
+  return {
+    ok: true,
+    message: changed ? `lifecycle pre-push shim installed at ${hookFile}` : `lifecycle pre-push shim already installed at ${hookFile}`,
+  };
+}
+
+// True when the commit is already reachable from the remote's tracking refs,
+// i.e. pushing it publishes nothing new (R27).
+function alreadyPublished(cwd, remote, sha) {
+  if (!remote) return false;
+  try {
+    return git(cwd, ['for-each-ref', '--contains', sha, '--format=%(refname)', `refs/remotes/${remote}/`]) !== '';
+  } catch {
+    return false;
+  }
 }
 
 // Returns a list of failure descriptions for the pushed refs.
-function check(cwd, lines) {
+function check(cwd, lines, remote) {
   const state = readState(cwd);
   const failures = [];
   for (const line of lines) {
     const [localRef, localSha, remoteRef] = line.trim().split(/\s+/);
     if (!localSha || ZERO.test(localSha)) continue;
+    if (alreadyPublished(cwd, remote, localSha)) continue;
     const tree = refTree(cwd, localSha);
     if (!tree) { failures.push(`${remoteRef}: cannot resolve ${localSha}`); continue; }
     const stale = REQUIRED.filter((s) => !state[s] || state[s].tree !== tree);
@@ -109,7 +141,8 @@ function runHook() {
   try {
     const lines = fs.readFileSync(0, 'utf8').split('\n').filter((l) => l.trim());
     // git runs pre-push at the top of the work tree, with GIT_DIR exported when it was set.
-    failures = check(process.cwd(), lines);
+    // git passes the remote's name (or URL) as the first argument.
+    failures = check(process.cwd(), lines, process.argv[2]);
   } catch (err) {
     failures = [`could not verify the lifecycle (${String(err.message).split('\n')[0]})`];
   }
