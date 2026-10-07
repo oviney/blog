@@ -3,8 +3,8 @@
 #
 # Each gate/recorder case builds a throwaway git repo, feeds the hook the JSON
 # Claude Code sends on stdin, and asserts on the hook's decision and output.
-# Cases follow specs/agent-skills-lifecycle-enforcement.md (Amendment 1);
-# R1-R7 refer to the review findings recorded there.
+# Cases follow specs/agent-skills-lifecycle-enforcement.md (Amendments 1 and
+# 1.1); R1-R14 refer to the review findings recorded there.
 #
 #   A. SessionStart emits hookSpecificOutput.additionalContext with the meta-skill
 #   B. UserPromptSubmit reminder is emitted
@@ -24,6 +24,15 @@
 #   M. Gate: null / malformed stdin                   → no crash; gated MCP call denies (R2)
 #   N. Gate: not a git repo                           → deny (fail closed)
 #   O. hooks/hooks.json quotes ${CLAUDE_PLUGIN_ROOT} (R7)
+#   P. Refspecs (R8): unreviewed feat via feat, feat:main, +feat, --head feat,
+#      head=feat, --input head, MCP head → deny; main, HEAD:x, deletes,
+#      --dry-run → allow; --all/--mirror/--tags/--branches → always deny;
+#      unknown ref → deny
+#   Q. Target repo (R9): cd / -C into an unreviewed repo → deny; -C into a
+#      reviewed repo from an unreviewed cwd → allow; quoted paths with spaces
+#   R. Parser (R10): --git-dir X, --work-tree X, sudo -u, line continuation
+#   S. Concurrency (R11): 20 parallel test+review records keep both
+#   T. Temp index (R12): no temp files left behind
 #
 # Dependencies: bash, git, node. Same as the hooks under test.
 
@@ -63,13 +72,13 @@ json() { local expr="$1"; shift; node -e "const [a,b,c]=process.argv.slice(1);pr
 
 record_skill()  { json '{hook_event_name:"PostToolUse",cwd:a,tool_name:"Skill",tool_input:{skill:b}}' "$1" "$2" | node "$RECORD"; }
 record_prompt() { json '{hook_event_name:"UserPromptSubmit",cwd:a,prompt:b}' "$1" "$2" | node "$RECORD"; }
-recorded()      { node -e 'const fs=require("fs");const p=process.argv[1]+"/.git/lifecycle-gate.json";
-  const s=fs.existsSync(p)?JSON.parse(fs.readFileSync(p,"utf8")):{};process.stdout.write(Object.keys(s).sort().join(","))' "$1"; }
+recorded()      { node -e 'const fs=require("fs");
+  process.stdout.write(["review","test"].filter(k=>fs.existsSync(process.argv[1]+"/.git/lifecycle-gate-"+k+".json")).join(","))' "$1"; }
 record_both()   { record_skill "$1" test; record_skill "$1" review; }
 
-# gate_out <repo> <tool_name> <command>: the gate's stdout.
+# gate_out <repo> <tool_name> <command | MCP tool_input JSON>: the gate's stdout.
 gate_out() {
-  json 'b==="Bash"?{hook_event_name:"PreToolUse",cwd:a,tool_name:b,tool_input:{command:c}}:{hook_event_name:"PreToolUse",cwd:a,tool_name:b,tool_input:{owner:"o",repo:"r"}}' "$1" "$2" "$3" \
+  json 'b==="Bash"?{hook_event_name:"PreToolUse",cwd:a,tool_name:b,tool_input:{command:c}}:{hook_event_name:"PreToolUse",cwd:a,tool_name:b,tool_input:Object.assign({owner:"o",repo:"r"},c?JSON.parse(c):{})}' "$1" "$2" "$3" \
     | node "$GATE" 2>/dev/null
 }
 
@@ -188,6 +197,58 @@ gate_case "N. push outside a git repo fails closed" deny "$TMP/plain" Bash "git 
 echo "Case O: plugin hook path"
 if grep -q '"bash \\"${CLAUDE_PLUGIN_ROOT}\\"/hooks/session-start.sh"' "$REPO_ROOT/hooks/hooks.json"; then
   pass "O. CLAUDE_PLUGIN_ROOT quoted (R7)"; else fail "O. CLAUDE_PLUGIN_ROOT quoted (R7)"; fi
+
+echo "Case P: refspecs (R8)"
+P=$(new_repo refspecs)
+git -C "$P" checkout -q -b feat; printf 'evil\n' > "$P/evil.txt"; commit_all "$P" "unreviewed"
+git -C "$P" checkout -q -; record_both "$P"
+printf '{"head":"feat","base":"main"}' > "$TMP/body-feat.json"
+for c in "git push origin feat" "git push origin feat:main" "git push origin +feat" "git push -u origin feat" \
+         "gh pr create --head feat --title x" "gh pr create -H feat --title x" \
+         "gh api repos/o/r/pulls -f head=feat -f base=main" "gh api -X POST repos/o/r/pulls --input $TMP/body-feat.json"; do
+  gate_case "P. $c" deny "$P" Bash "$c" "feat"
+done
+gate_case "P. MCP create_pull_request head feat" deny "$P" mcp__github__create_pull_request '{"head":"feat","base":"main"}'
+gate_case "P. MCP create_pull_request head main" allow "$P" mcp__github__create_pull_request '{"head":"main","base":"x"}'
+for c in "git push origin main" "git push -u origin main" "git push origin HEAD:refs/heads/x" "gh pr create --title x" \
+         "git push origin :old" "git push origin --delete old" "git push --dry-run origin feat" "git push -n origin feat"; do
+  gate_case "P. $c" allow "$P" Bash "$c"
+done
+J2=$(new_repo all-reviewed); record_both "$J2"
+for c in "git push --all origin" "git push --mirror origin" "git push --tags" "git push origin --branches"; do
+  gate_case "P. bulk: $c" deny "$J2" Bash "$c" "one at a time"
+done
+gate_case "P. unknown ref" deny "$P" Bash "git push origin nosuch" "nosuch"
+
+echo "Case Q: target repo (R9)"
+SP_REPO=$(new_repo "with space"); record_both "$SP_REPO"
+gate_case "Q. cd into unreviewed repo" deny "$J2" Bash "cd $D && git push"
+gate_case "Q. -C into unreviewed repo" deny "$J2" Bash "git -C $D push"
+gate_case "Q. -C into reviewed repo from unreviewed cwd" allow "$D" Bash "git -C $J2 push"
+gate_case "Q. quoted -C path with spaces, reviewed" allow "$D" Bash "git -C \"$SP_REPO\" push origin main"
+gate_case "Q. quoted cd path with spaces, reviewed" allow "$D" Bash "cd '$SP_REPO' && git push"
+gate_case "Q. relative cd then push" deny "$J2" Bash "cd ../none && git push"
+
+echo "Case R: parser (R10)"
+gate_case "R. --git-dir <dir> from reviewed cwd" deny "$J2" Bash "git --git-dir $D/.git push"
+gate_case "R. --work-tree X --git-dir X" deny "$D" Bash "git --work-tree . --git-dir .git push"
+gate_case "R. sudo -u me git push" deny "$D" Bash "sudo -u me git push"
+gate_case "R. line continuation" deny "$D" Bash $'git \\\n  push origin main'
+
+echo "Case S: concurrent records (R11)"
+S=$(new_repo concurrent); ok=0
+for i in $(seq 1 20); do
+  rm -f "$S"/.git/lifecycle-gate-*.json
+  record_skill "$S" test & record_skill "$S" review & wait
+  [ "$(recorded "$S")" = "review,test" ] && ok=$((ok + 1))
+done
+check "S. both snapshots kept in 20/20 parallel runs" "$ok" "20"
+
+echo "Case T: temp index (R12)"
+mkdir -p "$TMP/tmpcheck"
+TMPDIR="$TMP/tmpcheck" record_both "$J2"
+json '{hook_event_name:"PreToolUse",cwd:a,tool_name:"mcp__github__push_files",tool_input:{}}' "$J2" | TMPDIR="$TMP/tmpcheck" node "$GATE" >/dev/null 2>&1 || true
+check "T. no temp files left behind" "$(ls -A "$TMP/tmpcheck")" ""
 
 echo ""
 echo "Passed: $PASS  Failed: $FAIL"
