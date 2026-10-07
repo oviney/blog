@@ -223,6 +223,7 @@ for c in "git push --no-verify origin main" "git -c core.hooksPath=/dev/null pus
          "git send-pack origin main" "CLAUDECODE=0 git push" "BLOG_LIFECYCLE_GATE_BYPASS=1 git push"; do
   gate_case "I. guard: $c" deny "$A2" Bash "$c"
 done
+gate_case "I. guard deny explains the commit -F workaround" deny "$A2" Bash 'git commit -m "mention --no-verify push"' "commit -F"
 gate_case "I. guard: Edit on .git/hooks/pre-push" deny "$A2" Edit "{\"file_path\":\"$A2/.git/hooks/pre-push\"}"
 gate_case "I. Edit on an ordinary file" allow "$A2" Edit "{\"file_path\":\"$A2/a.txt\"}"
 for c in "git status" "git commit -m wip" "gh pr create --title x" 'grep -rn "git push" docs/' \
