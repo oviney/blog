@@ -1,6 +1,6 @@
 # Spec: Enforce the agent-skills lifecycle in Claude Code sessions
 
-Status: Amendment 2.1 approved 2026-10-07
+Status: Amendment 2.2 approved 2026-10-07
 Issue: #1340
 Owner decisions: 2026-10-02, all four layers approved; 2026-10-06, freshness
 via git snapshot (Amendment 1); 2026-10-07, fix all second-review findings and
@@ -113,6 +113,20 @@ A linked worktree does not accept a review recorded in the main checkout; this
 stays a Known limit, because sharing snapshots between worktrees would let one
 worktree's review count for another's different work.
 
+## Amendment 2.2 (2026-10-07): fifth review
+
+The fifth `review` re-verified the pre-push design and R21 to R31 by experiment,
+and found two should-fixes, both introduced by Amendment 2.1. The owner approved
+fixing all findings.
+
+| # | Finding | Severity | Resolution |
+|---|---------|----------|------------|
+| R32 | The R27 skip trusted any local tracking ref: an unreviewed branch fetched from someone else could be pushed onto `main`, and a stale tracking ref let a deleted remote branch be recreated | Should-fix | Skip only when git's own `<remote sha>` for that ref already contains the commit (a no-op or rewind, checked live by git), or the commit is in the remote's default branch (`refs/remotes/<remote>/HEAD`, else `.../main`), which is PR-reviewed. R27's `main:new-branch` case still passes |
+| R33 | The checker copy was refreshed from the working tree on every push command, so editing the tracked hooks weakened the installed check (undoing R23), and worktrees on different versions overwrote each other's copy | Should-fix | Install copies the checker from the committed default branch (`origin/HEAD`, else `origin/main`). Only when that branch does not have the hooks yet (true until this PR merges) does it fall back to the working tree, and it says so |
+| R34 | The path guard needed a trailing slash: `rm -rf .git/lifecycle-gate` was allowed | Nit | Guard matches the directory name followed by `/`, whitespace, a quote or the end |
+| R35 | No uninstall path: on a branch from before this PR (no recorder), every Claude push is rejected with advice that cannot help | Nit | `lifecycle-prepush.js --uninstall` removes the shim and the copy; the reject message tells the owner about it and the bypass |
+| R36 | Pushing by URL instead of a remote name disables the R27/R32 skip | Nit | Documented: it fails safe (the push is checked) |
+
 ## Assumptions
 
 1. Scope is Claude Code sessions (local CLI, desktop, and Claude Code on the
@@ -142,8 +156,10 @@ worktree's review count for another's different work.
    - **Pushes: `hooks/lifecycle-prepush.js` as git's `pre-push` hook.** For
      each line git passes, it resolves the local sha's tree (`<sha>^{tree}`,
      which also peels annotated tags) and requires both snapshots to equal it.
-     Deletes (all-zero local sha) publish nothing and pass, as do commits
-     already reachable from the remote's tracking refs (R27). Bulk pushes
+     Deletes (all-zero local sha) publish nothing and pass. So do commits git
+     reports the remote ref already contains (a no-op or rewind), and commits
+     in the remote's default branch (`refs/remotes/<remote>/HEAD`, else
+     `.../main`), which is PR-reviewed (R27, narrowed by R32). Bulk pushes
      (`--all`, `--tags`, matching, configured refspecs) are checked ref by ref
      (owner decision, replacing Amendment 1.1's blanket block). On failure it
      prints the stale skills, the failing refs and the changed paths, and exits
@@ -163,9 +179,13 @@ worktree's review count for another's different work.
    Running the skills on uncommitted work and then committing it matches
    exactly. Any change afterwards, by any tool, `Bash`, or subagent, does not
    (R1).
-5a. **Installation (Amendment 2.1).** `hooks/lifecycle-prepush.js --install`
-   copies the checker and `lifecycle-snapshot.js` into
-   `<git common dir>/lifecycle-gate/` and writes a `.git/hooks/pre-push` shim
+5a. **Installation (Amendments 2.1 and 2.2).** `hooks/lifecycle-prepush.js --install`
+   copies the checker and `lifecycle-snapshot.js` **from the committed default
+   branch** (`origin/HEAD`, else `origin/main`) into
+   `<git common dir>/lifecycle-gate/`, so unmerged edits to the hooks cannot
+   weaken the installed check (R33); only while that branch lacks the hooks
+   (until this PR merges) does it copy from the working tree, and it says so. It
+   also writes a `.git/hooks/pre-push` shim
    (none of it committed). The shim exits 0 unless `CLAUDECODE=1`, then exits 0
    if `BLOG_LIFECYCLE_GATE_BYPASS=1`, then runs the copied checker, so the check
    does not depend on which branch is checked out (R23). Install always sets
@@ -227,6 +247,18 @@ worktree's review count for another's different work.
   the worktree.
 - **Dry runs are checked** (R25). git runs pre-push for `git push --dry-run`, so
   a dry run with stale snapshots is rejected. Nothing is sent either way.
+- **Pushing by URL** (R36) instead of a remote name means there are no
+  tracking refs to consult, so the already-published skip never applies and
+  the push is checked in full. This fails safe.
+- **Editing the hook code.** Claude Code runs the `PreToolUse` hooks from the
+  working tree, so an agent editing `hooks/lifecycle-gate.js` changes them for
+  its own session. The pre-push check is protected once this PR is merged (the
+  copy comes from the default branch, R33); until then it falls back to the
+  working tree.
+- **Branches from before this PR** have no recorder, so with the shim
+  installed every Claude push is rejected. The owner can run
+  `node .git/lifecycle-gate/lifecycle-prepush.js --uninstall` (R35) or use the
+  bypass.
 
 ## Layers
 
@@ -310,6 +342,13 @@ push exit code and what the remote received:
   differently named GitHub MCP write tools are checked (R26); pushing an
   already-published commit to a new branch is accepted (R27); the reminder
   wording (R29); fixture A uses a temporary repo (R30).
+- L. Amendment 2.2: an unreviewed branch fetched from another clone pushed
+  onto `main` is rejected, and a stale tracking ref cannot recreate a deleted
+  remote branch (R32); a no-op push of an unchanged ref passes; with the hooks
+  on the remote's default branch, a weakened working-tree checker is not what
+  gets installed (R33) and the fallback says so; `rm -rf .git/lifecycle-gate`
+  is denied while reading the snapshot JSON files is not (R34); `--uninstall`
+  removes the shim and the copy, and leaves a foreign hook alone (R35).
 
 Then a live check in a real session: a push is rejected before
 `test`/`review`, and accepted after.
@@ -333,7 +372,7 @@ it. `_config.yml` is protected, so that is left as an owner follow-up.
 - [ ] In a Claude session, a push is rejected by git unless `test` and `review` ran on exactly the content of every ref it sends, however the command was written and whatever tool made the edits; the message names the stale skills, refs and changed paths.
 - [ ] Pushes from outside Claude Code are unaffected.
 - [ ] Out-of-git writes (MCP file tools, `gh api` content writes) use the working-tree proxy check; the evasion guards deny.
-- [ ] Review findings R1 to R5, R7 to R12, R15 to R21 and R23 to R30 each have a passing fixture test (R13 is superseded by R25; R22 and R28 are documented limits).
+- [ ] Review findings R1 to R5, R7 to R12, R15 to R21, R23 to R30 and R32 to R35 each have a passing fixture test (R13 is superseded by R25; R22, R28 and R36 are documented limits).
 - [ ] Installation never touches unrelated repos, does not depend on the checked-out branch, and the owner bypass works even when the checker is missing.
 - [ ] `BLOG_LIFECYCLE_GATE_BYPASS=1` in the Claude Code environment allows the push.
 - [ ] `tests/lifecycle-hooks.sh` passes locally and in CI.
@@ -349,3 +388,4 @@ it. `_config.yml` is protected, so that is left as an owner follow-up.
 6. Enforce pushes with a git pre-push hook instead of parsing shell (owner, 2026-10-07).
 7. Check bulk pushes ref by ref, superseding decision 4 (owner, 2026-10-07).
 8. Fix all fourth-review findings (R21-R31) in this PR; keep worktree review separation and other-clone coverage as Known limits (owner, 2026-10-07).
+9. Fix all fifth-review findings (R32-R36) in this PR (owner, 2026-10-07).
