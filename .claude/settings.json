@@ -16,6 +16,23 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR\"/hooks/lifecycle-reminder.sh"
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/hooks/lifecycle-record.js",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/hooks/lifecycle-record.js",
+            "timeout": 10
           }
         ]
       }

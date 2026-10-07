@@ -8,13 +8,17 @@ directly in this repository. Read this first, then follow the references below.
 >
 > 1. Invoke the lifecycle skills in order: `spec` → `plan` → `build` → `test` → `review` → `ship`.
 >    Invoke a phase's skill *before* doing that phase's work.
-> 2. Do not push or open a PR until `test` and `review` have both run **after your last file edit**.
->    The built-in `/code-review` does not substitute for the repo's `review` skill.
+> 2. Do not push or open a PR until `test` and `review` have both run **on exactly the content
+>    being pushed**. Any change after they run (by any tool, shell command, or subagent)
+>    means running them again. The built-in `/code-review` does not substitute for the
+>    repo's `review` skill.
 >
-> Rule 2 is enforced by `hooks/lifecycle-gate.js` (registered in `.claude/settings.json`),
-> which denies `git push`, `gh pr create`, `gh api` PR writes, and the GitHub MCP
-> remote-write tools until both skills have run. Only the owner can bypass it, by
-> launching Claude Code with `BLOG_LIFECYCLE_GATE_BYPASS=1`. See #1340.
+> Rule 2 is enforced by hooks registered in `.claude/settings.json`:
+> `hooks/lifecycle-record.js` snapshots the working tree when `test` or `review` runs, and
+> `hooks/lifecycle-gate.js` denies `git push`, `gh pr create`, `gh api` PR writes, and the
+> GitHub MCP remote-write tools unless both snapshots match what is being pushed. The deny
+> message lists what changed. Only the owner can bypass it, by launching Claude Code with
+> `BLOG_LIFECYCLE_GATE_BYPASS=1`. See #1340 and `specs/agent-skills-lifecycle-enforcement.md`.
 
 ---
 
