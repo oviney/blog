@@ -13,12 +13,14 @@ directly in this repository. Read this first, then follow the references below.
 >    means running them again. The built-in `/code-review` does not substitute for the
 >    repo's `review` skill.
 >
-> Rule 2 is enforced by hooks registered in `.claude/settings.json`:
-> `hooks/lifecycle-record.js` snapshots the working tree when `test` or `review` runs, and
-> `hooks/lifecycle-gate.js` denies `git push`, `gh pr create`, `gh api` PR writes, and the
-> GitHub MCP remote-write tools unless both snapshots match what is being pushed. The deny
-> message lists what changed. Only the owner can bypass it, by launching Claude Code with
-> `BLOG_LIFECYCLE_GATE_BYPASS=1`. See #1340 and `specs/agent-skills-lifecycle-enforcement.md`.
+> Rule 2 is enforced for Claude Code sessions (it does not affect pushes made outside them):
+> `hooks/lifecycle-record.js` snapshots the working tree when `test` or `review` runs;
+> git's pre-push hook (`hooks/lifecycle-prepush.js`, installed at session start) rejects any
+> push whose refs do not all match both snapshots, listing the stale skills, refs and changed
+> files; and `hooks/lifecycle-gate.js` applies the same check to writes that bypass git (GitHub
+> MCP file tools, `gh api` content writes) and blocks attempts to skip the hook. Only the owner
+> can bypass, by launching Claude Code with `BLOG_LIFECYCLE_GATE_BYPASS=1`. See #1340 and
+> `specs/agent-skills-lifecycle-enforcement.md`.
 
 ---
 

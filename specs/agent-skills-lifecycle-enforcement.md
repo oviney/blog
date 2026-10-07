@@ -166,10 +166,15 @@ unchanged). R15 to R19 disappear by construction.
   (a script file, `eval`), or push over HTTP with its own credentials. Those
   are out of scope. Since Amendment 2, the shell form of a push no longer
   matters: git reports the refs.
-- **Missing Node fails open.** If `node` is not installed, the hooks exit 127
-  and Claude Code treats that as a non-blocking error. Node is a hard
-  dependency of this repo (Playwright), so this is accepted rather than
-  blocking every `Bash` call.
+- **Missing Node.** Since Amendment 2, a missing `node` fails closed for
+  Claude's pushes: the pre-push shim cannot run the checker, so git rejects the
+  push. The `PreToolUse` hooks still exit 127, which Claude Code treats as
+  non-blocking, so the out-of-git proxy checks fail open in that case. Node is
+  a hard dependency of this repo (Playwright), so this is accepted.
+- **Guards match text, not intent.** The evasion guards are substring checks
+  over the whole command, so a commit message that mentions, say,
+  `--no-verify` and `push` is blocked too. The deny message says to write such
+  text to a file first (`git commit -F <file>`).
 - **Merges are not gated** (R6), by design.
 - **MCP file writes are a proxy check** (R14). `push_files` and
   `create_or_update_file` send content from their own arguments; the gate can
