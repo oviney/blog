@@ -1,38 +1,26 @@
 #!/usr/bin/env bash
 # lifecycle-hooks.sh — fixture tests for the Claude Code lifecycle hooks (#1340)
 #
-# Each gate/recorder case builds a throwaway git repo, feeds the hook the JSON
-# Claude Code sends on stdin, and asserts on the hook's decision and output.
-# Cases follow specs/agent-skills-lifecycle-enforcement.md (Amendments 1 and
-# 1.1); R1-R14 refer to the review findings recorded there.
+# Pushes are real: each repo gets a local bare `origin` and the pre-push shim,
+# and every push case asserts what the remote actually received. Cases follow
+# specs/agent-skills-lifecycle-enforcement.md (Amendment 2); R-numbers are the
+# review findings recorded there.
 #
-#   A. SessionStart emits hookSpecificOutput.additionalContext with the meta-skill
+#   A. SessionStart emits the meta-skill (and installs the shim)
 #   B. UserPromptSubmit reminder is emitted
-#   C. Recorder: Skill test/review and typed /test, /review record a snapshot;
-#      code-review, blog:test, /code-review and mid-sentence /test do not; the
-#      recorder never blocks
-#   D. Gate: nothing recorded                         → deny, names test + review
-#   E. Gate: only test recorded                       → deny, names review only
-#   F. Gate: reviewed uncommitted work, then commit   → allow
-#   G. Gate: file changed by plain shell after review → deny, lists the path (R1)
-#   H. Gate: new file committed after review          → deny; uncommitted edit → allow
-#   I. Gate: every push form from R4 (and earlier)    → deny when stale
-#   J. Gate: gh pr create, gh api POST, MCP writes    → deny when stale;
-#      MCP write allowed when the working tree matches
-#   K. Gate: false-positive forms (R5) and read-only commands → allow
-#   L. Gate: bypass env allows; bypass in the command string does not
-#   M. Gate: null / malformed stdin                   → no crash; gated MCP call denies (R2)
-#   N. Gate: not a git repo                           → deny (fail closed)
-#   O. hooks/hooks.json quotes ${CLAUDE_PLUGIN_ROOT} (R7)
-#   P. Refspecs (R8): unreviewed feat via feat, feat:main, +feat, --head feat,
-#      head=feat, --input head, MCP head → deny; main, HEAD:x, deletes,
-#      --dry-run → allow; --all/--mirror/--tags/--branches → always deny;
-#      unknown ref → deny
-#   Q. Target repo (R9): cd / -C into an unreviewed repo → deny; -C into a
-#      reviewed repo from an unreviewed cwd → allow; quoted paths with spaces
-#   R. Parser (R10): --git-dir X, --work-tree X, sudo -u, line continuation
-#   S. Concurrency (R11): 20 parallel test+review records keep both
-#   T. Temp index (R12): no temp files left behind
+#   C. Recorder: exact skill names and typed /test, /review; never blocks
+#   D. Freshness: nothing / only test recorded, reviewed-then-committed,
+#      sed or new file after review (R1), uncommitted edit after review
+#   E. Refs (R8, R17): other branches, feat:main, tags, --all, deletes, and
+#      remote.<name>.push / push.default=matching configs
+#   F. Shell forms (R15, R16, R18, R19): if/while, timeout -k, nice -n, env -u,
+#      xargs -I, a "# don't" comment, pushd, GIT_DIR=, $(...) arguments
+#   G. Scope: no CLAUDECODE → unaffected; bypass env; linked worktrees
+#   H. Installer: installs, idempotent, never overwrites a foreign hook,
+#      refuses when core.hooksPath is set
+#   I. PreToolUse: evasion guards, install-on-push, MCP and gh api content
+#      writes (R20) via the proxy check, ordinary commands, malformed input (R2)
+#   J. Concurrent records (R11), temp cleanup (R12), quoted plugin path (R7)
 #
 # Dependencies: bash, git, node. Same as the hooks under test.
 
@@ -42,63 +30,80 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 GATE="$REPO_ROOT/hooks/lifecycle-gate.js"
 RECORD="$REPO_ROOT/hooks/lifecycle-record.js"
+PREPUSH="$REPO_ROOT/hooks/lifecycle-prepush.js"
 
 PASS=0
 FAIL=0
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
-# The hooks must not see the developer's own bypass or project dir.
-unset BLOG_LIFECYCLE_GATE_BYPASS CLAUDE_PROJECT_DIR
+# The hooks must not see the caller's own session marker, bypass, or project dir.
+unset CLAUDECODE BLOG_LIFECYCLE_GATE_BYPASS CLAUDE_PROJECT_DIR
 
 pass() { echo "  ✅ $1"; PASS=$((PASS + 1)); }
 fail() { echo "  ❌ $1"; FAIL=$((FAIL + 1)); }
+check() { if [ "$2" = "$3" ]; then pass "$1"; else fail "$1 (expected '$3', got '$2')"; fi; }
 
-# new_repo <name>: a git repo with one committed file, prints its path.
+# new_repo <name>: repo with a committed a.txt, a bare origin holding main, and
+# the shim installed. Prints its path.
 new_repo() {
   local r="$TMP/$1"
+  git init -q --bare "$r.git"
   git init -q -b main "$r"
   git -C "$r" config user.email "lifecycle-test@example.com"
   git -C "$r" config user.name "lifecycle-test"
   git -C "$r" config commit.gpgsign false
+  git -C "$r" remote add origin "$r.git"
   printf 'one\n' > "$r/a.txt"
   git -C "$r" add . && git -C "$r" commit -q -m "baseline"
+  git -C "$r" push -q origin main 2>/dev/null
+  node "$PREPUSH" --install "$r" >/dev/null 2>&1 || true
   echo "$r"
 }
 
 commit_all() { git -C "$1" add -A && git -C "$1" commit -q -m "${2:-change}"; }
+remote_sha() { git -C "$1" ls-remote origin "$2" 2>/dev/null | cut -f1; }
 
-# json <node expression using argv a, b, c>: prints JSON built in node.
 json() { local expr="$1"; shift; node -e "const [a,b,c]=process.argv.slice(1);process.stdout.write(JSON.stringify($expr))" "$@"; }
-
 record_skill()  { json '{hook_event_name:"PostToolUse",cwd:a,tool_name:"Skill",tool_input:{skill:b}}' "$1" "$2" | node "$RECORD"; }
 record_prompt() { json '{hook_event_name:"UserPromptSubmit",cwd:a,prompt:b}' "$1" "$2" | node "$RECORD"; }
+record_both()   { record_skill "$1" test; record_skill "$1" review; }
 recorded()      { node -e 'const fs=require("fs");
   process.stdout.write(["review","test"].filter(k=>fs.existsSync(process.argv[1]+"/.git/lifecycle-gate-"+k+".json")).join(","))' "$1"; }
-record_both()   { record_skill "$1" test; record_skill "$1" review; }
 
-# gate_out <repo> <tool_name> <command | MCP tool_input JSON>: the gate's stdout.
-gate_out() {
-  json 'b==="Bash"?{hook_event_name:"PreToolUse",cwd:a,tool_name:b,tool_input:{command:c}}:{hook_event_name:"PreToolUse",cwd:a,tool_name:b,tool_input:Object.assign({owner:"o",repo:"r"},c?JSON.parse(c):{})}' "$1" "$2" "$3" \
-    | node "$GATE" 2>/dev/null
-}
-
-decision() { node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{
-  if(!s.trim()){console.log("allow");return}
-  try{console.log(JSON.parse(s).hookSpecificOutput.permissionDecision)}catch(e){console.log("unparseable")}})'; }
-
-# gate_case <name> <allow|deny> <repo> <tool_name> <command> [grep] [not_grep]
-gate_case() {
-  local name="$1" expect="$2" repo="$3" tool="$4" cmd="$5" want="${6:-}" unwanted="${7:-}"
-  local out got
-  out=$(gate_out "$repo" "$tool" "$cmd") || { fail "$name (gate exited non-zero)"; return; }
-  got=$(printf '%s' "$out" | decision)
+# push_case <name> <accept|reject> <repo> <remote ref> <expected sha if accepted> <cmd> [grep]
+# Runs <cmd> under bash from $TMP as a Claude session would (CLAUDECODE=1), then
+# checks whether the remote ref moved to the expected sha or stayed where it was.
+push_case() {
+  local name="$1" expect="$2" repo="$3" ref="$4" want_sha="$5" cmd="$6" grep_for="${7:-}"
+  local before after out got
+  before=$(remote_sha "$repo" "$ref")
+  out=$(cd "$TMP" && CLAUDECODE=1 bash -c "$cmd" 2>&1) || true
+  after=$(remote_sha "$repo" "$ref")
+  if [ "$after" = "$before" ] && [ "$after" != "$want_sha" ]; then got=reject
+  elif [ "$after" = "$want_sha" ]; then got=accept
+  else got="moved-elsewhere"; fi
   if [ "$got" != "$expect" ]; then fail "$name (expected $expect, got $got)"; return; fi
-  if [ -n "$want" ] && ! printf '%s' "$out" | grep -q -- "$want"; then fail "$name (output lacks '$want')"; return; fi
-  if [ -n "$unwanted" ] && printf '%s' "$out" | grep -q -- "$unwanted"; then fail "$name (output has '$unwanted')"; return; fi
+  if [ -n "$grep_for" ] && ! printf '%s' "$out" | grep -q -- "$grep_for"; then fail "$name (output lacks '$grep_for')"; return; fi
   pass "$name"
 }
 
-check() { if [ "$2" = "$3" ]; then pass "$1"; else fail "$1 (expected '$3', got '$2')"; fi; }
+# gate_out <cwd> <tool_name> <command | tool_input JSON>: PreToolUse stdout.
+gate_out() {
+  json 'b==="Bash"?{hook_event_name:"PreToolUse",cwd:a,tool_name:b,tool_input:{command:c}}:{hook_event_name:"PreToolUse",cwd:a,tool_name:b,tool_input:c?JSON.parse(c):{}}' "$1" "$2" "$3" \
+    | node "$GATE" 2>/dev/null
+}
+decision() { node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{
+  if(!s.trim()){console.log("allow");return}
+  try{console.log(JSON.parse(s).hookSpecificOutput.permissionDecision)}catch(e){console.log("unparseable")}})'; }
+# gate_case <name> <allow|deny> <cwd> <tool_name> <command | JSON> [grep]
+gate_case() {
+  local out got
+  out=$(gate_out "$3" "$4" "$5") || { fail "$1 (gate exited non-zero)"; return; }
+  got=$(printf '%s' "$out" | decision)
+  if [ "$got" != "$2" ]; then fail "$1 (expected $2, got $got)"; return; fi
+  if [ -n "${6:-}" ] && ! printf '%s' "$out" | grep -q -- "$6"; then fail "$1 (output lacks '$6')"; return; fi
+  pass "$1"
+}
 
 context_of() {
   echo '{}' | CLAUDE_PROJECT_DIR="$REPO_ROOT" bash "$1" 2>/dev/null | node -e 'let s="";
@@ -109,6 +114,7 @@ context_of() {
 echo "Case A: SessionStart"
 ctx=$(context_of "$REPO_ROOT/hooks/session-start.sh" || true)
 if printf '%s' "$ctx" | grep -q "Using Agent Skills"; then pass "A. meta-skill injected"; else fail "A. meta-skill injected"; fi
+if printf '%s' "$ctx" | grep -q "pre-push"; then pass "A. reports the pre-push shim"; else fail "A. reports the pre-push shim"; fi
 
 echo "Case B: UserPromptSubmit reminder"
 ctx=$(context_of "$REPO_ROOT/hooks/lifecycle-reminder.sh" || true)
@@ -130,125 +136,131 @@ out=$(record_skill "$R2" test 2>/dev/null; printf 'not json' | node "$RECORD" 2>
 check "C. recorder prints nothing and exits 0" "$out" "rc=0"
 check "C. index untouched by snapshot" "$(git -C "$R" status --porcelain)" ""
 
-echo "Cases D-H: freshness"
-D=$(new_repo none)
-gate_case "D. nothing recorded" deny "$D" Bash "git push" "content: test, review"
-E=$(new_repo only-test); record_skill "$E" test
-gate_case "E. only test recorded" deny "$E" Bash "git push" "content: review" "content: test"
+echo "Case D: freshness"
+D=$(new_repo none); printf 'x\n' >> "$D/a.txt"; commit_all "$D"
+push_case "D. nothing recorded" reject "$D" refs/heads/main "$(git -C "$D" rev-parse HEAD)" "cd '$D' && git push origin main" "test, review"
+E1=$(new_repo only-test); printf 'x\n' >> "$E1/a.txt"; commit_all "$E1"; record_skill "$E1" test
+push_case "D. only test recorded" reject "$E1" refs/heads/main "$(git -C "$E1" rev-parse HEAD)" "cd '$E1' && git push origin main" "content: review"
 F=$(new_repo fresh); printf 'two\n' > "$F/b.txt"; record_both "$F"; commit_all "$F"
-gate_case "F. reviewed work, then committed" allow "$F" Bash "git push -u origin main"
+push_case "D. reviewed work, then committed" accept "$F" refs/heads/main "$(git -C "$F" rev-parse HEAD)" "cd '$F' && git push origin main"
 G=$(new_repo shell-edit); record_both "$G"; sed -i 's/one/ONE/' "$G/a.txt"; commit_all "$G"
-gate_case "G. sed edit after review (R1)" deny "$G" Bash "git push" "a.txt"
+push_case "D. sed edit after review (R1)" reject "$G" refs/heads/main "$(git -C "$G" rev-parse HEAD)" "cd '$G' && git push origin main" "a.txt"
 H=$(new_repo new-file); record_both "$H"; printf 'x\n' > "$H/new.txt"; commit_all "$H"
-gate_case "H. new file after review" deny "$H" Bash "git push" "new.txt"
-H2=$(new_repo uncommitted); record_both "$H2"; printf 'wip\n' >> "$H2/a.txt"
-gate_case "H. uncommitted edit, HEAD still reviewed" allow "$H2" Bash "git push"
+push_case "D. new file after review" reject "$H" refs/heads/main "$(git -C "$H" rev-parse HEAD)" "cd '$H' && git push origin main" "new.txt"
+H2=$(new_repo uncommitted); printf 'r\n' > "$H2/b.txt"; commit_all "$H2"; record_both "$H2"; printf 'wip\n' >> "$H2/a.txt"
+push_case "D. uncommitted edit, HEAD still reviewed" accept "$H2" refs/heads/main "$(git -C "$H2" rev-parse HEAD)" "cd '$H2' && git push origin main"
 
-echo "Case I: push forms (stale repo)"
-for c in "git push" "git push -u origin main" "cd /r && git add . && git commit -m x && git push" \
-         "git -C /r push origin HEAD" "GIT_TRACE=1 git push" $'echo start\ngit push' "(git push)" \
-         "(cd /r && git push)" "env GIT_TRACE=1 git push" "timeout 120 git push origin HEAD" \
-         "nohup git push &" 'bash -c "git push"' "sh -c 'cd /r && git push'" "echo HEAD | xargs git push origin" \
-         "/usr/bin/git push" '\git push' 'git -C "/path with space" push' "git --git-dir=/r/.git push" \
-         "git -c http.x=y push" "git push 2>&1 | tail -2" "git push&&echo ok"; do
-  gate_case "I. $c" deny "$D" Bash "$c"
+echo "Case E: refs (R8, R17)"
+E=$(new_repo refs)
+git -C "$E" checkout -q -b feat; printf 'evil\n' > "$E/evil.txt"; commit_all "$E" unreviewed; FEAT=$(git -C "$E" rev-parse feat)
+git -C "$E" checkout -q main; printf 'ok\n' > "$E/ok.txt"; commit_all "$E" reviewed; record_both "$E"; MAIN=$(git -C "$E" rev-parse main)
+push_case "E. other branch: git push origin feat" reject "$E" refs/heads/feat "$FEAT" "cd '$E' && git push origin feat" "refs/heads/feat"
+push_case "E. feat:main" reject "$E" refs/heads/main "$FEAT" "cd '$E' && git push origin feat:main"
+push_case "E. +feat:other" reject "$E" refs/heads/other "$FEAT" "cd '$E' && git push origin +feat:other"
+push_case "E. --all with an unreviewed branch" reject "$E" refs/heads/feat "$FEAT" "cd '$E' && git push --all origin" "feat"
+git -C "$E" tag -a bad -m bad feat
+push_case "E. tag on unreviewed commit" reject "$E" refs/tags/bad "$(git -C "$E" rev-parse bad)" "cd '$E' && git push origin bad"
+git -C "$E" config remote.origin.push "refs/heads/feat:refs/heads/main"
+push_case "E. remote.origin.push config (R17)" reject "$E" refs/heads/main "$FEAT" "cd '$E' && git push origin"
+git -C "$E" config --unset remote.origin.push
+push_case "E. reviewed main" accept "$E" refs/heads/main "$MAIN" "cd '$E' && git push origin main"
+git -C "$E" tag -a good -m good main
+push_case "E. --tags with an unreviewed tag" reject "$E" refs/tags/bad "$(git -C "$E" rev-parse bad)" "cd '$E' && git push --tags origin" "bad"
+git -C "$E" tag -d bad >/dev/null
+push_case "E. --tags, only reviewed tags" accept "$E" refs/tags/good "$(git -C "$E" rev-parse good)" "cd '$E' && git push --tags origin"
+git -C "$E" push -q origin main:gone 2>/dev/null
+push_case "E. delete a remote branch" accept "$E" refs/heads/gone "" "cd '$E' && git push origin :gone"
+M=$(new_repo matching); git -C "$M" checkout -q -b feat; git -C "$M" push -q origin feat 2>/dev/null
+printf 'evil\n' > "$M/evil.txt"; commit_all "$M"; MF=$(git -C "$M" rev-parse feat); git -C "$M" checkout -q main; record_both "$M"
+push_case "E. push.default=matching (R17)" reject "$M" refs/heads/feat "$MF" "cd '$M' && git -c push.default=matching push origin" "feat"
+A2=$(new_repo all-reviewed); git -C "$A2" branch twin; record_both "$A2"
+push_case "E. --all, every ref reviewed" accept "$A2" refs/heads/twin "$(git -C "$A2" rev-parse twin)" "cd '$A2' && git push --all origin"
+
+echo "Case F: shell forms (R15, R16, R18, R19), stale repo"
+S=$(new_repo shell); printf 'x\n' >> "$S/a.txt"; commit_all "$S"; SH=$(git -C "$S" rev-parse HEAD)
+for c in "cd '$S' && if git push origin main; then echo ok; fi" \
+         "cd '$S' && while ! git push origin main; do break; done" \
+         "cd '$S' && timeout -k 5 60 git push origin main" \
+         "cd '$S' && nice -n 10 git push origin main" \
+         "cd '$S' && env -u FOO git push origin main" \
+         "cd '$S' && echo main | xargs -I {} git push origin {}" \
+         $'cd \''"$S"$'\' && git status >/dev/null   # don\'t push yet\ngit push origin main' \
+         "pushd '$S' >/dev/null && git push origin main" \
+         "GIT_DIR='$S/.git' git push origin main" \
+         "cd \"\$(git -C '$S' rev-parse --show-toplevel)\" && git push origin \"\$(git branch --show-current)\""; do
+  push_case "F. stale: ${c//$TMP/\$TMP}" reject "$S" refs/heads/main "$SH" "$c"
 done
+record_both "$S"
+push_case "F. reviewed: GIT_DIR= form" accept "$S" refs/heads/main "$SH" "GIT_DIR='$S/.git' git push origin main"
 
-echo "Case J: PR creation and MCP writes"
-gate_case "J. gh pr create" deny "$D" Bash "gh pr create --title x"
-gate_case "J. gh api POST pulls" deny "$D" Bash "gh api repos/o/r/pulls -f title=x -f head=b"
-gate_case "J. gh api -X POST quoted endpoint" deny "$D" Bash 'gh api -X POST "repos/o/r/pulls" --input body.json'
-for t in create_pull_request push_files create_or_update_file delete_file; do
-  gate_case "J. MCP $t stale" deny "$D" "mcp__github__$t" ""
+echo "Case G: scope"
+N=$(new_repo human); printf 'x\n' >> "$N/a.txt"; commit_all "$N"
+out=$(cd "$N" && git push -q origin main 2>&1) || true
+check "G. without CLAUDECODE an unreviewed push goes through" "$(remote_sha "$N" refs/heads/main)" "$(git -C "$N" rev-parse HEAD)"
+B=$(new_repo bypass); printf 'x\n' >> "$B/a.txt"; commit_all "$B"
+out=$(cd "$B" && CLAUDECODE=1 BLOG_LIFECYCLE_GATE_BYPASS=1 git push -q origin main 2>&1) || true
+check "G. bypass env lets the push through" "$(remote_sha "$B" refs/heads/main)" "$(git -C "$B" rev-parse HEAD)"
+W=$(new_repo worktree); record_both "$W"; git -C "$W" worktree add -q -b wt "$TMP/wt" 2>/dev/null
+git -C "$TMP/wt" config user.email t@e; printf 'w\n' > "$TMP/wt/w.txt"; commit_all "$TMP/wt"; WT=$(git -C "$TMP/wt" rev-parse HEAD)
+push_case "G. worktree without its own review" reject "$W" refs/heads/wt "$WT" "cd '$TMP/wt' && git push origin wt"
+record_both "$TMP/wt"
+push_case "G. worktree after its own review" accept "$W" refs/heads/wt "$WT" "cd '$TMP/wt' && git push origin wt"
+
+echo "Case H: installer"
+I=$(new_repo install)
+check "H. shim installed" "$(grep -c 'lifecycle-gate pre-push shim' "$I/.git/hooks/pre-push")" "1"
+rc=0; node "$PREPUSH" --install "$I" >/dev/null 2>&1 || rc=$?
+check "H. reinstall is idempotent" "$rc:$(grep -c 'lifecycle-gate pre-push shim' "$I/.git/hooks/pre-push")" "0:1"
+X=$(new_repo foreign); printf '#!/bin/sh\necho mine\n' > "$X/.git/hooks/pre-push"
+rc=0; node "$PREPUSH" --install "$X" >/dev/null 2>&1 || rc=$?
+check "H. foreign pre-push left alone" "$rc:$(cat "$X/.git/hooks/pre-push" | tail -1)" "2:echo mine"
+Y=$(new_repo hookspath); rm -f "$Y/.git/hooks/pre-push"; git -C "$Y" config core.hooksPath .githooks
+rc=0; node "$PREPUSH" --install "$Y" >/dev/null 2>&1 || rc=$?
+check "H. core.hooksPath set: refuses" "$rc" "2"
+
+echo "Case I: PreToolUse gate"
+for c in "git push --no-verify origin main" "git -c core.hooksPath=/dev/null push" "rm .git/hooks/pre-push" \
+         "git send-pack origin main" "CLAUDECODE=0 git push" "BLOG_LIFECYCLE_GATE_BYPASS=1 git push"; do
+  gate_case "I. guard: $c" deny "$A2" Bash "$c"
 done
-J=$(new_repo mcp-fresh); record_both "$J"
-gate_case "J. MCP push_files on reviewed tree" allow "$J" mcp__github__push_files ""
-
-echo "Case K: not pushes"
-gate_case "K. heredoc commit message" allow "$D" Bash $'git commit -F - <<\'EOF\'\nfix: x\n\ngit push is now gated\nEOF'
-gate_case "K. heredoc docs file" allow "$D" Bash $'cat > d.md <<EOF\n```bash\ngit push -u origin b\n```\nEOF'
-gate_case "K. && inside a quoted message" allow "$D" Bash 'git commit -m "fix && git push later"'
-gate_case "K. grep for the string" allow "$D" Bash 'grep -rn "git push" docs/'
-gate_case "K. gh api -X GET with -f" allow "$D" Bash "gh api -X GET repos/o/r/pulls -f state=closed"
-gate_case "K. gh api GET pulls" allow "$D" Bash "gh api repos/o/r/pulls --jq '.[].number'"
-gate_case "K. git stash push" allow "$D" Bash "git stash push -m wip"
-gate_case "K. git status / log / commit" allow "$D" Bash "git status && git log --oneline -3 && git commit -m wip"
-gate_case "K. not a push subcommand" allow "$D" Bash "git push-hook-test"
-gate_case "K. MCP read tool" allow "$D" mcp__github__pull_request_read ""
-
-echo "Case L: bypass"
-out=$(json '{hook_event_name:"PreToolUse",cwd:a,tool_name:"Bash",tool_input:{command:"git push"}}' "$D" \
-  | BLOG_LIFECYCLE_GATE_BYPASS=1 node "$GATE" 2>/dev/null || echo "exit-nonzero")
-check "L. bypass env allows push" "$out" ""
-gate_case "L. bypass in command string" deny "$D" Bash "BLOG_LIFECYCLE_GATE_BYPASS=1 git push"
-
-echo "Case M: malformed input"
-out=$(printf 'null' | node "$GATE" 2>/dev/null; echo "rc=$?"); check "M. null stdin, no crash" "$out" "rc=0"
-out=$(printf 'not json' | node "$GATE" 2>/dev/null; echo "rc=$?"); check "M. non-JSON stdin allowed" "$out" "rc=0"
-out=$(json '{tool_name:"Bash",tool_input:null,cwd:a}' "$D" | node "$GATE" 2>/dev/null; echo "rc=$?")
-check "M. Bash with null input allowed" "$out" "rc=0"
+gate_case "I. guard: Edit on .git/hooks/pre-push" deny "$A2" Edit "{\"file_path\":\"$A2/.git/hooks/pre-push\"}"
+gate_case "I. Edit on an ordinary file" allow "$A2" Edit "{\"file_path\":\"$A2/a.txt\"}"
+for c in "git status" "git commit -m wip" "gh pr create --title x" 'grep -rn "git push" docs/' \
+         "gh api -X GET repos/o/r/contents/a.txt" "git push origin main"; do
+  gate_case "I. allowed: $c" allow "$A2" Bash "$c"
+done
+U=$(new_repo uninstalled); rm -f "$U/.git/hooks/pre-push"
+gate_case "I. push installs a missing shim" allow "$U" Bash "git push origin main"
+check "I. shim present afterwards" "$(grep -c 'lifecycle-gate pre-push shim' "$U/.git/hooks/pre-push" 2>/dev/null || echo 0)" "1"
+gate_case "I. push with a foreign hook is denied" deny "$X" Bash "git push origin main" "pre-push"
+gate_case "I. MCP push_files, stale" deny "$D" mcp__github__push_files '{"owner":"o","repo":"r"}' "test, review"
+gate_case "I. MCP push_files, reviewed tree" allow "$A2" mcp__github__push_files '{"owner":"o","repo":"r"}'
+gate_case "I. gh api contents PUT, stale (R20)" deny "$D" Bash "gh api -X PUT repos/o/r/contents/a.txt -f message=x -f content=eA=="
+gate_case "I. gh api git/refs PATCH, stale (R20)" deny "$D" Bash "gh api repos/o/r/git/refs/heads/main -X PATCH -f sha=abc"
+gate_case "I. gh api graphql createCommitOnBranch, stale (R20)" deny "$D" Bash "gh api graphql -f query='mutation { createCommitOnBranch(input: {}) { commit { oid } } }'"
+gate_case "I. gh api contents PUT, reviewed tree" allow "$A2" Bash "gh api -X PUT repos/o/r/contents/a.txt -f message=x"
+out=$(printf 'null' | node "$GATE" 2>/dev/null; echo "rc=$?"); check "I. null stdin, no crash" "$out" "rc=0"
+out=$(printf 'not json' | node "$GATE" 2>/dev/null; echo "rc=$?"); check "I. non-JSON stdin allowed" "$out" "rc=0"
 got=$(json '{tool_name:"mcp__github__push_files",tool_input:null,cwd:a}' "$D" | node "$GATE" 2>/dev/null | decision)
-check "M. gated MCP call with null input denies (R2)" "$got" "deny"
+check "I. MCP write with null input denies (R2)" "$got" "deny"
+out=$(json '{hook_event_name:"PreToolUse",cwd:a,tool_name:"Bash",tool_input:{command:"git push --no-verify"}}' "$A2" \
+  | BLOG_LIFECYCLE_GATE_BYPASS=1 node "$GATE" 2>/dev/null || echo "exit-nonzero")
+check "I. bypass env skips the gate" "$out" ""
 
-echo "Case N: not a git repo"
-mkdir -p "$TMP/plain"
-gate_case "N. push outside a git repo fails closed" deny "$TMP/plain" Bash "git push" "could not verify"
-
-echo "Case O: plugin hook path"
-if grep -q '"bash \\"${CLAUDE_PLUGIN_ROOT}\\"/hooks/session-start.sh"' "$REPO_ROOT/hooks/hooks.json"; then
-  pass "O. CLAUDE_PLUGIN_ROOT quoted (R7)"; else fail "O. CLAUDE_PLUGIN_ROOT quoted (R7)"; fi
-
-echo "Case P: refspecs (R8)"
-P=$(new_repo refspecs)
-git -C "$P" checkout -q -b feat; printf 'evil\n' > "$P/evil.txt"; commit_all "$P" "unreviewed"
-git -C "$P" checkout -q -; record_both "$P"
-printf '{"head":"feat","base":"main"}' > "$TMP/body-feat.json"
-for c in "git push origin feat" "git push origin feat:main" "git push origin +feat" "git push -u origin feat" \
-         "gh pr create --head feat --title x" "gh pr create -H feat --title x" \
-         "gh api repos/o/r/pulls -f head=feat -f base=main" "gh api -X POST repos/o/r/pulls --input $TMP/body-feat.json"; do
-  gate_case "P. $c" deny "$P" Bash "$c" "feat"
-done
-gate_case "P. MCP create_pull_request head feat" deny "$P" mcp__github__create_pull_request '{"head":"feat","base":"main"}'
-gate_case "P. MCP create_pull_request head main" allow "$P" mcp__github__create_pull_request '{"head":"main","base":"x"}'
-for c in "git push origin main" "git push -u origin main" "git push origin HEAD:refs/heads/x" "gh pr create --title x" \
-         "git push origin :old" "git push origin --delete old" "git push --dry-run origin feat" "git push -n origin feat"; do
-  gate_case "P. $c" allow "$P" Bash "$c"
-done
-J2=$(new_repo all-reviewed); record_both "$J2"
-for c in "git push --all origin" "git push --mirror origin" "git push --tags" "git push origin --branches"; do
-  gate_case "P. bulk: $c" deny "$J2" Bash "$c" "one at a time"
-done
-gate_case "P. unknown ref" deny "$P" Bash "git push origin nosuch" "nosuch"
-
-echo "Case Q: target repo (R9)"
-SP_REPO=$(new_repo "with space"); record_both "$SP_REPO"
-gate_case "Q. cd into unreviewed repo" deny "$J2" Bash "cd $D && git push"
-gate_case "Q. -C into unreviewed repo" deny "$J2" Bash "git -C $D push"
-gate_case "Q. -C into reviewed repo from unreviewed cwd" allow "$D" Bash "git -C $J2 push"
-gate_case "Q. quoted -C path with spaces, reviewed" allow "$D" Bash "git -C \"$SP_REPO\" push origin main"
-gate_case "Q. quoted cd path with spaces, reviewed" allow "$D" Bash "cd '$SP_REPO' && git push"
-gate_case "Q. relative cd then push" deny "$J2" Bash "cd ../none && git push"
-
-echo "Case R: parser (R10)"
-gate_case "R. --git-dir <dir> from reviewed cwd" deny "$J2" Bash "git --git-dir $D/.git push"
-gate_case "R. --work-tree X --git-dir X" deny "$D" Bash "git --work-tree . --git-dir .git push"
-gate_case "R. sudo -u me git push" deny "$D" Bash "sudo -u me git push"
-gate_case "R. line continuation" deny "$D" Bash $'git \\\n  push origin main'
-
-echo "Case S: concurrent records (R11)"
-S=$(new_repo concurrent); ok=0
+echo "Case J: concurrency, temp files, plugin path"
+C=$(new_repo concurrent); ok=0
 for i in $(seq 1 20); do
-  rm -f "$S"/.git/lifecycle-gate-*.json
-  record_skill "$S" test & record_skill "$S" review & wait
-  [ "$(recorded "$S")" = "review,test" ] && ok=$((ok + 1))
+  rm -f "$C"/.git/lifecycle-gate-*.json
+  record_skill "$C" test & record_skill "$C" review & wait
+  [ "$(recorded "$C")" = "review,test" ] && ok=$((ok + 1))
 done
-check "S. both snapshots kept in 20/20 parallel runs" "$ok" "20"
-
-echo "Case T: temp index (R12)"
+check "J. both snapshots kept in 20/20 parallel runs (R11)" "$ok" "20"
 mkdir -p "$TMP/tmpcheck"
-TMPDIR="$TMP/tmpcheck" record_both "$J2"
-json '{hook_event_name:"PreToolUse",cwd:a,tool_name:"mcp__github__push_files",tool_input:{}}' "$J2" | TMPDIR="$TMP/tmpcheck" node "$GATE" >/dev/null 2>&1 || true
-check "T. no temp files left behind" "$(ls -A "$TMP/tmpcheck")" ""
+TMPDIR="$TMP/tmpcheck" record_both "$A2"
+json '{hook_event_name:"PreToolUse",cwd:a,tool_name:"mcp__github__push_files",tool_input:{}}' "$A2" | TMPDIR="$TMP/tmpcheck" node "$GATE" >/dev/null 2>&1 || true
+check "J. no temp files left behind (R12)" "$(ls -A "$TMP/tmpcheck")" ""
+if grep -q '"bash \\"${CLAUDE_PLUGIN_ROOT}\\"/hooks/session-start.sh"' "$REPO_ROOT/hooks/hooks.json"; then
+  pass "J. CLAUDE_PLUGIN_ROOT quoted (R7)"; else fail "J. CLAUDE_PLUGIN_ROOT quoted (R7)"; fi
 
 echo ""
 echo "Passed: $PASS  Failed: $FAIL"
