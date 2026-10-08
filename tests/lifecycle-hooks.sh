@@ -30,6 +30,8 @@
 #   M. Amendment 2.3: uninstall refused inside Claude Code (R37), rewritten
 #      local tracking refs (R38), a checker on origin/main that fails to load
 #      (R39), partial hooks on origin/main (R40), widened guards (R41)
+#   N. Amendment 2.4 (#1350): fetch guard short form and local sources only,
+#      set-head allowed, uninstall message, copy list from origin/main, rewind
 #
 # Dependencies: bash, git, node. Same as the hooks under test.
 
@@ -352,7 +354,7 @@ if printf '%s' "$out" | grep -q "own terminal"; then pass "M. refusal points the
 rc=0; CLAUDECODE=1 BLOG_LIFECYCLE_GATE_BYPASS=1 node "$PREPUSH" --uninstall "$MU" >/dev/null 2>&1 || rc=$?
 check "M. --uninstall with the owner bypass works (R37)" "$rc:$([ -e "$MU/.git/hooks/pre-push" ] && echo shim || echo noshim)" "0:noshim"
 for c in "node hooks/lifecycle-prepush.js --uninstall && git push origin main" \
-         "git remote set-head origin copilot/x" "git update-ref refs/remotes/origin/main HEAD" \
+         "git update-ref refs/remotes/origin/main HEAD" \
          "git fetch . feat:refs/remotes/origin/main" "rm -rf .git/lifecycle-gate*" "rm -rf ./.git//lifecycle-gate" \
          "cd .git && rm -rf lifecycle-gate"; do
   gate_case "M. guard: $c (R37, R38, R41)" deny "$A2" Bash "$c"
@@ -378,6 +380,59 @@ MP=$(new_repo partial-hooks); mkdir -p "$MP/hooks"; cp "$REPO_ROOT/hooks/lifecyc
 commit_all "$MP" "only the checker on main"; git -C "$MP" push -q origin main 2>/dev/null; rm -f "$MP/.git/hooks/pre-push"
 rc=0; out=$(node "$PREPUSH" --install "$MP" 2>&1) || rc=$?
 check "M. origin/main with only some hooks: install refuses (R40)" "$rc:$([ -e "$MP/.git/hooks/pre-push" ] && echo shim || echo noshim)" "2:noshim"
+
+echo "Case N: Amendment 2.4 (#1350)"
+# Item 1: the short form of a fetch into a tracking ref, and other local sources.
+for c in "git fetch . feat:remotes/origin/main" "git fetch ./ feat:refs/remotes/origin/main" \
+         "git fetch ../other feat:remotes/origin/main" "git fetch /tmp/x feat:refs/remotes/origin/main" \
+         "git fetch file:///tmp/x feat:refs/remotes/origin/main" "git fetch --force . +feat:refs/remotes/origin/main" \
+         "git fetch ~/clone feat:remotes/origin/main"; do
+  gate_case "N. guard: $c (item 1)" deny "$A2" Bash "$c"
+done
+# Items 2 and 3: fetches from a named remote, refspec config, and set-head are ordinary.
+for c in "git fetch origin main:refs/remotes/origin/main" "git fetch origin '+refs/heads/*:refs/remotes/origin/*'" \
+         "git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'" \
+         "git config --add remote.origin.fetch +refs/heads/dev:refs/remotes/origin/dev" \
+         "git remote set-head origin -a" "git remote set-head origin copilot/x"; do
+  gate_case "N. allowed: $c (items 2, 3)" allow "$A2" Bash "$c"
+done
+# Item 4: the refusal names the launch-time bypass too (no terminal on the web).
+NU=$(new_repo uninstall-message)
+out=$(CLAUDECODE=1 node "$PREPUSH" --uninstall "$NU" 2>&1) || true
+if printf '%s' "$out" | grep -q "BLOG_LIFECYCLE_GATE_BYPASS=1"; then pass "N. refusal mentions the launch-time bypass (item 4)"; else fail "N. refusal mentions the launch-time bypass (item 4) ($out)"; fi
+# Item 5: the files to copy come from origin/main's checker, not this one.
+# hooks_on_main <name> <COPIED list> [extra helper]: origin/main carries a checker
+# whose COPIED line is <list> and which requires ./lifecycle-extra when given.
+hooks_on_main() {
+  local r; r=$(new_repo "$1"); mkdir -p "$r/hooks"; rm -f "$r/.git/hooks/pre-push"
+  sed "s#^const COPIED = .*#const COPIED = $2;#" "$REPO_ROOT/hooks/lifecycle-prepush.js" > "$r/hooks/lifecycle-prepush.js"
+  cp "$REPO_ROOT/hooks/lifecycle-snapshot.js" "$r/hooks/"
+  if [ -n "${3:-}" ]; then
+    printf "require('./lifecycle-extra');\n" >> "$r/hooks/lifecycle-prepush.js"
+    printf 'module.exports = {};\n' > "$r/hooks/lifecycle-extra.js"
+  fi
+  commit_all "$r" "hooks on main"; git -C "$r" push -q origin main 2>/dev/null
+  echo "$r"
+}
+NM=$(hooks_on_main manifest "['lifecycle-prepush.js', 'lifecycle-snapshot.js', 'lifecycle-extra.js']" extra)
+rc=0; out=$(node "$PREPUSH" --install "$NM" 2>&1) || rc=$?
+check "N. a helper added on origin/main is copied and the checker loads (item 5)" \
+  "$rc:$([ -f "$NM/.git/lifecycle-gate/lifecycle-extra.js" ] && echo extra || echo noextra):$(git -C "$NM" show origin/main:hooks/lifecycle-prepush.js | cmp -s - "$NM/.git/lifecycle-gate/lifecycle-prepush.js" && echo from-main || echo fallback)" \
+  "0:extra:from-main"
+NX=$(hooks_on_main manifest-missing "['lifecycle-prepush.js', 'lifecycle-snapshot.js', 'lifecycle-extra.js']")
+rc=0; node "$PREPUSH" --install "$NX" >/dev/null 2>&1 || rc=$?
+check "N. a listed helper missing on origin/main: install refuses (item 5, R40)" "$rc:$([ -e "$NX/.git/hooks/pre-push" ] && echo shim || echo noshim)" "2:noshim"
+NT=$(hooks_on_main manifest-traversal "['lifecycle-prepush.js', 'lifecycle-snapshot.js', '../../evil.js']")
+rc=0; node "$PREPUSH" --install "$NT" >/dev/null 2>&1 || rc=$?
+check "N. a list naming a path outside hooks/: install refuses (item 5)" "$rc:$([ -e "$NT/.git/hooks/pre-push" ] && echo shim || echo noshim):$([ -e "$TMP/evil.js" ] && echo written || echo safe)" "2:noshim:safe"
+# Item 7: a force-push that rewinds to a commit the remote ref already contains
+# publishes nothing, so it passes even with stale snapshots; anything else is checked.
+NF=$(new_repo rewind); printf 'two\n' >> "$NF/a.txt"; commit_all "$NF" reviewed; record_both "$NF"
+push_case "N. reviewed commit pushed (setup)" accept "$NF" refs/heads/main "$(git -C "$NF" rev-parse HEAD)" "cd '$NF' && git push origin main"
+git -C "$NF" reset -q --hard HEAD~1
+push_case "N. force-push rewind to an ancestor passes (item 7)" accept "$NF" refs/heads/main "$(git -C "$NF" rev-parse HEAD)" "cd '$NF' && git push --force origin main"
+printf 'unreviewed\n' > "$NF/b.txt"; commit_all "$NF" unreviewed
+push_case "N. force-push of a commit the remote lacks is checked (item 7)" reject "$NF" refs/heads/main "$(git -C "$NF" rev-parse HEAD)" "cd '$NF' && git push --force origin main"
 
 echo ""
 echo "Passed: $PASS  Failed: $FAIL"
