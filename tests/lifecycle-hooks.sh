@@ -343,6 +343,7 @@ rc=0; out=$(node "$PREPUSH" --install "$LH" 2>&1) || rc=$?
 check "L. origin/main without the hooks: install refuses, no working-tree copy (R33, R49)" \
   "$rc:$([ -e "$LH/.git/hooks/pre-push" ] && echo shim || echo noshim):$([ -e "$LH/.git/lifecycle-gate" ] && echo copy || echo nocopy)" "2:shim:nocopy"
 if printf '%s' "$out" | grep -q "git fetch origin main:refs/remotes/origin/main"; then pass "L. the refusal gives a fetch that works in single-branch clones too (R49, R53)"; else fail "L. the refusal gives a fetch that works in single-branch clones too (R49, R53) ($out)"; fi
+if printf '%s' "$out" | grep -q "shim rejects Claude's pushes"; then pass "L. without a copy, the refusal says the shim rejects pushes (R55)"; else fail "L. without a copy, the refusal says the shim rejects pushes (R55) ($out)"; fi
 printf 'x\n' >> "$LH/a.txt"; commit_all "$LH"; record_both "$LH"
 push_case "L. refused install still blocks Claude pushes at the git layer (R53)" reject "$LH" refs/heads/main "$(git -C "$LH" rev-parse HEAD)" "cd '$LH' && git push origin main" "git fetch origin main:refs/remotes/origin/main"
 gate_case "L. guard: rm -rf .git/lifecycle-gate (R34)" deny "$A2" Bash "rm -rf .git/lifecycle-gate"
@@ -388,6 +389,7 @@ MP=$(new_repo partial-hooks); git -C "$MP" rm -q hooks/lifecycle-snapshot.js
 commit_all "$MP" "only the checker on main"; git -C "$MP" push -q origin main 2>/dev/null; rm -f "$MP/.git/hooks/pre-push"
 rc=0; out=$(node "$PREPUSH" --install "$MP" 2>&1) || rc=$?
 check "M. origin/main with only some hooks: install refuses (R40)" "$rc:$([ -e "$MP/.git/hooks/pre-push" ] && echo shim || echo noshim)" "2:shim"
+if printf '%s' "$out" | grep -q "earlier checker copy stays in use"; then pass "M. the refusal says the earlier copy stays in use (R55)"; else fail "M. the refusal says the earlier copy stays in use (R55) ($out)"; fi
 
 echo "Case N: Amendment 2.4 (#1350)"
 # Item 1: the short form of a fetch into a tracking ref, and other local sources.

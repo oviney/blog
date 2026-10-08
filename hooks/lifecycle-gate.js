@@ -56,7 +56,8 @@ const GUARDS = [
   // from `.`, a path or file:// into (refs/)remotes/origin/ (R42, R43).
   // Fetches from a named remote can only select commits that remote has, and
   // install refuses when origin/main lacks the hooks (R49) or carries a checker
-  // older than the R38 floor (R52), so they are allowed.
+  // without the R38 floor line (R52), so they are allowed. Any branch on
+  // origin whose checker carries that line can still be selected (Known limits).
   [(c) => /\bupdate-ref\b/.test(c), '`git update-ref` can rewrite local tracking refs'],
   [(c) => LOCAL_FETCH_INTO_REMOTES.test(c), 'fetching local content into a remote-tracking ref rewrites it'],
   [(c) => /\bsend-pack\b/.test(c), '`git send-pack` pushes without running the pre-push hook'],
@@ -150,7 +151,7 @@ function evaluate(input) {
     if (root && isBlogRepo(root)) {
       const result = installHook(root);
       if (!result.ok) {
-        return `Lifecycle gate (#1340): pushes are blocked because the pre-push lifecycle check is not active: ${result.message}. ` +
+        return `Lifecycle gate (#1340): pushes are blocked because the pre-push lifecycle check could not be installed: ${result.message}. ` +
           'Resolve it as the message says, or ask the owner.';
       }
     }

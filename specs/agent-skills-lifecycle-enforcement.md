@@ -177,6 +177,12 @@ Second review of Amendment 2.4 (changes requested):
 | R53 | With no `origin/main` (a single-branch clone), the `git fetch origin` hint did not help, and the refused install left no shim, so git itself enforced nothing | Should-fix | The hint is `git fetch origin main:refs/remotes/origin/main`; every source refusal still writes the shim, which keeps an earlier copy in use or, without one, blocks Claude's pushes through its missing-copy branch |
 | R54 | Pruning (R51) followed a symlinked copy dir and deleted `.js` files outside it | Nit | Install refuses when the copy dir is not a plain directory |
 
+The third review approved, with nits:
+
+| # | Finding | Severity | Resolution |
+|---|---------|----------|------------|
+| R55 | SessionStart repeated "pushes will be blocked"; the refusal said pushes "stay blocked" even when an earlier copy keeps enforcing; the gate called the check "not active"; the Known limit overstated what the text-marker floor proves; the floor line could be reformatted by accident | Nit | The refusal names the git-layer state (earlier copy in use, or shim rejecting); SessionStart says the gate denies push commands; the gate says the check "could not be installed"; the limit names unmerged branches carrying the floor line; a comment guards the line. A shim for a symlinked copy dir is declined: it would run whatever the symlink points at |
+
 ## Assumptions
 
 1. Scope is Claude Code sessions (local CLI, desktop, and Claude Code on the
@@ -344,10 +350,17 @@ Second review of Amendment 2.4 (changes requested):
   `origin/main` at any older commit or branch on `origin`. What bounds all of
   these: install never falls back to the working tree when `origin/main`
   lacks the checker (R49), and refuses checkers older than the R38 floor,
-  which trusted local tracking refs (R52). Moving the ref can therefore only
-  select a committed checker from R38 on, or one whose committed copy fails
-  to load (then R39 copies the working tree). A later change that weakens the
-  checker on purpose should raise the floor marker in the same PR.
+  which trusted local tracking refs (R52). The floor is a text marker, so
+  moving the ref can still select any committed checker that carries the R38
+  floor line, including one on an unmerged branch on `origin` (a Copilot
+  cloud-agent branch, which pre-push never covers, or a branch pushed after
+  `test` and `review`), or such a checker that fails to load, which reaches
+  the R39 working-tree fallback. Each needs a weakened checker authored on
+  purpose, which "Not a sandbox" covers. A later change that weakens the
+  checker on purpose should raise the floor marker in the same PR. When the
+  copy dir is not a plain directory (R54), install writes no shim, because
+  the shim would run whatever the symlink points at; the gate still denies
+  push commands.
 - **Republishing reviewed commits.** With the default-branch skip removed
   (R38), pushing an unchanged, already-merged commit to a new branch needs
   `test` and `review` first, like any push.
@@ -496,7 +509,7 @@ it. `_config.yml` is protected, so that is left as an owner follow-up.
 - [ ] In a Claude session, a push is rejected by git unless `test` and `review` ran on exactly the content of every ref it sends, however the command was written and whatever tool made the edits; the message names the stale skills, refs and changed paths.
 - [ ] Pushes from outside Claude Code are unaffected.
 - [ ] Out-of-git writes (MCP file tools, `gh api` content writes) use the working-tree proxy check; the evasion guards deny.
-- [ ] Review findings R1 to R5, R7 to R12, R15 to R21, R23 to R26, R28 to R30, R32 to R35, R37 to R46, R48, R49 and R51 to R54 each have a passing fixture test (R13 is superseded by R25; R27's default-branch case is removed by R38; R22, R28 and R36 are documented limits).
+- [ ] Review findings R1 to R5, R7 to R12, R15 to R21, R23 to R26, R28 to R30, R32 to R35, R37 to R46, R48, R49 and R51 to R55 each have a passing fixture test (R13 is superseded by R25; R27's default-branch case is removed by R38; R22, R28 and R36 are documented limits).
 - [ ] Installation never touches unrelated repos, does not depend on the checked-out branch, and the owner bypass works even when the checker is missing.
 - [ ] `BLOG_LIFECYCLE_GATE_BYPASS=1` in the Claude Code environment allows the push.
 - [ ] `tests/lifecycle-hooks.sh` passes locally and in CI.

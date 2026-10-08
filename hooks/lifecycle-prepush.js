@@ -91,6 +91,8 @@ function locations(root) {
   return { hookFile, copyDir };
 }
 
+// Keep this line byte-for-byte: it is also the anti-rollback floor marker
+// (FLOOR_MARK, R52), so reformatting it makes every install refuse.
 const SOURCE_REF = 'refs/remotes/origin/main'; // never origin/HEAD, which `git remote set-head` rewrites (R38)
 
 function workingTreeSource() {
@@ -195,7 +197,10 @@ function installHook(repo) {
     // shim's missing-copy branch blocks Claude's pushes.
     fs.mkdirSync(path.dirname(hookFile), { recursive: true });
     writeIfChanged(hookFile, shim(copy), 0o755);
-    return { ok: false, message: `${source.refuse}. Claude's pushes stay blocked by the pre-push shim until this is resolved` };
+    const atGit = fs.existsSync(copy)
+      ? 'the earlier checker copy stays in use'
+      : 'the pre-push shim rejects Claude\'s pushes until this is resolved';
+    return { ok: false, message: `${source.refuse}; ${atGit}` };
   }
   fs.mkdirSync(copyDir, { recursive: true });
   let changed = writeCopies(copyDir, source);
