@@ -341,8 +341,10 @@ push_case "L. weakened working-tree checker does not let a stale push through (R
 LH=$(new_repo no-hooks-on-main nohooks); mkdir -p "$LH/hooks"; cp "$REPO_ROOT/hooks/lifecycle-prepush.js" "$REPO_ROOT/hooks/lifecycle-snapshot.js" "$LH/hooks/"
 rc=0; out=$(node "$PREPUSH" --install "$LH" 2>&1) || rc=$?
 check "L. origin/main without the hooks: install refuses, no working-tree copy (R33, R49)" \
-  "$rc:$([ -e "$LH/.git/hooks/pre-push" ] && echo shim || echo noshim):$([ -e "$LH/.git/lifecycle-gate" ] && echo copy || echo nocopy)" "2:noshim:nocopy"
-if printf '%s' "$out" | grep -q "git fetch origin"; then pass "L. the refusal says to fetch origin (R49)"; else fail "L. the refusal says to fetch origin (R49) ($out)"; fi
+  "$rc:$([ -e "$LH/.git/hooks/pre-push" ] && echo shim || echo noshim):$([ -e "$LH/.git/lifecycle-gate" ] && echo copy || echo nocopy)" "2:shim:nocopy"
+if printf '%s' "$out" | grep -q "git fetch origin main:refs/remotes/origin/main"; then pass "L. the refusal gives a fetch that works in single-branch clones too (R49, R53)"; else fail "L. the refusal gives a fetch that works in single-branch clones too (R49, R53) ($out)"; fi
+printf 'x\n' >> "$LH/a.txt"; commit_all "$LH"; record_both "$LH"
+push_case "L. refused install still blocks Claude pushes at the git layer (R53)" reject "$LH" refs/heads/main "$(git -C "$LH" rev-parse HEAD)" "cd '$LH' && git push origin main" "git fetch origin main:refs/remotes/origin/main"
 gate_case "L. guard: rm -rf .git/lifecycle-gate (R34)" deny "$A2" Bash "rm -rf .git/lifecycle-gate"
 gate_case "L. guard: mv .git/lifecycle-gate (R34)" deny "$A2" Bash "mv .git/lifecycle-gate /tmp/x"
 gate_case "L. reading a snapshot file is allowed (R34)" allow "$A2" Bash "cat .git/lifecycle-gate-test.json"
@@ -376,7 +378,7 @@ push_case "M. origin/HEAD pointed at an unreviewed branch (R38)" reject "$MS" re
 git -C "$MS" update-ref refs/remotes/origin/main "$EVIL"
 push_case "M. origin/main rewritten to an unreviewed commit (R38)" reject "$MS" refs/heads/main "$EVIL" "cd '$MS' && git push origin $EVIL:refs/heads/main"
 MB=$(new_repo broken-checker)
-printf "const COPIED = ['lifecycle-prepush.js', 'lifecycle-snapshot.js'];\nrequire('./lifecycle-util');\n" > "$MB/hooks/lifecycle-prepush.js"
+printf "const SOURCE_REF = 'refs/remotes/origin/main';\nconst COPIED = ['lifecycle-prepush.js', 'lifecycle-snapshot.js'];\nrequire('./lifecycle-util');\n" > "$MB/hooks/lifecycle-prepush.js"
 commit_all "$MB" "broken checker on main"; git -C "$MB" push -q origin main 2>/dev/null
 rc=0; out=$(node "$PREPUSH" --install "$MB" 2>&1) || rc=$?
 check "M. checker on origin/main that fails to load is not installed (R39)" \
@@ -385,7 +387,7 @@ if printf '%s' "$out" | grep -q "failed to load"; then pass "M. the load failure
 MP=$(new_repo partial-hooks); git -C "$MP" rm -q hooks/lifecycle-snapshot.js
 commit_all "$MP" "only the checker on main"; git -C "$MP" push -q origin main 2>/dev/null; rm -f "$MP/.git/hooks/pre-push"
 rc=0; out=$(node "$PREPUSH" --install "$MP" 2>&1) || rc=$?
-check "M. origin/main with only some hooks: install refuses (R40)" "$rc:$([ -e "$MP/.git/hooks/pre-push" ] && echo shim || echo noshim)" "2:noshim"
+check "M. origin/main with only some hooks: install refuses (R40)" "$rc:$([ -e "$MP/.git/hooks/pre-push" ] && echo shim || echo noshim)" "2:shim"
 
 echo "Case N: Amendment 2.4 (#1350)"
 # Item 1: the short form of a fetch into a tracking ref, and other local sources.
@@ -427,14 +429,14 @@ check "N. a helper added on origin/main is copied and the checker loads (item 5)
   "0:extra:from-main"
 NX=$(hooks_on_main manifest-missing "['lifecycle-prepush.js', 'lifecycle-snapshot.js', 'lifecycle-extra.js']")
 rc=0; node "$PREPUSH" --install "$NX" >/dev/null 2>&1 || rc=$?
-check "N. a listed helper missing on origin/main: install refuses (item 5, R40)" "$rc:$([ -e "$NX/.git/hooks/pre-push" ] && echo shim || echo noshim)" "2:noshim"
+check "N. a listed helper missing on origin/main: install refuses (item 5, R40)" "$rc:$([ -e "$NX/.git/hooks/pre-push" ] && echo shim || echo noshim)" "2:shim"
 NT=$(hooks_on_main manifest-traversal "['lifecycle-prepush.js', 'lifecycle-snapshot.js', '../../evil.js']")
 rc=0; node "$PREPUSH" --install "$NT" >/dev/null 2>&1 || rc=$?
-check "N. a list naming a path outside hooks/: install refuses (item 5)" "$rc:$([ -e "$NT/.git/hooks/pre-push" ] && echo shim || echo noshim):$([ -e "$NT/evil.js" ] && echo written || echo safe)" "2:noshim:safe"
+check "N. a list naming a path outside hooks/: install refuses (item 5)" "$rc:$([ -e "$NT/.git/hooks/pre-push" ] && echo shim || echo noshim):$([ -e "$NT/evil.js" ] && echo written || echo safe)" "2:shim:safe"
 NC=$(new_repo manifest-absent); rm -f "$NC/.git/hooks/pre-push"
 sed -i '/^const COPIED = /d' "$NC/hooks/lifecycle-prepush.js"; commit_all "$NC" "checker without a COPIED line"; git -C "$NC" push -q origin main 2>/dev/null
 rc=0; node "$PREPUSH" --install "$NC" >/dev/null 2>&1 || rc=$?
-check "N. a checker on origin/main without a COPIED line: install refuses (review nit 2)" "$rc:$([ -e "$NC/.git/hooks/pre-push" ] && echo shim || echo noshim)" "2:noshim"
+check "N. a checker on origin/main without a COPIED line: install refuses (review nit 2)" "$rc:$([ -e "$NC/.git/hooks/pre-push" ] && echo shim || echo noshim)" "2:shim"
 cp "$REPO_ROOT/hooks/lifecycle-prepush.js" "$NM/hooks/"; git -C "$NM" rm -q hooks/lifecycle-extra.js
 commit_all "$NM" "helper dropped"; git -C "$NM" push -q origin main 2>/dev/null
 rc=0; node "$PREPUSH" --install "$NM" >/dev/null 2>&1 || rc=$?
@@ -450,6 +452,19 @@ git -C "$ND" fetch -q origin "+$PRE:refs/remotes/origin/main"; printf '\n// WEAK
 rc=0; node "$ND/hooks/lifecycle-prepush.js" --install "$ND" >/dev/null 2>&1 || rc=$?
 check "N. origin/main moved before the hooks: install refuses, the copy is not the working tree (R49)" \
   "$rc:$(grep -q WEAKENED "$ND/.git/lifecycle-gate/lifecycle-prepush.js" && echo weakened || echo intact)" "2:intact"
+# R52: a committed checker from before R38 (no SOURCE_REF floor line) trusts
+# local tracking refs; pointing origin/main at one must not install it.
+NR=$(new_repo rollback); sed -i "/^const SOURCE_REF = /d" "$NR/hooks/lifecycle-prepush.js"
+commit_all "$NR" "pre-R38 checker"; git -C "$NR" push -q origin main 2>/dev/null
+rc=0; out=$(node "$PREPUSH" --install "$NR" 2>&1) || rc=$?
+check "N. a checker below the floor on origin/main: install refuses, the copy stays current (R52)" \
+  "$rc:$(grep -c "^const SOURCE_REF = 'refs/remotes/origin/main';" "$NR/.git/lifecycle-gate/lifecycle-prepush.js")" "2:1"
+if printf '%s' "$out" | grep -q "older than"; then pass "N. the floor refusal says why (R52)"; else fail "N. the floor refusal says why (R52) ($out)"; fi
+# Review round 2 nit: a symlinked copy dir is refused before anything is pruned.
+SY=$(new_repo symlinked-copy); mkdir -p "$TMP/outside"; printf 'keep\n' > "$TMP/outside/victim.js"
+rm -rf "$SY/.git/lifecycle-gate"; ln -s "$TMP/outside" "$SY/.git/lifecycle-gate"
+rc=0; node "$PREPUSH" --install "$SY" >/dev/null 2>&1 || rc=$?
+check "N. a symlinked copy dir: install refuses, nothing outside is deleted (R54)" "$rc:$([ -f "$TMP/outside/victim.js" ] && echo kept || echo deleted)" "2:kept"
 gate_case "N. the gate's uninstall denial names the launch-time bypass (review nit 4)" deny "$A2" Bash \
   "node hooks/lifecycle-prepush.js --uninstall" "BLOG_LIFECYCLE_GATE_BYPASS=1"
 gate_case "N. allowed: a local mirror fetched into its own tracking refs (review nit 6)" allow "$A2" Bash \
