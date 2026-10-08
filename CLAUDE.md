@@ -3,12 +3,31 @@
 This file provides context for AI agents (GitHub Copilot, Claude, etc.) invoked
 directly in this repository. Read this first, then follow the references below.
 
+> **MANDATORY for every Claude Code session — no exceptions for bug fixes,
+> follow-ups, or "small" changes.**
+>
+> 1. Invoke the lifecycle skills in order: `spec` → `plan` → `build` → `test` → `review` → `ship`.
+>    Invoke a phase's skill *before* doing that phase's work.
+> 2. Do not push or open a PR until `test` and `review` have both run **on exactly the content
+>    being pushed**. Any change after they run (by any tool, shell command, or subagent)
+>    means running them again. The built-in `/code-review` does not substitute for the
+>    repo's `review` skill.
+>
+> Rule 2 is enforced for Claude Code sessions (it does not affect pushes made outside them):
+> `hooks/lifecycle-record.js` snapshots the working tree when `test` or `review` runs;
+> git's pre-push hook (`hooks/lifecycle-prepush.js`, installed at session start) rejects any
+> push whose refs do not all match both snapshots, listing the stale skills, refs and changed
+> files; and `hooks/lifecycle-gate.js` applies the same check to writes that bypass git (GitHub
+> MCP file tools, `gh api` content writes) and blocks attempts to skip the hook. Only the owner
+> can bypass, by launching Claude Code with `BLOG_LIFECYCLE_GATE_BYPASS=1`. See #1340 and
+> `specs/agent-skills-lifecycle-enforcement.md`.
+
 ---
 
 ## Lifecycle Backbone
 
-For direct/local agent sessions in this repo, use the upstream `agent-skills`
-lifecycle as the working backbone. In this runtime, agents should invoke the
+For direct/local agent sessions in this repo, the upstream `agent-skills`
+lifecycle is the mandatory working backbone. In this runtime, agents must invoke the
 callable local lifecycle skills first, then use the upstream-aligned reference
 guides in `.github/skills/` plus any viney.ca blog skill needed for repo-specific
 constraints and conventions.
