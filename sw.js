@@ -4,12 +4,19 @@ layout: null
 /**
  * Service Worker for Ouray Viney's Blog
  * Strategy:
- *   - Cache-first for static assets (CSS, fonts, images)
- *   - Network-first for HTML pages (fresh content when online)
- *   - Offline fallback page when both fail
+ *   - Cache-first for immutable-ish assets (fonts, images)
+ *   - Network-first for HTML, CSS and JS, which change together on every deploy
+ *   - Offline: network-first requests fall back to any cached copy
+ *
+ * CACHE_VERSION is stamped with the build time, so every deploy changes this
+ * file's bytes, the browser installs the new worker, and `activate` purges the
+ * previous deploy's caches. A hand-maintained version string was left at 'v2'
+ * from April while the homepage redesign shipped new CSS, so returning visitors
+ * got new HTML against a cached pre-redesign styles.css and the lead image
+ * rendered at its intrinsic 1600x900.
  */
 
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'build-{{ site.time | date: "%s" }}';
 const STATIC_CACHE  = 'static-' + CACHE_VERSION;
 const PAGES_CACHE   = 'pages-'  + CACHE_VERSION;
 
@@ -17,7 +24,7 @@ const PAGES_CACHE   = 'pages-'  + CACHE_VERSION;
 const PRECACHE_ASSETS = [
   '{{ "/" | relative_url }}',
   '{{ "/blog/" | relative_url }}',
-  '{{ "/assets/css/styles.css" | relative_url }}',
+  '{{ "/assets/css/styles.css" | relative_url }}?v={{ site.time | date: "%s" }}',
   '{{ "/assets/images/blog-default.svg" | relative_url }}',
   '{{ "/favicon.svg" | relative_url }}'
 ];
@@ -53,7 +60,7 @@ self.addEventListener('fetch', event => {
   // Only handle same-origin GET requests
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  const isAsset = /\.(css|js|woff2?|ttf|svg|png|webp|jpg|jpeg|gif|ico)(\?.*)?$/.test(url.pathname);
+  const isAsset = /\.(woff2?|ttf|svg|png|webp|jpg|jpeg|gif|ico)(\?.*)?$/.test(url.pathname);
 
   if (isAsset) {
     // Cache-first strategy for static assets
@@ -70,13 +77,14 @@ self.addEventListener('fetch', event => {
       })
     );
   } else {
-    // Network-first strategy for HTML pages
+    // Network-first strategy for HTML pages, CSS and JS
+    const isCode = /\.(css|js)(\?.*)?$/.test(url.pathname);
     event.respondWith(
       fetch(request)
         .then(response => {
           if (response.ok) {
             const clone = response.clone();
-            caches.open(PAGES_CACHE).then(cache => cache.put(request, clone));
+            caches.open(isCode ? STATIC_CACHE : PAGES_CACHE).then(cache => cache.put(request, clone));
           }
           return response;
         })
