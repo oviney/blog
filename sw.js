@@ -24,7 +24,7 @@ const PAGES_CACHE   = 'pages-'  + CACHE_VERSION;
 const PRECACHE_ASSETS = [
   '{{ "/" | relative_url }}',
   '{{ "/blog/" | relative_url }}',
-  '{{ "/assets/css/styles.css" | relative_url }}',
+  '{{ "/assets/css/styles.css" | relative_url }}?v={{ site.time | date: "%s" }}',
   '{{ "/assets/images/blog-default.svg" | relative_url }}',
   '{{ "/favicon.svg" | relative_url }}'
 ];
