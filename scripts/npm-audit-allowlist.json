@@ -5,7 +5,14 @@
       "id": 1139346,
       "package": "extract-zip",
       "title": "extract-zip unvalidated symlink path traversal",
-      "reason": "No patched release exists — the advisory covers extract-zip at range '*', and 2.0.1 is still the latest published version. It reaches us only as a transitive devDependency of the two browser-driving test tools: @lhci/cli 0.15.1 -> lighthouse 12.6.1 -> puppeteer-core 24.x -> @puppeteer/browsers 2.x, and pa11y-ci 4.1.1 -> puppeteer -> @puppeteer/browsers 2.x. Both tools are already at their latest published versions and @lhci/cli 0.15.1 hard-pins lighthouse to exactly 12.6.1, so there is no forward upgrade available to us; npm's own remedy is a downgrade to lighthouse 10.1.1 and pa11y-ci 3.1.0, multiple majors back, which would break the performance and accessibility gates. The fix exists upstream — @puppeteer/browsers 3.2.0 replaced extract-zip with modern-tar, and lighthouse 13.4.1 already consumes it — so this entry should be removed as soon as @lhci/cli picks up lighthouse 13.x. Exposure is limited to CI: package.json declares zero runtime dependencies, so none of this ships to readers, and the only archives these packages extract are Chrome builds fetched from Google's official download endpoints during test setup, not attacker-supplied zips.",
+      "reason": "No patched release exists — extract-zip 2.0.1 is still the latest published version. It reaches us only as a transitive devDependency through three paths, all via puppeteer-core/puppeteer 24.x -> @puppeteer/browsers 2.x: @lhci/cli 0.15.1 -> lighthouse 12.6.1, the direct lighthouse ^12.8.2, and pa11y-ci 4.1.1 -> puppeteer. @lhci/cli 0.15.1 is the latest release and hard-pins lighthouse to exactly 12.6.1, so that path has no forward upgrade (npm's remedy there is a downgrade to @lhci/cli 0.12.0). The other two paths have major upgrades (lighthouse 13.5.0, pa11y-ci 5.0.0, which also needs the puppeteer override moved to ^25), deferred as out of scope for a security-gate fix and pointless while the @lhci/cli path keeps extract-zip in the tree. The fix exists upstream — @puppeteer/browsers 3.x replaced extract-zip with modern-tar — so remove this entry once @lhci/cli picks up lighthouse 13.x. Exposure is limited to CI: package.json declares zero runtime dependencies, so none of this ships to readers, and the only archives these packages extract are Chrome builds fetched from Google's official download endpoints during test setup, not attacker-supplied zips.",
+      "reviewBy": "2026-11-30"
+    },
+    {
+      "id": 1193685,
+      "package": "extract-zip",
+      "title": "extract-zip allows arbitrary file writes through symlink archive entries",
+      "reason": "A second advisory against the same unpatched extract-zip 2.0.1 (range <=2.0.1) on the same three dependency paths as #1139346 above; that entry's reasoning and exposure apply unchanged. Remove both entries together once @lhci/cli consumes lighthouse 13.x (#1351).",
       "reviewBy": "2026-11-30"
     }
   ]
