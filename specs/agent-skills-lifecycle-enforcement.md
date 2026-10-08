@@ -157,9 +157,17 @@ The seventh review approved Amendment 2.3 with seven nits, tracked in #1350.
 | R43 | The fetch guard blocked legitimate fetches from `origin` into tracking refs and widening `remote.origin.fetch` | Nit | The guard fires only when the fetch source is `.`, a path (`/`, `./`, `../`, `~`) or a `file://` URL |
 | R44 | `git remote set-head` was guarded although nothing reads `origin/HEAD` any more | Nit | Guard removed |
 | R45 | The uninstall refusal only mentioned the owner's terminal, which Claude Code on the web does not have | Nit | It also names launching Claude Code with `BLOG_LIFECYCLE_GATE_BYPASS=1` |
-| R46 | The list of files to copy came from the running checker while the files came from `origin/main`, so a later helper would break installs from older branches | Nit | The list is read from the `COPIED` line of `origin/main`'s checker; only bare `.js` names in `hooks/` are accepted, otherwise install refuses |
+| R46 | The list of files to copy came from the running checker while the files came from `origin/main`, so a later helper would break installs from older branches | Nit | The list is read from the `COPIED` line of `origin/main`'s checker. The line must exist, list `lifecycle-prepush.js`, and name only bare `.js` files in `hooks/`, otherwise install refuses. Copies of files no longer listed are removed, so a missing entry fails the same way on every machine |
 | R47 | Header comments and Assumption 5b did not describe R37, R38 and R41 | Nit | Updated |
 | R48 | No fixture pinned the remaining skip | Nit | Fixtures: a force-push rewind to an ancestor of the remote ref passes with stale snapshots; a push of a commit the remote lacks is checked |
+
+Review of Amendment 2.4 (changes requested):
+
+| # | Finding | Severity | Resolution |
+|---|---------|----------|------------|
+| R49 | Allowing fetches from `origin` (R43) let `git fetch origin +<pre-hooks commit>:refs/remotes/origin/main` make install fall back to the editable working tree | Should-fix | The fallback for "`origin/main` has none of the hooks" is removed: install refuses and says to run `git fetch origin`. This closes the downgrade for every ref writer, not only fetch |
+| R50 | Known limits recorded one bypass of the narrowed fetch guard and presented the guard as covering the ordinary commands | Should-fix | Known limits list the unguarded ref writers and state that R49 is what bounds them |
+| R51 | Nits: stale helper copies were never pruned; a missing `COPIED` line silently used the running list; the refusal for a list without the checker was misleading; the gate's uninstall denial lacked the launch-time bypass; a traversal fixture asserted the wrong path; the guard fired for any `remotes/` destination | Nit | Unlisted `.js` copies are removed; a missing line and a list without `lifecycle-prepush.js` each refuse with their own message; the gate's denial names the bypass; the fixture checks the repo root; the guard is limited to `remotes/origin/` |
 
 ## Assumptions
 
@@ -213,17 +221,20 @@ The seventh review approved Amendment 2.3 with seven nits, tracked in #1350.
    Running the skills on uncommitted work and then committing it matches
    exactly. Any change afterwards, by any tool, `Bash`, or subagent, does not
    (R1).
-5a. **Installation (Amendments 2.1 to 2.3).** `hooks/lifecycle-prepush.js --install`
+5a. **Installation (Amendments 2.1 to 2.4).** `hooks/lifecycle-prepush.js --install`
    copies the checker and `lifecycle-snapshot.js` **from the committed
    `refs/remotes/origin/main`** (never `origin/HEAD`, R38) into
    `<git common dir>/lifecycle-gate/`, so unmerged edits to the hooks cannot
-   weaken the installed check (R33). It falls back to the working tree, and
-   says so, only while `origin/main` has none of those files (until this PR
-   merges) or when the copy from `origin/main` fails to load (R39); if
-   `origin/main` has only some of them, it refuses (R40). The list of files
-   comes from the `COPIED` line of `origin/main`'s checker, so a later helper
-   still installs from an older branch; a list naming anything but bare `.js`
-   files in `hooks/` makes install refuse (R46).
+   weaken the installed check (R33). If `origin/main` does not carry the
+   checker, install refuses and says to run `git fetch origin` (R49; the
+   working-tree fallback served only until #1340 merged). It falls back to
+   the working tree, and says so, only when the copy from `origin/main` fails
+   to load (R39); if `origin/main` has only some of the listed files, it
+   refuses (R40). The list of files comes from the `COPIED` line of
+   `origin/main`'s checker, so a later helper still installs from an older
+   branch; a missing line, a list without `lifecycle-prepush.js`, or one
+   naming anything but bare `.js` files in `hooks/` makes install refuse
+   (R46). Copies of files no longer listed are removed.
    `--uninstall` removes the shim and the copy, but refuses inside a Claude
    Code session unless the owner bypass is set (R37). It
    also writes a `.git/hooks/pre-push` shim
@@ -244,7 +255,7 @@ The seventh review approved Amendment 2.3 with seven nits, tracked in #1350.
    `.git/hooks`, `lifecycle-gate` anywhere except the snapshot files and
    `hooks/lifecycle-gate.js` (R34, R41), the checker's `--uninstall` (R37),
    `update-ref`, a fetch from `.`, a path or `file://` into
-   `(refs/)remotes/` (R38, R42, R43), `send-pack` (pushes without running
+   `(refs/)remotes/origin/` (R38, R42, R43, R51), `send-pack` (pushes without running
    hooks), `CLAUDECODE`, or `BLOG_LIFECYCLE_GATE_BYPASS`; and deny
    `Edit`/`Write`/`NotebookEdit` on paths under `.git/hooks/` or
    `.git/lifecycle-gate/`.
@@ -296,9 +307,8 @@ The seventh review approved Amendment 2.3 with seven nits, tracked in #1350.
   the push is checked in full. This fails safe.
 - **Editing the hook code.** Claude Code runs the `PreToolUse` hooks from the
   working tree, so an agent editing `hooks/lifecycle-gate.js` changes them for
-  its own session. The pre-push check is protected once this PR is merged (the
-  copy comes from the default branch, R33); until then it falls back to the
-  working tree.
+  its own session. The pre-push check is protected: the copy comes from
+  `origin/main` (R33), and without the hooks there install refuses (R49).
 - **Branches from before this PR** have no recorder, so with the shim
   installed every Claude push is rejected. The owner can run
   `node .git/lifecycle-gate/lifecycle-prepush.js --uninstall` from their own
@@ -308,11 +318,20 @@ The seventh review approved Amendment 2.3 with seven nits, tracked in #1350.
   `refs/remotes/origin/main`, so an agent that deliberately points that ref at
   other content changes the installed checker from then on, not only before
   the first install. That is deliberate tampering, covered by "Not a
-  sandbox"; the gate guards the ordinary commands for it (`update-ref`, and
-  fetches from `.`, a path or `file://` into `(refs/)remotes/`). A fetch from
-  a second configured remote that itself points at a local path is not
-  guarded (R43): guarding every fetch into tracking refs blocked ordinary
-  fetches from `origin`.
+  sandbox". The gate guards two ordinary commands for it: `update-ref`, and
+  fetches from `.`, a path or `file://` into `(refs/)remotes/origin/`.
+  Substring matching cannot cover every ref writer, so these are not
+  guarded: `git pull` or `git push --force` to `.`, `git symbolic-ref`,
+  changing the remote URL (`remote set-url`, `-c remote.<x>.url`), a second
+  remote pointing at a local path, fetch options that take a separate
+  argument before the source (`--depth 1 .`), sources such as `.git` or
+  `$PWD`, Windows paths, and a quoted destination. Fetches from `origin` into
+  its tracking refs are allowed on purpose (R43), so an agent can also point
+  `origin/main` at any older commit or branch on `origin`. What limits all of
+  these is R49: install never falls back to the working tree when
+  `origin/main` lacks the checker, so moving the ref can only select a
+  checker that is committed somewhere, such as an older version, or one whose
+  committed copy fails to load (then R39 copies the working tree).
 - **Republishing reviewed commits.** With the default-branch skip removed
   (R38), pushing an unchanged, already-merged commit to a new branch needs
   `test` and `review` first, like any push.
@@ -426,7 +445,13 @@ push exit code and what the remote received:
   helper missing on `origin/main` or a list naming `../../evil.js` makes
   install refuse (R46); a force-push rewind to an ancestor of the remote ref
   passes with stale snapshots, while a push of a commit the remote lacks is
-  checked (R48).
+  checked (R48). Review round: with `origin/main` lacking the hooks, install
+  refuses with a `git fetch origin` hint and writes no copy, including after
+  `git fetch origin +<pre-hooks commit>:refs/remotes/origin/main` with a
+  weakened working tree (R49); a checker without a `COPIED` line refuses, a
+  helper dropped from the list is pruned, the gate's uninstall denial names
+  the bypass, and a mirror fetched into `refs/remotes/mirror/` is allowed
+  (R51). Fixture repos commit the hooks, as the blog does since #1340.
 
 Then a live check in a real session: a push is rejected before
 `test`/`review`, and accepted after.
@@ -450,7 +475,7 @@ it. `_config.yml` is protected, so that is left as an owner follow-up.
 - [ ] In a Claude session, a push is rejected by git unless `test` and `review` ran on exactly the content of every ref it sends, however the command was written and whatever tool made the edits; the message names the stale skills, refs and changed paths.
 - [ ] Pushes from outside Claude Code are unaffected.
 - [ ] Out-of-git writes (MCP file tools, `gh api` content writes) use the working-tree proxy check; the evasion guards deny.
-- [ ] Review findings R1 to R5, R7 to R12, R15 to R21, R23 to R26, R28 to R30, R32 to R35, R37 to R46 and R48 each have a passing fixture test (R13 is superseded by R25; R27's default-branch case is removed by R38; R22, R28 and R36 are documented limits).
+- [ ] Review findings R1 to R5, R7 to R12, R15 to R21, R23 to R26, R28 to R30, R32 to R35, R37 to R46, R48, R49 and R51 each have a passing fixture test (R13 is superseded by R25; R27's default-branch case is removed by R38; R22, R28 and R36 are documented limits).
 - [ ] Installation never touches unrelated repos, does not depend on the checked-out branch, and the owner bypass works even when the checker is missing.
 - [ ] `BLOG_LIFECYCLE_GATE_BYPASS=1` in the Claude Code environment allows the push.
 - [ ] `tests/lifecycle-hooks.sh` passes locally and in CI.

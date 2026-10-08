@@ -37,10 +37,10 @@ const { installHook } = require('./lifecycle-prepush');
 const MCP_FILE_WRITE = /^mcp__.*github.*__(?:push_files|create_or_update_file|delete_file)$/i;
 const EDIT_TOOLS = new Set(['Edit', 'Write', 'NotebookEdit']);
 const PROTECTED_GIT_PATH = /(^|\/)\.git\/(?:hooks|lifecycle-gate)(\/|$)/;
-// `fetch [options] <local source> ... :[refs/]remotes/...`, where the source is
-// `.`, `..`, a relative, absolute or home path, or a file:// URL.
+// `fetch [options] <local source> ... :[refs/]remotes/origin/...`, where the
+// source is `.`, `..`, a relative, absolute or home path, or a file:// URL.
 const LOCAL_FETCH_INTO_REMOTES =
-  /\bfetch\b(?:\s+-{1,2}[\w-]+(?:=\S+)?)*\s+['"]?(?:\.{1,2}(?:\/\S*)?|\/\S*|~\S*|file:\/\/\S*)['"]?\s[\s\S]*:(?:refs\/)?remotes\//;
+  /\bfetch\b(?:\s+-{1,2}[\w-]+(?:=\S+)?)*\s+['"]?(?:\.{1,2}(?:\/\S*)?|\/\S*|~\S*|file:\/\/\S*)['"]?\s[\s\S]*:(?:refs\/)?remotes\/origin\//;
 
 const GUARDS = [
   [(c) => /--no-verify/.test(c) && /\bpush\b/.test(c), '`--no-verify` would skip the pre-push lifecycle check'],
@@ -49,11 +49,13 @@ const GUARDS = [
   // `lifecycle-gate` anywhere (R34, R41), except the snapshot files and the hook sources under hooks/.
   [(c) => /lifecycle-gate/.test(c.replace(/lifecycle-gate-(?:test|review)\.json/g, '').replace(/hooks\/lifecycle-gate\.js/g, '')),
     'commands touching the lifecycle-gate checker copy could change the pre-push lifecycle check'],
-  [(c) => /lifecycle-prepush/.test(c) && /--uninstall/.test(c), 'only the owner can remove the pre-push lifecycle check, from their own terminal'],
-  // Ordinary commands that point a local tracking ref (the installer reads
+  [(c) => /lifecycle-prepush/.test(c) && /--uninstall/.test(c), 'only the owner can remove the pre-push lifecycle check, from ' +
+    'their own terminal or by launching Claude Code with BLOG_LIFECYCLE_GATE_BYPASS=1'],
+  // Ordinary commands that point origin's tracking refs (the installer reads
   // refs/remotes/origin/main, R38) at local content: update-ref, and a fetch
-  // from `.`, a path or file:// into (refs/)remotes/ (#1350). Fetches from a
-  // named remote store what that remote really has, so they stay allowed.
+  // from `.`, a path or file:// into (refs/)remotes/origin/ (R42, R43).
+  // Fetches from a named remote can only select commits that remote has, and
+  // install refuses when origin/main lacks the hooks (R49), so they are allowed.
   [(c) => /\bupdate-ref\b/.test(c), '`git update-ref` can rewrite local tracking refs'],
   [(c) => LOCAL_FETCH_INTO_REMOTES.test(c), 'fetching local content into a remote-tracking ref rewrites it'],
   [(c) => /\bsend-pack\b/.test(c), '`git send-pack` pushes without running the pre-push hook'],

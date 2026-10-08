@@ -19,12 +19,14 @@
 // copies the checker and its helpers from refs/remotes/origin/main (never
 // origin/HEAD, R38; the file list comes from that checker's COPIED line,
 // #1350) into <git common dir>/lifecycle-gate/ and installs the
-// .git/hooks/pre-push shim that runs the copy. It uses the working tree
-// instead only while origin/main has none of the files, or when the copy fails
-// to load (R39), and says so. It refuses (exit 2, with the reason) when
-// origin/main has only some of the listed files (R40), when the list names
-// anything but bare .js files, when core.hooksPath is set, or when a pre-push
-// hook it did not write exists.
+// .git/hooks/pre-push shim that runs the copy, removing copies of files no
+// longer listed. It uses the working tree instead only when the copy from
+// origin/main fails to load (R39), and says so. It refuses (exit 2, with the
+// reason) when origin/main does not carry the checker (R49: run
+// `git fetch origin`), carries only some of the listed files (R40), or has no
+// COPIED line, one without lifecycle-prepush.js, or one naming anything but
+// bare .js files; also when core.hooksPath is set, or when a pre-push hook it
+// did not write exists.
 //   lifecycle-prepush.js --uninstall [repo]
 // removes the shim and the copy; a foreign pre-push hook is left alone (exit 2).
 // Refused inside a Claude Code session unless the owner bypass is set (R37).
@@ -96,20 +98,21 @@ const BARE_JS_NAME = /^[\w-]+(?:\.[\w-]+)*\.js$/;
 
 // The files to copy, read from the COPIED line of origin/main's own checker,
 // so a later main that adds or renames a helper still installs from an older
-// branch (#1350). Without that line, this checker's list. null when the line
-// names anything but bare .js file names in hooks/ (no paths).
+// branch (R46). Returns { names } or { error }: the line must exist, list
+// lifecycle-prepush.js, and name only bare .js files in hooks/ (no paths).
 function copiedList(checker) {
   const line = /^const COPIED = \[([^\]]*)\];/m.exec(checker);
-  if (!line) return COPIED;
+  if (!line) return { error: 'has no `const COPIED = [...]` line' };
   const names = [...line[1].matchAll(/'([^']*)'|"([^"]*)"/g)].map((m) => m[1] ?? m[2]);
-  const valid = names.includes('lifecycle-prepush.js') && names.every((n) => BARE_JS_NAME.test(n));
-  return valid ? names : null;
+  if (!names.includes('lifecycle-prepush.js')) return { error: 'does not list lifecycle-prepush.js in COPIED' };
+  if (!names.every((n) => BARE_JS_NAME.test(n))) return { error: 'lists files in COPIED that are not bare .js names in hooks/' };
+  return { names };
 }
 
 // The checker's source: the committed origin/main, so unmerged edits to the
-// hooks cannot weaken the installed check (R33). Returns { names, files, note }
-// or { refuse } when origin/main carries only some of the files (R40) or
-// lists files outside hooks/ (#1350).
+// hooks cannot weaken the installed check (R33). Returns { names, files, note },
+// or { refuse } when origin/main does not carry the hooks (R49), carries only
+// some of the listed files (R40), or has an unusable COPIED list (R46).
 function checkerSource(root) {
   // Not git(): file contents must keep their trailing newline.
   const show = (name) => {
@@ -120,13 +123,12 @@ function checkerSource(root) {
   const notInstalled = 'so the lifecycle pre-push hook was not installed';
   const checker = show('lifecycle-prepush.js');
   if (checker === null) {
-    if (COPIED.some((name) => show(name) !== null)) {
-      return { refuse: `${SOURCE_REF} carries only some of ${COPIED.join(', ')}, ${notInstalled}` };
-    }
-    return { ...workingTreeSource(), note: `checker copied from the working tree, because ${SOURCE_REF} does not carry the lifecycle hooks yet` };
+    // No working-tree fallback (R49): pointing origin/main at a commit from
+    // before the hooks would otherwise install whatever the working tree holds.
+    return { refuse: `${SOURCE_REF} does not carry hooks/lifecycle-prepush.js; run \`git fetch origin\` and retry, ${notInstalled}` };
   }
-  const names = copiedList(checker);
-  if (!names) return { refuse: `the checker on ${SOURCE_REF} lists files to copy that are not bare .js names in hooks/, ${notInstalled}` };
+  const { names, error } = copiedList(checker);
+  if (error) return { refuse: `the checker on ${SOURCE_REF} ${error}, ${notInstalled}` };
   const files = names.map((name) => (name === 'lifecycle-prepush.js' ? checker : show(name)));
   if (files.some((f) => f === null)) return { refuse: `${SOURCE_REF} carries only some of ${names.join(', ')}, ${notInstalled}` };
   return { names, files, fromRef: true, note: `checker copied from ${SOURCE_REF}` };
@@ -142,11 +144,18 @@ function loadError(copy) {
   }
 }
 
+// Writes the listed files and removes any other .js left by an earlier
+// install, so a checker that requires a helper it forgot to list fails the
+// same way on every machine (R39 then applies).
 function writeCopies(copyDir, { names, files }) {
   let changed = false;
   names.forEach((name, i) => {
     changed = writeIfChanged(path.join(copyDir, name), files[i], 0o644) || changed;
   });
+  for (const stale of fs.readdirSync(copyDir).filter((f) => f.endsWith('.js') && !names.includes(f))) {
+    fs.rmSync(path.join(copyDir, stale), { force: true });
+    changed = true;
+  }
   return changed;
 }
 
