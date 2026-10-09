@@ -16,13 +16,27 @@
 // Fails closed: any error while checking blocks the push.
 //
 //   lifecycle-prepush.js --install [repo]
-// copies this checker (from the committed default branch when it carries the
-// hooks, else the working tree) into <git common dir>/lifecycle-gate/ and
-// installs the .git/hooks/pre-push shim that runs the copy. It never
-// overwrites a pre-push hook it did not write, and refuses when core.hooksPath
-// is set; both exit 2 with the reason.
+// copies the checker and its helpers from refs/remotes/origin/main (never
+// origin/HEAD, R38; the file list comes from that checker's COPIED line,
+// #1350) into <git common dir>/lifecycle-gate/ and installs the
+// .git/hooks/pre-push shim that runs the copy, removing copies of files no
+// longer listed. It uses the working tree instead only when the copy from
+// origin/main fails to load (R39), and says so. It refuses (exit 2, with the
+// reason) when origin/main does not carry the checker (R49), carries one older
+// than the R38 floor (R52), carries only some of the listed files (R40), or
+// has no COPIED line, one without lifecycle-prepush.js, or one naming anything
+// but bare .js files. Those refusals still write the shim, so git keeps
+// blocking Claude's pushes: with an earlier copy, through that copy; without
+// one, through the shim's missing-copy branch (R53). It also refuses when the
+// copy dir is not a plain directory (R54), when core.hooksPath is set, or when
+// a pre-push hook it did not write exists.
 //   lifecycle-prepush.js --uninstall [repo]
 // removes the shim and the copy; a foreign pre-push hook is left alone (exit 2).
+// Refused inside a Claude Code session unless the owner bypass is set (R37).
+//
+// Already-published skip: a ref whose new commit git's live remote sha already
+// contains (a no-op or a force-push rewind) publishes nothing and is not
+// checked. Local tracking refs are never trusted for this (R32, R38).
 
 const { execFileSync } = require('child_process');
 const fs = require('fs');
@@ -52,7 +66,7 @@ function shim(checker) {
     '[ "$CLAUDECODE" = "1" ] || exit 0',
     '[ "$BLOG_LIFECYCLE_GATE_BYPASS" = "1" ] && exit 0',
     `if [ ! -f ${shellQuote(checker)} ]; then`,
-    '  echo "lifecycle gate (#1340): the checker copy is missing, so this push is blocked. Start a new Claude Code session to reinstall it." >&2',
+    '  echo "lifecycle gate (#1340): the checker copy is missing, so this push is blocked. If refs/remotes/origin/main lacks the hooks, run: git fetch origin main:refs/remotes/origin/main. Then start a new Claude Code session, or run any command that mentions push, to reinstall it." >&2',
     '  exit 1',
     'fi',
     `exec node ${shellQuote(checker)} "$@"`,
@@ -77,15 +91,38 @@ function locations(root) {
   return { hookFile, copyDir };
 }
 
+// Keep this line byte-for-byte: it is also the anti-rollback floor marker
+// (FLOOR_MARK, R52), so reformatting it makes every install refuse.
 const SOURCE_REF = 'refs/remotes/origin/main'; // never origin/HEAD, which `git remote set-head` rewrites (R38)
 
-function workingTreeFiles() {
-  return COPIED.map((name) => fs.readFileSync(path.join(__dirname, name), 'utf8'));
+function workingTreeSource() {
+  return { names: COPIED, files: COPIED.map((name) => fs.readFileSync(path.join(__dirname, name), 'utf8')) };
+}
+
+const BARE_JS_NAME = /^[\w-]+(?:\.[\w-]+)*\.js$/;
+const FETCH_MAIN = 'git fetch origin main:refs/remotes/origin/main';
+// Anti-rollback floor (R52): only checkers from R38 on read refs/remotes/origin/main
+// alone and never trust local tracking refs; older ones, still reachable on
+// origin through old branches and PR refs, lack this exact line.
+const FLOOR_MARK = /^const SOURCE_REF = 'refs\/remotes\/origin\/main';/m;
+
+// The files to copy, read from the COPIED line of origin/main's own checker,
+// so a later main that adds or renames a helper still installs from an older
+// branch (R46). Returns { names } or { error }: the line must exist, list
+// lifecycle-prepush.js, and name only bare .js files in hooks/ (no paths).
+function copiedList(checker) {
+  const line = /^const COPIED = \[([^\]]*)\];/m.exec(checker);
+  if (!line) return { error: 'has no `const COPIED = [...]` line' };
+  const names = [...line[1].matchAll(/'([^']*)'|"([^"]*)"/g)].map((m) => m[1] ?? m[2]);
+  if (!names.includes('lifecycle-prepush.js')) return { error: 'does not list lifecycle-prepush.js in COPIED' };
+  if (!names.every((n) => BARE_JS_NAME.test(n))) return { error: 'lists files in COPIED that are not bare .js names in hooks/' };
+  return { names };
 }
 
 // The checker's source: the committed origin/main, so unmerged edits to the
-// hooks cannot weaken the installed check (R33). Returns { files, note } or
-// { refuse } when origin/main carries only some of the files (R40).
+// hooks cannot weaken the installed check (R33). Returns { names, files, note },
+// or { refuse } when origin/main does not carry the hooks (R49), carries only
+// some of the listed files (R40), or has an unusable COPIED list (R46).
 function checkerSource(root) {
   // Not git(): file contents must keep their trailing newline.
   const show = (name) => {
@@ -93,12 +130,22 @@ function checkerSource(root) {
       return execFileSync('git', ['show', `${SOURCE_REF}:hooks/${name}`], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
     } catch { return null; }
   };
-  const files = COPIED.map(show);
-  if (files.every((f) => f !== null)) return { files, fromRef: true, note: `checker copied from ${SOURCE_REF}` };
-  if (files.some((f) => f !== null)) {
-    return { refuse: `${SOURCE_REF} carries only some of ${COPIED.join(', ')}, so the lifecycle pre-push hook was not installed` };
+  const notInstalled = 'so the lifecycle pre-push hook was not installed';
+  const checker = show('lifecycle-prepush.js');
+  if (checker === null) {
+    // No working-tree fallback (R49): pointing origin/main at a commit from
+    // before the hooks would otherwise install whatever the working tree holds.
+    // The fetch below also works in single-branch clones (R53).
+    return { refuse: `${SOURCE_REF} does not carry hooks/lifecycle-prepush.js; run \`${FETCH_MAIN}\` and retry, ${notInstalled}` };
   }
-  return { files: workingTreeFiles(), note: `checker copied from the working tree, because ${SOURCE_REF} does not carry the lifecycle hooks yet` };
+  if (!FLOOR_MARK.test(checker)) {
+    return { refuse: `the checker on ${SOURCE_REF} is older than the R38 floor (it would trust local tracking refs); run \`${FETCH_MAIN}\` and retry, ${notInstalled}` };
+  }
+  const { names, error } = copiedList(checker);
+  if (error) return { refuse: `the checker on ${SOURCE_REF} ${error}, ${notInstalled}` };
+  const files = names.map((name) => (name === 'lifecycle-prepush.js' ? checker : show(name)));
+  if (files.some((f) => f === null)) return { refuse: `${SOURCE_REF} carries only some of ${names.join(', ')}, ${notInstalled}` };
+  return { names, files, fromRef: true, note: `checker copied from ${SOURCE_REF}` };
 }
 
 // Loads the copied checker in a child process; returns an error line or null.
@@ -111,11 +158,18 @@ function loadError(copy) {
   }
 }
 
-function writeCopies(copyDir, files) {
+// Writes the listed files and removes any other .js left by an earlier
+// install, so a checker that requires a helper it forgot to list fails the
+// same way on every machine (R39 then applies).
+function writeCopies(copyDir, { names, files }) {
   let changed = false;
-  COPIED.forEach((name, i) => {
+  names.forEach((name, i) => {
     changed = writeIfChanged(path.join(copyDir, name), files[i], 0o644) || changed;
   });
+  for (const stale of fs.readdirSync(copyDir).filter((f) => f.endsWith('.js') && !names.includes(f))) {
+    fs.rmSync(path.join(copyDir, stale), { force: true });
+    changed = true;
+  }
   return changed;
 }
 
@@ -131,15 +185,29 @@ function installHook(repo) {
   if (fs.existsSync(hookFile) && !fs.readFileSync(hookFile, 'utf8').includes(SHIM_MARK)) {
     return { ok: false, message: `${hookFile} already exists and was not written by the lifecycle gate; it was left alone` };
   }
-  const source = checkerSource(root);
-  if (source.refuse) return { ok: false, message: source.refuse };
-  fs.mkdirSync(copyDir, { recursive: true });
-  let changed = writeCopies(copyDir, source.files);
-  let { note } = source;
+  let copyDirStat = null;
+  try { copyDirStat = fs.lstatSync(copyDir); } catch { /* not created yet */ }
+  if (copyDirStat && !copyDirStat.isDirectory()) { // R54: never prune through a symlink
+    return { ok: false, message: `${copyDir} is not a plain directory, so the lifecycle pre-push hook was not installed` };
+  }
   const copy = path.join(copyDir, 'lifecycle-prepush.js');
+  const source = checkerSource(root);
+  if (source.refuse) {
+    // Keep git enforcing (R53): an earlier copy stays in use; without one, the
+    // shim's missing-copy branch blocks Claude's pushes.
+    fs.mkdirSync(path.dirname(hookFile), { recursive: true });
+    writeIfChanged(hookFile, shim(copy), 0o755);
+    const atGit = fs.existsSync(copy)
+      ? 'the earlier checker copy stays in use'
+      : 'the pre-push shim rejects Claude\'s pushes until this is resolved';
+    return { ok: false, message: `${source.refuse}; ${atGit}` };
+  }
+  fs.mkdirSync(copyDir, { recursive: true });
+  let changed = writeCopies(copyDir, source);
+  let { note } = source;
   const broken = source.fromRef ? loadError(copy) : null;
   if (broken) { // R39: never leave a checker that cannot run
-    changed = writeCopies(copyDir, workingTreeFiles()) || changed;
+    changed = writeCopies(copyDir, workingTreeSource()) || changed;
     note = `the checker on ${SOURCE_REF} failed to load (${broken}); copied from the working tree instead`;
   }
   fs.mkdirSync(path.dirname(hookFile), { recursive: true });
@@ -155,7 +223,8 @@ function uninstallHook(repo) {
     return {
       ok: false,
       message: 'removing the lifecycle pre-push check is refused inside a Claude Code session. The owner can run ' +
-        'this command from their own terminal.',
+        'this command from their own terminal, or launch Claude Code with BLOG_LIFECYCLE_GATE_BYPASS=1 (Claude Code ' +
+        'on the web has no terminal outside a session).',
     };
   }
   const root = git(repo, ['rev-parse', '--show-toplevel']);
