@@ -12,7 +12,7 @@ gem "json", "~> 2.21.2"
 
 # Minimal Mistakes theme and required plugins
 group :jekyll_plugins do
-  gem "jekyll-feed", "~> 0.12"
+  gem "jekyll-feed", "~> 0.18"
   gem "jekyll-remote-theme"
   gem "jekyll-seo-tag"
   gem "jekyll-include-cache"
