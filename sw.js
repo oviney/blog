@@ -5,7 +5,11 @@ layout: null
  * Service Worker for Ouray Viney's Blog
  * Strategy:
  *   - Cache-first for immutable-ish assets (fonts, images)
- *   - Network-first for HTML, CSS and JS, which change together on every deploy
+ *   - Stale-while-revalidate for CSS/JS whose ?v= stamp is this build's (#1356):
+ *     its content is not expected to change under that URL, so the cached copy
+ *     is served at once and refreshed in the background, which also heals a bad
+ *     entry (say, from a mid-deploy CDN skew) on the next view
+ *   - Network-first for HTML and for unstamped or old-stamped CSS/JS
  *   - Offline: network-first requests fall back to any cached copy
  *
  * CACHE_VERSION is stamped with the build time, so every deploy changes this
@@ -16,7 +20,8 @@ layout: null
  * rendered at its intrinsic 1600x900.
  */
 
-const CACHE_VERSION = 'build-{{ site.time | date: "%s" }}';
+const BUILD = '{{ site.time | date: "%s" }}';
+const CACHE_VERSION = 'build-' + BUILD;
 const STATIC_CACHE  = 'static-' + CACHE_VERSION;
 const PAGES_CACHE   = 'pages-'  + CACHE_VERSION;
 
@@ -24,7 +29,7 @@ const PAGES_CACHE   = 'pages-'  + CACHE_VERSION;
 const PRECACHE_ASSETS = [
   '{{ "/" | relative_url }}',
   '{{ "/blog/" | relative_url }}',
-  '{{ "/assets/css/styles.css" | relative_url }}?v={{ site.time | date: "%s" }}',
+  '{{ "/assets/css/styles.css" | relative_url }}?v=' + BUILD,
   '{{ "/assets/images/blog-default.svg" | relative_url }}',
   '{{ "/favicon.svg" | relative_url }}'
 ];
@@ -52,7 +57,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch: cache-first for assets, network-first for pages
+// Fetch: strategies as described in the header
 self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
@@ -60,35 +65,35 @@ self.addEventListener('fetch', event => {
   // Only handle same-origin GET requests
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  const isAsset = /\.(woff2?|ttf|svg|png|webp|jpg|jpeg|gif|ico)(\?.*)?$/.test(url.pathname);
+  const isCode = /\.(css|js)$/.test(url.pathname);
+  const isStampedCode = isCode && url.searchParams.get('v') === BUILD;
+  const isAsset = /\.(woff2?|ttf|svg|png|webp|jpg|jpeg|gif|ico)$/.test(url.pathname);
 
-  if (isAsset) {
-    // Cache-first strategy for static assets
+  // The cache write is kept alive with waitUntil, so a background refresh is
+  // not lost when the worker stops, and a failed put (quota, 206) is swallowed.
+  const fetchAndCache = (cacheName) => fetch(request).then(response => {
+    if (response.ok) {
+      const clone = response.clone();
+      event.waitUntil(caches.open(cacheName).then(cache => cache.put(request, clone)).catch(() => {}));
+    }
+    return response;
+  });
+
+  if (isStampedCode) {
+    // Stale-while-revalidate: off the critical path, yet self-healing
     event.respondWith(
       caches.match(request).then(cached => {
-        if (cached) return cached;
-        return fetch(request).then(response => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(STATIC_CACHE).then(cache => cache.put(request, clone));
-          }
-          return response;
-        });
+        const refresh = fetchAndCache(STATIC_CACHE);
+        if (!cached) return refresh;
+        event.waitUntil(refresh.catch(() => {}));
+        return cached;
       })
     );
+  } else if (isAsset) {
+    // Cache-first strategy for static assets
+    event.respondWith(caches.match(request).then(cached => cached || fetchAndCache(STATIC_CACHE)));
   } else {
-    // Network-first strategy for HTML pages, CSS and JS
-    const isCode = /\.(css|js)(\?.*)?$/.test(url.pathname);
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(isCode ? STATIC_CACHE : PAGES_CACHE).then(cache => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => caches.match(request))
-    );
+    // Network-first strategy for HTML pages and unstamped or old-stamped CSS/JS
+    event.respondWith(fetchAndCache(isCode ? STATIC_CACHE : PAGES_CACHE).catch(() => caches.match(request)));
   }
 });
