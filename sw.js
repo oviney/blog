@@ -69,10 +69,12 @@ self.addEventListener('fetch', event => {
   const isStampedCode = isCode && url.searchParams.get('v') === BUILD;
   const isAsset = /\.(woff2?|ttf|svg|png|webp|jpg|jpeg|gif|ico)$/.test(url.pathname);
 
+  // The cache write is kept alive with waitUntil, so a background refresh is
+  // not lost when the worker stops, and a failed put (quota, 206) is swallowed.
   const fetchAndCache = (cacheName) => fetch(request).then(response => {
     if (response.ok) {
       const clone = response.clone();
-      caches.open(cacheName).then(cache => cache.put(request, clone));
+      event.waitUntil(caches.open(cacheName).then(cache => cache.put(request, clone)).catch(() => {}));
     }
     return response;
   });
