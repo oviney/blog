@@ -4,8 +4,9 @@ layout: null
 /**
  * Service Worker for Ouray Viney's Blog
  * Strategy:
- *   - Cache-first for immutable-ish assets (fonts, images)
- *   - Network-first for HTML, CSS and JS, which change together on every deploy
+ *   - Cache-first for immutable-ish assets (fonts, images), and for CSS/JS whose
+ *     ?v= stamp is this build's: their content cannot change under that URL (#1356)
+ *   - Network-first for HTML and for unstamped or old-stamped CSS/JS
  *   - Offline: network-first requests fall back to any cached copy
  *
  * CACHE_VERSION is stamped with the build time, so every deploy changes this
@@ -16,7 +17,8 @@ layout: null
  * rendered at its intrinsic 1600x900.
  */
 
-const CACHE_VERSION = 'build-{{ site.time | date: "%s" }}';
+const BUILD = '{{ site.time | date: "%s" }}';
+const CACHE_VERSION = 'build-' + BUILD;
 const STATIC_CACHE  = 'static-' + CACHE_VERSION;
 const PAGES_CACHE   = 'pages-'  + CACHE_VERSION;
 
@@ -24,7 +26,7 @@ const PAGES_CACHE   = 'pages-'  + CACHE_VERSION;
 const PRECACHE_ASSETS = [
   '{{ "/" | relative_url }}',
   '{{ "/blog/" | relative_url }}',
-  '{{ "/assets/css/styles.css" | relative_url }}?v={{ site.time | date: "%s" }}',
+  '{{ "/assets/css/styles.css" | relative_url }}?v=' + BUILD,
   '{{ "/assets/images/blog-default.svg" | relative_url }}',
   '{{ "/favicon.svg" | relative_url }}'
 ];
@@ -60,7 +62,11 @@ self.addEventListener('fetch', event => {
   // Only handle same-origin GET requests
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  const isAsset = /\.(woff2?|ttf|svg|png|webp|jpg|jpeg|gif|ico)(\?.*)?$/.test(url.pathname);
+  const isCode = /\.(css|js)$/.test(url.pathname);
+  // This build's stamped CSS/JS never changes under its URL, so it is as safe to
+  // serve from cache as a font; anything else that is code stays network-first.
+  const isStampedCode = isCode && url.searchParams.get('v') === BUILD;
+  const isAsset = isStampedCode || /\.(woff2?|ttf|svg|png|webp|jpg|jpeg|gif|ico)$/.test(url.pathname);
 
   if (isAsset) {
     // Cache-first strategy for static assets
@@ -77,8 +83,7 @@ self.addEventListener('fetch', event => {
       })
     );
   } else {
-    // Network-first strategy for HTML pages, CSS and JS
-    const isCode = /\.(css|js)(\?.*)?$/.test(url.pathname);
+    // Network-first strategy for HTML pages and unstamped or old-stamped CSS/JS
     event.respondWith(
       fetch(request)
         .then(response => {
