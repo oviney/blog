@@ -7,8 +7,11 @@
 //
 //   1. Evasion guards. Deny Bash commands that would skip or disable the
 //      pre-push check: `--no-verify` with `push`, `core.hooksPath`,
-//      `.git/hooks`, `send-pack`, or setting CLAUDECODE or the owner bypass.
-//      Deny Edit/Write/NotebookEdit on files under .git/hooks/.
+//      `.git/hooks`, `lifecycle-gate` anywhere except the snapshot files and
+//      hooks/lifecycle-gate.js (R34, R41), the checker's uninstall (R37),
+//      `update-ref` or a fetch of local content into a remote-tracking ref
+//      (R38, #1350), `send-pack`, or setting CLAUDECODE or the owner bypass.
+//      Deny Edit/Write/NotebookEdit under .git/hooks/ and .git/lifecycle-gate/.
 //   2. Install on push. When a command mentions `push`, make sure the pre-push
 //      shim is installed in the session's repo; deny with the reason if it
 //      cannot be (a foreign pre-push hook, or core.hooksPath set).
@@ -34,6 +37,10 @@ const { installHook } = require('./lifecycle-prepush');
 const MCP_FILE_WRITE = /^mcp__.*github.*__(?:push_files|create_or_update_file|delete_file)$/i;
 const EDIT_TOOLS = new Set(['Edit', 'Write', 'NotebookEdit']);
 const PROTECTED_GIT_PATH = /(^|\/)\.git\/(?:hooks|lifecycle-gate)(\/|$)/;
+// `fetch [options] <local source> ... :[refs/]remotes/origin/...`, where the
+// source is `.`, `..`, a relative, absolute or home path, or a file:// URL.
+const LOCAL_FETCH_INTO_REMOTES =
+  /\bfetch\b(?:\s+-{1,2}[\w-]+(?:=\S+)?)*\s+['"]?(?:\.{1,2}(?:\/\S*)?|\/\S*|~\S*|file:\/\/\S*)['"]?\s[\s\S]*:(?:refs\/)?remotes\/origin\//;
 
 const GUARDS = [
   [(c) => /--no-verify/.test(c) && /\bpush\b/.test(c), '`--no-verify` would skip the pre-push lifecycle check'],
@@ -42,11 +49,17 @@ const GUARDS = [
   // `lifecycle-gate` anywhere (R34, R41), except the snapshot files and the hook sources under hooks/.
   [(c) => /lifecycle-gate/.test(c.replace(/lifecycle-gate-(?:test|review)\.json/g, '').replace(/hooks\/lifecycle-gate\.js/g, '')),
     'commands touching the lifecycle-gate checker copy could change the pre-push lifecycle check'],
-  [(c) => /lifecycle-prepush/.test(c) && /--uninstall/.test(c), 'only the owner can remove the pre-push lifecycle check, from their own terminal'],
-  // Ordinary commands that rewrite local tracking refs (R38).
-  [(c) => /\bremote\s+set-head\b/.test(c), '`git remote set-head` rewrites a local tracking ref'],
+  [(c) => /lifecycle-prepush/.test(c) && /--uninstall/.test(c), 'only the owner can remove the pre-push lifecycle check, from ' +
+    'their own terminal or by launching Claude Code with BLOG_LIFECYCLE_GATE_BYPASS=1'],
+  // Ordinary commands that point origin's tracking refs (the installer reads
+  // refs/remotes/origin/main, R38) at local content: update-ref, and a fetch
+  // from `.`, a path or file:// into (refs/)remotes/origin/ (R42, R43).
+  // Fetches from a named remote can only select commits that remote has, and
+  // install refuses when origin/main lacks the hooks (R49) or carries a checker
+  // without the R38 floor line (R52), so they are allowed. Any branch on
+  // origin whose checker carries that line can still be selected (Known limits).
   [(c) => /\bupdate-ref\b/.test(c), '`git update-ref` can rewrite local tracking refs'],
-  [(c) => /\bfetch\b[\s\S]*:refs\/remotes\//.test(c), 'fetching into refs/remotes/ rewrites local tracking refs'],
+  [(c) => LOCAL_FETCH_INTO_REMOTES.test(c), 'fetching local content into a remote-tracking ref rewrites it'],
   [(c) => /\bsend-pack\b/.test(c), '`git send-pack` pushes without running the pre-push hook'],
   [(c) => /\bCLAUDECODE\b/.test(c), 'CLAUDECODE scopes the pre-push check to Claude sessions and must not be changed'],
   [(c) => /\bBLOG_LIFECYCLE_GATE_BYPASS\b/.test(c), 'only the owner can bypass, from the environment Claude Code is launched with'],
@@ -138,8 +151,8 @@ function evaluate(input) {
     if (root && isBlogRepo(root)) {
       const result = installHook(root);
       if (!result.ok) {
-        return `Lifecycle gate (#1340): pushes are blocked because the pre-push lifecycle check is not active: ${result.message}. ` +
-          'Ask the owner to resolve it.';
+        return `Lifecycle gate (#1340): pushes are blocked because the pre-push lifecycle check could not be installed: ${result.message}. ` +
+          'Resolve it as the message says, or ask the owner.';
       }
     }
   }
