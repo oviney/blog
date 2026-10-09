@@ -4,8 +4,11 @@ layout: null
 /**
  * Service Worker for Ouray Viney's Blog
  * Strategy:
- *   - Cache-first for immutable-ish assets (fonts, images), and for CSS/JS whose
- *     ?v= stamp is this build's: their content cannot change under that URL (#1356)
+ *   - Cache-first for immutable-ish assets (fonts, images)
+ *   - Stale-while-revalidate for CSS/JS whose ?v= stamp is this build's (#1356):
+ *     its content is not expected to change under that URL, so the cached copy
+ *     is served at once and refreshed in the background, which also heals a bad
+ *     entry (say, from a mid-deploy CDN skew) on the next view
  *   - Network-first for HTML and for unstamped or old-stamped CSS/JS
  *   - Offline: network-first requests fall back to any cached copy
  *
@@ -54,7 +57,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch: cache-first for assets, network-first for pages
+// Fetch: strategies as described in the header
 self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
@@ -63,37 +66,32 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
   const isCode = /\.(css|js)$/.test(url.pathname);
-  // This build's stamped CSS/JS never changes under its URL, so it is as safe to
-  // serve from cache as a font; anything else that is code stays network-first.
   const isStampedCode = isCode && url.searchParams.get('v') === BUILD;
-  const isAsset = isStampedCode || /\.(woff2?|ttf|svg|png|webp|jpg|jpeg|gif|ico)$/.test(url.pathname);
+  const isAsset = /\.(woff2?|ttf|svg|png|webp|jpg|jpeg|gif|ico)$/.test(url.pathname);
 
-  if (isAsset) {
-    // Cache-first strategy for static assets
+  const fetchAndCache = (cacheName) => fetch(request).then(response => {
+    if (response.ok) {
+      const clone = response.clone();
+      caches.open(cacheName).then(cache => cache.put(request, clone));
+    }
+    return response;
+  });
+
+  if (isStampedCode) {
+    // Stale-while-revalidate: off the critical path, yet self-healing
     event.respondWith(
       caches.match(request).then(cached => {
-        if (cached) return cached;
-        return fetch(request).then(response => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(STATIC_CACHE).then(cache => cache.put(request, clone));
-          }
-          return response;
-        });
+        const refresh = fetchAndCache(STATIC_CACHE);
+        if (!cached) return refresh;
+        event.waitUntil(refresh.catch(() => {}));
+        return cached;
       })
     );
+  } else if (isAsset) {
+    // Cache-first strategy for static assets
+    event.respondWith(caches.match(request).then(cached => cached || fetchAndCache(STATIC_CACHE)));
   } else {
     // Network-first strategy for HTML pages and unstamped or old-stamped CSS/JS
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(isCode ? STATIC_CACHE : PAGES_CACHE).then(cache => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => caches.match(request))
-    );
+    event.respondWith(fetchAndCache(isCode ? STATIC_CACHE : PAGES_CACHE).catch(() => caches.match(request)));
   }
 });

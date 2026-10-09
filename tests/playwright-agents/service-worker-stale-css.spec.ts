@@ -47,17 +47,29 @@ test('sw.js and the stylesheet URL are stamped per build', async ({ request, pag
   expect(href).toMatch(new RegExp(`/assets/css/styles\\.css\\?v=${build}$`));
 });
 
-test('the current build\'s stylesheet is served from the worker cache (#1356)', async ({ page }) => {
+test('the current build\'s stylesheet is served from the worker cache, then revalidated (#1356)', async ({ page }) => {
   await controlledHome(page);
-  const body = await page.evaluate(async () => {
+  const [first, healed] = await page.evaluate(async () => {
     const href = document.querySelector<HTMLLinkElement>('link[rel="stylesheet"][href*="/assets/css/styles.css"]')!.href;
-    const real = await (await fetch(href, { cache: 'no-store' })).text();
+    // Read the precached copy straight from the cache: a fetch() through the
+    // worker would start a background revalidation that could overwrite the
+    // marked entry below before the first assertion.
+    const current = await (await caches.match(href))!.text();
+    // A marked entry stands in for a bad body cached under this build's stamp.
     for (const key of await caches.keys()) {
-      await (await caches.open(key)).put(href, new Response(`${real}\n/* sw-cache-hit */`, { headers: { 'Content-Type': 'text/css' } }));
+      await (await caches.open(key)).put(href, new Response(`${current}\n/* sw-cache-hit */`, { headers: { 'Content-Type': 'text/css' } }));
     }
-    return (await fetch(href)).text();
+    const first = await (await fetch(href)).text();
+    // The background revalidation replaces the entry; a later fetch heals.
+    for (let i = 0; i < 50; i++) {
+      await new Promise(r => setTimeout(r, 100));
+      const body = await (await fetch(href)).text();
+      if (!body.includes('/* sw-cache-hit */')) return [first, true];
+    }
+    return [first, false];
   });
-  expect(body).toContain('/* sw-cache-hit */');
+  expect(first).toContain('/* sw-cache-hit */');
+  expect(healed).toBe(true);
 });
 
 test('unstamped and old-stamped CSS stay network-first (#1356)', async ({ page }) => {
