@@ -32,7 +32,9 @@ import { test, expect, request as playwrightRequest } from '@playwright/test';
 // Utility routes that legitimately carry no site chrome and must be skipped.
 // Google Search Console verification files (/google<hex>.html) are required by
 // Google to contain ONLY the verification token — adding chrome would break
-// verification. They land in the sitemap as a build quirk but are not pages.
+// verification. The current file sets `sitemap: false` (#1359), but one added
+// without front matter is copied as a static file and listed in sitemap.xml,
+// so this guard keeps such a file from failing the invariant.
 const CHROME_EXEMPT: RegExp[] = [/^\/google[0-9a-f]+\.html$/i];
 
 // Stable chrome markers emitted by _layouts/default.html for every real page.
