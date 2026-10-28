@@ -2,6 +2,8 @@
 
 Composite action for `.github/workflows/test-quality.yml` jobs. See [#958](https://github.com/oviney/blog/issues/958) for the flake history that motivated this action and `action.yml` for the inputs/steps.
 
+Uses Node 24 by default, matching the current Lighthouse and Pa11y requirements.
+
 ## Files
 
 - `action.yml` — the composite action (called as `uses: ./.github/actions/setup-node-with-puppeteer-cache`)

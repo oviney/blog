@@ -8,9 +8,9 @@ description: >
 
 inputs:
   node-version:
-    description: 'Node.js version to install (default 20)'
+    description: 'Node.js version to install (default 24)'
     required: false
-    default: '20'
+    default: '24'
   npm-cache:
     description: 'setup-node cache strategy (default npm)'
     required: false
@@ -29,7 +29,7 @@ runs:
 
     # 2. Cache puppeteer's Chrome browser download (the actual flake fix).
     # Key includes runner OS + Node version + package-lock.json hash. The
-    # Node version salt is defensive: today all callers use node 20, but
+    # Node version salt is defensive: today all callers use node 24, but
     # adding it now prevents future cache collisions if a sibling caller
     # ever pins a different Node ABI. Lockfile hash invalidates cleanly
     # when pa11y/puppeteer/Chrome version pins move. Restore-keys fallback

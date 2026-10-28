@@ -2,8 +2,9 @@ name: Quality Tests (Visual, Accessibility, Performance, Security)
 
 # ---------------------------------------------------------------------------
 # PR path (blocking, budgeted): build the site once, then run two jobs against
-# that one artifact — the page contract and the pixel gate. Nothing else gates a
-# PR. The full 138-test suite, pa11y and Lighthouse run nightly.
+# that one artifact — the page contract and the pixel gate. Security/content
+# checks also run on every PR. Dependency changes exercise Pa11y/Lighthouse;
+# test/configuration changes exercise the extended suite. Both run nightly.
 #
 # This replaced a PR path that cost 13.3 billable job-minutes and ~5 minutes of
 # wall-clock, rebuilt Jekyll four times, and in seven months caught one real
@@ -22,8 +23,8 @@ name: Quality Tests (Visual, Accessibility, Performance, Security)
 on:
   push:
     branches: [ main ]
+  # Validate stacked PRs as well as PRs targeting main.
   pull_request:
-    branches: [ main ]
   schedule:
     # Nightly full-suite run at 02:00 UTC every day
     - cron: '0 2 * * *'
@@ -258,12 +259,45 @@ jobs:
   security:
     name: 🔒 Security Audit
     runs-on: ubuntu-latest
+    outputs:
+      toolchain_changed: ${{ steps.selection.outputs.compatibility }}
+      extended_changed: ${{ steps.selection.outputs.extended }}
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Detect validation scope
+        id: selection
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          detect() {
+            output="$1"
+            shift
+            if git diff --quiet "$BASE_SHA" "$HEAD_SHA" -- "$@"; then
+              echo "$output=false" >> "$GITHUB_OUTPUT"
+            else
+              rc=$?
+              [ "$rc" -eq 1 ] || exit "$rc"
+              echo "$output=true" >> "$GITHUB_OUTPUT"
+            fi
+          }
+          detect compatibility package.json package-lock.json .pa11yci.json lighthouserc.json \
+            .github/actions/setup-node-with-puppeteer-cache/action.yml \
+            .github/workflows/test-quality.yml
+          detect extended playwright.config.ts scripts/playwright-policy.cjs \
+            scripts/check-playwright-selection.js 'tests/playwright-agents/*.spec.ts' \
+            .github/workflows/test-quality.yml
 
       - name: Setup Node + cache + install deps
         uses: ./.github/actions/setup-node-with-puppeteer-cache
+
+      - name: Verify test selection has no gaps or duplicates
+        run: npm run test:selection
 
       - name: Check Puppeteer support floor
         run: npm run test:deps
@@ -272,15 +306,18 @@ jobs:
         run: npm run test:security
 
   # ---------------------------------------------------------------------------
-  # Nightly: the full suite, pa11y and Lighthouse. Not a PR gate — it is a broad
-  # net whose findings become issues, not merge blocks. A PR should not wait five
-  # minutes for a Lighthouse score that has never once blocked a merge on merit.
+  # Extended behavior checks run nightly, on demand, and when their tests or
+  # runner configuration change. Dedicated contract/pixel gates are excluded
+  # here because sibling jobs already run them against this same artifact.
   # ---------------------------------------------------------------------------
   nightly-full-suite:
-    name: 🌙 Nightly Full Suite
+    name: 🌙 Extended Browser Tests
     runs-on: ubuntu-latest
-    needs: build-site
-    if: github.event_name == 'schedule' || inputs.full_suite
+    needs: [build-site, security]
+    if: >-
+      !cancelled() && needs.build-site.result == 'success' &&
+      (github.event_name == 'schedule' || inputs.full_suite ||
+       (github.event_name == 'pull_request' && needs.security.outputs.extended_changed == 'true'))
     permissions:
       contents: read
 
@@ -288,8 +325,6 @@ jobs:
     # are the only way to get step-level detail across a job boundary.
     outputs:
       playwright: ${{ steps.playwright.outcome }}
-      a11y: ${{ steps.a11y.outcome }}
-      lighthouse: ${{ steps.lighthouse.outcome }}
 
     steps:
       - uses: actions/checkout@v7
@@ -321,11 +356,64 @@ jobs:
           done
           curl -f http://localhost:4000/ || exit 1
 
-      - name: Run full Playwright suite
+      - name: Run extended Playwright suite
         id: playwright
         env:
           CI: true
         run: npm run test:playwright
+
+      - name: Upload extended results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: nightly-results
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+  # Dependency upgrades validate the affected browser tools directly, without
+  # waiting for hundreds of unrelated reader-journey test executions.
+  browser-compatibility:
+    name: 🔧 Browser Tool Compatibility
+    runs-on: ubuntu-latest
+    needs: [build-site, security]
+    if: >-
+      !cancelled() && needs.build-site.result == 'success' &&
+      (github.event_name == 'schedule' || inputs.full_suite ||
+       (github.event_name == 'pull_request' && needs.security.outputs.toolchain_changed == 'true'))
+    permissions:
+      contents: read
+    outputs:
+      a11y: ${{ steps.a11y.outcome }}
+      lighthouse: ${{ steps.lighthouse.outcome }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Setup Node + cache + install deps
+        uses: ./.github/actions/setup-node-with-puppeteer-cache
+
+      - name: Download built site
+        uses: actions/download-artifact@v8
+        with:
+          name: site-build-quality
+          path: _site/
+
+      - name: Serve built site
+        run: |
+          bundle exec jekyll serve --port 4000 --detach --skip-initial-build
+          for i in $(seq 1 30); do
+            if curl -s http://localhost:4000/ > /dev/null; then break; fi
+            sleep 1
+          done
+          curl -f http://localhost:4000/ || exit 1
 
       - name: Run accessibility tests
         id: a11y
@@ -339,15 +427,12 @@ jobs:
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
-      - name: Upload nightly artefacts
+      - name: Upload compatibility results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: nightly-results
-          path: |
-            playwright-report/
-            test-results/
-            .lighthouseci/
+          name: browser-compatibility-results
+          path: .lighthouseci/
           retention-days: 7
 
   # ---------------------------------------------------------------------------
@@ -375,6 +460,7 @@ jobs:
       - content-validation
       - security
       - nightly-full-suite
+      - browser-compatibility
     permissions:
       contents: read
       issues: write
@@ -404,20 +490,21 @@ jobs:
           | 🖼️ Visual Regression | ${{ needs.visual-regression.result }} |
           | 📝 Content Validation | ${{ needs.content-validation.result }} |
           | 🔒 Security Audit | ${{ needs.security.result }} |
-          | 🌙 Nightly Full Suite | ${{ needs.nightly-full-suite.result }} |
+          | 🌙 Extended Browser Tests | ${{ needs.nightly-full-suite.result }} |
+          | 🔧 Browser Tool Compatibility | ${{ needs.browser-compatibility.result }} |
 
-          Within the full suite:
+          Validation steps:
 
           | Step | Outcome |
           |------|---------|
           | Playwright | ${{ needs.nightly-full-suite.outputs.playwright }} |
-          | pa11y | ${{ needs.nightly-full-suite.outputs.a11y }} |
-          | Lighthouse | ${{ needs.nightly-full-suite.outputs.lighthouse }} |
+          | pa11y | ${{ needs.browser-compatibility.outputs.a11y }} |
+          | Lighthouse | ${{ needs.browser-compatibility.outputs.lighthouse }} |
 
           Note that 🔒 Security Audit *does* gate PRs — if it is failing here it is
-          also blocking every open PR. The rest of this run does not gate merges;
-          triage decides whether a finding becomes a fix, a new contract test, or
-          an accepted risk.
+          also blocking every open PR. Extended tests run on test/configuration
+          PRs, and browser compatibility runs on dependency/configuration PRs.
+          Nightly findings require triage and a confirmed reader impact.
           EOF
           )
 
