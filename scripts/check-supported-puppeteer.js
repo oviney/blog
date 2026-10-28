@@ -39,11 +39,11 @@ function isBeforeMinSupported(version, minVersion) {
 }
 
 for (const [packagePath, pkg] of Object.entries(packages)) {
-  if (!packagePath.endsWith('/puppeteer') || !pkg || !pkg.version) {
+  if (!/\/puppeteer(-core)?$/.test(packagePath) || !pkg || !pkg.version) {
     continue;
   }
 
-  if (pkg.deprecated || isBeforeMinSupported(pkg.version, '24.15.0')) {
+  if (pkg.deprecated || isBeforeMinSupported(pkg.version, '25.16.0')) {
     unsupported.push({
       path: packagePath,
       version: pkg.version,
@@ -61,4 +61,4 @@ if (unsupported.length > 0) {
   process.exit(1);
 }
 
-console.log('[deps] All lockfile Puppeteer entries are supported (>= 24.15.0, not deprecated).');
+console.log('[deps] All lockfile Puppeteer and puppeteer-core entries are supported (>= 25.16.0, not deprecated).');

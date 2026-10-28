@@ -17,6 +17,7 @@ const REPRESENTATIVE_PAGES = [
   { path: '/blog/', label: 'Blog' },
   { path: '/search/', label: 'Search' },
   { path: '/test-automation/', label: 'Topic page' },
+  { path: '/security/', label: 'Security topic page' },
   { path: '/2026/01/02/self-healing-tests-myth-vs-reality/', label: 'Article' },
 ];
 
