@@ -21,7 +21,7 @@
         "total-blocking-time": ["warn", {"maxNumericValue": 200}],
         "speed-index": ["warn", {"maxNumericValue": 3400}],
 
-        "viewport": "error",
+        "viewport-insight": "error",
         "document-title": "error",
         "meta-description": "error",
         "canonical": ["warn", {"minScore": 0.9}],

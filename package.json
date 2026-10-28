@@ -44,17 +44,20 @@
     "basic-ftp": "6.2.2",
     "ws": "^8.21.0",
     "qs": "^6.15.2",
-    "puppeteer": "^24.15.0",
+    "puppeteer": "^25.16.0",
     "js-yaml": "^4.2.0",
-    "@sentry/node": "^10.54.0",
     "@lhci/cli": {
       "uuid": "npm:@smithy/uuid@^1.1.2"
-    }
+    },
+    "lighthouse": "$lighthouse"
   },
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.62.1",
-    "lighthouse": "^12.8.2",
-    "pa11y-ci": "^4.1.0"
+    "lighthouse": "^13.6.0",
+    "pa11y-ci": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

@@ -3,7 +3,8 @@ name: Quality Tests (Visual, Accessibility, Performance, Security)
 # ---------------------------------------------------------------------------
 # PR path (blocking, budgeted): build the site once, then run two jobs against
 # that one artifact — the page contract and the pixel gate. Nothing else gates a
-# PR. The full 138-test suite, pa11y and Lighthouse run nightly.
+# PR. The full suite, pa11y and Lighthouse also run on browser-toolchain PRs
+# and nightly.
 #
 # This replaced a PR path that cost 13.3 billable job-minutes and ~5 minutes of
 # wall-clock, rebuilt Jekyll four times, and in seven months caught one real
@@ -258,9 +259,33 @@ jobs:
   security:
     name: 🔒 Security Audit
     runs-on: ubuntu-latest
+    outputs:
+      toolchain_changed: ${{ steps.toolchain.outputs.changed }}
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # Browser-toolchain upgrades must exercise pa11y and Lighthouse before
+      # merge, rather than discovering API incompatibilities the next night.
+      - name: Detect browser toolchain changes
+        id: toolchain
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if git diff --quiet "$BASE_SHA" "$HEAD_SHA" -- \
+            package.json package-lock.json .pa11yci.json lighthouserc.json \
+            .github/actions/setup-node-with-puppeteer-cache/action.yml \
+            .github/workflows/test-quality.yml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            rc=$?
+            [ "$rc" -eq 1 ] || exit "$rc"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Setup Node + cache + install deps
         uses: ./.github/actions/setup-node-with-puppeteer-cache
@@ -272,15 +297,18 @@ jobs:
         run: npm run test:security
 
   # ---------------------------------------------------------------------------
-  # Nightly: the full suite, pa11y and Lighthouse. Not a PR gate — it is a broad
-  # net whose findings become issues, not merge blocks. A PR should not wait five
-  # minutes for a Lighthouse score that has never once blocked a merge on merit.
+  # Full suite, pa11y and Lighthouse: nightly, on demand, and for PRs changing
+  # the browser toolchain. Ordinary content/design PRs keep the small gates;
+  # dependency upgrades must prove the tools still run together before merge.
   # ---------------------------------------------------------------------------
   nightly-full-suite:
     name: 🌙 Nightly Full Suite
     runs-on: ubuntu-latest
-    needs: build-site
-    if: github.event_name == 'schedule' || inputs.full_suite
+    needs: [build-site, security]
+    if: >-
+      !cancelled() && needs.build-site.result == 'success' &&
+      (github.event_name == 'schedule' || inputs.full_suite ||
+       (github.event_name == 'pull_request' && needs.security.outputs.toolchain_changed == 'true'))
     permissions:
       contents: read
 
