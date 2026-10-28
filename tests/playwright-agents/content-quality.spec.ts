@@ -60,18 +60,19 @@ test.describe('@content Teaser ledes never start with "Source:" @REQ-CONTENT-03'
 //     CTA must appear on content-consumption surfaces and must be absent on the
 //     utility pages (/search/ and /404/) where it has no place.
 //
-//     NOTE: the intended allowlist also includes the blog index, category
-//     pages, and /about/, but the shared-layout fix that would place the CTA
-//     there has NOT yet landed on main (the include lives only in index.md and
-//     _layouts/post.html). Those cases are encoded as `test.fixme` below so the
-//     full contract is documented and flips green once #16 is fixed, without
-//     shipping a red required check today.
+//     The shared default layout already implements this allowlist. Every
+//     case is active so a missing include or duplicate CTA is a failure.
 // ---------------------------------------------------------------------------
 const NEWSLETTER = 'aside.newsletter-signup';
 
-const NEWSLETTER_PRESENT_VERIFIED: { label: string; path: string }[] = [
+const NEWSLETTER_PRESENT: { label: string; path: string }[] = [
   { label: 'Homepage', path: '/' },
   { label: 'Article', path: '/2026/01/02/self-healing-tests-myth-vs-reality/' },
+  { label: 'Blog index', path: '/blog/' },
+  { label: 'Security category', path: '/security/' },
+  { label: 'Software Engineering category', path: '/software-engineering/' },
+  { label: 'Test Automation category', path: '/test-automation/' },
+  { label: 'About', path: '/about/' },
 ];
 
 const NEWSLETTER_ABSENT: { label: string; path: string }[] = [
@@ -79,18 +80,14 @@ const NEWSLETTER_ABSENT: { label: string; path: string }[] = [
   { label: '404', path: '/404/' },
 ];
 
-// Intended-present but pending the #16 shared-layout fix.
-const NEWSLETTER_PRESENT_PENDING: { label: string; path: string }[] = [
-  { label: 'Blog index', path: '/blog/' },
-  { label: 'Category page', path: '/security/' },
-  { label: 'About', path: '/about/' },
-];
-
 test.describe('@content Newsletter signup follows the page-type allowlist @REQ-CONTENT-04', () => {
-  for (const { label, path } of NEWSLETTER_PRESENT_VERIFIED) {
+  for (const { label, path } of NEWSLETTER_PRESENT) {
     test(`${label} (${path}) renders the newsletter CTA`, async ({ page }) => {
-      await page.goto(path);
-      await expect(page.locator(NEWSLETTER), `${path} should render ${NEWSLETTER}`).toHaveCount(1);
+      const response = await page.goto(path);
+      expect(response?.status(), `${path} should return 200`).toBe(200);
+      const newsletter = page.locator(NEWSLETTER);
+      await expect(newsletter, `${path} should render exactly one ${NEWSLETTER}`).toHaveCount(1);
+      await expect(newsletter, `${path} should expose the CTA to readers`).toBeVisible();
     });
   }
 
@@ -98,13 +95,6 @@ test.describe('@content Newsletter signup follows the page-type allowlist @REQ-C
     test(`${label} (${path}) does not render the newsletter CTA`, async ({ page }) => {
       await page.goto(path);
       await expect(page.locator(NEWSLETTER), `${path} must not render ${NEWSLETTER}`).toHaveCount(0);
-    });
-  }
-
-  for (const { label, path } of NEWSLETTER_PRESENT_PENDING) {
-    test.fixme(`${label} (${path}) renders the newsletter CTA (pending #16 shared-layout fix)`, async ({ page }) => {
-      await page.goto(path);
-      await expect(page.locator(NEWSLETTER), `${path} should render ${NEWSLETTER}`).toHaveCount(1);
     });
   }
 });
