@@ -7,13 +7,13 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "npm run test:visual:snap && npm run test:a11y && npm run test:lighthouse && npm run test:playwright",
+    "test": "npm run test:contract && npm run test:visual:snap && npm run test:a11y && npm run test:lighthouse && npm run test:playwright",
     "test:visual:snap": "npx playwright test visual-snapshot.spec.ts --project='Mobile Chrome' --project='Tablet Chrome' --project='Desktop Chrome'",
     "test:visual:snap:update": "npx playwright test visual-snapshot.spec.ts --project='Mobile Chrome' --project='Tablet Chrome' --project='Desktop Chrome' --update-snapshots",
     "test:a11y": "pa11y-ci",
     "test:lighthouse": "lhci autorun",
     "test:contract": "npx playwright test page-contract.spec.ts service-worker-stale-css.spec.ts --project='Mobile Chrome' --project='Desktop Chrome'",
-    "test:playwright": "npx playwright test",
+    "test:playwright": "PLAYWRIGHT_SUITE=extended npx playwright test",
     "test:playwright:headed": "npx playwright test --headed",
     "test:playwright:debug": "npx playwright test --debug",
     "test:playwright:ui": "npx playwright test --ui",
@@ -25,7 +25,8 @@
     "test:security": "node scripts/check-npm-audit.js",
     "pretest": "echo 'Ensure Jekyll is running on port 4000 before running tests'",
     "dashboard": "echo 'Dashboard available at: https://oviney.github.io/blog/dashboard/' && npx serve dashboard --port 8081",
-    "dashboard:dev": "npx serve dashboard --port 8081"
+    "dashboard:dev": "npx serve dashboard --port 8081",
+    "test:selection": "node scripts/check-playwright-selection.js"
   },
   "repository": {
     "type": "git",

@@ -7,8 +7,8 @@ test.use({ baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4000' }
  *
  * See docs/agents/visual-audit-findings.md §3 "Gap D". The blocking specs
  * historically checked structure/role/byline but never the *content* of the
- * built markup: teaser text, <head> tag uniqueness, the newsletter allowlist,
- * or raw-PNG usage where a WebP sibling exists. These four describe blocks
+ * built markup: teaser text, the newsletter allowlist,
+ * or raw-PNG usage where a WebP sibling exists. These describe blocks
  * guard the already-fixed defects (#4/#5, #3-metadata, #16, #8) so they cannot
  * silently regress.
  */
@@ -39,7 +39,7 @@ test.describe('@content Teaser ledes never start with "Source:" @REQ-CONTENT-03'
   for (const { name, path, excerptSelector } of LISTING_SURFACES) {
     test(`${name} (${path}) has no "Source:" teaser lede`, async ({ page }) => {
       await page.goto(path);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const cards = page.locator(excerptSelector);
       const count = await cards.count();
@@ -53,38 +53,7 @@ test.describe('@content Teaser ledes never start with "Source:" @REQ-CONTENT-03'
   }
 });
 
-// ---------------------------------------------------------------------------
-// (b) Exactly one <title>, canonical, and meta description per page type
-//     (defect #3 — hand-rolled <head> tags AND {% seo %} both firing). Uses
-//     toHaveCount(1) — never .first() — so a duplicate is a hard failure.
-// ---------------------------------------------------------------------------
-const HEAD_UNIQUENESS_PAGES: { label: string; path: string }[] = [
-  { label: 'Homepage', path: '/' },
-  { label: 'Blog index', path: '/blog/' },
-  { label: 'Category page', path: '/security/' },
-  { label: 'About', path: '/about/' },
-  { label: 'Search', path: '/search/' },
-  { label: 'Article', path: '/2026/01/02/self-healing-tests-myth-vs-reality/' },
-];
-
-test.describe('@content @seo <head> metadata is emitted exactly once @REQ-CONTENT-01', () => {
-  for (const { label, path } of HEAD_UNIQUENESS_PAGES) {
-    test(`${label} (${path}) emits one title/canonical/description`, async ({ page }) => {
-      const response = await page.goto(path);
-      expect(response?.ok(), `${path} should load`).toBe(true);
-
-      await expect(page.locator('head title'), `${path}: exactly one <title>`).toHaveCount(1);
-      await expect(
-        page.locator('head link[rel="canonical"]'),
-        `${path}: exactly one canonical`,
-      ).toHaveCount(1);
-      await expect(
-        page.locator('head meta[name="description"]'),
-        `${path}: exactly one meta description`,
-      ).toHaveCount(1);
-    });
-  }
-});
+// Head-tag uniqueness is covered by seo-metadata-dedupe.spec.ts.
 
 // ---------------------------------------------------------------------------
 // (c) Newsletter signup allowlist (defect #16). The `aside.newsletter-signup`
@@ -153,7 +122,7 @@ test.describe('@content Listing thumbnails prefer WebP over raw PNG @REQ-CONTENT
   for (const path of CARD_SURFACES) {
     test(`${path} has no raw PNG <img> with a WebP sibling`, async ({ page }) => {
       await page.goto(path);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Collect PNG <img> sources that are NOT inside a <picture> element.
       const rawPngSrcs = await page.$$eval('img', (imgs) =>
