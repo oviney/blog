@@ -29,8 +29,8 @@ without repeating the dedicated contract and screenshot gates.
 645 executions: 634 passed and 11 skipped, with one worker. Playwright took
 983 seconds, Pa11y 8 seconds, and Lighthouse 112 seconds.
 
-The revised default selection has 424 executions, including the dedicated gates;
-the extended selection has 337 executions and uses two workers. DOM/JavaScript
+At #1374, the default selection had 424 executions, including the dedicated gates;
+the extended selection had 337 executions and used two workers. DOM/JavaScript
 checks that do not depend on screen size run in Content Chrome. Specs that
 explicitly choose their own viewports run in Responsive Chrome. The other layout
 and journey specs retain mobile, tablet and desktop coverage.
@@ -44,7 +44,10 @@ to their own spec. Screenshot baselines, functional assertions and audit
 thresholds are unchanged.
 
 Measured runtime and validation evidence belong in the performance PR linked
-from [issue #1373](https://github.com/oviney/blog/issues/1373).
+from [issue #1373](https://github.com/oviney/blog/issues/1373). Current selection
+counts are printed by `npm run test:selection`. The evidence-collection and
+retention review is tracked in [issue #1376](https://github.com/oviney/blog/issues/1376)
+after 20 completed scheduled runs; keep unknown defect/effort values explicit.
 
 ## Retention review
 
