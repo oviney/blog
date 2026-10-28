@@ -1,4 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
+import policy from './scripts/playwright-policy.cjs';
+
+const patterns = (files: string[]) => files.map((file) => `**/${file}`);
+const singleRunSpecs = patterns([...policy.contentSpecs, ...policy.viewportSpecs]);
+const extendedExclusions = process.env.PLAYWRIGHT_SUITE === 'extended'
+  ? patterns(policy.gateSpecs)
+  : [];
 
 /**
  * Playwright configuration for Economist Blog v5
@@ -37,8 +44,8 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
 
-  /* Allow parallelism on CI when sharding; use 2 workers per shard */
-  workers: process.env.CI ? (shard ? 2 : 1) : undefined,
+  /* Each test has an isolated browser context; use two workers in CI. */
+  workers: process.env.CI ? 2 : undefined,
 
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
@@ -72,7 +79,18 @@ export default defineConfig({
   /* Configure projects for major browsers and viewports */
   projects: [
     {
+      name: 'Content Chrome',
+      testMatch: patterns(policy.contentSpecs),
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'Responsive Chrome',
+      testMatch: patterns(policy.viewportSpecs),
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
       name: 'Mobile Chrome',
+      testIgnore: [...singleRunSpecs, ...extendedExclusions],
       use: {
         ...devices['Pixel 5'],
         viewport: { width: 320, height: 568 } // Match BackstopJS phone viewport
@@ -80,6 +98,7 @@ export default defineConfig({
     },
     {
       name: 'Tablet Chrome',
+      testIgnore: [...singleRunSpecs, ...extendedExclusions],
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 768, height: 1024 } // Match BackstopJS tablet viewport
@@ -87,6 +106,7 @@ export default defineConfig({
     },
     {
       name: 'Desktop Chrome',
+      testIgnore: [...singleRunSpecs, ...extendedExclusions],
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1080 } // Match BackstopJS desktop viewport
@@ -110,10 +130,12 @@ export default defineConfig({
       ? [
           {
             name: 'Desktop Firefox',
+            testIgnore: extendedExclusions,
             use: { ...devices['Desktop Firefox'] },
           },
           {
             name: 'Desktop Safari',
+            testIgnore: extendedExclusions,
             use: { ...devices['Desktop Safari'] },
           },
         ]

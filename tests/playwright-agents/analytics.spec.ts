@@ -1,110 +1,28 @@
 import { test, expect } from '@playwright/test';
 
-/**
- * Analytics Integration Tests
- *
- * Validates that analytics scripts and meta tags are correctly injected
- * into the page <head> for:
- *  - Google Analytics 4 (GA4)
- *  - Plausible Analytics (privacy-friendly, cookie-free)
- *  - Google Search Console verification meta tag (when configured)
- */
-
+// Script configuration does not change with viewport size. Check the complete
+// contract during one visit per page template rather than reloading for each tag.
 test.describe('@content Analytics Integration @REQ-SEC-01', () => {
+  for (const path of ['/', '/blog/', '/2026/01/02/self-healing-tests-myth-vs-reality/']) {
+    test(`${path} emits valid analytics configuration`, async ({ page }) => {
+      const response = await page.goto(path);
+      expect(response?.ok(), `${path} should load`).toBe(true);
 
-  test('Google Analytics 4 script is present in <head>', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+      const ga = page.locator('head script[src*="googletagmanager.com/gtag/js"]');
+      await expect(ga).toHaveCount(1);
+      await expect(ga).toHaveAttribute('src', /G-/);
+      expect(await ga.getAttribute('async')).not.toBeNull();
+      expect(await page.evaluate(() => typeof (window as any).gtag)).toBe('function');
 
-    // Locate the GA4 async loader script by its src attribute
-    const gaScript = page.locator('script[src*="googletagmanager.com/gtag/js"]');
-    await expect(gaScript).toHaveCount(1);
-
-    const src = await gaScript.getAttribute('src');
-    expect(src).toContain('G-');       // measurement ID must be embedded
-
-    // async is a boolean attribute on the element, not part of the URL
-    const asyncAttr = await gaScript.getAttribute('async');
-    expect(asyncAttr).not.toBeNull();
-  });
-
-  test('Google Analytics 4 gtag initialisation is present', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
-    // Verify the inline gtag config script exists
-    const gtagInit = await page.evaluate(() => {
-      return typeof (window as any).gtag === 'function';
+      const plausible = page.locator('head script[src*="plausible.io/js/script.js"]');
+      await expect(plausible).toHaveCount(1);
+      expect((await plausible.getAttribute('data-domain'))?.trim().length).toBeGreaterThan(0);
+      expect(await plausible.getAttribute('defer')).not.toBeNull();
     });
-    expect(gtagInit).toBe(true);
-  });
+  }
 
-  test('Plausible Analytics script is present in <head>', async ({ page }) => {
+  test('Search Console meta is absent when its verification value is empty', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
-    // Locate the Plausible script by its src attribute
-    const plausibleScript = page.locator('script[src*="plausible.io/js/script.js"]');
-    await expect(plausibleScript).toHaveCount(1);
-
-    // Plausible must have a data-domain attribute set to the site domain
-    const dataDomain = await plausibleScript.getAttribute('data-domain');
-    expect(dataDomain).toBeTruthy();
-    expect(dataDomain!.length).toBeGreaterThan(0);
+    await expect(page.locator('meta[name="google-site-verification"]')).toHaveCount(0);
   });
-
-  test('Plausible script uses defer attribute for non-blocking load', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
-    const plausibleScript = page.locator('script[src*="plausible.io/js/script.js"]');
-    const deferAttr = await plausibleScript.getAttribute('defer');
-    // Playwright returns '' (empty string) when attribute is present with no value
-    expect(deferAttr).not.toBeNull();
-  });
-
-  test('Analytics scripts are present on blog listing page', async ({ page }) => {
-    await page.goto('/blog/');
-    await page.waitForLoadState('networkidle');
-
-    const gaScript = page.locator('script[src*="googletagmanager.com/gtag/js"]');
-    await expect(gaScript).toHaveCount(1);
-
-    const plausibleScript = page.locator('script[src*="plausible.io/js/script.js"]');
-    await expect(plausibleScript).toHaveCount(1);
-  });
-
-  test('Analytics scripts are present on individual post pages', async ({ page }) => {
-    // Navigate to any post — try the first link from the blog listing
-    await page.goto('/blog/');
-    await page.waitForLoadState('networkidle');
-
-    const firstPostLink = page.locator('article a, .article-card a, .post-link').first();
-    const count = await firstPostLink.count();
-    if (count === 0) {
-      console.log('No post links found on /blog/ — skipping post-page analytics check');
-      return;
-    }
-
-    await firstPostLink.click();
-    await page.waitForLoadState('networkidle');
-
-    const gaScript = page.locator('script[src*="googletagmanager.com/gtag/js"]');
-    await expect(gaScript).toHaveCount(1);
-
-    const plausibleScript = page.locator('script[src*="plausible.io/js/script.js"]');
-    await expect(plausibleScript).toHaveCount(1);
-  });
-
-  test('Google Search Console meta tag is absent when not configured', async ({ page }) => {
-    // The _data/analytics.yml has an empty google_search_console_verification value,
-    // so the meta tag should not be rendered.
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
-    const gscMeta = page.locator('meta[name="google-site-verification"]');
-    // The verification token in _data/analytics.yml is empty, so the tag must not be rendered.
-    await expect(gscMeta).toHaveCount(0);
-  });
-
 });
