@@ -12,10 +12,7 @@ image_caption: "Illustration: AI models scan dense enterprise traffic for signs 
 description: "Signature-based intrusion detection misses 60% of novel attacks. AI-driven threat detection is replacing legacy IDS/IPS across enterprise networks."
 ---
 
-![AI threat detection impact: 92% reduction in investigation time, 108 days faster breach detection, $2.22M saved per incident](/assets/charts/ai-threat-detection-enterprise.svg)
-*Source: IBM Cost of a Data Breach Report, 2025; CrowdStrike Charlotte AI, 2024; Palo Alto Networks Unit 42, 2024*
-
-Signature-based intrusion detection systems were built for a world of known threats. That world no longer exists. IBM's 2025 Cost of a Data Breach Report found that organisations using AI-driven security tools detected breaches 108 days faster than those relying on traditional methods — and saved an average of $2.22 million per incident. As adversaries weaponise generative AI to craft polymorphic malware and zero-day exploits at industrial scale, the enterprise security industry is undergoing its most significant architectural shift in two decades: the migration from pattern-matching to machine-learning-based threat detection.
+Security teams use a combination of signatures, behavioural analysis and other controls to identify suspicious activity. AI can help analyse large volumes of signals, but the value of a particular tool depends on the environment and how well teams can investigate its alerts. In its [2023 breach-cost study](https://newsroom.ibm.com/2023-07-24-IBM-Report-Half-of-Breached-Organizations-Unwilling-to-Increase-Security-Spend-Despite-Soaring-Breach-Costs), IBM reported that organisations extensively using both security AI and automation had breach lifecycles 108 days shorter on average than those using neither. The measure covers identification and containment, not detection alone, and the observational comparison does not establish that AI caused the difference.
 
 ## The signature problem
 
@@ -47,7 +44,7 @@ Adoption is accelerating but uneven. Gartner projected that by the end of 2026, 
 
 The deployment models vary. Some organisations embed AI detection within existing security information and event management (SIEM) platforms — Splunk, now owned by Cisco, and Microsoft Sentinel both offer native machine-learning modules. Others deploy dedicated network detection and response (NDR) solutions from specialists like Darktrace, Vectra AI, or ExtraHop. A third cohort builds bespoke models on internal data, an approach favoured by large banks with in-house data-science teams and proprietary threat-intelligence feeds.
 
-The economics favour migration. IBM's 2025 report calculated the average cost of a data breach at $4.88 million globally — the highest figure ever recorded. Organisations that had fully deployed AI in their security workflows reported average breach costs of $3.84 million, a $1.04 million saving. When detection speed, containment efficiency, and reduced analyst overhead are factored in, the return on investment for AI-driven security tools has become difficult to dispute.
+IBM's [2025 report](https://newsroom.ibm.com/2025-07-30-ibm-report-13-of-organizations-reported-breaches-of-ai-models-or-applications%2C-97-of-which-reported-lacking-proper-ai-access-controls) put the global average breach cost in its study at $4.44 million. A global average is not a return-on-investment calculation for an individual security tool. Teams should compare the cost of deployment and operations with observed investigation time, alert quality and outcomes in their own environment, while recognising that prevented incidents are difficult to measure.
 
 ## The adversarial horizon
 
