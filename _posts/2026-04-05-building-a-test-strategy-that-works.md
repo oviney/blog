@@ -57,3 +57,7 @@ The strongest teams also make ownership explicit. If a strategy says contract te
 That, in turn, produces a more realistic strategy. Effective teams measure outcomes rather than activities: escaped defects, mean time to feedback and the ratio of test maintenance to feature development hours. They fund environments and test data as shared capabilities, not optional extras. And they are willing to admit, quarterly, that the previous strategy was partly wrong.
 
 The organisations that test well are therefore not the ones with the thickest strategy documents. They are the ones with the shortest distance between evidence and revision. A test strategy earns its value only when it is cheap to challenge, cheap to update and tightly connected to the economics of delivery. Most quality plans fail because they are written as declarations of intent. The useful ones survive because they are run as feedback systems.
+
+## References
+
+1. ISTQB, [Risk-based testing](https://glossary.istqb.org/en_US/term/risk-based-testing?exact_matches_first=true&term=verification).

@@ -55,3 +55,7 @@ Platform engineering will fulfil its potential only where organisations treat th
 The tools are not the constraint. The discipline of building for your users — even when your users are your colleagues — is.
 
 For the platform design side, see [The Golden Path](/2026/04/12/platform-engineering-developer-portals/).
+
+## References
+
+1. DORA, [Platform engineering](https://dora.dev/capabilities/platform-engineering/).

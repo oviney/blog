@@ -73,3 +73,7 @@ Test automation is frequently portrayed as a quicksilver solution to software qu
 Ignoring the well-documented hidden costs is less an oversight than an open invitation for projects to founder, sowing frustration and squandering precious resources. Recognising and grappling with these concealed expenditures is indispensable to realising automation’s full promise.
 
 For a practical calculation, see [The automation accountant](/2026/01/19/the-surprising-economics-of-test-automation-roi/).
+
+## References
+
+1. ASQ, [Cost of Quality](https://asq.org/quality-resources/cost-of-quality).
