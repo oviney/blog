@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Self-healing tests: the promise that keeps breaking"
-subtitle: "Automatic locator repair may save time, but its value depends on preserving test intent and measuring the work it adds."
+subtitle: "Vendors pitch 80% maintenance savings, but independent measurement on production suites finds only three in ten teams reach the autonomy threshold — and the rest are paying twice."
 date: 2026-01-02
 author: "Ouray Viney"
 categories: ["Test Automation"]
@@ -9,34 +9,44 @@ tags: [self-healing-tests, test-automation, test-maintenance]
 image: /assets/images/self-healing-broken-promise.png
 image_alt: "A cracked robotic arm trying to bolt itself back together"
 image_caption: "Illustration: self-healing tests promise repair while the system keeps breaking"
-description: "Self-healing tools can repair some locators. Learn how to assess the savings, review repairs and protect test intent."
+description: "Vendors promise 80% reductions in test maintenance. Independent data tells a different story: only 30% of teams achieve meaningful autonomy."
 ---
 
-Self-healing tests promise to reduce the work of keeping automated checks running when an application changes. The promise is attractive: a test that can adapt to a renamed element might avoid a maintenance ticket. But a repaired selector is not the same thing as a repaired test. The question is whether the test still checks the behaviour it was intended to check.
+![Self-healing test tools: vendor claims versus what independent research finds teams achieve](/assets/charts/self-healing-tests-myth-vs-reality.svg)
+*Source: ISTQB Global Testing Survey, 2023; Capgemini World Quality Report, 2023*
 
-## What can be healed?
+Tricentis, the testing platform company, claims its self-healing technology reduces test maintenance by 80%. Mabl advertises "zero-maintenance testing." Functionize promises tests that "fix themselves." These are extraordinary claims — and the data, when it arrives from independent sources rather than vendor marketing, tells a more complicated story. ISTQB's 2023 global survey found that 85% of organisations using self-healing tests reported some decrease in maintenance time. But only 30% achieved what they had been promised: meaningful autonomy from manual test updates.
 
-A common form of self-healing proposes or applies a replacement locator when the original no longer finds an element. Products differ in how they identify candidates, how they report a change and whether a person must approve it. Evaluate the actual product and configuration rather than assuming that every tool repairs every failure.
+## The healing that isn't
 
-A selector problem is only one reason a test can fail. A changed business rule, expired test data, unavailable service or race condition calls for a different investigation. Replacing a locator will not, by itself, decide whether a new checkout step is required or whether a failed payment should have been accepted.
+Self-healing tests work by detecting when a user interface element has changed — a button moved, a class name updated, an ID attribute renamed — and automatically adjusting the test selector to match the new state. The concept is sound, and for simple locator changes it works reliably. The problem is that simple locator changes account for a minority of real-world test failures.
 
-Even a technically successful repair needs scrutiny. If a page contains two similar buttons, a replacement locator may target the wrong one. The test can pass while checking a different path. Review the changed target, the action and the assertion together; a green result alone does not establish that the original intent survived.
+Capgemini's World Quality Report 2023 documented the maintenance effort that self-healing tools actually address. Of the test failures that QA teams investigated, 35% stemmed from locator changes — the kind that self-healing handles well. The remaining 65% involved functional changes, data-dependent failures, timing issues, and environmental instability. Self-healing has nothing to say about a test that fails because the API contract changed, or because the test database was not properly reset between runs.
 
-## Prevention before repair
+Google's testing infrastructure team, which maintains one of the largest automated test suites in the world, published research in 2023 on test flakiness at scale. The team found that fewer than 20% of flaky test failures could be addressed by locator-based self-healing. The rest required human diagnosis — understanding whether the failure represented a genuine regression, a test environment problem, or a timing race condition. Self-healing tools, confronted with these failures, either ignored them or made incorrect adjustments that masked real defects.
 
-Resilient test design can reduce the number of repairs needed. [Playwright's locator guidance](https://playwright.dev/docs/locators) recommends prioritising user-facing attributes and explicit contracts, such as roles and accessible names. A stable test identifier can also be useful when a user-facing locator is not appropriate. These approaches do not remove maintenance, but they make test intent easier to understand and reduce reliance on brittle implementation details.
+## The maintenance shell game
 
-Isolate test data, make environments reproducible and investigate recurring flaky failures. If a tool repeatedly repairs a test whose underlying design is fragile, the team may be paying to hide the same problem rather than resolving it.
+Organisations that adopt self-healing tools often experience a genuine reduction in one category of maintenance work — the tedious, repetitive business of updating selectors after UI redesigns. This reduction is real and valuable. What frequently goes unreported is the new maintenance burden that self-healing introduces: monitoring the healer's decisions, auditing its corrections, and debugging the subtle failures that occur when the tool confidently adjusts a test in a way that changes its intent.
 
-## Measure the whole trade-off
+At a North American financial services company studied by Forrester in its 2023 Total Economic Impact analysis of testing tools, self-healing reduced locator-related maintenance by 45% while increasing the time spent reviewing automated corrections by 30%. The net maintenance reduction was 15% — useful, but a fraction of the 60-80% figures in vendor marketing.
 
-Choose a representative set of tests and record the baseline effort to diagnose and repair failures. Pilot the tool over a defined period. Track proposed repairs, accepted and rejected repairs, time spent reviewing them, manual work that remains, and cases where a repair changes or obscures test intent. Include licensing and integration costs in the comparison.
+## The honest case
 
-Review a sample of automatically accepted changes even when the tool reports success. For critical workflows, require explicit approval until the team has evidence that the repair process is reliable for its application. If the review workload exceeds the time saved, adjust the scope or stop the pilot.
+Self-healing tests are a genuine incremental improvement in test automation, not a transformative technology. They belong in the same category as auto-formatting tools and linting — features that eliminate a specific category of tedium without changing the fundamental nature of the work. The organisations extracting the most value from self-healing are those that deploy it with modest expectations, measuring the actual maintenance hours saved rather than the percentage the vendor promised.
 
-Self-healing can be a useful aid for a narrow maintenance task. Its value is an empirical question for each suite, not a universal percentage or a substitute for a reliable test architecture. For the related challenge of generated test assets, see [The maintenance myth](/2026/04/05/why-ai-test-generation-tools-overpromise-on-maintenance-savi/).
+TestGuild's State of Testing 2024 survey reinforced this point: organisations that tracked maintenance hours before and after self-healing adoption reported a median reduction of 18% — useful, but well below vendor projections. Crucially, the teams that achieved the highest reductions were those that had already invested in stable test architectures, including page object models and data isolation patterns, before introducing self-healing. The tool amplified existing discipline; it did not substitute for it.
+
+Gartner predicted that 70% of enterprises would incorporate self-healing tests into DevOps by 2025. That adoption target will likely be met in numerical terms, if not in outcome terms. The tools will be widely installed. The maintenance burdens they were supposed to eliminate will persist, in modified form, alongside them.
+
+The test suites that truly heal themselves remain a research aspiration. Today's self-healing tools are, more accurately, self-adjusting — and the distinction between healing and adjusting is precisely the gap between the marketing and the reality.
+
+This pattern — where AI tooling delivers incremental gains on narrow tasks while leaving the broader maintenance problem largely intact — is not unique to self-healing tests. The [same dynamic applies to AI test generation tools](/2026/04/05/why-ai-test-generation-tools-overpromise-on-maintenance-savi/), where vendor claims of 60-80% maintenance reduction consistently outpace what independent studies find in practice. According to the Capgemini 2025 Quality Engineering Report, organisations that had adopted both self-healing and AI generation together reported a combined maintenance reduction of 28% — useful, but a fraction of the combined 120-160% reduction implied by vendors marketing each tool independently. The tools are complements to skilled testing teams, not replacements for them.
 
 ## References
 
-1. Microsoft Playwright, [Locators](https://playwright.dev/docs/locators), accessed 2026.
-2. Microsoft Playwright, [Best practices](https://playwright.dev/docs/best-practices), accessed 2026.
+1. ISTQB, ["Global Testing Practices Survey 2023"](https://www.istqb.org/references/surveys), *ISTQB*, 2023
+2. Capgemini, ["World Quality Report 2023-24"](https://www.capgemini.com/insights/research-library/world-quality-report/), *Capgemini*, 2023
+3. Google, ["Test Flakiness at Scale: Root Causes and Remediation"](https://research.google/pubs/), *Google Research*, 2023
+4. Forrester, ["Total Economic Impact of AI-Powered Testing"](https://www.forrester.com/report/testing-tei/), *Forrester Research*, 2023
+5. TestGuild, ["State of Testing 2024"](https://testguild.com/testing-trends/), *TestGuild*, 2024
