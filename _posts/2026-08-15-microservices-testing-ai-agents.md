@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Velocity Illusion: AI Agents Are Shipping Microservices That Pass the Build and Break Production"
+title: "AI Agents and the Microservices Testing Gap"
 date: 2026-08-15
 author: "Ouray Viney"
 categories: ["Quality Engineering", "Software Engineering", "Test Automation", "Security"]
@@ -35,7 +35,7 @@ Treat the value of specifications and contract tests as a hypothesis: compare ou
 
 The Monday version of this is checkable. Pick one service pair. Commit the consumer-driven contract and the OpenAPI schema to the repository before the agent writes a line, wire the contract test into the pipeline as a merge gate, and measure two numbers over the next quarter: first-review acceptance rate on AI-authored PRs against that boundary, and contract-related defects escaping to integration. If the first does not rise and the second does not fall, the specification envelope is not working and you should know within twelve weeks.
 
-For the dependency risks that generated code can introduce, see [Dead Links, Live Bugs](/2026/08/11/hallucination-debt-ai-test-generation/).
+For the dependency risks that generated code can introduce, see [the package hallucination analysis](/2026/08/11/hallucination-debt-ai-test-generation/).
 
 ## References
 

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Green Light, Red Ledger: Flaky Tests Are Engineering's Costliest Invisible Tax"
+title: "The Hidden Cost of Flaky Tests"
 date: 2026-07-24
 author: Ouray Viney
 categories: ["Quality Engineering", "Test Automation", "Software Engineering"]
