@@ -44,7 +44,7 @@ The organisations that thrive will be those that treat their test suite not as a
 
 ---
 
-For a closer look at flaky failures, see [Green Light, Red Ledger](/2026/07/24/green-light-red-ledger-flaky-tests-invisible-tax/).
+For a closer look at flaky failures, see [the flaky-test analysis](/2026/07/24/green-light-red-ledger-flaky-tests-invisible-tax/).
 
 ## References
 
