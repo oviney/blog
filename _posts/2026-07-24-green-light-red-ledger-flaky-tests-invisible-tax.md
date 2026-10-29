@@ -4,7 +4,7 @@ title: "Green Light, Red Ledger: Flaky Tests Are Engineering's Costliest Invisib
 date: 2026-07-24
 author: Ouray Viney
 categories: ["Quality Engineering", "Test Automation", "Software Engineering"]
-description: "Flaky tests cost Atlassian 150,000 developer-hours a year and skew 84% of Google's CI signal. The real budget drain is larger than most leaders admit."
+description: "Flaky tests consume engineering time and make failures harder to trust. What published case studies can and cannot tell us."
 image: /assets/images/green-light-red-ledger-flaky-tests-are-engineering-s-costliest-invisible-tax-hero.svg
 image_alt: "An engineer raises a triumphant fist while pressing a green tick button, as a severed pipeline pours red coins into a floor drain behind them"
 image_caption: "The build is green; the budget drains"
@@ -20,7 +20,7 @@ At Atlassian, flaky tests waste an estimated 150,000 developer-hours per year in
 
 ## A Signal-to-Noise Catastrophe
 
-Google's engineers discovered that 16% of all tests in the company's codebase carry some degree of flakiness, a figure remarkable enough on its own. More corrosive is what Google found when examining build transitions: 84% of test-suite transitions from passing to failing are caused by flaky tests rather than genuine code defects, according to Google's Testing Blog. As the chart below illustrates, when a build turns red, the overwhelmingly probable explanation is not that a developer introduced a regression. It is that a test decided to behave differently on a Tuesday. Engineers, being empiricists, eventually update their priors accordingly and stop trusting the signal. This erosion of trust is the compounding cost that balance sheets do not capture. An alert system that cries wolf 84% of the time is not an alert system; it is ambient noise. Teams that have learnt to distrust their test suites begin shipping with lower confidence in quality gates, schedule additional manual review sessions, and, most damagingly, delay deployments until someone with institutional knowledge can intuit whether a failure "looks real." The hidden overhead has been quietly offloaded from the pipeline to the engineer's nervous system.
+In a [2016 account](https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html), Google reported that about 84% of observed transitions from passing to failing involved a flaky test. That observation concerns the transitions and infrastructure Google studied at the time; it is not the probability that any red build at another organisation is a false alarm. Flaky failures can erode trust in a test suite, but teams need their own data to establish the size and cause of the problem. A failing test can also expose a genuine regression, so investigation remains necessary.
 
 ## The Arithmetic of Investigation
 
