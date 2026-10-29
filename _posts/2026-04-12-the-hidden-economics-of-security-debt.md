@@ -21,7 +21,7 @@ What makes the problem stubborn is that most leaders already understand the prin
 
 ## The bill arrives after the breach
 
-Unpatched vulnerabilities are a ticking time bomb, accounting for up to 60% of cyber breaches. Even as the average cost of a data breach reached $4.35 million in 2025, the urgency of addressing these vulnerabilities has not been matched by action within many companies. Analysts from the IBM Cost of a Data Breach Report affirm that these breaches are not merely costly incidents but symptomatic of deeper systemic issues within organisations' approaches to cybersecurity.
+Unpatched vulnerabilities create an exposure that can persist until a fix is applied. IBM's [2025 Cost of a Data Breach Report](https://newsroom.ibm.com/2025-07-30-ibm-report-13-of-organizations-reported-breaches-of-ai-models-or-applications%2C-97-of-which-reported-lacking-proper-ai-access-controls) put the global average cost of a data breach at $4.44 million for the organisations in its study. That figure covers breaches with different causes; it should not be treated as the cost of an unpatched vulnerability specifically.
 
 Companies that delay patching critical vulnerabilities often see their potential breach costs rise by as much as 50%, according to FTI Consulting. This daunting increase demonstrates not only the latent financial risks but also the reactive approach many organisations have towards cybersecurity. Rather than proactively managing vulnerabilities, businesses frequently find themselves in a cycle of firefighting—addressing issues only after they escalate into breaches.
 
