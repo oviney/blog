@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Dead Links, Live Bugs: The Hallucination Debt in AI-Generated Tests"
+title: "The Hallucination Debt in AI-Generated Tests"
 date: 2026-08-11
 author: Ouray Viney
 categories: ["Quality Engineering", "Software Engineering", "Test Automation", "Security"]
