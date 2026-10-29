@@ -4,7 +4,7 @@ title: "Coverage is the BMI of Software Quality: A Comfortable Lie Your Board Be
 date: 2026-08-16
 author: "Ouray Viney"
 categories: ["Quality Engineering", "Test Automation"]
-description: "Line coverage tells your board 93.1% is green. Mutation testing reveals a 34-point gap where logic errors survive every test run. Your CI is lying by omission."
+description: "Line coverage and mutation testing measure different things. A case study shows why executing code does not guarantee tests will detect faults."
 subtitle: "What 93% coverage conceals: the gap between code your tests visit and bugs they would actually catch"
 slug: "code-coverage-mutation-score-quality"
 tags: [quality-engineering, test-automation]
@@ -21,7 +21,7 @@ The foundational claim behind every coverage mandate is that higher coverage mea
 
 ## The Thirty-Four-Point Oracle Gap
 
-If coverage tells you little, mutation testing tells you considerably more. The practice, introducing small, deliberate faults into source code and counting how many tests fail, exposes something coverage cannot: whether assertions actually validate behaviour, or merely observe that code ran without crashing. A practitioner study by J. Ghiringhelli, documented on Dev.to, found that a codebase reporting 93.1% line coverage yielded only a 58.62% mutation score. That 34-point gap represents the fraction of the codebase where a bug could be quietly introduced, all tests would continue to pass, and the CI pipeline would remain resolutely green. Three separate rounds of targeted assertion improvements were required to close it. The headline number had been accurate; it had simply been measuring the wrong thing: thoroughness of visitation, not rigour of judgement. Researchers at Carnegie Mellon and Northern Arizona University formalise this as the "oracle gap" (the difference between source-code coverage and mutation score), arguing it "surfaces important information about the extent and quality of a test effort beyond either adequacy metric alone," particularly exposing files where weak assertions mask untested behaviour. A test that visits a function without asserting on its output is, in any meaningful sense, not a test. Coverage counts it; mutation testing does not. Google's mutation-testing system, run by more than 24,000 developers across more than 1,000 projects in ten languages, shows the gap at industrial scale in the simplest way possible: mutants are generated only on lines that tests already cover, and some still survive. Every surviving mutant is a bug the green dashboard has already blessed.
+Mutation testing introduces small, deliberate changes into source code and checks whether tests detect them. It can reveal weaknesses that coverage alone cannot. In a practitioner case study by J. Ghiringhelli, a codebase reporting 93.1% line coverage yielded a 58.62% mutation score. The two percentages use different denominators: their numerical difference is not the fraction of the codebase containing undetected bugs. The example nevertheless shows why executing a line does not guarantee that a test detects a change to its behaviour. Researchers at Carnegie Mellon and Northern Arizona University study the difference between coverage and mutation score as an "oracle gap" that can help guide investigation. Google's mutation-testing system generates mutants on covered lines, some of which survive. A surviving mutant merits investigation, although it can also be equivalent to the original code or irrelevant to the behaviour under test.
 
 ## The Perverse Machine
 
@@ -35,7 +35,7 @@ As the chart below illustrates, four numbers put the dynamic side by side: one t
 
 [![The Code Coverage Mirage](/assets/charts/code-coverage-mutation-score-quality.png)](/assets/charts/code-coverage-mutation-score-quality.png)
 
-The Monday version of this is checkable. Pick the most critical service in your fleet. Run a mutation testing tool (such as PIT for Java, Stryker for JavaScript/TypeScript/C#, or mutmut for Python) against its core domain logic. Measure two numbers: the reported line coverage versus the mutation kill rate. If the gap exceeds twenty percentage points, your test suite is asserting on presence, not behaviour, and your green build is an illusion you can measure before production surfaces it for you.
+The Monday version of this is checkable. Pick a critical service and run a mutation testing tool (such as PIT for Java, Stryker for JavaScript/TypeScript/C#, or mutmut for Python) against its core domain logic. Review surviving mutants for missing assertions or scenarios, and distinguish meaningful survivors from equivalent or irrelevant changes. Use coverage to find unexecuted code and mutation results to investigate test sensitivity; neither percentage alone proves production quality.
 
 ## References
 
