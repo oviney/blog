@@ -12,26 +12,24 @@ image_alt: "Security debt costs rising as breach exposure grows over time"
 image_caption: "Illustration: security debt compounds into a growing financial burden"
 ---
 
-Security debt behaves like financial debt with one important difference: the interest invoice often arrives as a breach. A vulnerability left unpatched this quarter rarely appears as an accounting entry. It reappears later as incident-response overtime, regulatory exposure, delayed releases, higher cyber-insurance premiums, and board meetings devoted to explaining why a known weakness was left in place. Cybersecurity Ventures projects that unmanaged security debt will cost organisations an average of $9 million annually by 2026. The figure is less a forecast than a warning about what happens when patching, asset visibility, and remediation capacity remain permanently undersupplied.
+Security debt includes unresolved vulnerabilities, unsupported systems and deferred remediation. Its consequences can include incident response, disruption and recovery costs. The exposure is real, but a universal forecast is not a substitute for an organisation's own risk assessment.
 
 What makes the problem stubborn is that most leaders already understand the principle. They know that delaying remediation increases risk. Yet the operating model still treats vulnerability management as a discretionary clean-up task rather than a funded capability. The result is the same pattern seen across software delivery: structural underinvestment creates a backlog, the backlog normalises, and the cost of clearing it rises faster than the budget allocated to reduce it.
 
-![Trend in Security Debt Management Costs](/assets/charts/the-hidden-economics-of-security-debt.png)
-*Source: Cybersecurity Ventures, 2026; IBM Cost of a Data Breach Report, 2025*
 
 ## The bill arrives after the breach
 
 Unpatched vulnerabilities create an exposure that can persist until a fix is applied. IBM's [2025 Cost of a Data Breach Report](https://newsroom.ibm.com/2025-07-30-ibm-report-13-of-organizations-reported-breaches-of-ai-models-or-applications%2C-97-of-which-reported-lacking-proper-ai-access-controls) put the global average cost of a data breach at $4.44 million for the organisations in its study. That figure covers breaches with different causes; it should not be treated as the cost of an unpatched vulnerability specifically.
 
-Companies that delay patching critical vulnerabilities often see their potential breach costs rise by as much as 50%, according to FTI Consulting. This daunting increase demonstrates not only the latent financial risks but also the reactive approach many organisations have towards cybersecurity. Rather than proactively managing vulnerabilities, businesses frequently find themselves in a cycle of firefighting—addressing issues only after they escalate into breaches.
+Delayed remediation can increase the time a system remains exposed. Prioritise fixes using exploitability, asset criticality, available controls and evidence of active exploitation.
 
 ## Why the debt keeps compounding
 
-The charted rise from $5 million in 2024 to a projected $9 million in 2026 captures more than inflation in cyber tooling. It reflects the compounding mechanics of neglected exposure. The longer a backlog of critical findings remains unresolved, the more systems, suppliers, and business processes depend on insecure foundations. Security debt stops being a technical hygiene problem and becomes a drag on operating flexibility.
+A backlog of critical findings needs clear ownership, prioritisation and a plan for exceptions. Track the age and risk of unresolved findings rather than assuming a fixed financial cost for every delayed patch.
 
-Addressing security debt is not just a technical challenge but a financial and managerial one. A majority, 60% of Chief Information Security Officers (CISOs), cite budget constraints as the primary hurdle in addressing security debt effectively. The McKinsey Cybersecurity Survey underscores this reality, highlighting how severely limited budgets inhibit the ability to undertake comprehensive vulnerability management.
+Addressing security debt requires technical and managerial decisions. Teams need enough capacity, a clear view of critical assets and a process for deciding which risks to treat first.
 
-These constraints lead organisations to spend an average of 10% more on security tools due to inadequate vulnerability management. Essentially, limited budgetary allocations force many companies into a reactive, rather than proactive, stance on cybersecurity, leaving them vulnerable to constant threats and the associated high costs. The irony is that many of these same organisations will still approve emergency spend after an incident because the post-breach invoice is politically unavoidable in a way that preventive investment rarely is.
+Budget and capacity constraints can encourage reactive purchases. Assess whether additional tools reduce exposure and integrate with existing workflows before treating spending as a measure of risk reduction.
 
 ## Automation is not absolution
 
@@ -51,7 +49,4 @@ Ultimately, organisations that strategically invest in advanced security practic
 
 ## References
 
-1. Federal News Network, "Visibility is the Only Way to Fix the Public's Growing Security Debt", *Federal News Network*, 2026, [Accessed online](https://federalnewsnetwork.com/commentary/2026/04/visibility-is-the-only-way-to-fix-the-publics-growing-security-debt/).
-2. IBM Cost of a Data Breach Report, "Data Breach Costs", *IBM*, 2025, [Accessed online](https://www.ibm.com/reports/cost-of-a-data-breach-2025).
-3. FTI Consulting, "2026: Make-or-Break Year for Economy", *FTI Consulting*, 2026, [Accessed online](https://www.fticonsulting.com/insights/articles/2026-sets-up-make-break-year-economy).
-4. McKinsey Cybersecurity Survey, "Cybersecurity 2026", *McKinsey*, 2026, [Accessed online](https://www.mckinsey.com/business-functions/risk-and-resilience/our-insights/the-numbers-behind-cybersecurity-2026).
+1. IBM, [Cost of a Data Breach Report 2025 findings](https://newsroom.ibm.com/2025-07-30-ibm-report-13-of-organizations-reported-breaches-of-ai-models-or-applications%2C-97-of-which-reported-lacking-proper-ai-access-controls), 2025.
