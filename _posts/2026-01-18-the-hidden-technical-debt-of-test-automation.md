@@ -16,16 +16,15 @@ Slack's engineering team discovered that flaky tests — tests that pass and fai
 
 Test automation has become one of the fastest-growing sources of technical debt in modern software development, yet it rarely appears on any team's debt register. The suites that promised to reduce maintenance burden have themselves become the maintenance burden — demanding constant care, consuming compute resources, and delivering diminishing returns as they bloat beyond comprehension. The TestDino Flaky Test Benchmark Report 2026 found that the proportion of teams experiencing significant test flakiness grew from 10% in 2022 to 26% in 2025, a trajectory showing no signs of reversal.
 
-![The hidden cost of test automation debt — chart showing 40% of QA time on maintenance, 20–30% on flaky test triage, and flakiness growth from 10% in 2022 to 26% in 2025](/assets/charts/the-hidden-technical-debt-of-test-automation.svg)
 *Source: TestDino, 2026; Capgemini & Sogeti, 2025-26*
 
 ## The compounding cost
 
-The financial damage is quantifiable. Developers spend up to 1.28% of their time repairing flaky tests, translating to approximately $2,250 per month per organisation in direct costs. For enterprise teams, more than 8% of total development time is consumed by fixing unreliable tests — time logged against feature tickets rather than quality budgets, making the true cost invisible to leadership. QA engineers spend an average of 20-30% of their work week simply triaging failures to distinguish between genuine regressions and flaky phantoms.
+Flaky tests impose investigation, rerun and delay costs. Their impact varies by suite and team, so track the number of flaky failures, time spent diagnosing them, and the delay to delivery before converting those observations into a cost estimate.
 
 Microsoft's research found that roughly 25% of test failures in large-scale CI systems are caused by flaky tests rather than actual code defects. Google's testing infrastructure team has published extensively on the problem, documenting how flaky tests erode developer trust in the entire test suite — a second-order effect more damaging than the direct cost. When engineers learn to ignore red builds, real defects slip through undetected.
 
-Test maintenance, including the fight against flakiness, now consumes roughly 40% of QA team time — none of it spent finding actual bugs. The World Quality Report 2025-26, published by Capgemini and Sogeti, found that 58% of quality engineering leaders described their automation ROI as "disappointing" or "unclear."
+Maintenance is a recurring cost of automation, but not all maintenance is wasted: updating a test can preserve a valuable check as the product evolves. Track both the time spent and the risk the test continues to cover.
 
 ## The automation paradox
 

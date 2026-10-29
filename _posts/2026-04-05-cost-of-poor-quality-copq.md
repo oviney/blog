@@ -21,7 +21,7 @@ Software engineering inherited its quality models from manufacturing but impleme
 
 ## The manufacturing precedent
 
-Toyota's production system, the archetype of modern quality management, is built on a deceptively simple insight: stopping the line to fix a defect costs less than shipping it to the customer. Toyota's andon cord — which any worker can pull to halt production — embodies the principle that prevention is cheaper than detection. Toyota's COPQ runs at approximately 2-3% of revenue. Companies without mature quality systems operate at 15-25%.
+Toyota's production system uses the andon principle to make problems visible and enable workers to stop a process when necessary. The transferable idea is to investigate defects early and improve the process. A company's actual cost of poor quality depends on how it defines and measures prevention, appraisal and failure costs.
 
 Yet even Toyota stumbled at the software boundary. In October 2023, the company halted production across all fourteen of its Japanese assembly plants after discovering a database error in its supplier-ordering system. A software defect, not a manufacturing one, shut down the world's largest automaker for two days. Philip Crosby's dictum that "quality is free" — meaning the investment in prevention pays for itself through avoided failure costs — holds as firmly for microservices as for machined parts.
 

@@ -12,16 +12,16 @@ image_caption: "Illustration: AI becomes a crutch when teams stop building their
 description: "AI tools like Copilot now write 46% of code on GitHub. Developers ship faster—but understand less, creating compounding technical debt."
 ---
 
-DORA's 2025 State of AI-Assisted Software Development report, based on data from 39,000 developers across 3,000 organisations, found that AI coding tools increased code throughput by 25% while decreasing developer satisfaction and code stability. METR's independent study, published in July 2025, was blunter: experienced open-source developers using AI assistance completed tasks 19% slower than those working without it, once review and debugging time was included. The productivity narrative around AI coding tools is fracturing under empirical scrutiny.
+The [2025 DORA report](https://dora.dev/research/2025/dora-report/) examines how organisations use AI in software delivery and stresses that outcomes depend on the wider delivery system. Separately, [METR's early-2025 experiment](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/) found tasks took 19% longer when 16 experienced open-source developers could use the AI tools studied. That result applies to its particular participants, tasks and tools; METR later cautioned that its newer data was affected by selection bias and did not provide a reliable current estimate.
 
 ## The throughput illusion
 
-GitHub reported in its 2025 Octoverse analysis that Copilot now generates over 55% of code on its platform — up from 46% a year earlier. Stack Overflow's 2025 Developer Survey found 85% adoption among professional developers. The tools are ubiquitous. The question is whether ubiquity correlates with quality.
+AI coding tools are used across many development teams, but adoption and generated-code volume do not establish whether the resulting software is safer, more maintainable or faster to deliver. Those outcomes need to be measured in context.
 
 ![AI coding tools: the real productivity picture — bar chart comparing code throughput (+25%), task completion time (−19%), code churn (+43%), and failed deployments (+14%)](/assets/charts/practical-applications-of-ai-in-software-development.svg)
 *Source: DORA, 2025; METR, 2025; GitClear, 2025*
 
-DORA's research suggests it does not. Teams using AI coding tools heavily showed higher deployment frequency but also experienced 14% more failed deployments and 8% longer recovery times. The code shipped faster. It also broke more often. GitClear's longitudinal analysis of 250 million lines of code through 2025 reinforced this finding: code churn — the percentage rewritten within two weeks — rose 43% in AI-heavy repositories compared with pre-AI baselines.
+AI can change how quickly code is produced and where review or integration work accumulates. DORA's research discusses delivery performance at the system level; correlations in survey data should not be treated as proof that AI alone caused a team's defects or recovery time.
 
 ## The comprehension debt
 

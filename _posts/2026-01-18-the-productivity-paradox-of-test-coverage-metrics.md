@@ -23,7 +23,7 @@ The thesis is blunt: test coverage, measured as a percentage of lines or branche
 
 The empirical case against coverage targets is damning. Laura Inozemtseva and Reid Holmes at the University of Waterloo examined the relationship between coverage and test-suite effectiveness across five large Java programmes. After controlling for test-suite size, they found that coverage had low to moderate correlation with fault detection. Statement coverage, branch coverage, and even modified condition/decision coverage explained far less variance in bug-finding ability than the sheer number and diversity of test cases. Stronger forms of coverage did not provide greater insight into suite effectiveness.
 
-The finding has been replicated and extended. A 2024 ACM study confirmed that mutation coverage — a supposedly more rigorous metric — is itself not strongly correlated with mutation coverage across different granularities, undermining the assumption that any single metric captures test quality. The research converges on an uncomfortable conclusion: coverage measures whether code was executed during testing, not whether behaviour was verified.
+Coverage measures whether code was executed, not whether its behaviour was checked. Mutation testing can provide another view of test sensitivity, but its results depend on the mutations and tests used; no single percentage captures all aspects of test quality.
 
 Martin Fowler, ThoughtWorks chief scientist, framed it plainly: "I would say you are doing enough testing if the following is true — you rarely get bugs that escape into production, and you are rarely hesitant to change some code for fear it will cause production bugs." Coverage appears nowhere in that definition.
 

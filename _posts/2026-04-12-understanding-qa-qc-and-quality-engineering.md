@@ -12,10 +12,6 @@ image_caption: "Illustration: when quality ownership tangles, the product gets s
 description: "Most organisations treat QA, QC and quality engineering as synonyms. The confusion costs real money — and explains why quality maturity stalls."
 ---
 
-<figure class="article-chart">
-  <img src="/assets/charts/understanding-qa-qc-and-quality-engineering.svg" alt="Only 19% of organisations now say their quality strategy is effective, down from 23% two years earlier — a decline tied in part to unclear ownership between QA, QC, and QE">
-  <figcaption><strong>Source:</strong> OpenText &amp; Capgemini World Quality Report 2025-26; CISQ, 2022; DORA, 2025</figcaption>
-</figure>
 
 Most organisations say they take quality seriously. Far fewer can explain who is supposed to prevent defects, who is supposed to detect them, and who is supposed to engineer the delivery system so quality improves over time. Ask a product leader to distinguish Quality Assurance, Quality Control, and Quality Engineering and the answer is often a shrug, a job-title anecdote, or the all-purpose phrase "the QA team". The ambiguity is expensive. When organisations cannot articulate the difference between preventing defects, detecting defects, and engineering quality into the development lifecycle, they misallocate budgets, misstaff teams, and misdiagnose failures.
 
@@ -37,7 +33,7 @@ The confusion is understandable. All three functions orbit the same objective: s
 
 The practical damage emerges when organisations collapse these three functions into one team — typically labelled "QA" — and expect that team to handle everything from process governance to exploratory testing to test-framework architecture. The result is predictable: the team gravitates toward the most visible activity (finding bugs) and neglects the two activities whose value is structural but less visible (preventing bugs and engineering systemic quality). It is the organisational equivalent of measuring a fire brigade entirely by how many blazes it extinguishes while ignoring the wiring standards that would have prevented the fire in the first place.
 
-The OpenText and Capgemini World Quality Report 2025-26, which surveyed 1,800 technology leaders across 33 countries, found that only 19% of organisations believed their quality strategy was effective — a decline from 23% two years earlier. One contributing factor was organisational ambiguity. Companies that had a dedicated quality-engineering function operating alongside (not inside) QA reported higher satisfaction with quality outcomes than those that had merged all quality roles under a single umbrella.
+The terms QA, QC and QE are used differently across organisations. That variation makes an explicit description of responsibilities more useful than assuming a job title settles who prevents defects, checks behaviour or improves the delivery system.
 
 This mirrors a pattern well documented in manufacturing, where the distinction between QA and QC was settled decades ago. Toyota's production system — the template for lean manufacturing — explicitly separates process assurance (QA) from product inspection (QC), and both from the engineering of poka-yoke mechanisms that make defects structurally impossible (QE). Software organisations, despite borrowing heavily from manufacturing's vocabulary, have been slow to adopt its organisational clarity.
 

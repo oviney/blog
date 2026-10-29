@@ -12,16 +12,14 @@ image_caption: "Illustration: a developer portal turns scattered tools into one 
 description: "Platform engineering is reshaping how organisations deliver software. Internal developer portals are cutting onboarding times and cognitive load."
 ---
 
-![Platform engineering adoption: from 15% of large software orgs in 2022 to a projected 80% by 2027](/assets/charts/platform-engineering-developer-portals.svg)
-*Source: Gartner, 2024; CNCF Annual Survey, 2024; Spotify Engineering Blog, 2025*
 
-Platform engineering — the discipline of building internal toolchains and self-service infrastructure for development teams — has moved from conference buzzword to organisational imperative. Gartner predicts that by 2027, 80% of large software engineering organisations will have established platform engineering teams, up from fewer than 15% in 2022. The shift reflects a hard-won lesson: giving every team unfettered access to raw cloud primitives does not scale.
+Platform engineering builds internal toolchains and self-service infrastructure for development teams. [Gartner forecasts](https://www.gartner.com/en/infrastructure-and-it-operations-leaders/topics/platform-engineering) that by 2027, 80% of large organisations will embrace platform engineering to scale DevOps in hybrid cloud environments, up from less than 30% in 2023. This is a forecast about a defined population and use case, not a measurement of today's adoption.
 
 ## The problem with infinite choice
 
 The promise of cloud-native development was liberation. Containers, Kubernetes, serverless functions, and infrastructure-as-code tools handed developers unprecedented power to provision and deploy. What followed was not the productivity revolution that vendor slide decks forecast but a proliferation of bespoke configurations, inconsistent security postures, and what Humanitec's 2024 State of Platform Engineering report termed "the paradox of choice paralysis."
 
-The Cloud Native Computing Foundation's (CNCF) 2024 survey of over 2,000 organisations found that the average enterprise manages 16 different developer tools across the software delivery lifecycle. Nearly 60% of respondents reported that developers spend more than 30% of their time on infrastructure tasks rather than writing application code. Cognitive load — the mental overhead of navigating tooling complexity — had become the silent tax on engineering velocity.
+Developer teams often need to navigate multiple tools, infrastructure services and organisational processes. A platform can reduce that cognitive load if its workflows address real developer needs; the size of the problem should be measured in the organisation using it.
 
 This is the environment that platform engineering addresses. Rather than expecting every team to assemble its own deployment pipeline, database provisioning workflow, and monitoring stack, platform teams build opinionated, self-service "golden paths" — pre-approved, well-documented routes from code commit to production deployment. The developer retains autonomy to deviate when necessary. The default, however, is paved.
 

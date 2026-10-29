@@ -15,7 +15,7 @@ description: "Volkswagen's tests hit 94% pass rates — then a two-year launch d
 ![Testing theatre: 61% of QA teams still use pass rate as their primary metric; only 12% measure mutation testing](/assets/charts/the-real-cost-of-testing-theater-when-quality-metr.svg)
 *Source: PractiTest State of Testing Survey, 2025 (n=2,700 practitioners)*
 
-Volkswagen's software division, CARIAD, reported in 2024 that its automated test suites achieved 94% pass rates across all vehicle software modules. Six months later, the company delayed the launch of the Trinity electric sedan by two years, citing software quality failures so severe that board members described the codebase as "not production-ready." The test suites had been passing. The software had been failing. Nobody noticed because the dashboard was green.
+A dashboard can show a high pass rate while important customer journeys remain untested. The result may accurately describe the checks that ran, yet say little about missing scenarios, weak assertions or risks outside the suite. That is why leaders need to ask what the result covers and what it leaves out.
 
 This is testing theatre — the elaborate performance of quality assurance activity that creates the illusion of rigour while leaving actual software quality unmeasured. It is not a fringe problem. It is the default state of QA measurement in most large enterprises, and it persists because the metrics teams report are designed to reassure rather than inform.
 

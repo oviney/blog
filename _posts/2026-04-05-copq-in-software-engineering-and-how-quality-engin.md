@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Software's Trillion-Dollar Tax: The Cost Nobody Itemises"
-subtitle: "Poor software quality costs the US $2.41 trillion a year — and the CrowdStrike outage proved a single untested deployment can destroy half a billion dollars in an afternoon."
+subtitle: "CISQ estimated $2.41 trillion in US software quality costs in 2022; incident costs show why organisations should measure their own exposure."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
@@ -9,33 +9,13 @@ tags: [cost-of-quality, quality-engineering, software-engineering]
 image: /assets/images/copq-software-engineering.png
 image_alt: "A newspaper front page announcing a trillion-dollar software quality bill"
 image_caption: "Illustration: poor quality lands as a bill large enough to make headlines"
-description: "CISQ estimates poor software quality costs the US $2.41 trillion a year. CrowdStrike's single untested update destroyed $500 million in one afternoon."
+description: "CISQ estimated the US cost of poor software quality in 2022. The CrowdStrike outage illustrates the risks behind aggregate estimates."
 ---
 
 On 19 July 2024, a faulty content update pushed by CrowdStrike's Falcon sensor crashed 8.5 million Windows machines worldwide. Delta Air Lines cancelled 7,000 flights over five days, disrupting 1.3 million customers. Delta's CEO Ed Bastian put the cost at $500 million, encompassing lost revenue, tens of millions per day in customer compensation, and hotel costs. Delta has since sued CrowdStrike, seeking damages exceeding that figure. The root cause was not a sophisticated cyberattack. It was a defective configuration file that bypassed validation — a quality engineering lapse so elementary that it would fail a university exam.
 
-The CrowdStrike incident was spectacular, but it was not unusual. The Consortium for Information and Software Quality (CISQ) estimated in its 2022 report — still the most comprehensive macroeconomic analysis available — that poor software quality cost the United States economy $2.41 trillion annually. That figure comprises operational failures ($1.56 trillion), legacy system maintenance ($520 billion), and unsuccessful IT projects ($260 billion). The number has grown every year since CISQ began tracking in 2018, rising 24% in real terms over six years. Software quality is not improving. The cost of its absence is compounding.
+The [CISQ 2022 report](https://www.it-cisq.org/wp-content/uploads/sites/6/2022/11/CPSQ-Report-Nov-22-2.pdf) estimated the annual cost of poor software quality in the United States at at least $2.41 trillion. It also estimated accumulated technical debt at approximately $1.52 trillion, a distinct measure. These are estimates based on the report's methods and assumptions, not a direct accounting of any one company's costs. CISQ's 2018 and 2020 estimates were $2.8 trillion and $2.08 trillion respectively; they do not support a claim that the estimate rose every year.
 
-<figure aria-label="Horizontal bar chart: annual cost of poor software quality in the US — operational failures $1,560B, legacy system maintenance $520B, unsuccessful IT projects $260B" style="margin:2em 0;padding:1.25em 1.25em 0.75em;background:#f9f9f9;border-top:3px solid #E3120B;font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;">
-<figcaption style="font-size:0.9em;font-weight:700;color:#1a1a1a;margin:0 0 0.2em;">Annual cost of poor software quality in the US</figcaption>
-<p style="font-size:0.75em;color:#666;margin:0 0 1em;">$ billions · CISQ 2022 estimate</p>
-<div style="margin-bottom:0.75em;">
-<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.3em;"><span style="font-size:0.8em;color:#1a1a1a;">Operational failures</span><span style="font-size:0.8em;font-weight:700;color:#E3120B;">$1,560B</span></div>
-<!-- 100% = $1,560B (reference / max value) -->
-<div style="background:#e0e0e0;height:18px;"><div style="background:#E3120B;height:100%;width:100%;"></div></div>
-</div>
-<div style="margin-bottom:0.75em;">
-<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.3em;"><span style="font-size:0.8em;color:#1a1a1a;">Legacy system maintenance</span><span style="font-size:0.8em;font-weight:700;color:#555;">$520B</span></div>
-<!-- 33% = $520B / $1,560B -->
-<div style="background:#e0e0e0;height:18px;"><div style="background:#555;height:100%;width:33%;"></div></div>
-</div>
-<div style="margin-bottom:0.5em;">
-<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.3em;"><span style="font-size:0.8em;color:#1a1a1a;">Unsuccessful IT projects</span><span style="font-size:0.8em;font-weight:700;color:#888;">$260B</span></div>
-<!-- 17% = $260B / $1,560B -->
-<div style="background:#e0e0e0;height:18px;"><div style="background:#888;height:100%;width:17%;"></div></div>
-</div>
-<p style="font-size:0.7em;color:#999;margin:0.75em 0 0;padding-top:0.6em;border-top:1px solid #ddd;">Source: CISQ, <em>The Cost of Poor Software Quality in the US</em>, 2022</p>
-</figure>
 
 ## The invisible tax
 
@@ -45,7 +25,6 @@ Stripe's developer coefficient survey found that engineers at the average compan
 
 The CloudQA 2025 cost of software bugs report confirmed that defect economics follow a brutal exponential curve. A defect found in production costs 30 to 100 times more to fix than one caught during design or unit testing. Yet most teams still allocate the bulk of their quality spend to the end of the pipeline, where the cost multiplier is highest. The economics are perverse: the industry systematically over-invests in the most expensive place to find bugs and under-invests in the cheapest.
 
-![Defect cost multiplier by detection stage — chart showing costs rising from 1× at design to 30–100× in production](/assets/charts/copq-in-software-engineering-and-how-quality-engin.svg)
 *Source: CloudQA, 2025; CISQ, 2022*
 
 ## The shift-left arithmetic
@@ -56,7 +35,7 @@ CrowdStrike's Channel File 291 update bypassed the kind of staged rollout and ca
 
 ## The accountability gap
 
-The deeper problem is structural. In most companies, nobody is accountable for the total cost of quality. Engineering leadership owns development speed. Operations owns uptime. Product owns revenue. Quality falls between these boundaries, claimed by all and owned by none. ASQ benchmarking data shows that companies with mature quality systems operate at 2-3% COPQ as a share of revenue, while those without run at 15-25% — a tenfold difference driven by whether anyone actually owns the quality economics.
+The deeper problem is structural. In most companies, nobody is accountable for the total cost of quality. Engineering leadership owns development speed. Operations owns uptime. Product owns revenue. Quality falls between these boundaries, claimed by all and owned by none. Organisations can make those costs visible by agreeing on consistent categories and reviewing prevention, appraisal, rework and customer impact together.
 
 The irony is that the data to close this gap already exists. Every company tracks incident costs, rework hours, and customer churn. The missing step is aggregation — summing these scattered line items into a single quality cost figure that sits beside revenue and headcount on the executive dashboard. Google's error budget model does exactly this: it translates reliability targets into a financial framework where every outage minute has a dollar value and every feature freeze has an opportunity cost. The model forces trade-off decisions that most companies make by intuition and politics rather than arithmetic.
 
