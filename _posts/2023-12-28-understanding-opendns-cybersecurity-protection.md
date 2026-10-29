@@ -17,7 +17,7 @@ Many attacks require a device to find a destination on the internet. DNS filteri
 
 ## The DNS advantage
 
-The appeal of DNS security lies in its timing. Every internet connection begins with a DNS lookup — a device asking "where is this website?" By intercepting that question, a security provider can refuse to answer when the destination is known to harbour malware, phishing pages, or botnet command infrastructure. No software agent is required on the device. No signature database needs updating on every laptop. The protection blankets everything on the network, from an engineer's workstation to a neglected IoT thermostat that will never receive a security patch.
+The appeal of DNS security lies in its timing. Many connections use a DNS lookup to resolve a name to an address; cached results and direct IP connections can avoid a new lookup. By intercepting that question, a security provider can refuse to answer when the destination is known to harbour malware, phishing pages, or botnet command infrastructure. No software agent is required on the device. No signature database needs updating on every laptop. The protection blankets everything on the network, from an engineer's workstation to a neglected IoT thermostat that will never receive a security patch.
 
 DNS filtering is attractive because it can apply policy at a shared resolver. That coverage depends on which devices and applications actually use the resolver and on the quality of the detection rules.
 
