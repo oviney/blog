@@ -54,8 +54,4 @@ Platform engineering will fulfil its potential only where organisations treat th
 
 The tools are not the constraint. The discipline of building for your users — even when your users are your colleagues — is.
 
-## References
-
-1. Infrastructure Engineering: A Still Missing, Undervalued Role in the Research Ecosystem, *arXiv*, 2025. Available at: [arxiv.org/abs/2405.10473](https://arxiv.org/abs/2405.10473)
-2. Mastering Site Reliability Engineering in Enterprise, *Springer*, 2025. Available at: [link.springer.com](https://link.springer.com/content/pdf/10.1007/979-8-8688-1448-8.pdf)
-3. Internal Developer Platforms: A 2025 Benchmark Report, *CNCF TAG App Delivery*, 2025. Available at: [tag-app-delivery.cncf.io](https://tag-app-delivery.cncf.io)
+For the platform design side, see [The Golden Path](/2026/04/12/platform-engineering-developer-portals/).

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Quality's Second Act: What Software Can Steal from Factories"
-subtitle: "Manufacturing spent decades learning that quality is cheaper than inspection — Boeing's $31 billion lesson and CrowdStrike's $500 million afternoon prove software hasn't learned yet."
+subtitle: "Manufacturing practices offer lessons for identifying prevention, inspection and failure costs in software."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
@@ -9,15 +9,14 @@ tags: [cost-of-quality, quality-engineering, defect-prevention]
 image: /assets/images/copq-cross-industry.png
 image_alt: "A factory assembly line faces a chaotic software delivery pipeline split across the same frame"
 image_caption: "Illustration: manufacturing discipline and software chaos collide in the cost of poor quality"
-description: "Boeing's $31 billion quality failure mirrors software's inverted cost structure. US firms spend 3.4× more fixing defects than preventing them."
+description: "How cost-of-quality thinking can help software teams understand prevention, rework and customer impact."
 ---
 
-![Cost of poor quality: software organisations spend 3.4 times more fixing defects than preventing them](/assets/charts/cost-of-poor-quality-copq.svg)
 *Source: ASQ; CISQ Cost of Poor Software Quality in the US, 2022; Boeing SEC filings, 2024*
 
-Boeing has accumulated more than $22 billion in deferred production costs on the 737 programme alone, according to Leeham News analysis of Boeing's SEC filings through December 2024. Total financial impact from the MAX crisis — spanning compensation payments, production halts, regulatory fines, and a January 2024 door-plug blowout that grounded fleets again — exceeds $31 billion since the original 2019 grounding. The company reported an $11.83 billion net loss for 2024, its worst since the pandemic. That sum represents the most expensive proof in industrial history of a principle that W. Edwards Deming articulated in the 1950s: quality cannot be inspected into a product. It must be built into the process.
+Failures in complex products can carry costs well beyond the immediate repair: investigations, customer disruption, rework and lost confidence. Manufacturing's cost-of-quality model offers a way to make prevention and failure costs visible before a problem reaches that scale.
 
-Software engineering inherited its quality models from manufacturing but implemented them backwards. The American Society for Quality estimates that the cost of poor quality (COPQ) consumes 15-20% of sales revenue in American manufacturing, with some organisations reaching 40% of total operations. The CISQ pegged the software equivalent at $2.41 trillion in the United States alone. Whether the defect is a misaligned fuselage panel or a race condition in a payments API, the arithmetic of prevention versus failure follows identical curves.
+The [CISQ 2022 report](https://www.it-cisq.org/the-cost-of-poor-quality-software-in-the-us-a-2022-report/) estimated US costs associated with poor software quality at at least $2.41 trillion. Its aggregate estimate and a manufacturer's internal cost-of-quality measure use different scopes; they should not be treated as directly comparable.
 
 ## The manufacturing precedent
 
@@ -25,19 +24,19 @@ Toyota's production system uses the andon principle to make problems visible and
 
 Yet even Toyota stumbled at the software boundary. In October 2023, the company halted production across all fourteen of its Japanese assembly plants after discovering a database error in its supplier-ordering system. A software defect, not a manufacturing one, shut down the world's largest automaker for two days. Philip Crosby's dictum that "quality is free" — meaning the investment in prevention pays for itself through avoided failure costs — holds as firmly for microservices as for machined parts.
 
-The CPA Journal's 2025 analysis of Boeing's corporate culture failure traced the 737 MAX crisis to a systematic deprioritisation of engineering quality in favour of financial targets — a pattern Deming warned against in his fourteenth point: "put everybody in the company to work to accomplish the transformation." Boeing did the opposite, and the $31 billion bill is still growing.
+A culture that makes schedule and financial targets visible but suppresses quality concerns can make problems harder to address. Leaders need mechanisms for raising and acting on those concerns.
 
 ## Software's inverted pyramid
 
-Software development adopted quality assurance terminology from manufacturing but inverted the cost structure. In manufacturing, prevention dominates quality spending. In software, detection and failure costs dominate. CISQ's data shows that US software companies spend 3.4 times more on finding and fixing defects than on preventing them — a ratio that manufacturing abandoned in the 1980s.
+A team can use prevention, appraisal and failure categories to see where quality work and its consequences fall. The split must be measured locally; the categories do not establish a universal ratio.
 
-The CrowdStrike outage of July 2024 illustrated the consequences. A configuration file that bypassed validation testing crashed 8.5 million machines because the deployment pipeline lacked the software equivalent of Toyota's andon cord — a mechanism to halt the process when quality checks fail. CrowdStrike had testing. It had monitoring. What it lacked was the cultural authority for quality to stop the release.
+The CrowdStrike outage of July 2024 illustrates the reach a faulty update can have. Deployment safeguards, including validation and staged rollout, are ways to limit exposure, but their effectiveness depends on the failure mode and implementation.
 
 The shift-left movement, continuous testing, and the DevOps mantra of "quality is everyone's responsibility" are all restatements of principles that manufacturing formalised decades ago. Software is not inventing new quality theory. It is belatedly importing old quality theory and discovering, with expensive surprise, that it works.
 
 ## The digital twin bridge
 
-The most productive cross-pollination between manufacturing and software quality is happening through digital twins. IBM integrated TQM principles with Agile development practices and comprehensive quality assurance processes, resulting in a 30% reduction in bug reports and improved delivery timelines. Siemens's digital twin platform enables exhaustive scenario testing for automotive embedded software that would be prohibitively expensive on physical hardware.
+Digital twins and simulated environments can help teams exercise scenarios before changes reach physical systems. Their value depends on how faithfully they model the behaviour and risks of interest.
 
 Tesla's approach to vehicle software updates offers another hybrid model. The company tests changes against fleet-wide simulation before deploying over-the-air updates to millions of vehicles. Tesla's software defect rate per release runs significantly below the industry average for connected vehicles, attributable primarily to its simulation-first methodology. The digital twin is the software equivalent of a manufacturing test rig — a controlled environment where defects can be caught at prevention-stage costs.
 
@@ -45,14 +44,12 @@ Tesla's approach to vehicle software updates offers another hybrid model. The co
 
 The technical tools are available. What most software companies lack is the cultural infrastructure that makes them effective. Manufacturing's quality revolution required executive sponsorship, worker empowerment, and decades of institutional learning. Google's Site Reliability Engineering team adopted a similar defect-budget approach — teams that exhaust their error budget must freeze feature releases until stability is restored. The result is not slower delivery but more predictable delivery.
 
-Boeing's $31 billion lesson, Toyota's decades of compounding advantage, and CrowdStrike's $500 million afternoon all point to the same conclusion: the cost of quality is always paid. The only choice is whether to pay it in prevention, which compounds into competitive advantage, or in failure, which compounds into existential risk.
+The cost of quality appears in prevention, investigation and failure. Making those costs visible helps leaders decide where additional safeguards or process changes are worth the investment.
 
 ---
 
+For the wider software cost estimate, see [Software’s Trillion-Dollar Tax](/2026/04/05/copq-in-software-engineering-and-how-quality-engin/).
+
 ## References
 
-1. Leeham News, "Boeing Deferred Production Costs: $39bn since 2019 MAX grounding, $22bn for 737," February 2025, [leehamnews.com](https://leehamnews.com/2025/02/04/boeing-deferred-production-costs-39bn-since-2019-max-grounding-22bn-for-737/)
-2. The CPA Journal, "The Story of Boeing's Failed Corporate Culture," August 2025, [cpajournal.com](https://www.cpajournal.com/2025/08/12/the-story-of-boeings-failed-corporate-culture-3/)
-3. CISQ, *The Cost of Poor Software Quality in the US: A 2022 Report*, [it-cisq.org](https://www.it-cisq.org/the-cost-of-poor-quality-software-in-the-us-a-2022-report/)
-4. ASQ, "Cost of Poor Quality (COPQ)," [asq.org](https://asq.org/quality-resources/quality-glossary)
-5. CrowdStrike, "Preliminary Post Incident Review," July 2024, [crowdstrike.com](https://www.crowdstrike.com/blog/falcon-update-for-windows-hosts-technical-details/)
+1. CISQ, [Cost of Poor Software Quality in the US](https://www.it-cisq.org/the-cost-of-poor-quality-software-in-the-us-a-2022-report/), 2022.
