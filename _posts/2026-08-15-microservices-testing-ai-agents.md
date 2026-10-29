@@ -35,10 +35,6 @@ Two findings would weaken this argument. If LinearB's 2027 benchmarks show AI PR
 
 The Monday version of this is checkable. Pick one service pair. Commit the consumer-driven contract and the OpenAPI schema to the repository before the agent writes a line, wire the contract test into the pipeline as a merge gate, and measure two numbers over the next quarter: first-review acceptance rate on AI-authored PRs against that boundary, and contract-related defects escaping to integration. If the first does not rise and the second does not fall, the specification envelope is not working and you should know within twelve weeks.
 
-As the chart below illustrates, quality metrics, pull-request acceptance rates, and security vulnerability baselines diverge sharply when AI agents operate without strict specification boundaries.
-
-![The Quality Gap in AI Code](/assets/charts/microservices-testing-ai-agents.png)
-
 ## References
 
 1. DeviQA. *State of AI-Generated Code 2026: The QA and Testing Gap*. Survey of 300 QA engineers, SDETs, and test leads. https://www.deviqa.com/blog/state-of-ai-generated-code-2026-the-qa-and-testing-gap/
