@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Code Generators: The Brilliant Interns Nobody Supervises"
-subtitle: "The keystroke-per-minute gains are real — but METR's randomised trial found developers 19% slower at finishing tasks, while GitClear's data shows code churn up 41%."
+subtitle: "A small METR trial found slower task completion with early-2025 AI tools, while GitClear's data raises questions about code churn."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Software Engineering"]
@@ -9,13 +9,13 @@ tags: [ai, software-engineering, code-quality, productivity]
 image: /assets/images/ai-assisted-code-generation.png
 image_alt: "Office robots write code at keyboards with no human supervision"
 image_caption: "Illustration: code generators move fast when nobody is reviewing them"
-description: "AI code generators boost typing speed but degrade code quality — METR found developers are 19% slower on tasks, while GitClear shows 41% higher code churn."
+description: "AI coding tools raise questions about productivity and maintainability. A closer look at a METR trial and GitClear's code churn data."
 ---
 
 ![AI coding tools: productivity gains in throughput offset by code churn and slower experienced developers](/assets/charts/ai-assisted-development-the-new-industrial-revolut.svg)
 *Source: DORA State of AI-Assisted Software Development, 2025; METR, 2025; GitClear, 2025*
 
-METR, a non-profit AI safety research lab, tracked 16 experienced open-source developers as they completed 246 real-world coding tasks on mature repositories averaging over one million lines of code. The developers using AI tools took 19% longer than those working without them. Before the study, participants had predicted AI would make them 24% faster. Even after experiencing the slowdown, they estimated AI had improved their productivity by 20%. The gap between perception and measurement is the defining feature of the AI coding revolution: developers believe the tools help, the data says otherwise, and nobody wants to hear it.
+METR, a non-profit AI safety research lab, tracked 16 experienced open-source developers as they completed 246 real-world coding tasks on mature repositories averaging over one million lines of code. In this early-2025 experiment, tasks took 19% longer when developers were allowed to use AI tools. Before the study, participants had predicted AI would make them 24% faster; afterwards, they estimated an improvement of 20%. This gap between perception and measurement is a reason to measure outcomes, not a universal verdict on AI coding. In a [February 2026 update](https://metr.org/blog/2026-02-24-uplift-update/), METR said selection effects made its newer experiment an unreliable measure and judged that newer tools likely sped developers up more than in early 2025.
 
 The core problem is that AI code generators optimise for plausibility, not correctness. They produce code that looks right, compiles cleanly, and passes superficial review. But the evidence — from controlled studies, production telemetry, and security research — shows that the code they generate carries higher defect density, weaker security, and more churn than human-written equivalents. The productivity gains are real but narrow, and the costs are systematically undermeasured.
 
