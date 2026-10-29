@@ -25,7 +25,7 @@ This architectural elegance explains why Gartner's 2023 Market Guide for DNS Sec
 
 ## Where the shield cracks
 
-Yet DNS security is not impervious. Encrypted DNS protocols — DNS over HTTPS and DNS over TLS — are eroding the visibility that filtering depends upon. Mozilla enabled DNS over HTTPS by default in Firefox in 2020, routing queries through Cloudflare and bypassing corporate DNS controls entirely. Google followed with similar defaults in Chrome. The encrypted channel that protects user privacy simultaneously blinds the network defender.
+Yet DNS security is not impervious. DNS over HTTPS and DNS over TLS encrypt queries, which can limit the visibility available to a network-based filter if a client uses a different resolver. The effect depends on browser settings and enterprise policy. [Mozilla's documentation](https://support.mozilla.org/en-US/kb/dns-over-https) says Firefox's default protection can disable DNS over HTTPS when enterprise policies or network signals require it. Organisations should test which resolvers their managed devices actually use rather than assume that encryption always bypasses their controls.
 
 Cisco's own 2023 Cybersecurity Readiness Index acknowledged this tension. Among 6,700 organisations surveyed across 27 countries, only 15% had adapted their DNS security architecture to handle encrypted queries. The remaining 85% faced a growing blind spot — precisely the kind of gap that attackers, who read the same reports, know how to exploit.
 
