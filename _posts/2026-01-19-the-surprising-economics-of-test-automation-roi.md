@@ -33,3 +33,7 @@ After introducing automation, track run frequency, failed runs, time spent diagn
 For customer impact, examine escaped defects and incident trends, recognising that product changes and other controls also affect them. A single pilot rarely proves that automation caused a change in production quality.
 
 The useful business case is a hypothesis that can be checked. If maintenance outweighs the benefit, simplify the test, change its level or retire it. If the check reliably reduces repeated effort or makes an important risk visible sooner, retain it and update the calculation with observed data.
+
+## References
+
+1. ASQ, [Cost of Quality](https://asq.org/quality-resources/cost-of-quality).

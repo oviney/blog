@@ -33,3 +33,7 @@ Select a representative workflow and compare its current execution with the prop
 The decision is not simply whether automation is cheaper than manual testing. A check that catches an important regression early can be valuable even if it does not eliminate a manual role. Equally, an expensive test that rarely runs and contributes little assurance may not deserve continued maintenance.
 
 The practical goal is a balanced portfolio: fast, reliable checks for repeatable behaviour, supported by human exploration and investigation where judgement matters.
+
+## References
+
+1. Google Testing Blog, [Flaky Tests at Google and How We Mitigate Them](https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html), 2016.
