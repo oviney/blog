@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Testing times: why AI conquered QA without improving it"
-subtitle: "$2.3 billion in vendor funding and 80% adoption later, defect-escape rates look stubbornly familiar — AI changed who tests, but not yet what gets through."
+title: "Testing times: measuring AI’s value in QA"
+subtitle: "Faster test creation is useful, but it does not establish that fewer defects reach customers."
 date: 2025-12-31
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
@@ -9,46 +9,32 @@ tags: [ai-testing, test-automation, quality-engineering]
 image: /assets/images/testing-times-renovation.png
 image_alt: "Robots present QA dashboards while human testers watch from the edge of the room"
 image_caption: "Illustration: automation takes centre stage while quality outcomes barely move"
-description: "80% of software teams will use AI testing tools by 2025. Vendors raised $2.3 billion. Yet defect rates remain unchanged. An examination of the gap."
+description: "AI can help teams create tests faster. Measure review, maintenance and customer outcomes before claiming a quality improvement."
 ---
 
-Tricentis research projects that 80% of software teams will use AI-assisted testing tools by the end of 2025 — a fourfold increase from 2021. Vendors have raised $2.3 billion in venture capital since 2022, according to CB Insights, promising self-healing scripts, autonomous test generation, and the obsolescence of manual testers. Yet by the measures that matter to engineering leaders, remarkably little has changed. The artificial intelligence revolution in software testing is real. The productivity revolution is not.
+AI can produce test ideas and draft scripts quickly. Whether it improves quality is a separate question: a team must still decide what to test, verify the expected results and learn what reaches customers. Counting generated tests or tool licences cannot answer it.
 
-![AI in QA: the gap between vendor promises and measured reality — chart comparing claimed productivity gains against independent evidence](/assets/charts/testing-times-ai-gap.png)
-*Source: Tricentis, 2025; Forrester, 2024; TestGuild, 2024*
+The [World Quality Report 2025–26](https://www.opentext.com/ca/about/press-releases/world-quality-report-2025-ai-adoption-surges-in-quality-engineering-but-enterprise-level-scaling-remains-elusive), from OpenText, Capgemini and Sogeti, reported that 89% of responding organisations were piloting or deploying generative AI in quality engineering. The report distinguished pilots, production use and enterprise-scale deployment. Its adoption figures do not, by themselves, show whether escaped defects fell or whether a particular investment paid for itself.
 
-## The adoption paradox
+## Faster drafts, accountable decisions
 
-The adoption curves look like hockey sticks. DevOps testing practices jumped from 17% of teams in 2022 to 52% in 2024, per TestGuild's annual survey. Generative AI is now used by 61% of organisations for code generation and test scripting, according to GitLab's 2024 DevSecOps Report. These are not experimental programmes — they represent mainstream adoption at enterprise scale.
+A generated test can make a useful first draft: it can suggest boundary conditions, create repetitive setup or turn a clear example into executable code. It can also invent a requirement, choose an invalid expected result or create assertions that merely repeat the implementation. A reviewer must check the scenario and its oracle against an independent source of expected behaviour.
 
-The maintenance burden, meanwhile, has barely budged. When TestGuild surveyed 3,200 practitioners about their top challenges, test maintenance and flaky tests ranked first and second — the same positions they held in 2019, before the current AI wave began. Self-healing capabilities, the feature most loudly trumpeted by vendors, reduce maintenance effort by 15-20% in practice, according to Forrester's 2024 testing technology assessment. That is useful but falls far short of the 60-70% reductions promised in product demonstrations.
+Consider a payment API. Generating cases for missing fields is helpful, but the team still needs to establish what a rejected payment should return, whether a duplicate request can charge twice and how downstream systems learn the outcome. A test that runs successfully with the wrong expectation offers false confidence.
 
-The pattern is familiar. Selenium promised to eliminate manual regression testing; it created a new category of maintenance burden instead. Codeless tools promised to let business analysts write tests; they shifted the bottleneck from creation to debugging. Each generation of tooling solves one problem while quietly creating another.
+## Measure the full cost
 
-That is why the current AI cycle deserves a colder reading than the one investors and vendors prefer. The tools are changing how test assets are produced, but they have not changed the economic structure of quality work. Someone still has to decide what matters, verify the outputs, and pay for the false confidence that accumulates when teams confuse faster generation with better assurance.
+Creation time is only one part of the economics. A comparison should include the effort to describe the problem, review the output, prepare data, execute tests, investigate failures and maintain checks as the product changes. Tools may move work between these activities rather than remove it.
 
-## Where the value hides
+A useful pilot selects a few comparable changes and records elapsed and active effort for the whole workflow. Track meaningful defects or test gaps found, rejected suggestions, flaky checks and maintenance time. For customer risk, examine escaped defects and incident patterns over a longer period; a small pilot will rarely support a precise claim about production quality. Avoid comparing teams without considering differences in their systems and work.
 
-AI delivers genuine gains, but not where the marketing suggests. At Microsoft, the Developer Division found that AI-generated unit tests were 62% faster to create than manually written ones, with equivalent defect detection rates. The savings materialised in the most tedious work — boundary value analysis, null-input handling, simple integration checks — while human testers continued to own the exploratory testing and complex scenario design where AI tools produced unreliable results.
+## Keep the customer in view
 
-Spotify's test engineering team documented a similar pattern. AI tools reduced the time spent on regression test creation by 40%, but the time saved was immediately absorbed by a 35% increase in test suite maintenance. The net productivity gain, carefully measured over six months, was 8% — real, but hardly transformative.
+Exploration, accessibility, usability and assessment of ambiguous requirements demand attention even when a team automates regression checks. Developers can own quality while drawing on product and quality expertise. The goal is not to preserve every manual step or automate every one; it is to cover the important risks and understand the costs of doing so.
 
-## The talent question
-
-The most consequential effect of AI testing tools may be organisational rather than technical. Companies that positioned AI as a replacement for QA headcount are discovering that the remaining testers need to be significantly more skilled, not less. At Atlassian, the testing team's headcount dropped by 20% between 2022 and 2024, but the average seniority and compensation of remaining testers increased by 35%. The company needed fewer people who could click through test scripts and more who could design testing strategies, evaluate AI outputs, and debug the novel failure modes that AI-generated tests introduce.
-
-This shift creates a paradox for the profession. Junior testing roles — the traditional entry point into quality engineering — are disappearing. The roles that remain demand the kind of systems thinking and architectural knowledge that takes years to develop. The industry is removing the bottom rungs of the ladder while raising the height of the first accessible rung.
-
-## The uncomfortable equilibrium
-
-Testing has reached an uncomfortable equilibrium where AI tools are too useful to abandon but too unreliable to trust without substantial human oversight. Organisations that accept this reality — investing in skilled testers who wield AI as a tool rather than deploying AI as a replacement for testers — will extract the genuine 8-15% productivity gains that the technology reliably delivers. Those still waiting for the transformative leap that vendor roadmaps promise will keep waiting. The revolution was always going to be a renovation.
-
-The financial implications of this equilibrium are significant. When AI tools deliver 8% net productivity gains but are marketed as delivering 40-60%, organisations that built headcount reductions into their business cases face an unpleasant reckoning. According to Gartner's 2025 survey of QA leaders, 44% reported that their AI testing investments had not delivered the cost reductions they had projected — not because the tools failed, but because the projections were unrealistic from the outset. Understanding what AI testing tools actually deliver, rather than what they promise, is the prerequisite to making sound investment decisions. The [hidden technical debt of test automation](/2026/04/05/the-hidden-technical-debt-of-test-automation/) compounds this challenge: organisations that automate at scale without accounting for the full maintenance burden discover that their AI investment has added complexity rather than removing it.
+The [self-healing discussion](/2026/01/02/self-healing-tests-myth-vs-reality/) offers a related example. A tool that repairs a locator may save effort, but its repair still needs to preserve the behaviour under test. The same principle applies to generated tests: speed is valuable only when someone can trust what the test means.
 
 ## References
 
-1. Tricentis, ["State of Test Automation Report 2025"](https://www.tricentis.com/resources/state-of-testing), *Tricentis*, 2025
-2. CB Insights, ["Testing & QA Tech Funding Report"](https://www.cbinsights.com/research/testing-qa-funding/), *CB Insights*, 2024
-3. TestGuild, ["Testing Trends Survey 2024"](https://testguild.com/testing-trends/), *TestGuild*, 2024
-4. GitLab, ["DevSecOps Report 2024"](https://about.gitlab.com/developer-survey/), *GitLab*, 2024
-5. Forrester, ["Testing Technology Assessment 2024"](https://www.forrester.com/report/testing-technology/), *Forrester Research*, 2024
+1. OpenText, Capgemini and Sogeti, [World Quality Report 2025: AI adoption surges in Quality Engineering](https://www.opentext.com/ca/about/press-releases/world-quality-report-2025-ai-adoption-surges-in-quality-engineering-but-enterprise-level-scaling-remains-elusive), 2025.
+2. Perforce BlazeMeter, [2025 State of Continuous Testing Report: key takeaways](https://www.blazemeter.com/blog/2025-state-continuous-testing), 2025.
