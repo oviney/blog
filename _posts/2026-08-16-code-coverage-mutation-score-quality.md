@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Coverage is the BMI of Software Quality: A Comfortable Lie Your Board Believes"
+title: "What Code Coverage Misses"
 date: 2026-08-16
 author: "Ouray Viney"
 categories: ["Quality Engineering", "Test Automation"]
