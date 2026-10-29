@@ -17,7 +17,7 @@ description: "Only 25% of test automation programmes hit their projected ROI. Li
 
 The promise of test automation promises to whisk software releases along at breakneck speed with minimal errors. Yet, beneath this gleaming veneer lies a tangle of hidden costs that organisations seldom reckon with until budgets balloon and deadlines slip. A sober reckoning reveals that test automation is often a far more expensive and complicated beast than conventional wisdom admits.
 
-If you find yourself nodding politely while sipping your morning brew, consider the sobering statistic from the *World Quality Report 2023-24*: only a quarter of test automation initiatives hit their promised return on investment, while over half stagger under the weight of maintenance woes or entirely capitulate. This is not a footnote for enthusiasts to ignore—it is a clarion call to anyone contemplating automation as a shortcut to software quality and speed.
+A business case for automation should identify what the team expects to save and the costs required to achieve it. A suite that reduces repetitive execution can still need substantial investment in data, environments, maintenance and investigation.
 
 ## Automation: What It Is and What It Promises
 
@@ -31,7 +31,7 @@ However, once the rubber meets the road, a far more sobering tale emerges. Let�
 
 ### The Price of Entry: Initial Investment and Licensing
 
-Setting foot on the automation path demands serious currency. Gartner’s 2022 Market Guide estimates that rolling out enterprise-grade test automation tools can cost anywhere between $30,000 and $150,000 annually, exclusively for licensing—before you factor in installation or bespoke customisation. Forrester’s 2023 report paints an even grimmer picture, flagging that adjustments and integrations frequently inflate upfront costs by an extra 20%-30%. For firms betting on a nimble start, these figures beg a pause.
+Licensing is only one possible expense. Costs vary by tool, scale and delivery model; open-source frameworks and commercial platforms have different trade-offs. Obtain quotes where relevant and budget for implementation, integration, training and ongoing support.
 
 ### The Eternal Drain: Maintenance Overheads
 
