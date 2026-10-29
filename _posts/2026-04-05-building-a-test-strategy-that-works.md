@@ -30,9 +30,9 @@ The result is familiar. Teams inherit a document that prescribes contract tests,
 
 Automation targets can become expensive when they are set without the infrastructure, skills or budget to support them. A useful strategy identifies which checks are worth automating, estimates their ongoing costs and revisits the decision with delivery evidence.
 
-The pattern is predictable. A strategy mandates 80% automation coverage. The team automates the easy tests first — login flows, simple CRUD operations and happy-path scenarios. These reach 40% coverage quickly, so progress charts look healthy. Then the team reaches integration tests, complex data setups and dependencies on third-party services. Progress stalls. The remaining 40% costs far more than the first 40%, and nobody budgeted for the asymmetry.
+Consider a hypothetical strategy that mandates 80% automation coverage. The team automates the easy tests first — login flows, simple CRUD operations and happy-path scenarios. These reach 40% coverage quickly, so progress charts look healthy. Then the team reaches integration tests, complex data setups and dependencies on third-party services. Progress stalls. The remaining 40% costs far more than the first 40%, and nobody budgeted for the asymmetry.
 
-Qyrus's 2026 Guide to Software Testing Cost Estimation describes why. Organisations that forecast automation costs from early pilot results underestimated total programme costs by an average factor of 2.8. Pilot systems tend to have cleaner APIs, narrower workflows and more senior attention than the estate that follows. The hidden costs of maintaining those automation assets compound the problem further — as explored in [Test automation's hidden ledger: costs nobody budgets](/2026/04/04/the-real-cost-of-test-automation-balancing-speed-and-sustai/).
+Pilot results do not automatically predict the cost of a full rollout. More varied systems, data and dependencies can create additional work; revisit estimates as the scope expands.
 
 Coverage targets make the mistake worse. A strategy that sets a blanket percentage goal invites teams to optimise the easiest number on the dashboard rather than the riskiest behaviour in production. As argued in [Coverage Obsession: The Metric That Ate Quality Engineering](/2026/04/05/the-productivity-paradox-of-test-coverage-metrics/), high coverage is often a record of activity rather than evidence that the system is protected where failure would actually hurt.
 
@@ -50,17 +50,10 @@ In practice, a live strategy answers four questions for each major flow. What is
 
 A useful strategy works as an operating mechanism. Teams can revise it against observed maintenance costs, escaped defects and feedback delays rather than defend an outdated plan.
 
-DORA's 2025 data reinforces the point: teams that reviewed their test strategy at least quarterly had 40% fewer escaped defects than teams reviewing annually or not at all. The measurement discipline matters more than the measurement ritual. Regular reviews force leaders to decide whether a target still reflects production risk, whether a test suite is yielding signal fast enough, and whether infrastructure bottlenecks should be funded as platform work rather than absorbed by project teams.
+A regular review gives teams a chance to revisit risks, escaped defects and feedback delays. The appropriate cadence depends on how quickly the product changes; a calendar reminder alone cannot guarantee better outcomes.
 
 The strongest teams also make ownership explicit. If a strategy says contract testing matters, somebody owns the provider stubs, schema governance and environment fidelity required to make contract testing real. If it says feedback must arrive in under ten minutes, somebody owns CI parallelisation, test selection and the removal of redundant checks. The test strategy stops being a wish list and becomes a set of funded promises.
 
 That, in turn, produces a more realistic strategy. Effective teams measure outcomes rather than activities: escaped defects, mean time to feedback and the ratio of test maintenance to feature development hours. They fund environments and test data as shared capabilities, not optional extras. And they are willing to admit, quarterly, that the previous strategy was partly wrong.
 
 The organisations that test well are therefore not the ones with the thickest strategy documents. They are the ones with the shortest distance between evidence and revision. A test strategy earns its value only when it is cheap to challenge, cheap to update and tightly connected to the economics of delivery. Most quality plans fail because they are written as declarations of intent. The useful ones survive because they are run as feedback systems.
-
-## References
-
-1. OpenText & Capgemini, ["World Quality Report 2025-2026"](https://www.opentext.com/en/media/report/world-quality-report-17th-edition), *OpenText*, July 2025
-2. DORA, ["State of DevOps Report 2025"](https://dora.dev/dora-report-2025/), *DORA/Google Cloud*, September 2025
-3. LinkedIn, ["Your AI Testing Tools Won't Save You: The Real Problem"](https://www.linkedin.com/pulse/your-ai-testing-tools-wont-save-you-real-problem), December 2025
-4. Qyrus, ["The 2026 Guide to Software Testing Cost Estimation"](https://www.qyrus.com/post/software-testing-cost-estimation-and-strategies), *Qyrus*, November 2025
