@@ -46,7 +46,7 @@ The engineering leaders who successfully retire coverage mandates reframe qualit
 
 ---
 
-For a practical comparison with mutation testing, see [Coverage is the BMI of Software Quality](/2026/08/16/code-coverage-mutation-score-quality/).
+For a practical comparison with mutation testing, see [the coverage and mutation-testing analysis](/2026/08/16/code-coverage-mutation-score-quality/).
 
 ## References
 
