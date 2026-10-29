@@ -36,8 +36,4 @@ A time-boxed pilot with explicit success criteria and a rollback plan gives the 
 
 ## References
 
-1. Perforce BlazeMeter, *2025 State of Continuous Testing Report*, [blazemeter.com](https://www.blazemeter.com/blog/2025-state-continuous-testing)
-2. Capgemini and Sogeti, *World Quality Report 2025-26*, [capgemini.com](https://www.capgemini.com/insights/research-library/world-quality-report-2025-26/)
-3. arXiv, "Expectations vs Reality — A Secondary Study on AI Adoption in Software Testing," April 2025, [arxiv.org](https://arxiv.org/html/2504.04921v1)
-4. Rainforest QA, *AI in Software Testing: State of Test Automation Report 2025*, [rainforestqa.com](https://www.rainforestqa.com/blog/ai-in-software-testing-report-2025)
-5. Momentic, "AI Agents in QA Testing: Is 2026 The Year Everything Changes?," [momentic.ai](https://momentic.ai/blog/ai-agents-in-qa-testing)
+1. OpenText, Capgemini and Sogeti, [World Quality Report 2025 findings](https://www.opentext.com/ca/about/press-releases/world-quality-report-2025-ai-adoption-surges-in-quality-engineering-but-enterprise-level-scaling-remains-elusive), 2025.
