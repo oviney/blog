@@ -21,7 +21,7 @@ That gap matters because strategy is supposed to allocate scarce attention: what
 
 A strategy written at the start of a project can become stale as architecture, dependencies and customer needs change. Review the plan when those changes alter the risks, and record what the team will test, defer or monitor.
 
-This is not chiefly a documentation failure. It is an incentive failure. The person who writes the test strategy is rewarded for its completeness at the moment of approval. Almost nobody is measured on its accuracy two quarters later. So the strategy becomes a compliance artifact — evidence that planning occurred — rather than an operational tool that guides daily testing decisions.
+Incentives matter too. A strategy assessed only for completeness at approval can become a compliance artifact rather than a tool that guides testing decisions. Assign an owner and revisit its assumptions as the product and its risks change.
 
 A strategy can prescribe contract tests and environment standards that delivery teams cannot yet support. For example, a team that depends on a third-party service without a sandbox needs an agreed alternative, such as a provider-supported test environment or a carefully maintained stub.
 

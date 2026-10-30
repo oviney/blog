@@ -19,7 +19,7 @@ The [CISQ 2022 report](https://www.it-cisq.org/wp-content/uploads/sites/6/2022/1
 
 ## The invisible tax
 
-Most companies have no idea what poor quality costs them because the expenses hide in plain sight. Rework hours are logged against feature sprints. Incident response is charged to operations. Customer churn caused by buggy releases appears in the retention budget. Nobody totals the bill because nobody owns the line item.
+The costs of poor quality can be hard to see when they are spread across budgets. Rework may be logged against feature delivery, incident response against operations and customer losses against retention. Combining these measures can make the trade-offs clearer, provided teams state their assumptions and avoid double counting.
 
 Rework and maintenance can consume capacity that might otherwise support new capabilities. Measure the time spent on known reliability problems and distinguish necessary product maintenance from avoidable rework.
 
@@ -34,7 +34,7 @@ CrowdStrike's [root-cause analysis](https://www.crowdstrike.com/wp-content/uploa
 
 ## The accountability gap
 
-The deeper problem is structural. In most companies, nobody is accountable for the total cost of quality. Engineering leadership owns development speed. Operations owns uptime. Product owns revenue. Quality falls between these boundaries, claimed by all and owned by none. Organisations can make those costs visible by agreeing on consistent categories and reviewing prevention, appraisal, rework and customer impact together.
+The problem can also be structural: development, operations and product teams may each see only part of the cost. Organisations can agree on consistent categories and review prevention, appraisal, rework and customer impact together.
 
 Teams can begin by combining the incident costs and rework data they already collect, while noting gaps and avoiding double counting. [Google's error budget approach](https://sre.google/sre-book/service-best-practices/) defines an acceptable amount of unreliability against a service objective. It can inform a reliability-versus-change trade-off, but it does not itself assign a dollar value to an outage.
 
