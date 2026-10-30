@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Testing Theatre: The QA Metrics That Fool Everyone"
-subtitle: "Most QA dashboards measure activity, not outcomes — and DORA 2025 finds that AI adoption widens the gap, lifting throughput while increasing delivery instability."
+subtitle: "A passing dashboard measures the checks that ran; it does not reveal which customer risks those checks missed."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
@@ -9,23 +9,21 @@ tags: [testing-theater, quality-metrics, cost-of-quality]
 image: /assets/images/testing-theatre-vanity-metrics.png
 image_alt: "Actors perform on a stage built from glowing QA dashboards"
 image_caption: "Illustration: vanity metrics turn testing into performance instead of assurance"
-description: "Volkswagen's tests hit 94% pass rates — then a two-year launch delay exposed the gap. Most QA dashboards measure activity, not outcomes."
+description: "Pass rates and execution counts need context about test coverage, assertions and customer risk."
 ---
 
-![Testing theatre: 61% of QA teams still use pass rate as their primary metric; only 12% measure mutation testing](/assets/charts/the-real-cost-of-testing-theater-when-quality-metr.svg)
-*Source: PractiTest State of Testing Survey, 2025 (n=2,700 practitioners)*
 
-Volkswagen's software division, CARIAD, reported in 2024 that its automated test suites achieved 94% pass rates across all vehicle software modules. Six months later, the company delayed the launch of the Trinity electric sedan by two years, citing software quality failures so severe that board members described the codebase as "not production-ready." The test suites had been passing. The software had been failing. Nobody noticed because the dashboard was green.
+A dashboard can show a high pass rate while important customer journeys remain untested. The result may accurately describe the checks that ran, yet say little about missing scenarios, weak assertions or risks outside the suite. That is why leaders need to ask what the result covers and what it leaves out.
 
-This is testing theatre — the elaborate performance of quality assurance activity that creates the illusion of rigour while leaving actual software quality unmeasured. It is not a fringe problem. It is the default state of QA measurement in most large enterprises, and it persists because the metrics teams report are designed to reassure rather than inform.
+This is testing theatre — the elaborate performance of quality assurance activity that creates the illusion of rigour while leaving actual software quality unmeasured. It can persist when metrics are selected to reassure rather than to inform decisions.
 
 ## The Goodhart trap
 
 Charles Goodhart, a Bank of England economist, observed in 1975 that any measure which becomes a target ceases to be a good measure. Software engineering adopted this law with enthusiasm but learned nothing from it. As the Axify engineering metrics blog warns: ignoring Goodhart's law and making broad statements like "every application must deploy multiple times per day by year's end" increases the likelihood that teams will game the metrics rather than improve the underlying capability.
 
-The 2025 DORA report, now led by Google Cloud, documented a subtler manifestation. AI adoption improves throughput but increases delivery instability — teams deploying AI tools shipped more frequently while experiencing higher change failure rates. The report's most profound implication is that AI fundamentally shifts the measurement focus from the individual developer to the organisational system. Yet most QA dashboards still measure individual-level activity metrics that the DORA programme has spent a decade proving irrelevant.
+The [2025 DORA report](https://dora.dev/research/2025/dora-report/) examines AI use and software delivery as an organisational system. Teams should interpret delivery and quality measures together and avoid attributing changes to a tool without investigating other factors.
 
-Nicole Forsgren, DORA's co-creator and a vice president at Microsoft Research, has repeatedly demonstrated that test pass rates, test case counts, and test execution volumes have no statistically significant correlation with deployment success or customer-facing quality. The metrics that predict software delivery performance — lead time for changes, deployment frequency, change failure rate, and failed deployment recovery time — require measuring outcomes in production, not activity in pre-production.
+A pass rate describes the tests that ran; it does not reveal omitted scenarios or weak assertions. Pair it with evidence about the risks covered and the outcomes customers experience.
 
 ## The self-healing mirage
 
@@ -37,22 +35,20 @@ The antidote to Goodhart's Law, as multiple engineering metrics practitioners ha
 
 ## The dashboard industrial complex
 
-A 2025 PractiTest survey of over 2,700 QA practitioners across 76 countries found that 61% still relied on test execution count and pass rate as their primary quality metrics. Only 19% tracked escaped defects — bugs found by customers rather than tests. Fewer than 12% measured any form of mutation testing. The industry knows which metrics matter. It prefers the ones that look good in a slide deck.
+Pass rates, execution counts and defect counts each describe part of testing activity. To interpret them, pair the numbers with what was tested, known gaps and the risk associated with failures.
 
-Charity Majors, co-founder of Honeycomb and a persistent critic of testing orthodoxy, has argued that observability in production outperforms pre-production testing for complex distributed systems. Honeycomb's own engineering team ships with modest unit test coverage and invests heavily in canary deployments and real-time anomaly detection. Their production incident rate compares favourably with teams running far larger test suites. The lesson is not that testing is worthless but that the feedback loop matters more than the test count.
+Production observability can reveal failures that pre-release checks miss. It complements, rather than automatically replaces, testing before a change reaches users.
 
 ## The path from theatre to evidence
 
 The companies abandoning theatrical metrics share a common approach: they replace activity measurements with outcome measurements. Defects reaching customers, revenue lost to incidents, engineering hours consumed by rework. These metrics are harder to game precisely because they measure what the business actually feels.
 
-Within three years, AI-generated test suites will push code coverage toward 95% as a default across most commercial codebases. Every dashboard will glow green. And the gap between measured quality and experienced quality will grow wider than ever — because generating tests that execute code is trivially easy, while generating tests that encode meaningful expectations about behaviour is genuinely hard. The teams that thrive will be those that had the nerve to stop counting tests and start counting the defects their customers find. The rest will be performing to an empty theatre, applauding their own metrics while the audience has already left.
+AI can make it easier to generate tests that execute code, but the resulting coverage number still does not demonstrate that assertions protect the right behaviour. Review generated checks against independent requirements and customer risks.
 
 ---
 
+For more on interpreting coverage, see [Coverage Obsession](/2026/04/05/the-productivity-paradox-of-test-coverage-metrics/).
+
 ## References
 
-1. DORA Team, Google Cloud, *Accelerate State of DevOps Report 2025*, [dora.dev](https://dora.dev/guides/dora-metrics/)
-2. PractiTest, *State of Testing Report 2025*, [practitest.com](https://www.practitest.com/state-of-testing/)
-3. Axify, "Goodhart's Law: The Hidden Risk in Software Engineering Metrics," 2025, [axify.io](https://axify.io/blog/goodhart-law)
-4. Octopus Deploy, "Understanding The 4 DORA Metrics And Top Findings From 2024/25 DORA Report," [octopus.com](https://octopus.com/devops/metrics/dora-metrics/)
-5. Forsgren, N., Humble, J., and Kim, G., *Accelerate: The Science of Lean Software and DevOps*, IT Revolution Press, 2018
+1. DORA, [State of AI-assisted Software Development](https://dora.dev/research/2025/dora-report/), 2025.

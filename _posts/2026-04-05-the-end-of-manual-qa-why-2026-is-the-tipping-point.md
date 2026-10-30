@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Manual QA's Last Stand: The Machines Have Already Won"
-subtitle: "Manual testing is not declining gradually — it is being economically exterminated by AI tools that 89% of enterprises are piloting and only 16% have deployed at scale."
+title: "What AI Changes About Manual Testing"
+subtitle: "AI can accelerate repeatable testing, but adoption figures do not tell us which human work is safe to remove."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]
@@ -9,46 +9,36 @@ tags: [test-automation, qa-strategy, ai-testing]
 image: /assets/images/the-end-of-manual-qa.png
 image_alt: "A lone tester sits at a desk as robotic lines close in from both sides"
 image_caption: "Illustration: manual QA is squeezed as industrial automation moves in"
-description: "89% of enterprises are piloting AI in QA, yet only 16% have adopted it. The 59-point gap is closing fast — and manual QA's economics have collapsed."
+description: "AI is changing testing work. Measure outcomes and retain human exploration and judgement when deciding what to automate."
 ---
 
-![AI non-adoption in quality engineering fell from 31% in 2023 to 11% in 2025; 89% now piloting or deploying](/assets/charts/the-end-of-manual-qa-why-2026-is-the-tipping-point.svg)
-*Source: Capgemini/Sogeti World Quality Report 2025-26; Perforce State of Continuous Testing, 2025*
+AI is changing how teams prepare and execute tests, but adoption is not evidence that manual testing has become economically obsolete. The useful question is which work a tool can do reliably, which decisions still need human judgement and whether the change improves outcomes for customers.
 
-In a Perforce industry survey published in 2025, 75% of respondents identified AI-driven testing as a pivotal component of their strategy. Only 16% had actually adopted it. That 59-point chasm between intention and execution is the defining feature of quality engineering in 2026 — and it is closing fast, in one direction only. The World Quality Report 2025-26, published by Capgemini and Sogeti, found that 89% of organisations are now piloting or deploying generative-AI-augmented QE workflows, with 37% already in production. Manual QA, as a standalone profession, is being squeezed between a technology that works and an industry that has finally decided to use it.
+The [World Quality Report 2025–26](https://www.opentext.com/ca/about/press-releases/world-quality-report-2025-ai-adoption-surges-in-quality-engineering-but-enterprise-level-scaling-remains-elusive), published by OpenText, Capgemini and Sogeti, reported that 89% of responding organisations were piloting or deploying generative AI in quality engineering. Of respondents, 52% were in pilots and 37% in production; 15% had achieved enterprise-scale deployment. Those are survey findings about participating organisations, not a census of every enterprise, and they do not measure how many manual testing jobs can be replaced.
 
-The thesis is not that manual testing will vanish overnight, but that its economic rationale has collapsed. When AI tools can generate exploratory scenarios, self-heal broken locators, and adapt to UI changes autonomously, the case for staffing large manual QA teams evaporates. Companies clinging to headcount-heavy manual processes are not exercising caution — they are burning capital.
+## Separate execution from judgement
 
-## The economics of extinction
+Repeated checks of stable, deterministic behaviour are often good automation candidates. A machine can run the same assertion across builds without a person clicking the same path each time. AI may help draft the checks or diagnose failures, but generated tests still need review: a passing test is useful only if its setup, assertions and expected result reflect the behaviour that matters.
 
-The numbers are brutal. The Capgemini report found that the rate of non-adopters of generative AI in quality engineering dropped from 31% in 2023 to just 11% in 2025. Among adopters, test-cycle time reductions of 30-40% were commonplace. Tricentis's 2025 State of Testing survey confirmed that three-quarters of teams using traditional code-based automation frameworks had already layered AI tools on top to assist with test writing and maintenance.
+Human testing covers more than executing a prewritten script. People explore unexpected workflows, question ambiguous requirements, assess whether an experience makes sense and recognise when a result is technically valid but unacceptable to a customer. Automation can support these activities, yet a generated scenario is not evidence that the scenario was explored well or that its oracle is correct.
 
-Yet the adoption gap persists because the barriers are organisational, not technical. The top obstacles cited in the World Quality Report were hallucination and reliability concerns (60%), data privacy risks (67%), and integration complexity (64%). These are governance problems, not engineering problems — and governance problems dissolve the moment a competitor ships faster because it solved them first.
+The distinction matters when a team redesigns roles. Replacing repetitive execution may free time for risk analysis, automation and exploratory work. It does not follow that the same number of people can automatically be removed without losing coverage or judgement. That depends on the product, the existing test suite and the work performed in practice.
 
-## The AI competence threshold
+## The economics need measurement
 
-Two breakthroughs have shifted the calculus. First, large language models can now generate meaningful exploratory test scenarios — a capability that was the exclusive preserve of experienced human testers as recently as 2023. Google DeepMind researchers demonstrated in 2025 that LLM-based test generation achieved 82% branch coverage on previously untested Java codebases, competitive with experienced human testers given the same time constraints. Applitools demonstrated in late 2024 that its Visual AI engine detected 31% more visual regressions than senior manual testers across a benchmark of 2,000 screen comparisons, producing fewer false positives.
+An automation business case should include creation, review, test data, infrastructure, maintenance and failure investigation. Count the work that remains after the first successful run. A self-healing feature, for example, may help when a locator changes; it cannot be assumed to understand every change in business intent. See [Self-healing tests](/2026/01/02/self-healing-tests-myth-vs-reality/) for the distinction.
 
-Second, self-healing test frameworks crossed the reliability threshold. Katalon's 2025 benchmark showed that AI-maintained locators survived 89% of UI changes without human intervention, up from 54% in 2023. The maintenance burden that made automation expensive — the very argument manual QA advocates wielded for decades — is dissolving. Deloitte projects that 25% of businesses investing in generative AI will deploy autonomous testing agents in 2026, rising to 50% in 2027.
+Before changing staffing or retiring a manual regression activity, select a representative workflow and establish a baseline: how long the work takes, which risks it covers, what defects it finds and how often its results need investigation. Run the proposed automated or AI-assisted approach alongside the existing practice for a defined period. Compare total effort and the meaningful failures found, including failures the new approach missed. Keep exploratory sessions for risks the checks do not address.
 
-## The workforce reckoning
+A pilot that saves time on one workflow is evidence about that workflow, not a guarantee for a whole organisation. Scale when the team can explain what was saved, what new work appeared and who remains accountable for the risk.
 
-The human consequences are stark and uneven. Demand for manual test execution roles has cratered while demand for test automation architects and AI/ML quality engineers has surged. The pattern repeats across the industry: Spotify's quality engineering team restructured in mid-2025, eliminating dedicated manual QA positions entirely and embedding quality ownership within cross-functional squads equipped with AI testing toolchains. Atlassian, Shopify, and Stripe have disclosed similar reorganisations.
+## What to keep human
 
-The common thread is not mass layoffs but role transformation. Former manual testers who upskilled into automation or AI-assisted testing retained their positions. Those who did not found their roles consolidated or eliminated. As Jason Arbon, CEO of test.ai and former Google engineering director, has argued publicly: "The biggest barrier to AI testing isn't the AI — it's the ten-year-old test suite nobody wants to touch."
+Teams still need someone to decide what is worth testing, challenge generated assertions, examine confusing behaviour and represent customer consequences. Those responsibilities may sit with developers, dedicated quality specialists, product staff or a combination. The role label matters less than making the work visible and ensuring people have time and skill to do it.
 
-## The uncomfortable conclusion
-
-Manual QA is not dying because it was bad. For decades it was the only reliable method for validating software behaviour, and the discipline produced rigorous thinkers who understood systems deeply. But economics is merciless. The 77.7% of QA teams that have adopted AI-first quality approaches, according to the 2026 QA Trends Report, are not early adopters anymore — they are the new mainstream.
-
-The remaining holdouts face a compounding disadvantage. Every quarter that a competitor runs AI-assisted regression suites while a rival's manual testers click through the same screens, the gap in release velocity and defect economics widens. The companies that thrive will be those that redeploy human intelligence where it genuinely outperforms machines: understanding user intent, questioning ambiguous requirements, designing quality into architecture rather than inspecting it after the fact, and — critically — supervising the AI tools that are doing the inspecting. The rest will discover that nostalgia for manual processes is an expensive indulgence in a market that stopped subsidising it the moment the machines learned to explore.
-
----
+The strongest case for AI in testing is not that machines have won a contest against manual QA. It is that teams can use tools to reduce repetitive work while spending more human attention on the questions and failures that matter most.
 
 ## References
 
-1. Perforce Software, *State of Continuous Testing 2025*, [perforce.com](https://www.blazemeter.com/blog/2025-state-continuous-testing)
-2. Capgemini and Sogeti, *World Quality Report 2025-26*, [capgemini.com](https://www.capgemini.com/insights/research-library/world-quality-report-2025-26/)
-3. Tricentis, *State of Software Testing 2025*, [tricentis.com](https://www.tricentis.com)
-4. ThinkSys, *QA Trends Report 2026: Market Growth, AI-Driven Testing*, [thinksys.com](https://thinksys.com/qa-testing/qa-trends-report-2026/)
-5. Rainforest QA, *AI in Software Testing: State of Test Automation Report 2025*, [rainforestqa.com](https://www.rainforestqa.com/blog/ai-in-software-testing-report-2025)
+1. OpenText, Capgemini and Sogeti, [World Quality Report 2025: AI adoption surges in Quality Engineering](https://www.opentext.com/ca/about/press-releases/world-quality-report-2025-ai-adoption-surges-in-quality-engineering-but-enterprise-level-scaling-remains-elusive), 2025.
+2. Perforce BlazeMeter, [2025 State of Continuous Testing Report: key takeaways](https://www.blazemeter.com/blog/2025-state-continuous-testing), 2025.
