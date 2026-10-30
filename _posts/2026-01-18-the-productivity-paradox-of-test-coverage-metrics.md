@@ -12,7 +12,6 @@ image_caption: "Illustration: high coverage numbers can still leave real defects
 description: "Research shows coverage has low correlation with fault detection after controlling for suite size. Google enforces no coverage target — here is why."
 ---
 
-*Source: Codecov State of Software Quality, 2025; Google Engineering Productivity Research*
 
 Coverage reports can reveal code that a test suite never executes. They cannot by themselves show whether the suite checks the right behaviours or would detect a defect. The question is how teams use the information, not whether a single percentage looks impressive.
 

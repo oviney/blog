@@ -12,7 +12,6 @@ image_caption: "Illustration: manufacturing discipline and software chaos collid
 description: "How cost-of-quality thinking can help software teams understand prevention, rework and customer impact."
 ---
 
-*Source: ASQ; CISQ Cost of Poor Software Quality in the US, 2022; Boeing SEC filings, 2024*
 
 Failures in complex products can carry costs well beyond the immediate repair: investigations, customer disruption, rework and lost confidence. Manufacturing's cost-of-quality model offers a way to make prevention and failure costs visible before a problem reaches that scale.
 

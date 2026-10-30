@@ -12,7 +12,6 @@ image_caption: "Illustration: every layer of automation carries a price tag team
 description: "Understand the full cost of test automation, from implementation to maintenance and failure investigation."
 ---
 
-*Source: Gartner Market Guide for Test Automation Tools, 2022; Forrester Enterprise Automation Study, 2023*
 
 The promise of test automation promises to whisk software releases along at breakneck speed with minimal errors. Yet, beneath this gleaming veneer lies a tangle of hidden costs that organisations seldom reckon with until budgets balloon and deadlines slip. A sober reckoning reveals that test automation is often a far more expensive and complicated beast than conventional wisdom admits.
 
