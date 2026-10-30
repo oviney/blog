@@ -41,7 +41,7 @@ Addressing this requires sequencing. Platform engineering adoption should begin 
 
 ## Measuring What Actually Matters
 
-A recurring observation from platform engineering post-mortems is that teams measure the wrong things. Lines of platform code written, number of services onboarded, and portal page views are easy to report but poorly correlated with value delivered.
+Teams can mistake platform activity for value. Lines of platform code written, services onboarded and portal page views are easy to report, but they do not by themselves show whether the platform helps developers.
 
 The metrics that matter are downstream: deployment frequency for teams on the platform versus off it, change failure rate, mean time to restore, and developer satisfaction scores. These require baseline measurement before the platform launches, which most organisations skip, making it impossible to demonstrate impact after the fact.
 
