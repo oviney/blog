@@ -17,7 +17,7 @@ Many attacks require a device to find a destination on the internet. DNS filteri
 
 ## The DNS advantage
 
-The appeal of DNS security lies in its timing. Many connections use a DNS lookup to resolve a name to an address; cached results and direct IP connections can avoid a new lookup. By intercepting that question, a security provider can refuse to answer when the destination is known to harbour malware, phishing pages, or botnet command infrastructure. No software agent is required on the device. No signature database needs updating on every laptop. The protection blankets everything on the network, from an engineer's workstation to a neglected IoT thermostat that will never receive a security patch.
+The appeal of DNS security lies in its timing. Many connections use a DNS lookup to resolve a name to an address; cached results and direct IP connections can avoid a new lookup. By intercepting that question, a security provider can refuse to answer when the destination is known to harbour malware, phishing pages, or botnet command infrastructure. A shared resolver can protect devices without an agent on each one, provided their queries reach that resolver. Devices that use another resolver or connect directly to an IP address may fall outside that protection.
 
 DNS filtering is attractive because it can apply policy at a shared resolver. That coverage depends on which devices and applications actually use the resolver and on the quality of the detection rules.
 
@@ -31,11 +31,7 @@ Attackers can also use newly registered or generated domains to evade known-doma
 
 ## The integration imperative
 
-The most effective deployments treat DNS security not as a standalone solution but as one layer in a defence-in-depth strategy. Palo Alto Networks, which competes with Cisco in this space, argues that DNS telemetry becomes most valuable when correlated with endpoint detection, network traffic analysis, and identity management — a convergence the company calls "platform security."
-
-Microsoft's own enterprise security division has taken a different approach, embedding DNS filtering directly into its Defender suite so that policy enforcement follows the user rather than depending on network topology. For organisations with remote workforces that never touch the corporate network, this model addresses a fundamental limitation of traditional DNS filtering: it only protects traffic that flows through it.
-
-The choice between network-centric and endpoint-centric DNS security will define the next phase of this market. Organisations that treat DNS as a checkbox — install Umbrella, declare victory — will discover that the shield has gaps they never tested. Those that integrate DNS telemetry into their broader security operations, correlating query patterns with authentication anomalies and endpoint behaviour, will build something genuinely resilient.
+DNS filtering works best as one layer in a defence-in-depth strategy. Teams can correlate resolver logs with endpoint, network and identity signals to investigate suspicious activity. Remote devices may need additional configuration or endpoint controls to use an organisation's chosen resolver. Organisations that treat DNS as a checkbox — install Umbrella, declare victory — will discover that the shield has gaps they never tested. Those that integrate DNS telemetry into their broader security operations, correlating query patterns with authentication anomalies and endpoint behaviour, can gain a fuller view of suspicious activity.
 
 DNS filtering is not a substitute for a complete security posture. Its strongest role is as one control and source of telemetry alongside endpoint protection, identity controls, monitoring and user education.
 
