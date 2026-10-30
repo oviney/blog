@@ -15,7 +15,7 @@ description: "Pass rates and execution counts need context about test coverage, 
 
 A dashboard can show a high pass rate while important customer journeys remain untested. The result may accurately describe the checks that ran, yet say little about missing scenarios, weak assertions or risks outside the suite. That is why leaders need to ask what the result covers and what it leaves out.
 
-This is testing theatre — the elaborate performance of quality assurance activity that creates the illusion of rigour while leaving actual software quality unmeasured. It is not a fringe problem. It is the default state of QA measurement in most large enterprises, and it persists because the metrics teams report are designed to reassure rather than inform.
+This is testing theatre — the elaborate performance of quality assurance activity that creates the illusion of rigour while leaving actual software quality unmeasured. It can persist when metrics are selected to reassure rather than to inform decisions.
 
 ## The Goodhart trap
 
