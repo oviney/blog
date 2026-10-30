@@ -37,13 +37,11 @@ Agentic coding tools can make changes across files and run commands, increasing 
 
 ## The narrow value corridor
 
-AI code generation is not useless. It excels at boilerplate, scaffolding, test stub generation, and language translation — tasks where speed matters and correctness is easily verified. The same logic applies anywhere the schema is explicit and the output is cheaply verified: generating API client code from an OpenAPI specification, where the contract is machine-readable and a compile check confirms correctness; or producing test stubs from existing function signatures, where the structure is given and the developer fills in assertions rather than designs the architecture. In both cases the AI is doing transcription, not design.
+AI assistance may help draft boilerplate, test stubs or API clients when inputs and acceptance criteria are clear. A generated client may compile yet still violate the API contract or fail at runtime. Check it against the specification and exercise representative requests and error cases.
 
 AI assistance may be useful for constrained tasks with clear acceptance criteria. Validate the result against those criteria and inspect failures and maintenance costs before scaling the practice.
 
-The mistake is treating these results as evidence of general-purpose productivity transformation. Kent Beck, the creator of extreme programming, summarised the dynamic in a widely shared 2025 essay: "AI makes me mass-produce rough drafts. But programming was never bottlenecked on rough drafts." The companies extracting real value are those that deploy AI where it works, [reckon honestly with its hidden costs](/2026/04/05/practical-applications-of-ai-in-software-development/), and resist the temptation to mistake faster typing for faster shipping. The demo reel will always outperform the daily reality — and the engineers who understand that distinction are the ones whose productivity is genuinely improving.
-
-A good intern accelerates well-scoped work and slows you down on open-ended work because the supervision cost exceeds the contribution. The ROI calculation for AI code generation depends entirely on which category of work you assign — and most organisations are not being honest about the ratio. [Self-healing test tools followed the same arc](/2026/01/02/self-healing-tests-myth-vs-reality/): genuine value in constrained scenarios, oversold as a general solution, disappointing at scale. The tools are not the problem. The problem is organisations treating boilerplate-speed gains as proof of design-quality improvement — a confusion the data, consistently, refuses to support.
+Faster drafts are not enough to establish a productivity gain. Include review, debugging and maintenance in the comparison, and measure the outcome against the team's existing workflow. [Self-healing test tools](/2026/01/02/self-healing-tests-myth-vs-reality/) raise a related question: whether time saved on a narrow task exceeds the cost of verifying the result.
 
 ---
 

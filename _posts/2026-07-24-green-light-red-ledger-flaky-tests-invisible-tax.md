@@ -12,7 +12,7 @@ tags: [flaky-tests, continuous-integration, test-automation, developer-productiv
 subtitle: "What a green build hides: the payroll cost of tests that lie"
 ---
 
-A software engineer who dismisses a failing CI pipeline as "probably flaky" is not cutting corners—she is making a statistically well-informed decision. That quiet act of professional resignation, multiplied across thousands of engineers and hundreds of daily builds, is how flaky tests drain engineering budgets: with the gentle persistence of a dripping tap that nobody has been asked to fix. Flaky tests are a quantifiable payroll cost, a signal-to-noise crisis, and a structural defect in how software quality is measured. Auto-retry scripts manage the symptom and bill the difference to the engineers.
+When a CI failure is dismissed as “probably flaky”, a genuine regression can go unnoticed. Flaky tests also waste engineering time and weaken trust in feedback. Retries can reduce disruption, but teams still need to investigate recurring failures and fix their causes.
 
 ## The Payroll Cost of Phantom Failures
 
