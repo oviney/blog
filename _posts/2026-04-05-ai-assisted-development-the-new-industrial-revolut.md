@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Code Generators: The Brilliant Interns Nobody Supervises"
-subtitle: "A small METR trial found slower task completion with early-2025 AI tools, while GitClear's data raises questions about code churn."
+subtitle: "A small METR trial found slower task completion with early-2025 AI tools, raising questions about how teams measure productivity."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Software Engineering"]
@@ -9,7 +9,7 @@ tags: [ai, software-engineering, code-quality, productivity]
 image: /assets/images/ai-assisted-code-generation.png
 image_alt: "Office robots write code at keyboards with no human supervision"
 image_caption: "Illustration: code generators move fast when nobody is reviewing them"
-description: "AI coding tools raise questions about productivity and maintainability. A closer look at a METR trial and GitClear's code churn data."
+description: "AI coding tools raise questions about productivity and maintainability. A closer look at a METR trial and the limits of productivity measures."
 ---
 
 

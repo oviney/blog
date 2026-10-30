@@ -22,7 +22,7 @@ Pricing and procurement can affect a pilot's economics, but licence prices and a
 
 ## The capability gap
 
-Even when procurement hurdles clear, deployment falters on skills. The World Quality Report found that the barriers are not purely technical — organisations struggle with readiness, governance, and alignment with business goals. AI testing tools require a different mental model from traditional automation — [a transition the broader AI-in-QA data confirms takes longer than vendors claim](/2025/12/31/testing-times/). Test engineers using AI-assisted tools need to define intent, supply suitable context and evaluate generated outputs.
+Even when procurement hurdles clear, deployment falters on skills. The World Quality Report found that the barriers are not purely technical — organisations struggle with readiness, governance, and alignment with business goals. AI-assisted testing changes how teams create and review tests. The [related discussion of AI in testing](/2025/12/31/testing-times/) considers the full cost of that work. Test engineers using AI-assisted tools need to define intent, supply suitable context and evaluate generated outputs.
 
 The trust deficit compounds the skills gap. When an AI visual testing tool flags a 2-pixel rendering difference as a potential regression, the test engineer must decide whether to trust the model or investigate manually. When an [AI test generator](/2026/04/05/why-ai-test-generation-tools-overpromise-on-maintenance-savi/) produces a scenario the human tester would not have written, the team must decide whether the scenario is insightful or nonsensical. Running a new approach alongside existing checks can help compare results, but adds execution and review work during the trial.
 
