@@ -8,7 +8,7 @@ categories: ["Quality Engineering"]
 tags: [ai-testing, test-automation, quality-engineering]
 image: /assets/images/testing-times-renovation.png
 image_alt: "Robots present QA dashboards while human testers watch from the edge of the room"
-image_caption: "Illustration: automation takes centre stage while quality outcomes barely move"
+image_caption: "Illustration: automation takes centre stage in the testing discussion"
 description: "AI can help teams create tests faster. Measure review, maintenance and customer outcomes before claiming a quality improvement."
 ---
 
