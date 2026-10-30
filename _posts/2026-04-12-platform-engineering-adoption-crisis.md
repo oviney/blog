@@ -14,7 +14,6 @@ image_caption: "Illustration: platform engineering stalls when teams never get o
 
 Platform engineering promises reusable infrastructure and easier delivery, but investment alone does not guarantee that developers will use or benefit from a platform. Outcomes depend on the team's users, the service offered and the way its value is measured.
 
-*Source: Infrastructure Engineering research, 2025*
 
 ## The Misunderstanding at the Core
 

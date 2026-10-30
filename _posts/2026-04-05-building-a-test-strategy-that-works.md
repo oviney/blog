@@ -12,7 +12,6 @@ image_caption: "Illustration: a brittle test strategy collapses when the structu
 description: "A test strategy is useful when it directs risk decisions and changes with the product, rather than sitting unused."
 ---
 
-*Source: OpenText/Capgemini World Quality Report 2025-26 (n=1,800, 33 countries)*
 
 A test strategy can help a team decide where to spend limited testing time. Its value depends on whether those decisions inform delivery and change as the product changes. A document alone does not demonstrate that the most important risks are covered.
 

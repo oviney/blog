@@ -25,7 +25,6 @@ Rework and maintenance can consume capacity that might otherwise support new cap
 
 A defect that reaches production can cause incident response, customer disruption and remediation costs. The multiplier between detection stages varies by system and defect; it should be estimated from the organisation's own incidents rather than assumed.
 
-*Source: CloudQA, 2025; CISQ, 2022*
 
 ## The shift-left arithmetic
 

@@ -18,7 +18,6 @@ The [2025 DORA report](https://dora.dev/research/2025/dora-report/) examines how
 
 AI coding tools are used across many development teams, but adoption and generated-code volume do not establish whether the resulting software is safer, more maintainable or faster to deliver. Those outcomes need to be measured in context.
 
-*Source: DORA, 2025; METR, 2025; GitClear, 2025*
 
 AI can change how quickly code is produced and where review or integration work accumulates. DORA's research discusses delivery performance at the system level; correlations in survey data should not be treated as proof that AI alone caused a team's defects or recovery time.
 
@@ -28,7 +27,7 @@ A useful concern is whether developers can explain and maintain code generated w
 
 Consider a mundane but consequential assignment: add retry logic around a payment-service client. A coding model can generate the wrapper, the backoff policy, and a neat set of unit tests in under a minute. What it cannot infer from a short prompt is which failures are safe to retry, how duplicate events are reconciled in the ledger, what audit trail finance requires, or how the queue behaves when a dependency returns a late success. The code looks finished precisely because the missing context is operational rather than syntactic. A junior developer can therefore ship something that passes review for style and still fails the business the first time a partial outage hits.
 
-That is why AI-heavy code often arrives with hidden review work attached. The first draft is instant; the verification is not. Senior engineers know to interrogate generated code for edge cases, transaction boundaries, and observability gaps. Less experienced engineers are more likely to review for readability alone. The difference is not taste. It is whether the reviewer can see the system that exists outside the snippet. GitClear's churn data suggests many teams discover those omissions only after merge, when supposedly finished code is rewritten in the first fortnight.
+That is why AI-heavy code often arrives with hidden review work attached. The first draft is instant; the verification is not. Senior engineers know to interrogate generated code for edge cases, transaction boundaries, and observability gaps. Review must account for the system outside the snippet, including its interactions and operational behaviour.
 
 ## The honest productivity gain
 

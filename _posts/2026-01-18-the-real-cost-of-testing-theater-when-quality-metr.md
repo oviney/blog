@@ -12,7 +12,6 @@ image_caption: "Illustration: vanity metrics turn testing into performance inste
 description: "Pass rates and execution counts need context about test coverage, assertions and customer risk."
 ---
 
-*Source: PractiTest State of Testing Survey, 2025 (n=2,700 practitioners)*
 
 A dashboard can show a high pass rate while important customer journeys remain untested. The result may accurately describe the checks that ran, yet say little about missing scenarios, weak assertions or risks outside the suite. That is why leaders need to ask what the result covers and what it leaves out.
 

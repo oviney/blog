@@ -16,7 +16,6 @@ A flaky test can pass or fail without a relevant change in code. Repeated failur
 
 Test suites can accumulate technical debt when checks become brittle, slow or difficult to interpret. That debt includes the effort to keep useful tests working as a product evolves.
 
-*Source: TestDino, 2026; Capgemini & Sogeti, 2025-26*
 
 ## The compounding cost
 
