@@ -25,7 +25,7 @@ A commonly repeated claim assigns a fixed multiplier to the cost of a production
 
 The cost of a defect depends on its impact, the time to detect and repair it, and the users affected. Test plans should focus on plausible consequences rather than an assumed universal multiplier.
 
-## Debt That Doubled While Teams Sprinted
+## Managing Migration Debt
 
 Technical debt can increase the effort needed to make changes and recover from failures. Identify the debt that affects the migration and decide how it will be addressed or monitored.
 

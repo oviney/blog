@@ -16,17 +16,17 @@ Security teams use a combination of signatures, behavioural analysis and other c
 
 ## The signature problem
 
-Traditional intrusion detection and prevention systems — IDS and IPS — operate on a conceptually simple model. Security researchers identify a malicious payload, extract a unique byte pattern, and distribute that signature to every sensor on the network. When traffic matches the pattern, the system fires an alert. The approach works reliably against known threats. It fails catastrophically against unknown ones.
+Intrusion detection and prevention systems can use signatures to identify known malicious patterns. Signatures are useful but may miss threats that do not match existing rules; products can also combine other detection techniques.
 
 Security teams must contend with changing threats and a large volume of alerts. Signatures, behavioural detection and analyst investigation each have strengths and limitations; assess them against the threats and telemetry relevant to the organisation.
 
-The result is a detection gap that widens with every passing quarter. Enterprises that depend solely on legacy IDS/IPS are not merely accepting known risk — they are accumulating unknown risk at an accelerating rate.
+Relying on a single detection method can leave gaps. Assess which threats and environments the existing controls cover.
 
 ## How machine learning changes the equation
 
-AI-driven threat detection inverts the traditional model. Instead of asking "does this traffic match a known bad pattern?", machine-learning systems ask "does this traffic deviate from learned normal behaviour?" The distinction is profound. A signature-based system can only catch what it has seen before. A behavioural model can flag what it has never seen — precisely the category that matters most.
+Some machine-learning systems look for behaviour that deviates from a learned baseline; others use labelled examples or different approaches. An anomaly can warrant investigation without necessarily being malicious.
 
-The approach relies on several complementary techniques. Supervised models trained on labelled datasets of malicious and benign traffic provide baseline classification. Unsupervised anomaly detection identifies statistical outliers in network flow data — unusual data volumes, atypical connection patterns, or communications with previously unseen endpoints. Deep-learning architectures, particularly recurrent neural networks and transformers, analyse sequences of network events to detect multi-stage attack campaigns that unfold over days or weeks, where no single event would trigger a traditional alert.
+Possible approaches include supervised classification and unsupervised anomaly detection. Their usefulness depends on the available data and evaluation against real operational conditions.
 
 Security products use different approaches to help analysts correlate alerts and investigate activity. Evaluate vendor demonstrations against representative incidents, including false positives and the effort needed for human review.
 
@@ -34,7 +34,7 @@ Security products use different approaches to help analysts correlate alerts and
 
 AI-driven detection is not without costs. The same sensitivity that catches novel threats also generates false positives — benign activities flagged as suspicious because they deviate from learned baselines. A developer downloading an unusually large dataset for a legitimate project, a marketing team launching a new SaaS tool without informing IT, or a server running a scheduled batch job at an atypical hour can all trigger behavioural alerts.
 
-The industry has converged on a layered mitigation strategy. Initial anomaly scores are refined through ensemble models that cross-reference multiple data sources. Adaptive feedback loops incorporate analyst decisions — when a human marks an alert as a false positive, the model retrains. And increasingly, security orchestration platforms use reinforcement learning to tune alert thresholds dynamically, balancing detection sensitivity against analyst fatigue.
+Teams can reduce alert fatigue by tuning rules, correlating signals and incorporating analyst feedback. Evaluate changes against representative incidents and false positives before relying on them.
 
 An assistant can help summarise alerts and suggest investigation steps, but its outputs require validation against source telemetry and the organisation's response procedures.
 
@@ -42,17 +42,17 @@ An assistant can help summarise alerts and suggest investigation steps, but its 
 
 Adoption varies by organisation, security architecture and access to suitable data. A pilot should measure alert quality, investigation effort and operational risk rather than assume a universal benefit.
 
-The deployment models vary. Some organisations embed AI detection within existing security information and event management (SIEM) platforms — Splunk, now owned by Cisco, and Microsoft Sentinel both offer native machine-learning modules. Others deploy dedicated network detection and response (NDR) solutions from specialists like Darktrace, Vectra AI, or ExtraHop. A third cohort builds bespoke models on internal data, an approach favoured by large banks with in-house data-science teams and proprietary threat-intelligence feeds.
+Deployment models vary: teams may use capabilities in an existing security platform, a dedicated detection product or an internally developed system.
 
 IBM's [2025 report](https://newsroom.ibm.com/2025-07-30-ibm-report-13-of-organizations-reported-breaches-of-ai-models-or-applications%2C-97-of-which-reported-lacking-proper-ai-access-controls) put the global average breach cost in its study at $4.44 million. A global average is not a return-on-investment calculation for an individual security tool. Teams should compare the cost of deployment and operations with observed investigation time, alert quality and outcomes in their own environment, while recognising that prevented incidents are difficult to measure.
 
 ## The adversarial horizon
 
-The arms race is far from settled. Attackers are already using generative AI to produce convincing phishing emails, deepfake voice messages for social engineering, and polymorphic malware that mutates its code with every execution. The same transformer architectures that power defensive tools are available to offensive actors — a symmetry that the security industry calls the "dual-use dilemma."
+Attackers can use AI tools as well as defenders. Teams should assess how their detection and response processes handle changing techniques.
 
-The implications extend well beyond network perimeters. As organisations instrument more of their operations — from software supply chains to cloud-native microservices — the attack surface grows faster than human teams can monitor. This is the same scaling challenge that confronts [quality engineering in software development](/2026/04/05/ai-quality-testing-automation/): the volume and velocity of signals have outstripped manual inspection capacity, making AI augmentation not a luxury but an operational necessity.
+Growing systems can produce more signals than analysts can review manually. [Quality engineering teams](/2026/04/05/ai-quality-testing-automation/) face a related challenge in deciding where automation helps and where human investigation remains necessary.
 
-The enterprises that will fare best are those treating AI-driven threat detection not as a product purchase but as a capability investment — retraining analysts, building feedback loops, and accepting that the models will be imperfect but improvable. In cybersecurity, as in most domains where AI is transforming operations, the competitive advantage belongs not to those with the best algorithms but to those with the best data, the fastest learning cycles, and the institutional willingness to trust — and verify — machine judgement.
+Treat threat detection as an operational capability: train analysts, evaluate alert quality and verify tool outputs against evidence.
 
 ## References
 
