@@ -27,7 +27,7 @@ Maintenance is a recurring cost of automation, but not all maintenance is wasted
 
 ## The automation paradox
 
-The irony runs deep. Automation was sold on the promise of reducing human toil, but poorly managed test suites create more of it. Engineering leaders at Google and Meta have moved away from exhaustive testing toward what the industry now calls "intent-based selection" and "autonomous healing" — strategies that acknowledge the old approach of running every test on every commit is economically unsustainable.
+The irony runs deep. Automation was sold on the promise of reducing human toil, but poorly managed test suites create more of it. Teams can select checks based on risk and feedback needs, while retaining broader suites for later stages. Any selection strategy needs monitoring so that speed does not come at the expense of important coverage.
 
 A suite review can reveal checks that duplicate others, no longer exercise relevant paths or fail too often to be useful. Remove or redesign those checks only after understanding the risk they cover.
 

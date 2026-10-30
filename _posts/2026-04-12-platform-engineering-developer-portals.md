@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The Golden Path: Platform Engineering's Quiet Revolution"
-subtitle: "Internal developer portals are doing for software what assembly lines did for manufacturing — codifying the golden path, cutting onboarding from weeks to days, and lifting cognitive load off every engineer."
+subtitle: "Internal developer portals can make approved workflows easier to find and use, but their value depends on the needs of developers."
 date: 2026-04-12
 author: "Ouray Viney"
 categories: ["Software Engineering"]
@@ -9,7 +9,7 @@ tags: [platform-engineering, developer-portals, backstage, developer-experience,
 image: /assets/images/platform-engineering-developer-portals.png
 image_alt: "Developer tools linked together through a single platform portal"
 image_caption: "Illustration: a developer portal turns scattered tools into one path through the platform"
-description: "Platform engineering is reshaping how organisations deliver software. Internal developer portals are cutting onboarding times and cognitive load."
+description: "How internal developer portals can support onboarding and reduce friction, and what teams should measure."
 ---
 
 
