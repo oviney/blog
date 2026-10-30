@@ -9,7 +9,7 @@ tags: [test-automation, quality-metrics, productivity]
 image: /assets/images/test-coverage-paradox.png
 image_alt: "A coverage gauge stuck at 100% while a bug slips through an uncovered gap"
 image_caption: "Illustration: high coverage numbers can still leave real defects untouched"
-description: "Research shows coverage has low correlation with fault detection after controlling for suite size. Google enforces no coverage target — here is why."
+description: "Research suggests coverage alone is a weak indicator of test effectiveness. How teams can use it alongside other evidence."
 ---
 
 
@@ -19,7 +19,7 @@ The thesis is blunt: test coverage, measured as a percentage of lines or branche
 
 ## The correlation that isn't
 
-The empirical case against coverage targets is damning. [Laura Inozemtseva and Reid Holmes](https://www.cs.ubc.ca/~rtholmes/papers/icse_2014_inozemtseva.pdf) examined the relationship between coverage and test-suite effectiveness across five large Java programmes. After controlling for test-suite size, they found that coverage had low to moderate correlation with fault detection. Statement coverage, branch coverage, and even modified condition/decision coverage explained far less variance in bug-finding ability than the sheer number and diversity of test cases. Stronger forms of coverage did not provide greater insight into suite effectiveness.
+The empirical case against coverage targets is damning. [Laura Inozemtseva and Reid Holmes](https://www.cs.ubc.ca/~rtholmes/papers/icse_2014_inozemtseva.pdf) examined the relationship between coverage and test-suite effectiveness across five large Java programmes. After controlling for test-suite size, they found that coverage had low to moderate correlation with fault detection. The study controlled for suite size and examined several coverage measures; it did not establish that any one measure guarantees fault detection. Stronger forms of coverage did not provide greater insight into suite effectiveness.
 
 Coverage measures whether code was executed, not whether its behaviour was checked. Mutation testing can provide another view of test sensitivity, but its results depend on the mutations and tests used; no single percentage captures all aspects of test quality.
 
