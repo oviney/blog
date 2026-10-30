@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Coverage Obsession: The Metric That Ate Quality Engineering"
-subtitle: "Test coverage has become the most gamed metric in software engineering — empirically uncorrelated with fault detection, yet mandated by managers who mistake activity for quality."
+subtitle: "Coverage can reveal untested code, but a high percentage alone cannot show that tests catch meaningful faults."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Test Automation"]
@@ -15,7 +15,7 @@ description: "Research suggests coverage alone is a weak indicator of test effec
 
 Coverage reports can reveal code that a test suite never executes. They cannot by themselves show whether the suite checks the right behaviours or would detect a defect. The question is how teams use the information, not whether a single percentage looks impressive.
 
-The thesis is blunt: test coverage, measured as a percentage of lines or branches exercised, has become the most widely gamed metric in software engineering. Teams chase coverage numbers not because high coverage reliably prevents defects but because the number is easy to measure, easy to mandate, and easy to present to executives who want a simple quality score. The result is a perverse incentive structure that rewards writing trivial tests and penalises thoughtful engineering judgement.
+The thesis is blunt: test coverage, measured as a percentage of lines or branches exercised, can become a target that rewards the wrong work. Teams chase coverage numbers not because high coverage reliably prevents defects but because the number is easy to measure, easy to mandate, and easy to present to executives who want a simple quality score. The result is a perverse incentive structure that rewards writing trivial tests and penalises thoughtful engineering judgement.
 
 ## The correlation that isn't
 
@@ -23,7 +23,7 @@ The empirical case against coverage targets is damning. [Laura Inozemtseva and R
 
 Coverage measures whether code was executed, not whether its behaviour was checked. Mutation testing can provide another view of test sensitivity, but its results depend on the mutations and tests used; no single percentage captures all aspects of test quality.
 
-Martin Fowler, ThoughtWorks chief scientist, framed it plainly: "I would say you are doing enough testing if the following is true — you rarely get bugs that escape into production, and you are rarely hesitant to change some code for fear it will cause production bugs." Coverage appears nowhere in that definition.
+[Martin Fowler](https://martinfowler.com/bliki/TestCoverage.html) proposes looking at escaped bugs and confidence when changing code as signals of test sufficiency. Coverage helps find untested code, but it cannot answer that question alone.
 
 ## The gaming epidemic
 
