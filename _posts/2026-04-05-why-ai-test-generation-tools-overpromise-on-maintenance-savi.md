@@ -8,7 +8,7 @@ categories: ["Quality Engineering"]
 tags: [ai-testing, test-maintenance, test-automation]
 image: /assets/images/why-recent-ai-test-generation-tools-are-overpromising-on-mai.png
 image_alt: "Bars comparing high promised AI test savings with lower measured results"
-image_caption: "Illustration: vendor promises rise higher than the savings teams actually measure"
+image_caption: "Illustration: generated tests add review and maintenance work"
 description: "Evaluate AI-generated tests by their assertions, maintenance costs and usefulness, not their volume."
 ---
 

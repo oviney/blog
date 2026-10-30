@@ -46,7 +46,7 @@ The risk is real, while the evidence does not establish that disappearing webpag
 
 Four controls, each with a way to tell whether it worked.
 
-**Gate on resolution, before you gate on tests.** Run dependency resolution as a discrete CI step ahead of the suite, so an invented import fails at the pipeline rather than on someone's laptop at 16:40. Measure the count of build failures attributed to unresolvable packages per week. Expect it to spike, then decline. If it never spikes, the gate is not wired in.
+**Gate on resolution, before you gate on tests.** Run dependency resolution as a discrete CI step ahead of the suite, so an invented import fails at the pipeline rather than on someone's laptop at 16:40. Track failures attributed to unresolvable packages. Verify the gate with a controlled invalid dependency; no failures in normal operation may simply mean none were introduced.
 
 **Pin, hash, and scan the lockfile rather than the manifest.** A hallucinated name that has been squatted resolves cleanly and installs cleanly. Hash pinning is what distinguishes the package you reviewed from the package you received. Measure the percentage of repositories with hash-pinned lockfiles and SCA running against them.
 
