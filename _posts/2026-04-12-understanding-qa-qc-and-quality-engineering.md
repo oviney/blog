@@ -9,17 +9,13 @@ tags: [quality-assurance, quality-control, quality-engineering, quality-manageme
 image: /assets/images/understanding-qa-qc-quality-engineering-hero.svg
 image_alt: "A product box caught in a red knot linking a checklist, magnifying glass, and gear"
 image_caption: "Illustration: when quality ownership tangles, the product gets stuck"
-description: "Most organisations treat QA, QC and quality engineering as synonyms. The confusion costs real money — and explains why quality maturity stalls."
+description: "How quality assurance, quality control and quality engineering can clarify responsibilities across delivery."
 ---
 
-<figure class="article-chart">
-  <img src="/assets/charts/understanding-qa-qc-and-quality-engineering.svg" alt="Only 19% of organisations now say their quality strategy is effective, down from 23% two years earlier — a decline tied in part to unclear ownership between QA, QC, and QE">
-  <figcaption><strong>Source:</strong> OpenText &amp; Capgemini World Quality Report 2025-26; CISQ, 2022; DORA, 2025</figcaption>
-</figure>
 
-Most organisations say they take quality seriously. Far fewer can explain who is supposed to prevent defects, who is supposed to detect them, and who is supposed to engineer the delivery system so quality improves over time. Ask a product leader to distinguish Quality Assurance, Quality Control, and Quality Engineering and the answer is often a shrug, a job-title anecdote, or the all-purpose phrase "the QA team". The ambiguity is expensive. When organisations cannot articulate the difference between preventing defects, detecting defects, and engineering quality into the development lifecycle, they misallocate budgets, misstaff teams, and misdiagnose failures.
+Quality work includes preventing defects, detecting problems and improving the delivery system. Teams benefit from making those responsibilities explicit, whatever titles they use.
 
-The cost is not abstract. The Consortium for Information and Software Quality (CISQ) estimated in 2022 that poor software quality cost the United States economy $2.41 trillion annually. A meaningful share of that waste sits inside the same pattern explored in [the broader economics of poor quality](/2026/04/05/cost-of-poor-quality-copq/): companies fund visible inspection work, underfund systemic prevention, and then wonder why the defect bill keeps arriving.
+The [CISQ 2022 report](https://www.it-cisq.org/the-cost-of-poor-quality-software-in-the-us-a-2022-report/) estimated the US cost of poor software quality at at least $2.41 trillion. That aggregate estimate does not identify how much is caused by ambiguity between QA, QC and QE. Teams can instead examine their own rework, incidents and ownership gaps.
 
 A familiar scene follows. A release slips, customers complain, and executives ask "QA" why quality failed. The problem, however, sits upstream: no release criteria were defined, no telemetry fed production failures back into engineering priorities, and no one owned the test infrastructure well enough to keep signal flowing. The diagnosis is wrong before the postmortem begins.
 
@@ -27,21 +23,21 @@ A familiar scene follows. A release slips, customers complain, and executives as
 
 The confusion is understandable. All three functions orbit the same objective: shipping products that work. But they attack the problem from fundamentally different angles, and treating them as substitutes produces the organisational equivalent of hiring a locksmith to design a house.
 
-**Quality Assurance** is preventive. It focuses on process: defining standards, establishing workflows, and creating the conditions under which defects are less likely to arise. The American Society for Quality (ASQ) [defines QA](https://asq.org/quality-resources/quality-assurance) as "a systematic approach to ensuring that processes used to manage and create deliverables meet quality standards." A QA function does not touch the product directly. It shapes the environment in which the product is built. When QA works well, fewer defects are introduced in the first place. When it fails, teams discover too late that nobody documented the deployment checklist, the code review criteria, or the requirements-traceability matrix.
+**Quality Assurance** focuses on providing confidence that quality requirements will be fulfilled. [ASQ describes](https://asq.org/quality-resources/quality-assurance-vs-control) planned and systematic activities across the quality system. In software, these can include agreed practices for reviews, validation and learning from failures.
 
-**Quality Control** is reactive. It inspects finished or semi-finished work to identify defects that slipped through. ASQ's [definition of QC](https://asq.org/quality-resources/quality-control) centres on "activities used to verify requirements and ensure standards are met." QC is the checkpoint at the end of the assembly line — the manual test pass, the regression suite, the user-acceptance sign-off. It catches problems. It does not prevent them. Yet in many software organisations, QC is the only quality discipline with meaningful headcount and budget, precisely because its output — bugs found — is the easiest to measure.
+**Quality Control** focuses on fulfilling quality requirements, including inspection and checks of a product or process. An automated regression check and a user-acceptance test are examples of activities that can provide evidence about a product. Finding a defect can also prompt changes that prevent it recurring.
 
-**Quality Engineering** is systemic. It embeds quality thinking into every phase of the development lifecycle, from architecture to observability in production. ASQ describes the [quality engineer's role](https://asq.org/quality-resources/quality-engineering) as one that "applies statistical methods and engineering principles to ensure quality." QE practitioners own test infrastructure, define quality metrics, build feedback loops between production telemetry and development priorities, and treat quality as a product attribute rather than a gatekeeping function. Where QA writes the standards and QC enforces them, QE designs the system so that compliance is a byproduct of the architecture rather than an overhead bolted on afterward.
+**Quality Engineering** applies engineering methods to improve quality across a system. In software, teams may build test infrastructure, design feedback loops and use production observations to guide improvements. Organisations define the role differently; responsibilities should be explicit rather than inferred from the title.
 
 ## The cost of conflation
 
 The practical damage emerges when organisations collapse these three functions into one team — typically labelled "QA" — and expect that team to handle everything from process governance to exploratory testing to test-framework architecture. The result is predictable: the team gravitates toward the most visible activity (finding bugs) and neglects the two activities whose value is structural but less visible (preventing bugs and engineering systemic quality). It is the organisational equivalent of measuring a fire brigade entirely by how many blazes it extinguishes while ignoring the wiring standards that would have prevented the fire in the first place.
 
-The OpenText and Capgemini World Quality Report 2025-26, which surveyed 1,800 technology leaders across 33 countries, found that only 19% of organisations believed their quality strategy was effective — a decline from 23% two years earlier. One contributing factor was organisational ambiguity. Companies that had a dedicated quality-engineering function operating alongside (not inside) QA reported higher satisfaction with quality outcomes than those that had merged all quality roles under a single umbrella.
+The terms QA, QC and QE are used differently across organisations. That variation makes an explicit description of responsibilities more useful than assuming a job title settles who prevents defects, checks behaviour or improves the delivery system.
 
-This mirrors a pattern well documented in manufacturing, where the distinction between QA and QC was settled decades ago. Toyota's production system — the template for lean manufacturing — explicitly separates process assurance (QA) from product inspection (QC), and both from the engineering of poka-yoke mechanisms that make defects structurally impossible (QE). Software organisations, despite borrowing heavily from manufacturing's vocabulary, have been slow to adopt its organisational clarity.
+Manufacturing offers useful examples of process improvement, inspection and mistake-proofing. The QA, QC and QE labels used here are a way to discuss responsibilities in software, not a claim about Toyota's own taxonomy.
 
-DORA's 2025 State of DevOps Report reinforced the point from a performance angle: elite-performing teams deployed 182 times more frequently than low performers while maintaining change failure rates below 5%. These teams did not achieve both speed and stability by testing harder at the end of the pipeline. They achieved it by engineering quality into the pipeline itself — building automated guardrails, monitoring production telemetry in real time, and feeding failure data back into design decisions. That is quality engineering, not quality assurance and not quality control, and it requires a distinct skill set, a distinct mandate, and a distinct budget line. It is also why [AI-augmented quality operations](/2026/04/05/ai-quality-testing-automation/) matter only when they strengthen the system rather than merely accelerate inspection.
+Delivery speed and operational stability both matter. Clear responsibility for prevention, feedback and incident learning helps teams evaluate those outcomes together.
 
 ## Separating the disciplines
 
@@ -55,15 +51,12 @@ Third, **fund quality engineering as infrastructure**. Test frameworks, CI/CD qu
 
 ## The clarity dividend
 
-The organisations that distinguish clearly between QA, QC, and QE do not merely find fewer bugs. They build systems that produce fewer bugs, catch the remaining ones earlier, and learn from production failures systematically. The discipline is not glamorous. It requires admitting that a team called "QA" might actually be doing "QC" — an admission that bruises egos but clarifies priorities. In an industry where the cost of poor quality is measured in trillions, that clarity is not a luxury. It is a competitive advantage that most companies have not yet claimed, and it is one of the cleanest ways to stop quality work from degenerating into [testing theatre](/2026/04/05/the-real-cost-of-testing-theater-when-quality-metr/).
+Clear responsibilities can help teams discuss prevention, detection and improvement without assuming a job title tells the whole story. Revisit ownership when gaps appear, and examine outcomes rather than treating labels as proof of quality.
 
 ---
 
 ## References
 
-1. CISQ, *The Cost of Poor Software Quality in the US: A 2022 Report*, [it-cisq.org](https://www.it-cisq.org/the-cost-of-poor-quality-software-in-the-us-a-2022-report/)
-2. ASQ, *Quality Assurance Resources*, [asq.org](https://asq.org/quality-resources/quality-assurance)
-3. ASQ, *Quality Control Resources*, [asq.org](https://asq.org/quality-resources/quality-control)
-4. ASQ, *Quality Engineering Resources*, [asq.org](https://asq.org/quality-resources/quality-engineering)
-5. OpenText & Capgemini, *World Quality Report 2025-26*, [opentext.com](https://www.opentext.com/en/media/report/world-quality-report-17th-edition)
-6. DORA, *State of DevOps Report 2025*, [dora.dev](https://dora.dev/dora-report-2025/)
+1. ASQ, [Quality Assurance vs Quality Control](https://asq.org/quality-resources/quality-assurance-vs-control).
+2. ASQ, [Quality Glossary](https://asq.org/quality-resources/quality-glossary).
+3. CISQ, [Cost of Poor Software Quality in the US](https://www.it-cisq.org/the-cost-of-poor-quality-software-in-the-us-a-2022-report/), 2022.
