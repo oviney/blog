@@ -37,9 +37,9 @@ A test that remains flaky can repeatedly interrupt delivery and make later failu
 
 A new framework can help with some maintenance problems, but changing tools does not remove the need to design stable tests, manage data and investigate failures.
 
-AI-assisted test generation — now offered by tools from Codium, Diffblue, and embedded in GitHub Copilot — threatens to accelerate the debt cycle rather than resolve it. These tools excel at producing tests quickly, but they encode current behaviour without distinguishing intended contracts from incidental implementation details. A team that uses AI to double its test count in six months will face quadrupled maintenance load within a year unless it simultaneously invests in test architecture, rigorous flakiness budgets, and the discipline to delete tests that no longer earn their keep.
+AI-assisted test generation can produce checks that reflect existing behaviour without establishing whether that behaviour is intended. Review assertions against requirements and track whether the resulting tests remain useful and maintainable.
 
-The organisations that thrive will be those that treat their test suite not as an ever-growing archive but as a garden requiring constant, deliberate pruning. A lean suite that runs fast, fails meaningfully, and costs little to maintain will catch more real bugs than a sprawling one that drowns its signals in noise. The test suite is not a safety net — it is a tool, and like any tool, it works best when kept sharp.
+The organisations that thrive will be those that treat their test suite not as an ever-growing archive but as a garden requiring constant, deliberate pruning. A suite that runs quickly and fails meaningfully can make it easier to investigate problems; its effectiveness still depends on the risks its tests cover. The test suite is not a safety net — it is a tool, and like any tool, it works best when kept sharp.
 
 ---
 
