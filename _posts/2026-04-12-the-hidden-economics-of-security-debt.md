@@ -39,13 +39,13 @@ This view is partly right and often overstated. Tooling does help when it reduce
 
 ## What leaders should fund first
 
-The financial dynamics of security debt will continue to evolve as organisations strive to keep pace with a rapidly changing cyber threat landscape. The continuous increase in breach costs and security debt management expenses indicates a clear requirement for a strategic overhaul. Organisations must move towards integrating proactive measures into their cybersecurity frameworks.
+Security leaders should assess exposure, assign ownership and fund remediation based on the organisation's risks. Breach costs vary over time and across incidents; aggregate figures do not establish a continuous upward trend.
 
-A real-world example can be seen in the strategic approach taken by major financial institutions. These institutions have incorporated AI-driven threat detection tools, which not only identify potential breaches before they occur but also provide predictive insights that enable more effective resource allocation. These tools represent a forward-thinking strategy that organisations across sectors can emulate to balance their budgets against the need for robust security measures.
+Threat detection tools can help analysts investigate suspicious activity, but their effectiveness depends on telemetry, configuration and the team's response capacity.
 
 Furthermore, organisations adopting comprehensive cyber hygiene practices will be better positioned to manage security debt effectively. By revisiting their security policies, investing in remediation capacity, and keeping abreast of emerging threat landscapes, they ensure their investments in cybersecurity yield tangible returns. The key lies in transforming cybersecurity from a reactive to a proactive posture, ensuring robust defence mechanisms are in place long before threats materialise.
 
-Ultimately, organisations that strategically invest in advanced security practices and tools today will safeguard their operations and finances against the increasing threat of cyber vulnerabilities tomorrow.
+Ultimately, organisations that strategically invest in advanced security practices and tools today can reduce exposure, although no set of controls eliminates cyber risk.
 
 ## References
 
