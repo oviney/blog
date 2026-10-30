@@ -5,17 +5,15 @@ subtitle: "Platform teams keep getting stood up and the value keeps not appearin
 date: 2026-04-12
 author: "Ouray Viney"
 categories: ["Software Engineering"]
-description: "Most platform engineering initiatives stall before delivering value. Here is why cultural inertia, poor tooling, and misaligned expectations derail the promise."
+description: "Platform engineering can struggle to deliver value when tooling, team needs and expectations are misaligned."
 tags: [platform-engineering, developer-experience, devops, adoption]
 image: /assets/images/platform-engineering-adoption-crisis.png
 image_alt: "A platform engineering rollout stalling before team-wide adoption"
 image_caption: "Illustration: platform engineering stalls when teams never get onto the path"
 ---
 
-Only 30% of companies fully realise the benefits of platform engineering within the first three years of adoption. Despite significant capital and engineering time invested, organisations repeatedly find that the gap between what platform engineering promises and what it delivers in practice is wider than expected. The culprits are rarely technical.
+Platform engineering promises reusable infrastructure and easier delivery, but investment alone does not guarantee that developers will use or benefit from a platform. Outcomes depend on the team's users, the service offered and the way its value is measured.
 
-![Platform Engineering Adoption Rates 2023–2026](/assets/charts/platform-engineering-adoption-crisis.png)
-*Source: Infrastructure Engineering research, 2025*
 
 ## The Misunderstanding at the Core
 
@@ -23,11 +21,11 @@ Platform engineering sits at the crossroads of software development and operatio
 
 Without a clear definition, platform teams get pulled in conflicting directions. Some are asked to build and maintain Kubernetes clusters. Others become an internal consulting function. Still others are treated as a second helpdesk. This role ambiguity produces weak integration and chronic underutilisation, ensuring the investment never compounds.
 
-Developer portals are a case in point. Approximately 45% fail to meet user expectations, according to research on internal developer platforms conducted in 2025. The failure mode is almost always the same: the portal is built for the team that built it, not the developers expected to use it. Insufficient usability research, sparse documentation, and no feedback loop ensure that adoption stalls within the first quarter of launch.
+Developer portals are a case in point. A portal built around the platform team's assumptions can miss the needs of its users. Usability research, current documentation and a feedback loop help teams identify the workflows worth improving.
 
 ## Cultural Resistance Outlasts Technical Debt
 
-More than 60% of platform engineering initiatives encounter significant cultural pushback. This figure should not surprise anyone who has tried to change how an engineering organisation works. Technical transformation is a proxy for organisational transformation, and organisations resist the latter far more stubbornly than they resist upgrading a runtime.
+A platform initiative can also meet cultural resistance. Teams may be concerned about loss of autonomy, migration effort or whether the proposed path fits their service. Those concerns need to be understood and addressed rather than assumed away.
 
 The pattern is consistent. When platform teams introduce golden paths, mandatory CI templates, or centralised secrets management, engineers who have spent years building their own tooling perceive it as a loss of autonomy rather than a reduction in toil. The resistance is rarely explicit. It manifests as slow adoption metrics, polite non-compliance, and a quiet proliferation of shadow tooling that defeats the purpose of standardisation.
 
@@ -43,11 +41,11 @@ Addressing this requires sequencing. Platform engineering adoption should begin 
 
 ## Measuring What Actually Matters
 
-A recurring observation from platform engineering post-mortems is that teams measure the wrong things. Lines of platform code written, number of services onboarded, and portal page views are easy to report but poorly correlated with value delivered.
+Teams can mistake platform activity for value. Lines of platform code written, services onboarded and portal page views are easy to report, but they do not by themselves show whether the platform helps developers.
 
-The metrics that matter are downstream: deployment frequency for teams on the platform versus off it, change failure rate, mean time to restore, and developer satisfaction scores. These require baseline measurement before the platform launches, which most organisations skip, making it impossible to demonstrate impact after the fact.
+The metrics that matter are downstream: deployment frequency for teams on the platform versus off it, change failure rate, mean time to restore, and developer satisfaction scores. Establish a baseline where possible and account for differences between teams before attributing a change to the platform.
 
-Without that evidence, platform teams struggle to justify continued investment — even when the platform is working. The 30% adoption figure cited above may be an undercount of value delivered, because teams that never measured the counterfactual cannot prove what they saved.
+Without evidence of outcomes, platform teams may struggle to justify continued investment. Measure adoption alongside task completion, reliability and developer feedback, and compare results with the previous workflow.
 
 ## The Path Forward
 
@@ -55,8 +53,8 @@ Platform engineering will fulfil its potential only where organisations treat th
 
 The tools are not the constraint. The discipline of building for your users — even when your users are your colleagues — is.
 
+For the platform design side, see [The Golden Path](/2026/04/12/platform-engineering-developer-portals/).
+
 ## References
 
-1. Infrastructure Engineering: A Still Missing, Undervalued Role in the Research Ecosystem, *arXiv*, 2025. Available at: [arxiv.org/abs/2405.10473](https://arxiv.org/abs/2405.10473)
-2. Mastering Site Reliability Engineering in Enterprise, *Springer*, 2025. Available at: [link.springer.com](https://link.springer.com/content/pdf/10.1007/979-8-8688-1448-8.pdf)
-3. Internal Developer Platforms: A 2025 Benchmark Report, *CNCF TAG App Delivery*, 2025. Available at: [tag-app-delivery.cncf.io](https://tag-app-delivery.cncf.io)
+1. DORA, [Platform engineering](https://dora.dev/capabilities/platform-engineering/).
