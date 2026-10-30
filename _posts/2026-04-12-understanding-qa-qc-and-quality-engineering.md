@@ -9,11 +9,11 @@ tags: [quality-assurance, quality-control, quality-engineering, quality-manageme
 image: /assets/images/understanding-qa-qc-quality-engineering-hero.svg
 image_alt: "A product box caught in a red knot linking a checklist, magnifying glass, and gear"
 image_caption: "Illustration: when quality ownership tangles, the product gets stuck"
-description: "Most organisations treat QA, QC and quality engineering as synonyms. The confusion costs real money — and explains why quality maturity stalls."
+description: "How quality assurance, quality control and quality engineering can clarify responsibilities across delivery."
 ---
 
 
-Most organisations say they take quality seriously. Far fewer can explain who is supposed to prevent defects, who is supposed to detect them, and who is supposed to engineer the delivery system so quality improves over time. Ask a product leader to distinguish Quality Assurance, Quality Control, and Quality Engineering and the answer is often a shrug, a job-title anecdote, or the all-purpose phrase "the QA team". The ambiguity is expensive. When organisations cannot articulate the difference between preventing defects, detecting defects, and engineering quality into the development lifecycle, they misallocate budgets, misstaff teams, and misdiagnose failures.
+Quality work includes preventing defects, detecting problems and improving the delivery system. Teams benefit from making those responsibilities explicit, whatever titles they use.
 
 The [CISQ 2022 report](https://www.it-cisq.org/the-cost-of-poor-quality-software-in-the-us-a-2022-report/) estimated the US cost of poor software quality at at least $2.41 trillion. That aggregate estimate does not identify how much is caused by ambiguity between QA, QC and QE. Teams can instead examine their own rework, incidents and ownership gaps.
 
@@ -35,7 +35,7 @@ The practical damage emerges when organisations collapse these three functions i
 
 The terms QA, QC and QE are used differently across organisations. That variation makes an explicit description of responsibilities more useful than assuming a job title settles who prevents defects, checks behaviour or improves the delivery system.
 
-This mirrors a pattern well documented in manufacturing, where the distinction between QA and QC was settled decades ago. Toyota's production system — the template for lean manufacturing — explicitly separates process assurance (QA) from product inspection (QC), and both from the engineering of poka-yoke mechanisms that make defects structurally impossible (QE). Software organisations, despite borrowing heavily from manufacturing's vocabulary, have been slow to adopt its organisational clarity.
+Manufacturing offers useful examples of process improvement, inspection and mistake-proofing. The QA, QC and QE labels used here are a way to discuss responsibilities in software, not a claim about Toyota's own taxonomy.
 
 Delivery speed and operational stability both matter. Clear responsibility for prevention, feedback and incident learning helps teams evaluate those outcomes together.
 
@@ -51,7 +51,7 @@ Third, **fund quality engineering as infrastructure**. Test frameworks, CI/CD qu
 
 ## The clarity dividend
 
-The organisations that distinguish clearly between QA, QC, and QE do not merely find fewer bugs. They build systems that produce fewer bugs, catch the remaining ones earlier, and learn from production failures systematically. The discipline is not glamorous. It requires admitting that a team called "QA" might actually be doing "QC" — an admission that bruises egos but clarifies priorities. In an industry where the cost of poor quality is measured in trillions, that clarity is not a luxury. It is a competitive advantage that most companies have not yet claimed, and it is one of the cleanest ways to stop quality work from degenerating into [testing theatre](/2026/04/05/the-real-cost-of-testing-theater-when-quality-metr/).
+Clear responsibilities can help teams discuss prevention, detection and improvement without assuming a job title tells the whole story. Revisit ownership when gaps appear, and examine outcomes rather than treating labels as proof of quality.
 
 ---
 

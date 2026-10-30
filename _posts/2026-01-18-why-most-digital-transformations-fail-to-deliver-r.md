@@ -9,7 +9,7 @@ tags: [digital-transformation, software-engineering, change-management, engineer
 image: /assets/images/digital-transformation-secret.png
 image_alt: "A digital bridge collapsing before it reaches the far side"
 image_caption: "Illustration: transformation programmes fail when the bridge to outcomes never closes"
-description: "Why digital transformations fail: most programmes still miss targets because governance, talent and operating-model problems overwhelm the technology."
+description: "How governance, integration, skills and customer outcomes influence digital transformation."
 ---
 
 
@@ -35,7 +35,7 @@ The same logic appears in {% post_url 2026-04-12-platform-engineering-adoption-c
 
 Integration can make a transformation take longer than its initial plan. Legacy dependencies, data migration and external interfaces should be tested early enough for the programme to adjust its schedule.
 
-The integration problem is particularly acute in regulated industries. At a major European bank that Deloitte studied, a core banking platform migration planned for 18 months took 42 months because each regulatory approval cycle added 4-6 months that the project plan had not anticipated. The technology worked. The organisation could not move at the speed the technology permitted.
+Regulated programmes may also need to account for approval cycles. Identify those dependencies early and include them in the delivery plan.
 
 ## The talent gap transformation budgets ignore
 

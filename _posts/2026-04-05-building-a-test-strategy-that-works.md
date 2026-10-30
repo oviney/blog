@@ -23,7 +23,7 @@ A strategy written at the start of a project can become stale as architecture, d
 
 This is not chiefly a documentation failure. It is an incentive failure. The person who writes the test strategy is rewarded for its completeness at the moment of approval. Almost nobody is measured on its accuracy two quarters later. So the strategy becomes a compliance artifact — evidence that planning occurred — rather than an operational tool that guides daily testing decisions.
 
-The result is familiar. Teams inherit a document that prescribes contract tests, environment standards and coverage targets with great confidence, then discover that the delivery system cannot support them. A financial-services firm with 1,200 engineers, for example, produced a 60-page strategy in Q1 that mandated complete API contract testing across 47 microservices. By Q3, the teams had fallen back to ad hoc integration testing — not because the mandate was irrational, but because the strategy had been written without the engineers responsible for third-party integrations. Three critical services had no sandbox environment. The strategy had assumed they did.
+A strategy can prescribe contract tests and environment standards that delivery teams cannot yet support. For example, a team that depends on a third-party service without a sandbox needs an agreed alternative, such as a provider-supported test environment or a carefully maintained stub.
 
 ## The automation fantasy
 
@@ -55,7 +55,7 @@ The strongest teams also make ownership explicit. If a strategy says contract te
 
 That, in turn, produces a more realistic strategy. Effective teams measure outcomes rather than activities: escaped defects, mean time to feedback and the ratio of test maintenance to feature development hours. They fund environments and test data as shared capabilities, not optional extras. And they are willing to admit, quarterly, that the previous strategy was partly wrong.
 
-The organisations that test well are therefore not the ones with the thickest strategy documents. They are the ones with the shortest distance between evidence and revision. A test strategy earns its value only when it is cheap to challenge, cheap to update and tightly connected to the economics of delivery. Most quality plans fail because they are written as declarations of intent. The useful ones survive because they are run as feedback systems.
+The organisations that test well are therefore not the ones with the thickest strategy documents. They are the ones with the shortest distance between evidence and revision. A test strategy earns its value only when it is cheap to challenge, cheap to update and tightly connected to the economics of delivery. A quality plan can fail when it remains a declaration of intent. The useful ones survive because they are run as feedback systems.
 
 ## References
 

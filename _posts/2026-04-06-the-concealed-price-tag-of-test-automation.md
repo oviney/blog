@@ -13,7 +13,7 @@ description: "Understand the full cost of test automation, from implementation t
 ---
 
 
-The promise of test automation promises to whisk software releases along at breakneck speed with minimal errors. Yet, beneath this gleaming veneer lies a tangle of hidden costs that organisations seldom reckon with until budgets balloon and deadlines slip. A sober reckoning reveals that test automation is often a far more expensive and complicated beast than conventional wisdom admits.
+Test automation promises to whisk software releases along at breakneck speed with minimal errors. Yet, beneath this gleaming veneer lies a tangle of hidden costs that organisations seldom reckon with until budgets balloon and deadlines slip. A sober reckoning reveals that test automation is often a far more expensive and complicated beast than conventional wisdom admits.
 
 A business case for automation should identify what the team expects to save and the costs required to achieve it. A suite that reduces repetitive execution can still need substantial investment in data, environments, maintenance and investigation.
 
@@ -51,13 +51,13 @@ Automated tests also use infrastructure. Measure the cost of execution and envir
 
 Measure maintenance and execution costs in a representative pilot. Use the results to adjust the suite and business case before scaling.
 
-These cautionary tales illustrate that automation is neither plug-and-play nor low-maintenance.
+Automation requires ongoing investment and maintenance.
 
 ## Charting a Reasoned Course Through Automation Costs
 
 Modest optimism remains for organisations willing to navigate these complexities. Practices to dilute hidden expenses include:
 
-- **Balanced Testing Regiments:** Marry automated scripts with manual exploratory tests to cover what automation misses, as Capgemini advises. 
+- **Balanced Testing Practices:** Combine automated checks with exploratory testing to investigate risks predefined checks may miss. 
 - **Robust Test Automation Architecture:** Use modular, understandable checks and review recurring maintenance work.
 - **Selective Automation:** Prioritise high-value, repetitive tests and steer clear of brittle UI tests more trouble than they are worth. 
 - **Continuous Workforce Development:** Keep skills current with regular training to forestall obsolescence and costly errors. 
