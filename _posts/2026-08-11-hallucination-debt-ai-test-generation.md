@@ -46,11 +46,11 @@ The risk is real, while the evidence does not establish that disappearing webpag
 
 Four controls, each with a way to tell whether it worked.
 
-**Gate on resolution, before you gate on tests.** Run dependency resolution as a discrete CI step ahead of the suite, so an invented import fails at the pipeline rather than on someone's laptop at 16:40. Track failures attributed to unresolvable packages. Verify the gate with a controlled invalid dependency; no failures in normal operation may simply mean none were introduced.
+**Gate on resolution, before you gate on tests.** Run dependency resolution and execute generated tests in a clean CI environment; use import checks where appropriate. Dependency resolution alone will not catch an import absent from the manifest. Track failures attributed to unresolvable packages. Verify the gate with a controlled invalid dependency; no failures in normal operation may simply mean none were introduced.
 
-**Pin, hash, and scan the lockfile rather than the manifest.** A hallucinated name that has been squatted resolves cleanly and installs cleanly. Hash pinning is what distinguishes the package you reviewed from the package you received. Measure the percentage of repositories with hash-pinned lockfiles and SCA running against them.
+**Pin, hash, and scan the lockfile rather than the manifest.** A hallucinated name that has been squatted resolves cleanly and installs cleanly. Hashes can verify that installed bytes match a trusted lockfile, but they do not establish that the package was legitimate when first pinned. Review package names and provenance before adding them. Measure the percentage of repositories with hash-pinned lockfiles and SCA running against them.
 
-**Mark AI-authored change at the pull request.** You cannot measure the defect rate of AI-generated tests without a field that says which tests are AI-generated. This is a policy choice, not an engineering problem. Measure the percentage of PRs carrying authorship metadata, then segment escaped-defect rate by that field after one quarter. If the two segments look the same, this article was wrong and you will have the data to say so.
+**Mark AI-authored change at the pull request.** You cannot measure the defect rate of AI-generated tests without a field that says which tests are AI-generated. This is a policy choice, not an engineering problem. Track authorship metadata where useful and compare defect patterns over time. Interpret any comparison cautiously: sample size, the kind of work and other differences between changes may confound the result.
 
 **Check dependency provenance.** Compare suggested package names with approved registries and trusted project documentation. The replication identified 127 shared hallucinated names, of which 53 remained registrable after the registry protections described in the paper. Registry status can change, so a static list is only supplementary to ongoing dependency verification.
 
