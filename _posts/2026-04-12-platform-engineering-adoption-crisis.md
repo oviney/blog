@@ -5,7 +5,7 @@ subtitle: "Platform teams keep getting stood up and the value keeps not appearin
 date: 2026-04-12
 author: "Ouray Viney"
 categories: ["Software Engineering"]
-description: "Most platform engineering initiatives stall before delivering value. Here is why cultural inertia, poor tooling, and misaligned expectations derail the promise."
+description: "Platform engineering can struggle to deliver value when tooling, team needs and expectations are misaligned."
 tags: [platform-engineering, developer-experience, devops, adoption]
 image: /assets/images/platform-engineering-adoption-crisis.png
 image_alt: "A platform engineering rollout stalling before team-wide adoption"
@@ -43,7 +43,7 @@ Addressing this requires sequencing. Platform engineering adoption should begin 
 
 Teams can mistake platform activity for value. Lines of platform code written, services onboarded and portal page views are easy to report, but they do not by themselves show whether the platform helps developers.
 
-The metrics that matter are downstream: deployment frequency for teams on the platform versus off it, change failure rate, mean time to restore, and developer satisfaction scores. These require baseline measurement before the platform launches, which most organisations skip, making it impossible to demonstrate impact after the fact.
+The metrics that matter are downstream: deployment frequency for teams on the platform versus off it, change failure rate, mean time to restore, and developer satisfaction scores. Establish a baseline where possible and account for differences between teams before attributing a change to the platform.
 
 Without evidence of outcomes, platform teams may struggle to justify continued investment. Measure adoption alongside task completion, reliability and developer feedback, and compare results with the previous workflow.
 

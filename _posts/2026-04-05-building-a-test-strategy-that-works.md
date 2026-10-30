@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The test strategy trap: why quality plans fail"
-subtitle: "Most test strategies fail not because teams skip planning, but because the plan is written as a static document instead of a live allocation system for risk, tooling and feedback."
+subtitle: "A useful test strategy guides decisions about risk, tooling and feedback as the product changes."
 date: 2026-04-05
 author: "Ouray Viney"
 categories: ["Quality Engineering"]

@@ -30,13 +30,13 @@ A defect that reaches production can cause incident response, customer disruptio
 
 Fast delivery and stable operation can reinforce each other when teams use small changes, meaningful checks and rapid feedback. Measure delivery and reliability together rather than treating either as a sufficient measure of quality.
 
-CrowdStrike's Channel File 291 update bypassed the kind of staged rollout and canary testing that Google's Site Reliability Engineering handbook has prescribed since 2016. George Kurtz, CrowdStrike's CEO, acknowledged in testimony before the US House of Representatives that the update had not been subjected to the same validation as a full sensor release. A cybersecurity company was undone by a quality-engineering failure — the irony was bitter and the lesson universal.
+CrowdStrike's [root-cause analysis](https://www.crowdstrike.com/wp-content/uploads/2024/08/Channel-File-291-Incident-Root-Cause-Analysis-08.06.2024.pdf) describes the validation gap and the steps the company proposed after the incident, including changes to testing and deployment. The case illustrates the consequences of a defect in a widely deployed update.
 
 ## The accountability gap
 
 The deeper problem is structural. In most companies, nobody is accountable for the total cost of quality. Engineering leadership owns development speed. Operations owns uptime. Product owns revenue. Quality falls between these boundaries, claimed by all and owned by none. Organisations can make those costs visible by agreeing on consistent categories and reviewing prevention, appraisal, rework and customer impact together.
 
-The irony is that the data to close this gap already exists. Every company tracks incident costs, rework hours, and customer churn. The missing step is aggregation — summing these scattered line items into a single quality cost figure that sits beside revenue and headcount on the executive dashboard. Google's error budget model does exactly this: it translates reliability targets into a financial framework where every outage minute has a dollar value and every feature freeze has an opportunity cost. The model forces trade-off decisions that most companies make by intuition and politics rather than arithmetic.
+Teams can begin by combining the incident costs and rework data they already collect, while noting gaps and avoiding double counting. [Google's error budget approach](https://sre.google/sre-book/service-best-practices/) defines an acceptable amount of unreliability against a service objective. It can inform a reliability-versus-change trade-off, but it does not itself assign a dollar value to an outage.
 
 Make ownership of quality costs explicit across engineering, operations and product. Incident response, rework and customer disruption should be visible alongside investment in prevention and testing.
 

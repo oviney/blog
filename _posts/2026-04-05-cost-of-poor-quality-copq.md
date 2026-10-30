@@ -21,7 +21,7 @@ The [CISQ 2022 report](https://www.it-cisq.org/the-cost-of-poor-quality-software
 
 Toyota's production system uses the andon principle to make problems visible and enable workers to stop a process when necessary. The transferable idea is to investigate defects early and improve the process. A company's actual cost of poor quality depends on how it defines and measures prevention, appraisal and failure costs.
 
-Yet even Toyota stumbled at the software boundary. In October 2023, the company halted production across all fourteen of its Japanese assembly plants after discovering a database error in its supplier-ordering system. A software defect, not a manufacturing one, shut down the world's largest automaker for two days. Philip Crosby's dictum that "quality is free" — meaning the investment in prevention pays for itself through avoided failure costs — holds as firmly for microservices as for machined parts.
+In August 2023, Toyota halted operations at its Japanese plants after a database maintenance issue. [Toyota's account](https://global.toyota/en/newsroom/corporate/39732568.html) identifies insufficient disk space during maintenance and a failed backup system. The incident illustrates how operational dependencies can interrupt production, even when the problem does not originate on the factory floor.
 
 A culture that makes schedule and financial targets visible but suppresses quality concerns can make problems harder to address. Leaders need mechanisms for raising and acting on those concerns.
 
@@ -37,11 +37,11 @@ The shift-left movement, continuous testing, and the DevOps mantra of "quality i
 
 Digital twins and simulated environments can help teams exercise scenarios before changes reach physical systems. Their value depends on how faithfully they model the behaviour and risks of interest.
 
-Tesla's approach to vehicle software updates offers another hybrid model. The company tests changes against fleet-wide simulation before deploying over-the-air updates to millions of vehicles. Tesla's software defect rate per release runs significantly below the industry average for connected vehicles, attributable primarily to its simulation-first methodology. The digital twin is the software equivalent of a manufacturing test rig — a controlled environment where defects can be caught at prevention-stage costs.
+Simulation can help teams investigate software behaviour in a controlled environment. Its value depends on how well the model represents real conditions and what additional testing is needed.
 
 ## The cultural import
 
-The technical tools are available. What most software companies lack is the cultural infrastructure that makes them effective. Manufacturing's quality revolution required executive sponsorship, worker empowerment, and decades of institutional learning. Google's Site Reliability Engineering team adopted a similar defect-budget approach — teams that exhaust their error budget must freeze feature releases until stability is restored. The result is not slower delivery but more predictable delivery.
+The technical tools are available. What most software companies lack is the cultural infrastructure that makes them effective. Manufacturing's quality revolution required executive sponsorship, worker empowerment, and decades of institutional learning. [Google's Site Reliability Engineering guidance](https://sre.google/sre-book/embracing-risk/) describes error budgets as an explicit way to balance reliability and the pace of change. Teams can agree in advance how to respond when reliability falls below its objective.
 
 The cost of quality appears in prevention, investigation and failure. Making those costs visible helps leaders decide where additional safeguards or process changes are worth the investment.
 
