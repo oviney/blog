@@ -1,4 +1,21 @@
 {
   "$comment": "Advisories consciously accepted by the 🔒 Security Audit gate. Every entry needs a reason and a reviewBy date; check-npm-audit.js fails once an entry expires or stops matching a live advisory, so exceptions cannot rot silently.",
-  "allow": []
+  "allow": [
+    {
+      "id": 1244013,
+      "package": "glob",
+      "title": "AbortSignal cancellation bypass",
+      "reason": "Temporary CI tooling exception: the locked Sentry bundler plugin requires glob 13; patched glob 14 is outside its declared range. No attacker-controlled traversal is known in this static-site workflow. Reassess compatible upstream fixes.",
+      "owner": "oviney",
+      "reviewBy": "2026-11-15"
+    },
+    {
+      "id": 1244012,
+      "package": "minimatch",
+      "title": "globparts amplification",
+      "reason": "Temporary CI tooling exception: patched minimatch 11 is outside existing parent ranges, including legacy glob 7. No attacker-supplied patterns are known in this workflow. Reassess compatible upstream fixes.",
+      "owner": "oviney",
+      "reviewBy": "2026-11-15"
+    }
+  ]
 }
