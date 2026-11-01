@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-24T09:45:17.770Z",
+  "generatedAt": "2026-11-01T09:31:58.282Z",
   "kpis": {
     "agentPRsMerged30d": 2,
     "evalPassRate": 33,
     "contentAvgScore": null,
-    "openBacklog": 1,
-    "openPRCount": 2,
+    "openBacklog": 3,
+    "openPRCount": 8,
     "evalCount": 3,
     "remediationQueueDepth": 0,
     "remediationThreshold": 85
@@ -70,174 +70,144 @@
   "content": null,
   "recentPRs": [
     {
-      "number": 1288,
-      "title": "fix(content): alt text on the regenerated coverage draft (4th occurrence)",
+      "number": 1381,
+      "title": "Correct AI testing articles and refresh visual baselines",
       "author": "oviney",
-      "mergedAt": "2026-08-16T02:22:21Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1287,
-      "title": "fix(gate): check _review/ drafts, and fix the draft already carrying the defect",
-      "author": "oviney",
-      "mergedAt": "2026-08-16T02:11:34Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1286,
-      "title": "docs(backlog): the published-internal-docs P3 is ten files, not just tasks/",
-      "author": "oviney",
-      "mergedAt": "2026-08-15T23:00:49Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1285,
-      "title": "fix(content): replace prompt text with real alt text on the microservices hero",
-      "author": "oviney",
-      "mergedAt": "2026-08-15T22:32:53Z",
-      "labels": [
-        "agent:editorial-chief"
-      ],
-      "isAgent": true
-    },
-    {
-      "number": 1280,
-      "title": "docs: archive the 2026-08-12 cycle and stop local doc-audit runs filing issues",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T02:52:13Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1278,
-      "title": "docs: ADR-010 — defer native custom agents, agent:* labels stay canonical",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T02:38:12Z",
-      "labels": [
-        "governance-update"
-      ],
-      "isAgent": false
-    },
-    {
-      "number": 1277,
-      "title": "fix(doc-audit): audit skill files for accuracy instead of age",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T02:35:29Z",
-      "labels": [
-        "governance-update"
-      ],
-      "isAgent": false
-    },
-    {
-      "number": 1242,
-      "title": "chore(deps-dev): Bump jekyll-remote-theme from 0.4.3 to 0.5.2",
-      "author": "dependabot[bot]",
-      "mergedAt": "2026-08-13T02:32:49Z",
+      "mergedAt": "2026-10-30T13:45:44Z",
       "labels": [
         "needs-human-review"
       ],
       "isAgent": false
     },
     {
-      "number": 1275,
-      "title": "docs: repair the archived-cycle cross-links and record why they break",
+      "number": 1380,
+      "title": "Correct content review claims across strategy and quality posts",
       "author": "oviney",
-      "mergedAt": "2026-08-13T02:32:33Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1274,
-      "title": "chore: remove the healing machinery orphaned by the monitor retirement",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T02:22:52Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1273,
-      "title": "fix(404): give the page a height floor so its baseline stops straddling the fold",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T02:20:15Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1272,
-      "title": "fix(a11y): stop the masthead claiming a heading level, and guard the outline",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T02:17:09Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1271,
-      "title": "refactor(css): delete the orphaned econ-card cluster from the theme",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T02:07:52Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1270,
-      "title": "test(visual): stop the blocking pixel gate depending on third-party hosts",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T01:47:31Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1268,
-      "title": "docs(agent-memory): record the four lessons the #1260 fan-out produced",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T01:47:20Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1269,
-      "title": "fix(security): accept the extract-zip advisory so the PR queue is not blocked",
-      "author": "oviney",
-      "mergedAt": "2026-08-13T01:36:15Z",
-      "labels": [],
-      "isAgent": false
-    },
-    {
-      "number": 1260,
-      "title": "fix(home): apply the four fixes from the undelivered Claude Design drop",
-      "author": "oviney",
-      "mergedAt": "2026-08-12T03:59:48Z",
+      "mergedAt": "2026-10-30T13:42:10Z",
       "labels": [
         "needs-human-review"
       ],
       "isAgent": false
     },
     {
-      "number": 1264,
-      "title": "fix(a11y): replace prompt text with real alt text on the hallucination-debt post",
+      "number": 1379,
+      "title": "Repair unsupported automation cost claims",
       "author": "oviney",
-      "mergedAt": "2026-08-12T03:56:33Z",
+      "mergedAt": "2026-10-30T13:42:03Z",
       "labels": [
-        "agent:editorial-chief"
+        "needs-human-review"
       ],
-      "isAgent": true
+      "isAgent": false
     },
     {
-      "number": 1259,
-      "title": "docs(lifecycle): close out the Dependabot scope-exemption work",
+      "number": 1378,
+      "title": "Correct high-risk claims in content review",
       "author": "oviney",
-      "mergedAt": "2026-08-11T18:04:31Z",
+      "mergedAt": "2026-10-30T13:41:57Z",
+      "labels": [
+        "needs-human-review"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 1377,
+      "title": "test(GH-1375): enable stale newsletter coverage checks",
+      "author": "oviney",
+      "mergedAt": "2026-10-28T21:38:08Z",
       "labels": [],
       "isAgent": false
     },
     {
-      "number": 1257,
-      "title": "chore(ci): let Dependabot's bundler bumps pass the scope guard on their own",
+      "number": 1374,
+      "title": "perf(GH-1373): reduce duplicate browser tests and PR wait time",
       "author": "oviney",
-      "mergedAt": "2026-08-11T17:56:23Z",
+      "mergedAt": "2026-10-28T18:29:25Z",
+      "labels": [
+        "agent:qa-gatekeeper"
+      ],
+      "isAgent": true
+    },
+    {
+      "number": 1372,
+      "title": "fix(GH-1322): remove vulnerable browser-tooling dependencies",
+      "author": "oviney",
+      "mergedAt": "2026-10-28T18:20:20Z",
+      "labels": [],
+      "isAgent": false
+    },
+    {
+      "number": 1359,
+      "title": "chore(seo): exclude Search Console verification file from sitemap",
+      "author": "oviney",
+      "mergedAt": "2026-10-12T01:05:08Z",
+      "labels": [
+        "needs-human-review"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 1358,
+      "title": "feat(sw): serve the build-stamped stylesheet from cache, revalidating in the background",
+      "author": "oviney",
+      "mergedAt": "2026-10-09T11:14:58Z",
+      "labels": [
+        "enhancement",
+        "performance",
+        "P3:low"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 1355,
+      "title": "fix(hooks): lifecycle gate follow-ups (Amendment 2.4)",
+      "author": "oviney",
+      "mergedAt": "2026-10-08T23:51:33Z",
+      "labels": [
+        "enhancement",
+        "P3:low"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 1354,
+      "title": "fix(sw): stop serving stale CSS to returning visitors (oversized homepage hero)",
+      "author": "oviney",
+      "mergedAt": "2026-10-08T17:03:14Z",
+      "labels": [
+        "bug",
+        "P1:high",
+        "needs-human-review"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 1349,
+      "title": "feat: enforce the agent-skills lifecycle in Claude Code sessions (#1340)",
+      "author": "oviney",
+      "mergedAt": "2026-10-08T03:12:44Z",
+      "labels": [
+        "needs-human-review"
+      ],
+      "isAgent": false
+    },
+    {
+      "number": 1352,
+      "title": "fix(deps): clear npm audit advisories failing the Security Audit gate",
+      "author": "oviney",
+      "mergedAt": "2026-10-08T02:17:47Z",
+      "labels": [
+        "bug",
+        "P1:high",
+        "agent:qa-gatekeeper",
+        "needs-human-review"
+      ],
+      "isAgent": true
+    },
+    {
+      "number": 1348,
+      "title": "review: revise green-build-safe draft",
+      "author": "oviney",
+      "mergedAt": "2026-10-06T22:48:31Z",
       "labels": [],
       "isAgent": false
     }
@@ -246,9 +216,19 @@
     "agent:creative-director": [],
     "agent:qa-gatekeeper": [
       {
-        "number": 1299,
+        "number": 1382,
         "title": "Nightly quality suite failing",
-        "age": 6
+        "age": 1
+      },
+      {
+        "number": 1376,
+        "title": "Review optimized test value after 20 nightly runs",
+        "age": 4
+      },
+      {
+        "number": 1318,
+        "title": "Workflow ROI Review — 2026-09-01",
+        "age": 61
       }
     ],
     "agent:editorial-chief": [],
@@ -257,8 +237,8 @@
   "remediationQueue": [],
   "copilotUsage": {
     "seatsActive": null,
-    "billingCycleStart": "2026-08-01",
-    "billingCycleEnd": "2026-08-31",
+    "billingCycleStart": "2026-11-01",
+    "billingCycleEnd": "2026-11-30",
     "seatCostPerMonth": 19,
     "apiAvailable": false,
     "note": "Copilot billing API unavailable. Add a PAT with manage_billing:copilot or read:org scope as secret COPILOT_BILLING_PAT to enable live seat data."
