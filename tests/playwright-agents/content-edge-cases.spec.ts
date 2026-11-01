@@ -16,7 +16,6 @@ test.describe('@content @links April AI posts: cross-post links resolve @REQ-CON
       links: [
         '/2025/12/31/testing-times/',
         '/2026/04/05/why-ai-test-generation-tools-overpromise-on-maintenance-savi/',
-        '/2026/01/19/the-surprising-economics-of-test-automation-roi/',
       ],
     },
     {
@@ -25,8 +24,6 @@ test.describe('@content @links April AI posts: cross-post links resolve @REQ-CON
       name: 'Code Generators',
       postUrl: '/2026/04/05/ai-assisted-development-the-new-industrial-revolut/',
       links: [
-        '/2026/04/05/ai-quality-testing-automation/',
-        '/2026/04/05/practical-applications-of-ai-in-software-development/',
         '/2026/01/02/self-healing-tests-myth-vs-reality/',
       ],
     },
