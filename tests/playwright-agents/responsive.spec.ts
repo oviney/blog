@@ -471,7 +471,7 @@ test.describe('@visual Inline Chart Overflow @REQ-VISUAL-01', () => {
   // cap on narrow phones so the page never gains horizontal scroll. Fails on
   // origin/main (fixed max-width: 500px) and passes once the chart rule uses
   // max-width: min(500px, 100%).
-  const chartPost = '/2026/01/19/the-surprising-economics-of-test-automation-roi/';
+  const chartPost = '/2026/04/27/the-ai-testing-paradox-when-silicon-valley-s-saviour-become/';
   const narrowViewports = [
     { width: 320, height: 568 },
     { width: 390, height: 844 },
