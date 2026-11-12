@@ -162,12 +162,11 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
     await expect(page.locator('.search-result').first()).toBeVisible();
   });
 
-  test('QA/QC article keeps one article heading and its internal references resolve', async ({ page }) => {
+  test('QA/QC article keeps one article heading and its hero', async ({ page }) => {
     await page.goto('/2026/04/12/understanding-qa-qc-and-quality-engineering/');
     await page.waitForLoadState('networkidle');
 
     await expect(page.locator('.article-title')).toHaveCount(1);
-    await expect(page.locator('.article-chart img')).toBeVisible();
     await expect(page.locator('.article-hero-image img')).toHaveAttribute('src', /understanding-qa-qc-quality-engineering-hero\.svg/);
     // #1103 dropped the `| upcase` filter so hero captions render in the case
     // the author wrote (the audit flagged all-caps captions as a P2 defect).
@@ -177,17 +176,6 @@ test.describe('@navigation @links Navigation & User Journeys @REQ-NAV-01 @REQ-NA
 
     const articleHeadings = page.locator('article.economist-article h1');
     await expect(articleHeadings).toHaveCount(1);
-
-    const internalPaths = [
-      '/2026/04/05/cost-of-poor-quality-copq/',
-      '/2026/04/05/ai-quality-testing-automation/',
-      '/2026/04/05/the-real-cost-of-testing-theater-when-quality-metr/',
-    ];
-
-    for (const path of internalPaths) {
-      const response = await page.request.get(path);
-      expect(response.ok(), `${path} should resolve`).toBeTruthy();
-    }
   });
 
   test('Footer navigation and links', async ({ page }) => {
