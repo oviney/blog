@@ -48,9 +48,16 @@
     "puppeteer": "^25.16.0",
     "js-yaml": "^4.2.0",
     "@lhci/cli": {
-      "uuid": "npm:@smithy/uuid@^1.1.2"
+      "uuid": "npm:@smithy/uuid@^1.1.2",
+      "chrome-launcher": "^1.2.2"
     },
-    "lighthouse": "$lighthouse"
+    "lighthouse": "$lighthouse",
+    "@sentry/bundler-plugins": {
+      "glob": "^14.0.2"
+    },
+    "pa11y-ci": {
+      "globby": "^11.1.0"
+    }
   },
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
